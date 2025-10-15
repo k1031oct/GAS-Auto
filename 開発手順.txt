@@ -1,0 +1,62 @@
+GAS Auto 開発手順書
+
+この手順書は、ローカル環境でコードを修正し、URLを変更せずに本番のWebアプリに反映させるまでの流れをまとめたものです。
+
+■ 開発ディレクトリ
+- C:\Users\k1031\OneDrive\ドキュメント\GAS Auto
+
+■ コード構成
+- サーバーサイド: /server ディレクトリ内の .gs ファイル
+- クライアントサイド: /ui ディレクトリ内の .html ファイル
+- モジュール定義: /modules.json
+
+■ 開発フロー
+
+1. コードの修正
+   開発ディレクトリ内にある .gs や .html, .json ファイルを編集します。
+
+2. 変更のプッシュ (GAS)
+   編集したファイルをGoogle Apps Scriptプロジェクトにアップロードします。
+   コマンド:
+   `clasp push`
+
+3. バージョンの作成
+   デプロイするために、現在のコード状態のスナップショット（バージョン）を作成します。
+   コマンド:
+   `clasp version "ここにバージョン名（例: v1.1 不具合修正）"`
+
+4. 本番環境へのデプロイ
+   作成したバージョンを、URLを変更せずに本番のWebアプリに反映させます。
+   - <デプロイID>: AKfycbzpPYteA6mHg8Reu-wt6UdOhDAYufTn_EGuLDhWxZWFhpog2W92coFPCWhjJ3ayM9gM4g
+
+   コマンド:
+   `clasp deploy --versionNumber <バージョン番号> --deploymentId AKfycbzpPYteA6mHg8Reu-wt6UdOhDAYufTn_EGuLDhWxZWFhpog2W92coFPCWhjJ3ayM9gM4g`
+
+4.5. Gitリポジトリの初期化とリモート設定
+   ローカルディレクトリがGitリポジリでない場合、以下のコマンドで初期化し、リモートリポジトリを設定します。
+   コマンド:
+   `git init`
+   `git remote add origin https://github.com/k1031oct/GAS-Auto.git`
+   `git pull origin master` (リモートリポジトリから最新の変更を取り込みます)
+
+5. 変更のプッシュ (GitHub)
+   デプロイが完了し、動作に問題がなければ、コードをGitHubリポジトリにプッシュして変更を記録します。
+   - リポジトリURL: https://github.com/k1031oct/GAS-Auto.git
+   コマンド:
+   `git add .`
+   `git commit -m "変更内容の要約"`
+   `git push origin master`
+
+■ 特記事項
+- `clasp login` はブラウザでの認証が必要なため、手動で実行してください。
+- `.clasp.json` ファイルの `scriptId` は、Google Apps Scriptプロジェクトの「プロジェクトの設定」から取得し、適切に設定してください。
+
+■ 参照データ
+- **GAS Workflow Builder (旧):** C:\Users\k1031\OneDrive\ドキュメント\GAS Builder
+- **File Organizer (統合対象):** C:\Users\k1031\OneDrive\ドキュメント\File Organizer
+
+■ モジュール開発について
+- 各モジュールは、`modules` ディレクトリ内の個別のJSONファイルとして定義されます。
+- モジュールのUI定義はJSONの `settings` フィールドに記述され、バックエンドロジックは `backendAction` と `backendParams` フィールドに宣言的に記述されます。
+- 新しいモジュールを追加する場合、`modules` ディレクトリに新しいJSONファイルを作成し、`backendAction` と `backendParams` を適切に定義してください。
+- `backendAction` に対応する実際の処理は、`BackendActionService.gs` に実装されます。新しい種類のバックエンド処理が必要な場合は、`BackendActionService.gs` を更新する必要があります。
