@@ -99,6 +99,10 @@ jobs:
               core.setOutput('additional_context', additionalContext);
             } else if (request.startsWith("@gemini-cli /triage")) {
               core.setOutput('command', 'triage');
+            } else if (request.startsWith("@gemini-cli /fix")) { // /fix コマンドをここで認識
+              core.setOutput('command', 'fix');
+              const additionalContext = request.replace(/^@gemini-cli \/fix/, '').trim();
+              core.setOutput('additional_context', additionalContext);
             } else if (request.startsWith("@gemini-cli")) {
               core.setOutput('command', 'invoke');
               const additionalContext = request.replace(/^@gemini-cli/, '').trim();
@@ -164,6 +168,23 @@ jobs:
     with:
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
     secrets: 'inherit'
+  
+  # ★★★ FIXジョブ（ai_auto_fix.ymlを呼び出す）を追加 ★★★
+  fix:
+    needs: 'dispatch'
+    if: |-
+      ${{ needs.dispatch.outputs.command == 'fix' }}
+    uses: './.github/workflows/ai_auto_fix.yml' # ai_auto_fix.yml を呼び出し
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+      issues: 'write'
+      pull-requests: 'write'
+    with:
+      issue_number: ${{ needs.dispatch.outputs.issue_number }}
+      prompt: '${{ needs.dispatch.outputs.request }}' # コメント全体をプロンプトとして渡す
+    secrets: 'inherit'
+  # ★★★ FIXジョブの追加ここまで ★★★
 
   fallthrough:
     needs:
@@ -171,6 +192,7 @@ jobs:
       - 'review'
       - 'triage'
       - 'invoke'
+      - 'fix' # ★★★ 依存関係に追加 ★★★
     if: |-
       ${{ always() && !cancelled() && (failure() || needs.dispatch.outputs.command == 'fallthrough') }}
     runs-on: 'ubuntu-latest'
