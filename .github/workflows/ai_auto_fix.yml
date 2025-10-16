@@ -28,47 +28,56 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- STEP 1: コンテキスト変数の設定 ---
-      - name: Set Context Variables (Unified)
-        id: set_context
+      # --- STEP 1: トリガー判定と変数確定 ---
+      - name: Determine Trigger Context
+        id: trigger_context
+        # シェルスクリプトを最大限にシンプルに保ち、変数の展開エラーを避ける
         run: |
-          # 1. ISSUE_NUM を設定
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-            ISSUE_NUM="${{ inputs.issue_number }}"
-          else
-            ISSUE_NUM="${{ github.event.issue.number }}"
-          fi
+          # 1. Issue番号の確定 (YAMLレベルで確定)
+          ISSUE_NUM="${{ github.event.issue.number || inputs.issue_number }}"
           
-          # 2. AI_TASK_PROMPT を設定
-          AI_TASK_PROMPT=""
-          
+          # 2. PROMPTの初期化 (inputs.prompt は存在する場合のみ使用)
+          AI_TASK_PROMPT="${{ inputs.prompt }}"
+          IS_AI_TRIGGERED="false"
+
           # ラベルによる起動の場合
-          if [[ "${{ github.event_name }}" == "issues" ]] && [[ "${{ github.event.label.name }}" == "ready-for-ai" ]]; then
-             AI_TASK_PROMPT="Fix the issue described in #${ISSUE_NUM} based on GEMINI.md."
+          if [ "${{ github.event.action }}" = "labeled" ] && [ "${{ github.event.label.name }}" = "ready-for-ai" ]; then
+            IS_AI_TRIGGERED="true"
+            AI_TASK_PROMPT="Fix the issue described in #${ISSUE_NUM} based on GEMINI.md."
           fi
-          
+
           # コメントによる起動の場合
-          if [[ "${{ github.event_name }}" == "issue_comment" ]]; then
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
             COMMENT_BODY="${{ github.event.comment.body }}"
             if echo "$COMMENT_BODY" | grep -q "@gemini-cli /fix"; then
-              AI_TASK_PROMPT="$COMMENT_BODY"
+              IS_AI_TRIGGERED="true"
+              # コメント全体をプロンプトとして使用 (workflow_callでない場合)
+              if [ "${{ github.event_name }}" != "workflow_call" ]; then
+                AI_TASK_PROMPT="$COMMENT_BODY"
+              fi
             fi
           fi
           
-          # workflow_call の場合、inputs.prompt を優先
-          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-             AI_TASK_PROMPT="${{ inputs.prompt }}"
+          # workflow_call の場合は既に IS_AI_TRIGGERED が true であり、inputs.prompt が設定されている
+          if [ -n "${{ inputs.prompt }}" ]; then
+              IS_AI_TRIGGERED="true"
+          fi
+          
+          # --- GITHUB_OUTPUTへの書き出し ---
+          if [ "$IS_AI_TRIGGERED" = "true" ]; then
+              echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
+              echo "ai_prompt=$AI_TASK_PROMPT" >> $GITHUB_OUTPUT
+              echo "is_triggered=true" >> $GITHUB_OUTPUT
+          else
+              echo "::notice file=ai_auto_fix.yml::No explicit AI trigger detected. Skipping job."
+              echo "is_triggered=false" >> $GITHUB_OUTPUT
+              exit 0
           fi
 
-          echo "ISSUE_NUM=$ISSUE_NUM" >> $GITHUB_OUTPUT
-          echo "AI_TASK_PROMPT=$AI_TASK_PROMPT" >> $GITHUB_OUTPUT
-          
-        # このステップでは、トリガー判定は行わず、変数に値を格納するだけに留める。
-        # トリガー判定は次のステップの 'if' 条件に委譲する。
 
       - name: Run Gemini CLI for Code Fix
-        # 修正: トリガー判定をここで実施。AI_TASK_PROMPTが空ではないことを確認。
-        if: steps.set_context.outputs.AI_TASK_PROMPT != '' && secrets.GEMINI_API_KEY != ''
+        # secrets.GEMINI_API_KEY が設定されていることを確認し、トリガーが有効な場合のみ実行
+        if: steps.trigger_context.outputs.is_triggered == 'true' && secrets.GEMINI_API_KEY != ''
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -77,7 +86,7 @@ jobs:
             Your task is to implement the necessary changes to solve the following request, strictly adhering to the instructions and constraints in the GEMINI.md file and the issue description.
 
             # TASK
-            ${{ steps.set_context.outputs.AI_TASK_PROMPT }}
+            ${{ steps.trigger_context.outputs.ai_prompt }}
 
             # PROJECT CONTEXT
             The existing code structure (Code.gs, WorkflowService.gs, ModuleService.gs, etc.) and the UI (index.html, javascript.html) are part of a merged project.
@@ -87,7 +96,8 @@ jobs:
             - Ensure ModuleService dynamically loads JSON definitions from Drive.
             - Omit all API secret management functions.
             
-          command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ steps.set_context.outputs.ISSUE_NUM }}"
+          # PR作成とコミットを自動化
+          command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ steps.trigger_context.outputs.issue_num }}"
 
       - name: Log Completion
         if: always()
