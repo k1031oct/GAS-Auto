@@ -27,7 +27,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # この設定は念のため残しておきます
           submodules: false
+
+      # ★★★ ここから追加 ★★★
+      # クリーンアップ処理が失敗する原因のファイルを強制的に削除する
+      - name: Remove broken submodule configuration
+        run: rm -f .gitmodules
+      # ★★★ ここまで追加 ★★★
 
       - name: Run Gemini CLI for Code Fix
         uses: google-github-actions/run-gemini-cli@v0
