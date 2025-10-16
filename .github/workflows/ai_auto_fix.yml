@@ -1,0 +1,85 @@
+name: 🤖 Gemini AI Agent Autonomy
+
+on:
+  # Issueに特定のラベルが追加されたときにトリガー
+  issues:
+    types: [labeled]
+  # プルリクエストにコメントがついたときにトリガー (@gemini-cliのメンションを監視)
+  issue_comment:
+    types: [created]
+
+jobs:
+  ai_agent_fixer:
+    # プライベートリポジトリの場合、料金が発生しない標準ランナーを使用
+    runs-on: ubuntu-latest
+
+    # 権限設定: PRへの書き込みとIssueへの書き込みを許可
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # AIにリポジトリ全体を理解させるため
+
+      - name: Check for AI Trigger
+        id: trigger_check
+        run: |
+          IS_AI_TRIGGERED="false"
+          # 1. ラベルによるトリガーチェック
+          if [ "${{ github.event.action }}" == "labeled" ] && [ "${{ github.event.label.name }}" == "ready-for-ai" ]; then
+            IS_AI_TRIGGERED="true"
+            echo "AI_TASK_TYPE=ISSUE_FIX" >> $GITHUB_OUTPUT
+            echo "AI_TASK_PROMPT=Fix the issue described in #${{ github.event.issue.number }} based on GEMINI.md." >> $GITHUB_OUTPUT
+          fi
+
+          # 2. コメントによるトリガーチェック (@gemini-cli fix...)
+          if [ "${{ github.event.issue.pull_request }}" == "" ] && [ "${{ github.event.comment.body }}" != "" ]; then
+            if echo "${{ github.event.comment.body }}" | grep -q "@gemini-cli fix"; then
+              IS_AI_TRIGGERED="true"
+              echo "AI_TASK_TYPE=COMMENT_FIX" >> $GITHUB_OUTPUT
+              echo "AI_TASK_PROMPT=${{ github.event.comment.body }}" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+          echo "IS_AI_TRIGGERED=$IS_AI_TRIGGERED" >> $GITHUB_OUTPUT
+          
+          # トリガーされなければジョブをスキップ
+          if [ "$IS_AI_TRIGGERED" == "false" ]; then
+            echo "::notice file=main.yml::No AI trigger detected. Skipping job."
+            exit 0
+          fi
+        # Issue bodyからコンテキストを取得し、プロンプトを構築するロジックをここにさらに追加できます
+
+      - name: Run Gemini CLI for Code Fix
+        # 必要な認証情報がない場合はスキップする
+        if: steps.trigger_check.outputs.IS_AI_TRIGGERED == 'true' && secrets.GEMINI_API_KEY
+        uses: google-github-actions/run-gemini-cli@v0
+        with:
+          # Google AI Studioから取得したAPIキー
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          # 実行するプロンプト。GEMINI.mdと Issueの内容を参照するように指示
+          prompt: |
+            You are an expert Google Apps Script developer specialized in workflow automation and modern web UI (Tailwind CSS).
+            Your task is to implement the necessary changes to solve the following request, strictly adhering to the instructions and constraints in the GEMINI.md file and the issue description.
+
+            # TASK
+            ${{ steps.trigger_check.outputs.AI_TASK_PROMPT }}
+
+            # PROJECT CONTEXT
+            The existing code structure (Code.gs, WorkflowService.gs, ModuleService.gs, etc.) and the UI (index.html, javascript.html) are part of a merged project.
+            The main goal is to integrate all required changes (Tailwind CSS conversion, Drive JSON module loading, API management omission).
+
+            - Always convert legacy styling (MDL/Inline CSS) to Tailwind CSS.
+            - Ensure ModuleService dynamically loads JSON definitions from Drive.
+            - Omit all API secret management functions.
+            
+          # AIがコードを修正する権限を与え、PRを自動作成
+          command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ github.event.issue.number }}"
+
+      - name: Log Completion
+        if: success() || failure()
+        run: echo "AI Agent run finished."
