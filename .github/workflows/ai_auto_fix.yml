@@ -1,21 +1,28 @@
-name: 🤖 Gemini AI Agent Autonomy
+name: 🤖 AI Auto Fix
+run-name: 🤖 AI is fixing issue ${{ inputs.issue_number || github.event.issue.number }}
 
+# ワークフローのトリガー (この部分は削除しません)
 on:
-  issues:
-    types: [labeled]
-  issue_comment:
-    types: [created]
+  # 1. 'gemini-dispatch.yml' から手動で呼び出される
   workflow_call:
     inputs:
       issue_number:
-        type: number
         required: true
-      prompt:
         type: string
+      prompt:
         required: true
+        type: string
+
+  # 2. Issueにラベルが付与されたときに直接実行
+  issues:
+    types: [labeled]
+
+  # 3. Issueにコメントが投稿されたときに直接実行
+  issue_comment:
+    types: [created]
 
 jobs:
-  ai_agent_fixer:
+  auto-fix:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -28,42 +35,43 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- STEP 1: トリガー判定と変数確定 ---
+      # --- STEP 1: トリガー判定と変数確定 (★ここを修正★) ---
       - name: Determine Trigger Context
         id: trigger_context
-        # シェルスクリプトを最大限にシンプルに保ち、変数の展開エラーを避ける
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_NUMBER_EVENT: ${{ github.event.issue.number }}
+          ISSUE_NUMBER_INPUT: ${{ inputs.issue_number }}
+          PROMPT_INPUT: ${{ inputs.prompt }}
         run: |
-          # 1. Issue番号の確定 (YAMLレベルで確定)
-          ISSUE_NUM="${{ github.event.issue.number || inputs.issue_number }}"
-          
-          # 2. PROMPTの初期化 (inputs.prompt は存在する場合のみ使用)
-          AI_TASK_PROMPT="${{ inputs.prompt }}"
+          # 各変数を初期化
+          ISSUE_NUM=""
+          AI_TASK_PROMPT=""
           IS_AI_TRIGGERED="false"
 
-          # ラベルによる起動の場合
-          if [ "${{ github.event.action }}" = "labeled" ] && [ "${{ github.event.label.name }}" = "ready-for-ai" ]; then
+          # 1. workflow_callによる起動を最優先で判定
+          if [ -n "$ISSUE_NUMBER_INPUT" ]; then
             IS_AI_TRIGGERED="true"
+            ISSUE_NUM="$ISSUE_NUMBER_INPUT"
+            AI_TASK_PROMPT="$PROMPT_INPUT"
+          # 2. ラベルによる起動を判定
+          elif [ "$EVENT_ACTION" = "labeled" ] && [ "$LABEL_NAME" = "ready-for-ai" ]; then
+            IS_AI_TRIGGERED="true"
+            ISSUE_NUM="$ISSUE_NUMBER_EVENT"
             AI_TASK_PROMPT="Fix the issue described in #${ISSUE_NUM} based on GEMINI.md."
-          fi
-
-          # コメントによる起動の場合
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            COMMENT_BODY="${{ github.event.comment.body }}"
+          # 3. コメントによる起動を判定
+          elif [ "$EVENT_NAME" = "issue_comment" ]; then
             if echo "$COMMENT_BODY" | grep -q "@gemini-cli /fix"; then
               IS_AI_TRIGGERED="true"
-              # コメント全体をプロンプトとして使用 (workflow_callでない場合)
-              if [ "${{ github.event_name }}" != "workflow_call" ]; then
-                AI_TASK_PROMPT="$COMMENT_BODY"
-              fi
+              ISSUE_NUM="$ISSUE_NUMBER_EVENT"
+              AI_TASK_PROMPT="$COMMENT_BODY"
             fi
           fi
           
-          # workflow_call の場合は既に IS_AI_TRIGGERED が true であり、inputs.prompt が設定されている
-          if [ -n "${{ inputs.prompt }}" ]; then
-              IS_AI_TRIGGERED="true"
-          fi
-          
-          # --- GITHUB_OUTPUTへの書き出し ---
+          # 最終的にトリガーが有効だった場合のみ、後続ステップで使う変数を出力
           if [ "$IS_AI_TRIGGERED" = "true" ]; then
               echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
               echo "ai_prompt=$AI_TASK_PROMPT" >> $GITHUB_OUTPUT
@@ -71,9 +79,7 @@ jobs:
           else
               echo "::notice file=ai_auto_fix.yml::No explicit AI trigger detected. Skipping job."
               echo "is_triggered=false" >> $GITHUB_OUTPUT
-              exit 0
           fi
-
 
       - name: Run Gemini CLI for Code Fix
         # secrets.GEMINI_API_KEY が設定されていることを確認し、トリガーが有効な場合のみ実行
@@ -96,7 +102,6 @@ jobs:
             - Ensure ModuleService dynamically loads JSON definitions from Drive.
             - Omit all API secret management functions.
             
-          # PR作成とコミットを自動化
           command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ steps.trigger_context.outputs.issue_num }}"
 
       - name: Log Completion
