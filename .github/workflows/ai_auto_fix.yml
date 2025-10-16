@@ -1,13 +1,10 @@
 name: 🤖 Gemini AI Agent Autonomy
 
 on:
-  # Issueに特定のラベルが追加されたときにトリガー
   issues:
     types: [labeled]
-  # プルリクエストにコメントがついたときにトリガー (@gemini-cliのメンションを監視)
   issue_comment:
     types: [created]
-  # gemini-dispatch.yml からの呼び出しを許可する
   workflow_call:
     inputs:
       issue_number:
@@ -34,26 +31,25 @@ jobs:
       - name: Check for AI Trigger and Set Context
         id: trigger_check
         run: |
-          # 初期値を設定
+          # --- 変数の初期化 ---
           IS_AI_TRIGGERED="false"
           ISSUE_NUM=""
           AI_TASK_PROMPT=""
           
-          # 1. workflow_call (Dispatch) からの実行
-          if [ "${{ github.event_name }}" == "workflow_call" ]; then
+          # 1. workflow_call (Dispatch) からの実行の場合
+          if [[ "${{ github.event_name }}" == "workflow_call" ]]; then
             IS_AI_TRIGGERED="true"
             ISSUE_NUM="${{ inputs.issue_number }}"
+            # workflow_callでは inputs.prompt を直接使用
             AI_TASK_PROMPT="${{ inputs.prompt }}"
           
-          # 2. ラベルまたはコメントからの直接実行
+          # 2. Issues / Issue_comment (直接トリガー) からの実行の場合
           else
-            # Issue番号の取得 (コメント/ラベルイベントの場合)
-            if [ -n "${{ github.event.issue.number }}" ]; then
-              ISSUE_NUM="${{ github.event.issue.number }}"
-            fi
-
+            # Issue番号の取得 (直接トリガーの場合は event.issue.number を使用)
+            ISSUE_NUM="${{ github.event.issue.number }}"
+            
             # A. ラベル (ready-for-ai) による起動
-            if [ "${{ github.event.action }}" == "labeled" ] && [ "${{ github.event.label.name }}" == "ready-for-ai" ]; then
+            if [[ "${{ github.event.action }}" == "labeled" ]] && [[ "${{ github.event.label.name }}" == "ready-for-ai" ]]; then
               IS_AI_TRIGGERED="true"
               AI_TASK_PROMPT="Fix the issue described in #${ISSUE_NUM} based on GEMINI.md."
             fi
@@ -61,7 +57,7 @@ jobs:
             # B. コメント (@gemini-cli /fix) による起動
             COMMENT_BODY="${{ github.event.comment.body }}"
             
-            if [ "${{ github.event_name }}" == "issue_comment" ] && echo "$COMMENT_BODY" | grep -q "@gemini-cli /fix"; then
+            if [[ "${{ github.event_name }}" == "issue_comment" ]] && echo "$COMMENT_BODY" | grep -q "@gemini-cli /fix"; then
               IS_AI_TRIGGERED="true"
               # コメント全体をプロンプトとして使用
               AI_TASK_PROMPT="$COMMENT_BODY"
@@ -81,8 +77,8 @@ jobs:
 
 
       - name: Run Gemini CLI for Code Fix
-        # 修正: 'if' 条件をステップに移動し、変数を確実に展開
-        if: steps.trigger_check.outputs.IS_AI_TRIGGERED == 'true' && secrets.GEMINI_API_KEY
+        # secrets.GEMINI_API_KEY が設定されていることを確認
+        if: steps.trigger_check.outputs.IS_AI_TRIGGERED == 'true' && secrets.GEMINI_API_KEY != ''
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -101,6 +97,7 @@ jobs:
             - Ensure ModuleService dynamically loads JSON definitions from Drive.
             - Omit all API secret management functions.
             
+          # PR作成とコミットを自動化
           command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ steps.trigger_check.outputs.ISSUE_NUM }}"
 
       - name: Log Completion
