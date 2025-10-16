@@ -1,9 +1,7 @@
 name: 🤖 AI Auto Fix
 run-name: 🤖 AI is fixing issue ${{ inputs.issue_number || github.event.issue.number }}
 
-# ワークフローのトリガー (この部分は削除しません)
 on:
-  # 1. 'gemini-dispatch.yml' から手動で呼び出される
   workflow_call:
     inputs:
       issue_number:
@@ -12,12 +10,8 @@ on:
       prompt:
         required: true
         type: string
-
-  # 2. Issueにラベルが付与されたときに直接実行
   issues:
     types: [labeled]
-
-  # 3. Issueにコメントが投稿されたときに直接実行
   issue_comment:
     types: [created]
 
@@ -35,7 +29,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # --- STEP 1: トリガー判定と変数確定 (★ここを修正★) ---
       - name: Determine Trigger Context
         id: trigger_context
         env:
@@ -47,22 +40,17 @@ jobs:
           ISSUE_NUMBER_INPUT: ${{ inputs.issue_number }}
           PROMPT_INPUT: ${{ inputs.prompt }}
         run: |
-          # 各変数を初期化
           ISSUE_NUM=""
           AI_TASK_PROMPT=""
           IS_AI_TRIGGERED="false"
-
-          # 1. workflow_callによる起動を最優先で判定
           if [ -n "$ISSUE_NUMBER_INPUT" ]; then
             IS_AI_TRIGGERED="true"
             ISSUE_NUM="$ISSUE_NUMBER_INPUT"
             AI_TASK_PROMPT="$PROMPT_INPUT"
-          # 2. ラベルによる起動を判定
           elif [ "$EVENT_ACTION" = "labeled" ] && [ "$LABEL_NAME" = "ready-for-ai" ]; then
             IS_AI_TRIGGERED="true"
             ISSUE_NUM="$ISSUE_NUMBER_EVENT"
             AI_TASK_PROMPT="Fix the issue described in #${ISSUE_NUM} based on GEMINI.md."
-          # 3. コメントによる起動を判定
           elif [ "$EVENT_NAME" = "issue_comment" ]; then
             if echo "$COMMENT_BODY" | grep -q "@gemini-cli /fix"; then
               IS_AI_TRIGGERED="true"
@@ -70,8 +58,6 @@ jobs:
               AI_TASK_PROMPT="$COMMENT_BODY"
             fi
           fi
-          
-          # 最終的にトリガーが有効だった場合のみ、後続ステップで使う変数を出力
           if [ "$IS_AI_TRIGGERED" = "true" ]; then
               echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
               echo "ai_prompt=$AI_TASK_PROMPT" >> $GITHUB_OUTPUT
@@ -81,8 +67,17 @@ jobs:
               echo "is_triggered=false" >> $GITHUB_OUTPUT
           fi
 
+      # --- ★ここから修正★ ---
+      # STEP 2: Pull Requestのタイトルを安全に生成する
+      - name: Prepare PR Title
+        id: prepare_pr
+        if: steps.trigger_context.outputs.is_triggered == 'true'
+        run: |
+          TITLE="fix: AI implemented changes for issue #${{ steps.trigger_context.outputs.issue_num }}"
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+
+      # STEP 3: Gemini CLIを実行する
       - name: Run Gemini CLI for Code Fix
-        # secrets.GEMINI_API_KEY が設定されていることを確認し、トリガーが有効な場合のみ実行
         if: steps.trigger_context.outputs.is_triggered == 'true' && secrets.GEMINI_API_KEY != ''
         uses: google-github-actions/run-gemini-cli@v0
         with:
@@ -101,8 +96,9 @@ jobs:
             - Always convert legacy styling (MDL/Inline CSS) to Tailwind CSS.
             - Ensure ModuleService dynamically loads JSON definitions from Drive.
             - Omit all API secret management functions.
-            
-          command: /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ steps.trigger_context.outputs.issue_num }}"
+          # 前のステップで生成したタイトルを安全に参照する
+          command: /fix --auto-commit --pr-title "${{ steps.prepare_pr.outputs.title }}"
+      # --- ★ここまで修正★ ---
 
       - name: Log Completion
         if: always()
