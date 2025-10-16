@@ -28,20 +28,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare PR Title
-        id: prepare_pr
-        run: |
-          TITLE="fix: AI implemented changes for issue #${{ inputs.issue_number }}"
-          echo "title=$TITLE" >> $GITHUB_OUTPUT
-
-
       - name: Run Gemini CLI for Code Fix
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-
           prompt: |
-            /fix --auto-commit --pr-title "${{ steps.prepare_pr.outputs.title }}"
+            /fix --auto-commit --pr-title "fix: AI implemented changes for issue #${{ inputs.issue_number }}"
 
             You are an expert Google Apps Script developer specialized in workflow automation and modern web UI (Tailwind CSS).
             Your task is to implement the necessary changes to solve the following request, strictly adhering to the instructions and constraints in the GEMINI.md file and the issue description.
@@ -59,4 +51,5 @@ jobs:
 
       - name: Log Completion
         if: always()
-        run: echo "AI Agent run finished for issue #${{ inputs.issue_number }}"
+        run: |
+          echo "AI Agent run finished for issue #${{ inputs.issue_number }}"
