@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <base target="_top">
+  <title>GAS File & Workflow Automator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-color-hover: #2563eb;
+      --accent-color: #f97316;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    /* SortableJS Ghost style */
+    .sortable-ghost {
+      opacity: 0.4;
+      background-color: #bfdbfe;
+      border: 2px dashed var(--primary-color);
+    }
+
+    /* Custom Scrollbar for Pre */
+    #log-content {
+      scrollbar-color: #4b5563 #374151;
+      scrollbar-width: thin;
+      font-size: 0.8rem;
+    }
+    
+    .cursor-ns-resize {
+        cursor: ns-resize;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+  <?!= include('javascript.html'); ?>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+  <div id="app" class="flex flex-col h-screen overflow-hidden">
+    <!-- Header -->
+    <header class="bg-white shadow-lg p-3 flex items-center justify-between flex-shrink-0 z-10">
+      <div class="flex items-center gap-3">
+        <i class="fas fa-cubes text-3xl text-blue-600"></i>
+        <h1 class="text-xl font-extrabold text-gray-800">GAS Workflow Automator</h1>
+        <span id="dirty-indicator" class="text-xs text-red-500 font-bold hidden">*未保存の変更</span>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <select id="workflow-selector" class="border border-gray-300 rounded-lg px-3 py-1.5 bg-white shadow-sm text-sm focus:ring-2 focus:ring-blue-500 transition-all">
+          <option value="">-- 新規ワークフロー --</option>
+        </select>
+        
+        <button id="new-workflow-btn" title="新規作成" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"><i class="fas fa-plus"></i></button>
+        <button id="save-workflow-btn" title="保存" class="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 shadow-md transition-colors"><i class="fas fa-save"></i></button>
+        <button id="delete-workflow-btn" title="削除" class="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-md transition-colors disabled:bg-gray-300" disabled><i class="fas fa-trash"></i></button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="trigger-btn" title="定期実行/トリガーを設定" class="p-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 shadow-md transition-colors"><i class="fas fa-clock"></i></button>
+        <button id="history-btn" title="実行履歴シートを開く" class="p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md transition-colors"><i class="fas fa-history"></i></button>
+        <button id="run-btn" title="実行" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"><i class="fas fa-play mr-2"></i>実行</button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex flex-row overflow-hidden">
+      <!-- Module Palette (Sidebar) -->
+      <aside id="module-palette" class="w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 overflow-y-auto">
+        <div class="p-4 border-b">
+          <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
+          <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div id="module-list" class="p-3 space-y-3 flex-grow overflow-y-auto">
+          <p class="text-center text-sm text-gray-400 p-4">Google Driveからモジュールを読み込み中...</p>
+        </div>
+      </aside>
+
+      <!-- Workflow Editor -->
+      <section id="main-area" class="flex-grow p-4 overflow-y-auto bg-gray-50">
+        <div id="settings-area" class="bg-white p-4 rounded-xl shadow-md mb-6 border border-gray-200">
+          <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-gray-800">ワークフロー設定</h2>
+              <span id="workflow-name-display" class="text-lg font-extrabold text-blue-800">新規ワークフロー</span>
+          </div>
+
+          <label for="module-folder-id" class="font-bold text-gray-700 text-sm block mb-2">
+             カスタムモジュールJSONフォルダID <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="module-folder-id" placeholder="Google DriveのモジュールJSONファイルが格納されているフォルダID" 
+                 class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                 <p class="text-xs text-gray-500 mt-1">このフォルダID内のJSONファイルがモジュールパレットに表示されます。**再読み込みボタン**で更新。</p>
+          <div class="flex justify-end mt-3">
+              <button id="reload-modules-btn" class="px-3 py-1 text-sm bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"><i class="fas fa-sync-alt mr-2"></i>モジュールを再読み込み</button>
+          </div>
+        </div>
+        <div id="workflow-container" class="space-y-4 min-h-[50vh] p-4 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner">
+          <div class="text-center text-gray-500 p-8">
+            <i class="fas fa-arrow-left text-4xl mb-3 text-gray-300"></i>
+            <p>左側のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+            <p class="text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer (Log Area) -->
+    <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-48 flex flex-col">
+      <div id="resize-handle" class="w-full h-2 cursor-ns-resize hover:bg-gray-700 transition-colors"></div>
+      <div class="p-3 flex flex-col flex-grow overflow-hidden">
+        <h3 class="font-mono text-sm font-bold text-gray-200 mb-1">実行ログ</h3>
+        <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300"></pre>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Custom Dialog (Modal replacement) -->
+  <div id="custom-dialog-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[60]">
+    <div id="custom-dialog" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="p-4 border-b border-gray-200">
+        <h2 id="custom-dialog-title" class="text-lg font-bold text-gray-800"></h2>
+      </div>
+      <div class="p-6">
+        <p id="custom-dialog-message" class="text-gray-600 mb-4"></p>
+        <input type="text" id="custom-dialog-input" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm hidden">
+      </div>
+      <div id="custom-dialog-footer" class="p-4 bg-gray-50 border-t flex justify-end gap-3">
+        <button id="custom-dialog-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">キャンセル</button>
+        <button id="custom-dialog-ok" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader Overlay -->
+  <div id="loader" class="fixed inset-0 bg-white bg-opacity-70 hidden items-center justify-center z-[60]">
+    <div class="text-center"><i class="fas fa-sync fa-spin text-4xl text-blue-600"></i>
+      <p class="mt-2 text-gray-700">処理中です...</p>
+    </div>
+  </div>
+</body>
+
+</html>
