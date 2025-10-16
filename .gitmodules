@@ -1,6 +1,0 @@
-[submodule "libs/builder"]
-	path = libs/builder
-	url = https://github.com/k1031oct/GAS-Auto-Builder.git
-[submodule "libs/Organizer"]
-	path = libs/Organizer
-	url = https://github.com/k1031oct/GAS-Aoto-Organizer.git
