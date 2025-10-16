@@ -81,6 +81,7 @@ jobs:
 
 
       - name: Run Gemini CLI for Code Fix
+        # 修正: 'if' 条件をステップに移動し、変数を確実に展開
         if: steps.trigger_check.outputs.IS_AI_TRIGGERED == 'true' && secrets.GEMINI_API_KEY
         uses: google-github-actions/run-gemini-cli@v0
         with:
