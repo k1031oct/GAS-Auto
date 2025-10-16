@@ -8,32 +8,36 @@ on:
     types: [created]
 
 jobs:
+  # === コメントをトリガーとするジョブ ===
   dispatch-on-comment:
-    # コメントが自分自身（bot）でなく、`/fix` を含む場合のみ実行
+    # 実行条件：ボットからのコメントではなく、特定のコマンドを含む
     if: github.event.sender.type != 'Bot' && contains(github.event.comment.body, '@gemini-cli /fix')
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write # workflow_callを呼び出すために必要
-    steps:
-      - name: Call AI Code Generator
-        uses: ./.github/workflows/ai-code-generator.yml
-        with:
-          issue_number: ${{ github.event.issue.number }}
-          prompt: ${{ github.event.comment.body }}
-        secrets:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    
+    # ジョブの定義：ステップを実行するのではなく、別のワークフローを呼び出す
+    uses: ./.github/workflows/ai-code-generator.yml
+    
+    # 呼び出すワークフローに渡すパラメータ
+    with:
+      issue_number: ${{ github.event.issue.number }}
+      prompt: ${{ github.event.comment.body }}
+      
+    # 呼び出すワークフローに渡すシークレット
+    secrets:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
+  # === ラベルをトリガーとするジョブ ===
   dispatch-on-label:
-    # 'ready-for-ai' ラベルが付与された場合のみ実行
+    # 実行条件：特定のラベルが付与された
     if: github.event.label.name == 'ready-for-ai'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-    steps:
-      - name: Call AI Code Generator
-        uses: ./.github/workflows/ai-code-generator.yml
-        with:
-          issue_number: ${{ github.event.issue.number }}
-          prompt: "Fix the issue described in #${{ github.event.issue.number }} based on GEMINI.md."
-        secrets:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    
+    # ジョブの定義：ステップを実行するのではなく、別のワークフローを呼び出す
+    uses: ./.github/workflows/ai-code-generator.yml
+    
+    # 呼び出すワークフローに渡すパラメータ
+    with:
+      issue_number: ${{ github.event.issue.number }}
+      prompt: "Fix the issue described in #${{ github.event.issue.number }} based on GEMINI.md."
+      
+    # 呼び出すワークフローに渡すシークレット
+    secrets:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
