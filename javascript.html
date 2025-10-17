@@ -45,6 +45,7 @@
       settingsCloseBtn: document.getElementById('settings-close-btn'),
       settingsModuleFolderIdInput: document.getElementById('settings-module-folder-id'),
       darkModeToggle: document.getElementById('dark-mode-toggle'),
+      createInitialModulesBtn: document.getElementById('create-initial-modules-btn'),
     };
 
     // --- State Management ---
@@ -266,25 +267,32 @@
           applySettings(settings);
           state.currentModuleFolderId = folderId;
           app.moduleFolderIdInput.value = folderId; // メイン画面の入力欄も更新
-
-          // 初回設定時のみモジュールを生成
-          if (folderId) {
-            google.script.run
-              .withSuccessHandler((result) => {
-                log(result, 'success');
-                loadModuleDefinitionsFromDrive(); // 再読み込み
-                hideLoader();
-                closeSettingsModal();
-              })
-              .withFailureHandler(showError)
-              .createInitialModules(folderId);
-          } else {
-            hideLoader();
-            closeSettingsModal();
-          }
+          hideLoader();
+          closeSettingsModal();
         })
         .withFailureHandler(showError)
         .saveSettings(settings);
+    };
+
+    const handleCreateInitialModules = () => {
+      const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
+      const folderId = _extractIdFromUrl(rawFolderId);
+
+      if (!folderId) {
+        showError({ message: 'モジュール保管用フォルダIDが入力されていません。' });
+        return;
+      }
+
+      showLoader();
+      google.script.run
+        .withSuccessHandler((result) => {
+          log(result, 'success');
+          // モジュールが生成された可能性があるので、リストを再読み込み
+          loadModuleDefinitionsFromDrive(); 
+          hideLoader();
+        })
+        .withFailureHandler(showError)
+        .createInitialModules(folderId);
     };
     
     const applySettings = (settings) => {
@@ -641,6 +649,7 @@
         app.settingsBtn.addEventListener('click', openSettingsModal);
         app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
         app.settingsSaveBtn.addEventListener('click', saveSettings);
+        app.createInitialModulesBtn.addEventListener('click', handleCreateInitialModules);
     };
 
     const handleWorkflowSelect = async () => {
