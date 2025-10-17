@@ -15,6 +15,7 @@ jobs:
     steps:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
+        # refを削除し、PRブランチ全体をチェックアウトする
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -29,7 +30,6 @@ jobs:
       - name: Create .clasp.json for Review Environment
         run: |
           echo "Creating .clasp.json pointed to the review script..."
-          # GAS_SCRIPT_ID を参照するように修正
           if [[ -z "${{ secrets.GAS_SCRIPT_ID }}" ]]; then
             echo "::error::GAS_SCRIPT_ID secret is not set. Please ensure the review script ID is saved under this name."
             exit 1
@@ -53,10 +53,17 @@ jobs:
           > ~/.clasprc.json
           echo "Credentials configured."
 
+      # ★★★ ここから追加 ★★★
+      - name: Push all files to GAS Editor
+        run: |
+          echo "Pushing all project files to Google Apps Script..."
+          clasp push --force
+          echo "Push completed successfully."
+      # ★★★ ここまで追加 ★★★
+
       - name: Deploy to Review Environment
         id: deploy_gas
         run: |
-          # GAS_SCRIPT_ID を参照するように修正
           echo "Deploying to Review Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
           clasp deploy --deploymentId ${{ secrets.GAS_DEV_DEPLOYMENT_ID }} --description "Review Deployment for PR #${{ github.event.pull_request.number }}"
 
@@ -82,3 +89,4 @@ jobs:
                 After reviewing, please merge the PR if there are no issues.
               `
             });
+
