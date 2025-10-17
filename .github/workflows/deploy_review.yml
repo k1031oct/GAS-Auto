@@ -52,6 +52,81 @@ jobs:
           > ~/.clasprc.json
           echo "Credentials configured."
 
+      - name: Authenticate with Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Synchronize Remote File Names
+        run: |
+          echo "Synchronizing remote file names with local state..."
+          ACCESS_TOKEN=$(gcloud auth print-access-token)
+          SCRIPT_ID="${{ secrets.GAS_SCRIPT_ID }}"
+          API_URL="https://script.googleapis.com/v1/projects/$SCRIPT_ID/content"
+
+          # Get remote file list
+          REMOTE_CONTENT=$(curl -s -H "Authorization: Bearer $ACCESS_TOKEN" "$API_URL")
+          if [ -z "$REMOTE_CONTENT" ]; then
+            echo "::error::Failed to fetch remote project content. The response was empty."
+            exit 1
+          fi
+          echo "Successfully fetched remote file content."
+
+          # Extract remote file names, excluding appsscript.json
+          REMOTE_FILES=$(echo "$REMOTE_CONTENT" | jq -r '.files[] | select(.name != "appsscript") | .name')
+          echo "Remote files: $REMOTE_FILES"
+
+          # Get local file list from appsscript.json's filePushOrder
+          # Fallback to filesystem if filePushOrder is not present
+          LOCAL_FILES_FROM_JSON=$(jq -r '.filePushOrder[]' appsscript.json 2>/dev/null)
+          if [ -z "$LOCAL_FILES_FROM_JSON" ]; then
+            echo "filePushOrder not found in appsscript.json, scanning filesystem..."
+            # Find all .gs and .html files, strip extensions, and handle subdirectories
+            LOCAL_FILES=$(find . -name "*.gs" -o -name "*.html" | sed -e 's|^\./||' -e 's|\.gs$||' -e 's|\.html$||' | grep -v '^Tests/TestRunner$' | grep -v '^appsscript$')
+          else
+            echo "Using filePushOrder from appsscript.json."
+            # Strip extensions from the file names in filePushOrder
+            LOCAL_FILES=$(echo "$LOCAL_FILES_FROM_JSON" | sed -e 's|\.gs$||' -e 's|\.html$||')
+          fi
+          echo "Local files: $LOCAL_FILES"
+
+          # Identify files that exist remotely but not locally
+          FILES_TO_DELETE=""
+          for REMOTE_FILE in $REMOTE_FILES; do
+            # Check if the remote file (case-insensitive) exists in the local file list
+            if ! echo "$LOCAL_FILES" | grep -iq "^$REMOTE_FILE$"; then
+              FILES_TO_DELETE="$FILES_TO_DELETE $REMOTE_FILE"
+            fi
+          done
+
+          if [ -z "$FILES_TO_DELETE" ]; then
+            echo "No remote files to delete. Local and remote states are synchronized."
+          else
+            echo "Files to delete from remote: $FILES_TO_DELETE"
+            # Create a request body to update content, effectively deleting the files by not including them
+            # We need to provide the full, correct file structure for the update, so we build it from local files
+            
+            echo "Building payload to update remote content..."
+            # Start with appsscript.json
+            APPS_SCRIPT_JSON_CONTENT=$(cat appsscript.json | jq -c '.')
+            PAYLOAD="{\"files\":[{\"name\":\"appsscript\",\"type\":\"JSON\",\"source\":$APPS_SCRIPT_JSON_CONTENT}"
+            
+            # Add all local files to the payload
+            for FILE_PATH in $(echo "$LOCAL_FILES_FROM_JSON"); do
+              FILE_NAME=$(basename "$FILE_PATH" | sed -e 's|\.gs$||' -e 's|\.html$||')
+              FILE_TYPE=$(echo "$FILE_PATH" | awk -F. '{if ($NF=="gs") print "SERVER_JS"; else if ($NF=="html") print "HTML"}')
+              # Read file content and escape it for JSON
+              FILE_CONTENT=$(cat "$FILE_PATH" | jq -Rs '.')
+              PAYLOAD="$PAYLOAD,{\"name\":\"$FILE_NAME\",\"type\":\"$FILE_TYPE\",\"source\":$FILE_CONTENT}"
+            done
+            PAYLOAD="$PAYLOAD]}"
+
+            echo "Sending update request to remove obsolete files..."
+            curl -s -X PUT -H "Authorization: Bearer $ACCESS_TOKEN" -H "Content-Type: application/json" \
+              -d "$PAYLOAD" "$API_URL"
+            echo "Remote content updated successfully."
+          fi
+
       - name: Push all files to GAS Editor
         run: |
           echo "Pushing all project files to Google Apps Script..."
