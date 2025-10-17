@@ -79,7 +79,7 @@ function _findModuleRecursive(modules, condition) {
 function getInitialData() {
   const workflows = WorkflowService.listWorkflows();
   const settings = getSettings();
-  return { workflows: workflows, moduleFolderId: settings.moduleFolderId };
+  return { workflows: workflows, moduleFolderId: settings.moduleFolderId, settings: settings };
 }
 
 function getSheetNamesFromUrl(url) {
@@ -159,6 +159,7 @@ function saveSettings(settings) {
   try {
     PropertiesService.getUserProperties().setProperty('appSettings', JSON.stringify(settings));
     Logger.log(`設定を保存しました: ${JSON.stringify(settings)}`);
+    return settings; // 保存した設定を返す
   } catch (e) {
     Logger.log(`設定の保存に失敗しました: ${e.message}`);
     throw new Error('設定の保存中にエラーが発生しました。');

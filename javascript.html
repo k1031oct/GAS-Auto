@@ -56,6 +56,7 @@
       isDirty: false,
       allModuleDefinitions: [], // Loaded from Drive
       initialWorkflows: [],
+      appSettings: {}, // Holds application settings like darkMode
       logArea: {
         isMaximized: false,
         originalHeight: '12rem', // Corresponds to h-48
@@ -237,15 +238,10 @@
     // --- App Settings Modal ---
 
     const openSettingsModal = () => {
-      // Load current settings into the modal before showing
-      google.script.run
-        .withSuccessHandler(settings => {
-          app.settingsModuleFolderIdInput.value = settings.moduleFolderId || '';
-          app.darkModeToggle.checked = settings.darkMode || false;
-          app.settingsModalBackdrop.classList.remove('hidden');
-        })
-        .withFailureHandler(showError)
-        .getSettings();
+      // サーバー呼び出しをせず、クライアントのstateから直接読み込む
+      app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
+      app.darkModeToggle.checked = state.appSettings.darkMode || false;
+      app.settingsModalBackdrop.classList.remove('hidden');
     };
 
     const closeSettingsModal = () => {
@@ -262,9 +258,10 @@
       };
       showLoader();
       google.script.run
-        .withSuccessHandler(() => {
+        .withSuccessHandler((savedSettings) => {
           log('設定を保存しました。', 'success');
-          applySettings(settings);
+          state.appSettings = savedSettings; // Update state with saved settings
+          applySettings(savedSettings);
           state.currentModuleFolderId = folderId;
           app.moduleFolderIdInput.value = folderId; // メイン画面の入力欄も更新
           hideLoader();
@@ -303,12 +300,7 @@
         }
     };
 
-    const loadAndApplySettings = () => {
-        google.script.run
-            .withSuccessHandler(applySettings)
-            .withFailureHandler(showError)
-            .getSettings();
-    };
+
 
 
 
@@ -716,9 +708,12 @@
 
     function init() {
       initEventListeners();
-      loadAndApplySettings();
 
       google.script.run.withSuccessHandler(data => {
+        if (data.settings) {
+            state.appSettings = data.settings;
+            applySettings(data.settings);
+        }
         if (data.workflows) {
             updateWorkflowList(data.workflows);
         }
