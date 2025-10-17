@@ -1,10 +1,10 @@
 /**
  * @file ModuleService.gs
  * @description Google Driveからモジュール定義 (JSON) を動的にロードする。
- * API管理機能はオミット。
  */
 var ModuleService = {
   _APP_DATA_FOLDER_NAME: 'GAS_Workflow_Automator_AppData',
+  // ユーザープロパティに最後に使用したモジュールフォルダIDを保存するためのキー
   _DEFAULT_MODULE_FOLDER_KEY: 'MODULE_JSON_FOLDER_ID',
 
   /**
