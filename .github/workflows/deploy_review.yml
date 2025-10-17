@@ -29,11 +29,12 @@ jobs:
       - name: Create .clasp.json for Review Environment
         run: |
           echo "Creating .clasp.json pointed to the review script..."
-          if [[ -z "${{ secrets.GAS_REVIEW_SCRIPT_ID }}" ]]; then
-            echo "::error::GAS_REVIEW_SCRIPT_ID secret is not set."
+          # GAS_SCRIPT_ID を参照するように修正
+          if [[ -z "${{ secrets.GAS_SCRIPT_ID }}" ]]; then
+            echo "::error::GAS_SCRIPT_ID secret is not set. Please ensure the review script ID is saved under this name."
             exit 1
           fi
-          printf '{"scriptId":"%s"}' "${{ secrets.GAS_REVIEW_SCRIPT_ID }}" > .clasp.json
+          printf '{"scriptId":"%s"}' "${{ secrets.GAS_SCRIPT_ID }}" > .clasp.json
           echo ".clasp.json created successfully."
 
       - name: Configure Clasp Credentials
@@ -55,7 +56,8 @@ jobs:
       - name: Deploy to Review Environment
         id: deploy_gas
         run: |
-          echo "Deploying to Review Script ID: ${{ secrets.GAS_REVIEW_SCRIPT_ID }}"
+          # GAS_SCRIPT_ID を参照するように修正
+          echo "Deploying to Review Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
           clasp deploy --deploymentId ${{ secrets.GAS_DEV_DEPLOYMENT_ID }} --description "Review Deployment for PR #${{ github.event.pull_request.number }}"
 
       - name: Post Review URL as PR Comment
@@ -80,4 +82,3 @@ jobs:
                 After reviewing, please merge the PR if there are no issues.
               `
             });
-
