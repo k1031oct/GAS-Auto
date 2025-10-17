@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <style>
+      .test-results {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top: 10px;
+      }
+      .test-results .success {
+        color: green;
+      }
+      .test-results .failure {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>GasT Test Runner</h1>
+    <button id="run-tests">Run All Tests</button>
+    <div id="test-results" class="test-results"></div>
+
+    <script>
+      document.getElementById('run-tests').addEventListener('click', function() {
+        google.script.run
+          .withSuccessHandler(function(results) {
+            var resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = results;
+          })
+          .withFailureHandler(function(error) {
+            var resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '<div class="failure">Error: ' + error.message + '</div>';
+          })
+          .runAllTests();
+      });
+    </script>
+  </body>
+</html>
