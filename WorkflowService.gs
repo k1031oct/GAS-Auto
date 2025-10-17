@@ -195,50 +195,88 @@ var WorkflowService = {
     }
   },
 
-  // ワークフローの実行ロジック (簡略化し、runWorkflowByTriggerから実行される前提)
+  // ワークフローの実行ロジック
   runWorkflow: function (payload, executionType = '手動') {
     const startTime = new Date();
     const workflowName = payload.name || '名称未設定のワークフロー';
     const workflowData = payload.modules;
 
-    let logs = [];
-    const addLog = (message, type = 'info') => {
-        logs.push({ message, type });
-        Logger.log(`[${type}] ${message}`);
-    };
-
     let logContext = LogService.startLog(workflowName, executionType);
     let status = '成功';
-
-    const context = {
-      variables: {},
-      executionResults: {}
-    };
+    let lastReturnValue = null;
 
     try {
-      addLog('ワークフローの実行を開始します...');
-      // モジュールの実行ロジックは WorkflowService.gs / ModuleFunctions.gs に依存
-      // ここでは簡略化された実行ロジックを想定
-      for(const module of workflowData) {
-          const moduleDef = ModuleService.getModuleById(module.id);
-          if (!moduleDef) {
-              throw new Error(`モジュール「${module.id}」の定義が見つかりません。`);
-          }
-          addLog(`[実行] ${module.name}`, 'system');
-          // ここで ModuleFunctions.gs 内の具体的な関数を呼び出す
-          // 例: ModuleFunctions.execute(module.id, module.settings, context);
+      logContext.addLog('ワークフローの実行を開始します...');
+      
+      for (const moduleConfig of workflowData) {
+        const moduleDef = ModuleService.getModuleById(moduleConfig.id, payload.moduleFolderId);
+        if (!moduleDef) {
+          throw new Error(`モジュール「${moduleConfig.id}」の定義が見つかりません。`);
+        }
+        
+        logContext.addLog(`[実行] ${moduleDef.name}`, 'system');
+        
+        const result = this._executeModuleLogic(moduleConfig, lastReturnValue);
+
+        if (moduleDef.returnsValue) {
+          lastReturnValue = result;
+        } else {
+          lastReturnValue = null;
+        }
+        logContext.addLog(`[完了] ${moduleDef.name} (戻り値: ${JSON.stringify(lastReturnValue)})`);
       }
-      addLog('ワークフローの実行が完了しました。', 'success');
+      
+      logContext.addLog('ワークフローの実行が正常に完了しました。', 'success');
 
     } catch (e) {
       status = '失敗';
-      addLog(`[致命的なエラー] ${e.message} ワークフローの実行を中断しました。`, 'error');
+      logContext.addLog(`[致命的なエラー] ${e.message} ワークフローの実行を中断しました。`, 'error');
       Logger.log(e.stack);
     } finally {
       const endTime = new Date();
       const executionTime = (endTime.getTime() - startTime.getTime()) / 1000;
       LogService.endLog(logContext.runId, logContext.summaryRow, status, executionTime);
     }
-    return logs;
+  },
+
+  /**
+   * モジュールIDに基づいて実際の処理を実行する
+   * @private
+   */
+  _executeModuleLogic: function (moduleConfig, lastReturnValue) {
+    const { id, settings } = moduleConfig;
+    
+    // TODO: ここに各モジュールの実行ロジックを記述する
+    switch (id) {
+      // =============================================
+      // Organizer Modules
+      // =============================================
+      case 'drive_filter_files':
+        return OrganizerFunctions.filterFiles(settings, lastReturnValue);
+      case 'drive_convert_files':
+        return OrganizerFunctions.convertFiles(settings, lastReturnValue);
+      case 'drive_archive_files':
+        return OrganizerFunctions.archiveFiles(settings, lastReturnValue);
+
+      // =============================================
+      // Example Modules
+      // =============================================
+      case 'log_message':
+        Logger.log(settings.message || 'No message set.');
+        return null;
+        
+      case 'create_document':
+        const doc = DocumentApp.create(settings.docName || 'New Document');
+        doc.getBody().appendParagraph(settings.content || '');
+        if (settings.folderId) {
+            DriveApp.getFolderById(settings.folderId).addFile(DriveApp.getFileById(doc.getId()));
+        }
+        return doc.getId();
+
+      default:
+        Logger.log(`モジュール「${id}」に対応する実行ロジックが見つかりません。`);
+        // throw new Error(`モジュール「${id}」に対応する実行ロジックが見つかりません。`);
+        return null;
+    }
   },
 };

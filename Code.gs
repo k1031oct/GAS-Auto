@@ -77,8 +77,11 @@ function _findModuleRecursive(modules, condition) {
 //================================================================
 
 function getInitialData() {
+  // アプリケーションの初回起動時に標準モジュールをセットアップする
+  const moduleFolderId = ModuleSetupService.setupDefaultModules();
+  
   const workflows = WorkflowService.listWorkflows();
-  const moduleFolderId = PropertiesService.getUserProperties().getProperty(MODULE_JSON_FOLDER_ID);
+  // const moduleFolderId = PropertiesService.getUserProperties().getProperty(MODULE_JSON_FOLDER_ID);
   return { workflows: workflows, moduleFolderId: moduleFolderId };
 }
 
