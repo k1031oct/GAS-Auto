@@ -9,7 +9,10 @@ on:
 
 jobs:
   dispatch-on-comment:
-    if: github.event.sender.type != 'Bot' && contains(github.event.comment.body, '@gemini-cli /fix')
+    # README.mdの記述 (@github-actions /fix) にも対応できるように修正
+    if: |
+      github.event.sender.type != 'Bot' && 
+      (contains(github.event.comment.body, '@gemini-cli /fix') || contains(github.event.comment.body, '@github-actions /fix'))
     permissions:
       contents: write
       pull-requests: write

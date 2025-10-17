@@ -1,30 +1,25 @@
 name: 🚀 GAS Review Deployment
 
-# Pull Requestがオープンされたとき、または新しいコミットがプッシュされたときにトリガー
 on:
   pull_request:
     types: [opened, synchronize]
-  # 手動実行を可能にする (Actionsタブから実行可能)
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
-    # Secretsを利用するために権限を設定
     permissions:
       contents: read
-      pull-requests: write # PRにコメントを投稿するために必要
+      pull-requests: write
 
     steps:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
-        # AIが作成したPRブランチの最新コードを取得
         with:
           ref: ${{ github.event.pull_request.head.ref }} 
 
       - name: Install Clasp and Node
-        # claspを実行するためにNode.js環境をセットアップ
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -33,46 +28,42 @@ jobs:
         run: npm install -g @google/clasp
 
       - name: Configure Clasp and Credentials
-        # GitHub Secretsから認証情報（リフレッシュトークン）を取得し、Claspに認証させる
         run: |
           echo "Attempting to configure Clasp..."
-          # Claspに認証情報（リフレッシュトークン）を注入
           clasp login --creds ${{ secrets.GAS_REFRESH_TOKEN }} --script-id ${{ secrets.GAS_SCRIPT_ID }}
         env:
-          # Claspのログイン処理が環境変数に依存するため、一時ファイルとして認証情報を保持
           HOME: /home/runner
 
       - name: Deploy to Review Deployment ID
         id: deploy_gas
         run: |
           echo "Deploying to Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
-          # 指定されたデプロイIDに対して、PRブランチのコードをデプロイ
-          # --deploymentId でデプロイID（AKfycbys...）を指定
           clasp deploy --deploymentId ${{ secrets.GAS_DEV_DEPLOYMENT_ID }} --description "Review Deployment for PR #${{ github.event.pull_request.number }}"
         env:
           HOME: /home/runner
 
       - name: Post Review URL as PR Comment
-        # デプロイが成功した場合のみ、レビュー用URLをPRにコメントとして投稿
         if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
+          # GITHUB_TOKENはユーザーが手動で設定するSecretではありません。
+          # GitHub Actionsが実行ごとに自動で生成する、一時的で安全なトークンです。
+          # PRへのコメント投稿など、リポジトリ操作のために必要です。
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
-            // デプロイIDからWebアプリの実行URLを構成
-            const deployUrl = \`https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec\`;
+            const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
             
             github.rest.issues.createComment({
               issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: \`
+              body: `
                 ## ✨ Review App Deployed (レビュー用アプリがデプロイされました)
                 AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
                 
                 **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
                 
                 レビュー後、問題がなければPRをマージしてください。
-              \`
+              `
             });
