@@ -3,7 +3,6 @@
   "dependencies": {},
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-  "name": "Automater",
   "webapp": {
     "executeAs": "USER_DEPLOYING",
     "access": "MYSELF"
