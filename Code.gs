@@ -76,6 +76,12 @@ function _findModuleRecursive(modules, condition) {
 // 3. クライアント(JavaScript)から呼び出される公開関数
 //================================================================
 
+function getInitialData() {
+  const workflows = WorkflowService.listWorkflows();
+  const moduleFolderId = PropertiesService.getUserProperties().getProperty(MODULE_JSON_FOLDER_ID);
+  return { workflows: workflows, moduleFolderId: moduleFolderId };
+}
+
 function getSheetNamesFromUrl(url) {
   if (!url) {
     throw new Error("URLが入力されていません。");
