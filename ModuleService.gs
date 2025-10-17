@@ -89,6 +89,7 @@ var ModuleService = {
    */
   createInitialModules: function (folderId) {
     const defaultModules = [
+      // Existing modules
       {
         "id": "drive_move_file",
         "name": "ドライブファイルを移動",
@@ -116,6 +117,52 @@ var ModuleService = {
           { "id": "value", "name": "書き込む値", "type": "text", "required": true }
         ],
         "handler": "SheetService.updateCell"
+      },
+      // New Organizer Modules
+      {
+        "id": "drive_filter_files",
+        "name": "ファイル絞り込み",
+        "description": "指定フォルダ内のファイルを種類やキーワードで絞り込みます。",
+        "category": "Google Drive",
+        "icon": "fa-filter",
+        "type": "unit",
+        "returnsValue": true,
+        "settings": [
+          { "id": "sourceFolderId", "name": "対象フォルダID", "type": "text", "required": true },
+          { "id": "filterFileType", "name": "ファイル種別", "type": "select", "required": true, "options": ["any", "excel", "csv", "pdf"], "defaultValue": "any" },
+          { "id": "filterKeyword", "name": "キーワード", "type": "text", "required": false },
+          { "id": "filterCondition", "name": "キーワード条件", "type": "select", "required": false, "options": ["contains", "does_not_contain", "starts_with", "ends_with"], "defaultValue": "contains" },
+          { "id": "moveToFolderId", "name": "中間フォルダID (任意)", "type": "text", "required": false }
+        ]
+      },
+      {
+        "id": "drive_convert_files",
+        "name": "ファイル変換",
+        "description": "ファイルをGoogleスプレッドシートなどの形式に変換します。",
+        "category": "Google Drive",
+        "icon": "fa-sync-alt",
+        "type": "unit",
+        "returnsValue": true,
+        "settings": [
+          { "id": "actionType", "name": "変換タイプ", "type": "select", "required": true, "options": ["excel_to_sheet", "csv_to_sheet"] },
+          { "id": "outputFolderId", "name": "出力先フォルダID (Excel→Sheet)", "type": "text", "required": false },
+          { "id": "templateSheetUrl", "name": "読込先シートURL (CSV→Sheet)", "type": "text", "required": false }
+        ]
+      },
+      {
+        "id": "drive_archive_files",
+        "name": "ファイルアーカイブ",
+        "description": "ファイルを指定のルールでアーカイブフォルダに整理します。",
+        "category": "Google Drive",
+        "icon": "fa-archive",
+        "type": "unit",
+        "returnsValue": true,
+        "settings": [
+          { "id": "archiveRootFolderId", "name": "アーカイブ先ルートフォルダID", "type": "text", "required": true },
+          { "id": "archiveFormat", "name": "フォルダ形式", "type": "select", "required": false, "options": ["YYYY/MM", "YYYY"], "defaultValue": "YYYY/MM" },
+          { "id": "renameKeyword", "name": "リネームキーワード (任意)", "type": "text", "required": false },
+          { "id": "overwriteAction", "name": "上書き処理", "type": "select", "required": false, "options": ["skip", "overwrite", "add_sequence"], "defaultValue": "skip" }
+        ]
       }
     ];
 
