@@ -36,6 +36,7 @@
         <button id="trigger-btn" title="定期実行/トリガーを設定" class="p-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 shadow-md transition-colors"><i class="fas fa-clock"></i></button>
         <button id="history-btn" title="実行履歴シートを開く" class="p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md transition-colors"><i class="fas fa-history"></i></button>
         <button id="run-btn" title="実行" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"><i class="fas fa-play mr-2"></i>実行</button>
+        <button id="show-log-btn" title="ログを表示" class="hidden bg-gray-600 text-white font-semibold px-4 py-2 rounded-xl shadow-lg hover:bg-gray-700 transition-colors"><i class="fas fa-chevron-up mr-2"></i>ログを表示</button>
       </div>
     </header>
 
@@ -84,7 +85,13 @@
     <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-48 flex flex-col">
       <div id="resize-handle" class="w-full h-2 cursor-ns-resize hover:bg-gray-700 transition-colors"></div>
       <div class="p-3 flex flex-col flex-grow overflow-hidden">
-        <h3 class="font-mono text-sm font-bold text-gray-200 mb-1">実行ログ</h3>
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-mono text-sm font-bold text-gray-200">実行ログ</h3>
+          <div class="flex items-center gap-2">
+            <button id="maximize-log-btn" title="最大化" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-window-maximize"></i></button>
+            <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+          </div>
+        </div>
         <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300 scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800"></pre>
       </div>
     </footer>
