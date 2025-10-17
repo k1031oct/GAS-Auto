@@ -6,17 +6,6 @@
 var ModuleService = {
   _APP_DATA_FOLDER_NAME: 'GAS_Workflow_Automator_AppData',
   _DEFAULT_MODULE_FOLDER_KEY: 'MODULE_JSON_FOLDER_ID',
-  _DEFAULT_MODULES: [
-    // 組み込みモジュールとして、必ず必要な制御系モジュールを最低限定義
-    { id: 'control_set_variable', name: '変数を設定', icon: 'fa-tag', category: '制御', type: 'unit', returnsValue: true, settings: [] },
-    { id: 'control_if_else', name: '条件分岐', icon: 'fa-code-branch', category: '制御', type: 'container', settings: [] },
-    { id: 'drive_create_folder', name: 'フォルダを新規作成', icon: 'fa-folder-plus', category: 'ドライブ操作', type: 'unit', returnsValue: true, settings: [] },
-    { id: 'sheets_set_value', name: 'セルに値を設定', icon: 'fa-table', category: 'スプレッドシート', type: 'unit', settings: [] },
-    // ファイル整理機能の一部をモジュールとして統合 (旧 Organizerのsort, convert, archiveを分割・抽象化)
-    { id: 'drive_file_sort', name: 'ファイル絞込・移動', icon: 'fa-filter', category: 'ドライブ操作', type: 'unit', settings: [] },
-    { id: 'drive_file_convert', name: 'ファイル変換 (Excel→Sheet)', icon: 'fa-file-excel', category: 'ドライブ操作', type: 'unit', returnsValue: true, settings: [] },
-    { id: 'drive_file_archive', name: 'ファイルアーカイブ', icon: 'fa-box-archive', category: 'ドライブ操作', type: 'unit', settings: [] }
-  ],
 
   /**
    * モジュールJSONファイルが格納されているフォルダIDを取得する
@@ -33,21 +22,21 @@ var ModuleService = {
    */
   loadModuleDefinitions: function (folderId) {
     if (!folderId) {
-      Logger.log("モジュールフォルダIDが未指定です。デフォルトモジュールのみを返します。");
-      return this._DEFAULT_MODULES;
+      Logger.log("モジュールフォルダIDが未指定です。カスタムモジュールはロードされません。");
+      return [];
     }
     
     // ユーザープロパティにフォルダIDを保存
     PropertiesService.getUserProperties().setProperty(this._DEFAULT_MODULE_FOLDER_KEY, folderId);
 
-    const loadedModules = [...this._DEFAULT_MODULES];
+    const loadedModules = [];
     let folder;
     
     try {
       folder = DriveApp.getFolderById(folderId);
     } catch (e) {
       Logger.log(`指定されたフォルダID「${folderId}」が見つからないか、アクセスできません。エラー: ${e.message}`);
-      return this._DEFAULT_MODULES;
+      return [];
     }
 
     const jsonFiles = folder.getFilesByType(MimeType.JSON);
@@ -74,7 +63,7 @@ var ModuleService = {
       }
     }
 
-    Logger.log(`Driveから ${loadedModules.length - this._DEFAULT_MODULES.length} 個のカスタムモジュールをロードしました。`);
+    Logger.log(`Driveから ${loadedModules.length} 個のカスタムモジュールをロードしました。`);
     return loadedModules;
   },
   
