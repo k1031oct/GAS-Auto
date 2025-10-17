@@ -7,40 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --primary-color: #3b82f6;
-      --primary-color-hover: #2563eb;
-      --accent-color: #f97316;
-    }
-
-    body {
-      font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    }
-
-    /* SortableJS Ghost style */
-    .sortable-ghost {
-      opacity: 0.4;
-      background-color: #bfdbfe;
-      border: 2px dashed var(--primary-color);
-    }
-
-    /* Custom Scrollbar for Pre */
-    #log-content {
-      scrollbar-color: #4b5563 #374151;
-      scrollbar-width: thin;
-      font-size: 0.8rem;
-    }
-    
-    .cursor-ns-resize {
-        cursor: ns-resize;
-    }
-  </style>
+  
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
   <?!= include('javascript.html'); ?>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 font-sans">
   <div id="app" class="flex flex-col h-screen overflow-hidden">
     <!-- Header -->
     <header class="bg-white shadow-lg p-3 flex items-center justify-between flex-shrink-0 z-10">
@@ -113,7 +85,7 @@
       <div id="resize-handle" class="w-full h-2 cursor-ns-resize hover:bg-gray-700 transition-colors"></div>
       <div class="p-3 flex flex-col flex-grow overflow-hidden">
         <h3 class="font-mono text-sm font-bold text-gray-200 mb-1">実行ログ</h3>
-        <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300"></pre>
+        <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300 scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800"></pre>
       </div>
     </footer>
   </div>
