@@ -37,6 +37,13 @@
       moduleSettingsSaveBtn: document.getElementById('module-settings-save-btn'),
       moduleSettingsCancelBtn: document.getElementById('module-settings-cancel-btn'),
       moduleSettingsCloseBtn: document.getElementById('module-settings-close-btn'),
+      
+      // App Settings Modal Elements
+      settingsBtn: document.getElementById('settings-btn'),
+      settingsModalBackdrop: document.getElementById('settings-modal-backdrop'),
+      settingsSaveBtn: document.getElementById('settings-save-btn'),
+      settingsCloseBtn: document.getElementById('settings-close-btn'),
+      darkModeToggle: document.getElementById('dark-mode-toggle'),
     };
 
     // --- State Management ---
@@ -213,6 +220,55 @@
       app.moduleSettingsCancelBtn.onclick = null;
       app.moduleSettingsCloseBtn.onclick = null;
     };
+
+    // --- App Settings Modal ---
+
+    const openSettingsModal = () => {
+      // Load current settings into the modal before showing
+      google.script.run
+        .withSuccessHandler(settings => {
+          app.darkModeToggle.checked = settings.darkMode || false;
+          app.settingsModalBackdrop.classList.remove('hidden');
+        })
+        .withFailureHandler(showError)
+        .getSettings();
+    };
+
+    const closeSettingsModal = () => {
+      app.settingsModalBackdrop.classList.add('hidden');
+    };
+
+    const saveSettings = () => {
+      const settings = {
+        darkMode: app.darkModeToggle.checked,
+      };
+      showLoader();
+      google.script.run
+        .withSuccessHandler(() => {
+          hideLoader();
+          log('設定を保存しました。', 'success');
+          applySettings(settings);
+          closeSettingsModal();
+        })
+        .withFailureHandler(showError)
+        .saveSettings(settings);
+    };
+    
+    const applySettings = (settings) => {
+        if (settings.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    };
+
+    const loadAndApplySettings = () => {
+        google.script.run
+            .withSuccessHandler(applySettings)
+            .withFailureHandler(showError)
+            .getSettings();
+    };
+
 
 
     // --- Module & Workflow DOM Rendering (Simplified for illustration) ---
@@ -547,6 +603,11 @@
         app.maximizeLogBtn.addEventListener('click', toggleMaximizeLog);
         app.hideLogBtn.addEventListener('click', hideLog);
         app.showLogBtn.addEventListener('click', showLog);
+
+        // App Settings Modal Listeners
+        app.settingsBtn.addEventListener('click', openSettingsModal);
+        app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
+        app.settingsSaveBtn.addEventListener('click', saveSettings);
     };
 
     const handleWorkflowSelect = async () => {
@@ -612,6 +673,9 @@
     // --- Initialization ---
 
     function init() {
+      initEventListeners();
+      loadAndApplySettings();
+
       google.script.run.withSuccessHandler(data => {
         state.workflows = data.workflows;
         if (data.moduleFolderId) {
