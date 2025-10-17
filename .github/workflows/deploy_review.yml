@@ -2,13 +2,12 @@ name: 🚀 GAS Review Deployment
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
     permissions:
       contents: read
       pull-requests: write
@@ -17,53 +16,71 @@ jobs:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }} 
+          ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Install Clasp and Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install Clasp Globally
+      - name: Install Clasp
         run: npm install -g @google/clasp
 
-      - name: Configure Clasp and Credentials
+      - name: Create .clasprc.json for Authentication
         run: |
-          echo "Attempting to configure Clasp..."
-          clasp login --creds ${{ secrets.GAS_REFRESH_TOKEN }} --script-id ${{ secrets.GAS_SCRIPT_ID }}
-        env:
-          HOME: /home/runner
+          echo "Creating .clasprc.json file in home directory..."
+          # Secret名を REFRESH_TOKEN に修正
+          echo '{"token":{"refresh_token":"${{ secrets.REFRESH_TOKEN }}"},"oauth2ClientSettings":{"clientId":"${{ secrets.GAS_CLIENT_ID }}","clientSecret":"${{ secrets.GAS_CLIENT_SECRET }}","redirectUri":"http://localhost"}}' > ~/.clasprc.json
+          echo "Authentication file created successfully."
 
-      - name: Deploy to Review Deployment ID
+      - name: Deploy to Review Environment
         id: deploy_gas
         run: |
-          echo "Deploying to Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
+          echo "Deploying to Review Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
           clasp deploy --deploymentId ${{ secrets.GAS_DEV_DEPLOYMENT_ID }} --description "Review Deployment for PR #${{ github.event.pull_request.number }}"
-        env:
-          HOME: /home/runner
 
-      - name: Post Review URL as PR Comment
+      - name: Post Review URL to PR
         if: success() && github.event_name == 'pull_request'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
-          # GITHUB_TOKENはユーザーが手動で設定するSecretではありません。
-          # GitHub Actionsが実行ごとに自動で生成する、一時的で安全なトークンです。
-          # PRへのコメント投稿など、リポジトリ操作のために必要です。
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
             const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
             
-            github.rest.issues.createComment({
-              issue_number: prNumber,
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `
-                ## ✨ Review App Deployed (レビュー用アプリがデプロイされました)
-                AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
-                
-                **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
-                
-                レビュー後、問題がなければPRをマージしてください。
-              `
+              issue_number: prNumber,
             });
+
+            const botComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' &&
+              comment.body.includes('Review App Deployed')
+            );
+
+            const body = `
+              ## ✨ Review App Deployed (Updated)
+              AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
+              
+              **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
+              
+              レビュー後、問題がなければPRをマージしてください。
+            `;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
+
