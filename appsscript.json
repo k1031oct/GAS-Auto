@@ -3,14 +3,21 @@
   "dependencies": {},
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-  "oauthScopes": [
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/userinfo.email"
-  ],
   "webapp": {
     "executeAs": "USER_DEPLOYING",
     "access": "MYSELF"
-  }
+  },
+  "filePushOrder": [
+    "Code.gs",
+    "WorkflowService.gs",
+    "ModuleService.gs",
+    "LogService.gs",
+    "OrganizerFunctions.gs",
+    "Tests/GasT.gs",
+    "Tests/UnitTests.gs",
+    "Tests/TestRunner.gs",
+    "index.html",
+    "javascript.html",
+    "Tests/TestRunner.html"
+  ]
 }
