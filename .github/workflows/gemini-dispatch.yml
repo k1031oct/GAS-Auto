@@ -8,16 +8,12 @@ on:
     types: [created]
 
 jobs:
-  # === コメントをトリガーとするジョブ ===
   dispatch-on-comment:
     if: github.event.sender.type != 'Bot' && contains(github.event.comment.body, '@gemini-cli /fix')
-
     permissions:
       contents: write
       pull-requests: write
       issues: write
-
-
     uses: ./.github/workflows/ai-code-generator.yml
     with:
       issue_number: ${{ github.event.issue.number }}
@@ -25,21 +21,15 @@ jobs:
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-  # === ラベルをトリガーとするジョブ ===
   dispatch-on-label:
     if: github.event.label.name == 'ready-for-ai'
-
-    # ★★★ ここから追加 ★★★
-    # 呼び出し先のワークフローに渡す権限をここで定義
     permissions:
       contents: write
       pull-requests: write
       issues: write
-    # ★★★ ここまで追加 ★★★
-
     uses: ./.github/workflows/ai-code-generator.yml
     with:
       issue_number: ${{ github.event.issue.number }}
-      prompt: "Fix the issue described in #${{ github.event.issue.number }} based on GEMINI.md."
+      prompt: ${{ github.event.issue.body }}
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
