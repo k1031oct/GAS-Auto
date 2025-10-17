@@ -2,7 +2,7 @@ name: 🚀 GAS Review Deployment
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 jobs:
@@ -26,19 +26,23 @@ jobs:
       - name: Install Clasp
         run: npm install -g @google/clasp
 
-      # --- ここからが重要 ---
-      # ワークフロー実行時に、Secretからレビュー用のScript IDを読み込み、
-      # 動的に.clasp.jsonファイルを作成します。
-      # これにより、リポジトリに.clasp.jsonが存在しなくても安全に動作します。
       - name: Create .clasp.json for Review Environment
         run: |
           echo "Creating .clasp.json pointed to the review script..."
+          if [[ -z "${{ secrets.GAS_REVIEW_SCRIPT_ID }}" ]]; then
+            echo "::error::GAS_REVIEW_SCRIPT_ID secret is not set."
+            exit 1
+          fi
           printf '{"scriptId":"%s"}' "${{ secrets.GAS_REVIEW_SCRIPT_ID }}" > .clasp.json
+          echo ".clasp.json created successfully."
 
       - name: Configure Clasp Credentials
         run: |
           echo "Configuring clasp credentials..."
-          # ~/.clasprc.json を作成して認証情報を設定
+          if [[ -z "${{ secrets.GAS_CLIENT_ID }}" || -z "${{ secrets.GAS_CLIENT_SECRET }}" || -z "${{ secrets.REFRESH_TOKEN }}" ]]; then
+            echo "::error::One or more authentication secrets (GAS_CLIENT_ID, GAS_CLIENT_SECRET, REFRESH_TOKEN) are not set."
+            exit 1
+          fi
           printf '{"token":{"client_id":"%s","client_secret":"%s","refresh_token":"%s","scope":"https://www.googleapis.com/auth/script.deployments https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/service.management","token_type":"Bearer","expiry_date":0},"oauth2ClientSettings":{"clientId":"%s","clientSecret":"%s","redirectUri":"http://localhost"}}' \
           "${{ secrets.GAS_CLIENT_ID }}" \
           "${{ secrets.GAS_CLIENT_SECRET }}" \
@@ -46,6 +50,7 @@ jobs:
           "${{ secrets.GAS_CLIENT_ID }}" \
           "${{ secrets.GAS_CLIENT_SECRET }}" \
           > ~/.clasprc.json
+          echo "Credentials configured."
 
       - name: Deploy to Review Environment
         id: deploy_gas
@@ -75,3 +80,4 @@ jobs:
                 After reviewing, please merge the PR if there are no issues.
               `
             });
+
