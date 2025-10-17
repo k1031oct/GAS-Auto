@@ -15,7 +15,6 @@ jobs:
     steps:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
-        # refを削除し、PRブランチ全体をチェックアウトする
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -53,13 +52,11 @@ jobs:
           > ~/.clasprc.json
           echo "Credentials configured."
 
-      # ★★★ ここから追加 ★★★
       - name: Push all files to GAS Editor
         run: |
           echo "Pushing all project files to Google Apps Script..."
           clasp push --force
           echo "Push completed successfully."
-      # ★★★ ここまで追加 ★★★
 
       - name: Deploy to Review Environment
         id: deploy_gas
@@ -84,9 +81,12 @@ jobs:
                 ## ✨ Review App Deployed
                 The version including the AI agent's fixes can be checked at the URL below.
                 
-                **Review Web App URL:** [Open deployed app](${deployUrl})
+                **Review Web App URL:**
+                [Open deployed app](${deployUrl})
+
+                Or copy this URL directly:
+                \`${deployUrl}\`
                 
                 After reviewing, please merge the PR if there are no issues.
               `
             });
-
