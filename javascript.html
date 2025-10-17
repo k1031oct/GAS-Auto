@@ -677,14 +677,15 @@
       loadAndApplySettings();
 
       google.script.run.withSuccessHandler(data => {
-        state.workflows = data.workflows;
+        if (data.workflows) {
+            updateWorkflowList(data.workflows);
+        }
         if (data.moduleFolderId) {
           state.currentModuleFolderId = data.moduleFolderId;
-          document.getElementById('module-folder-id').value = data.moduleFolderId;
+          app.moduleFolderIdInput.value = data.moduleFolderId;
           loadModuleDefinitionsFromDrive();
         }
-        renderWorkflowList();
-        showLoader(false);
+        hideLoader();
       }).withFailureHandler(showError).getInitialData();
     }
 
