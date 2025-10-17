@@ -78,8 +78,8 @@ function _findModuleRecursive(modules, condition) {
 
 function getInitialData() {
   const workflows = WorkflowService.listWorkflows();
-  const moduleFolderId = PropertiesService.getUserProperties().getProperty(MODULE_JSON_FOLDER_ID);
-  return { workflows: workflows, moduleFolderId: moduleFolderId };
+  const settings = getSettings();
+  return { workflows: workflows, moduleFolderId: settings.moduleFolderId };
 }
 
 function getSheetNamesFromUrl(url) {
@@ -134,6 +134,17 @@ function runWorkflow(payload) {
 
 function getExecutionLogUrl() {
   return LogService.getLogSheetUrl();
+}
+
+/**
+ * 指定されたフォルダIDに初期モジュールを生成する
+ * @param {string} folderId
+ */
+function createInitialModules(folderId) {
+  if (!folderId) {
+    throw new Error('フォルダIDが指定されていません。');
+  }
+  return ModuleService.createInitialModules(folderId);
 }
 
 //================================================================
