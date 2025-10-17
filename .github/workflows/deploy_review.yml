@@ -16,9 +16,9 @@ jobs:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }} 
+          ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Setup Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -26,28 +26,26 @@ jobs:
       - name: Install Clasp
         run: npm install -g @google/clasp
 
-      - name: Create .clasprc.json for Authentication
-        run: |
-          echo "Creating authentication file..."
-          echo '{
-            "token": {
-              "access_token": "DUMMY_TOKEN_WILL_BE_REFRESHED",
-              "refresh_token": "${{ secrets.REFRESH_TOKEN }}",
-              "scope": "https://www.googleapis.com/auth/script.deployments https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/script.webapp.deploy https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/userinfo.email",
-              "token_type": "Bearer",
-              "expiry_date": 1
-            },
-            "oauth2ClientSettings": {
-              "clientId": "${{ secrets.GAS_CLIENT_ID }}",
-              "clientSecret": "${{ secrets.GAS_CLIENT_SECRET }}",
-              "redirectUri": "http://localhost"
-            }
-          }' > ~/.clasprc.json
-        
+      # --- ここからが重要 ---
+      # ワークフロー実行時に、Secretからレビュー用のScript IDを読み込み、
+      # 動的に.clasp.jsonファイルを作成します。
+      # これにより、リポジトリに.clasp.jsonが存在しなくても安全に動作します。
       - name: Create .clasp.json for Review Environment
         run: |
           echo "Creating .clasp.json pointed to the review script..."
-          echo '{"scriptId":"${{ secrets.GAS_REVIEW_SCRIPT_ID }}"}' > .clasp.json
+          printf '{"scriptId":"%s"}' "${{ secrets.GAS_REVIEW_SCRIPT_ID }}" > .clasp.json
+
+      - name: Configure Clasp Credentials
+        run: |
+          echo "Configuring clasp credentials..."
+          # ~/.clasprc.json を作成して認証情報を設定
+          printf '{"token":{"client_id":"%s","client_secret":"%s","refresh_token":"%s","scope":"https://www.googleapis.com/auth/script.deployments https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/service.management","token_type":"Bearer","expiry_date":0},"oauth2ClientSettings":{"clientId":"%s","clientSecret":"%s","redirectUri":"http://localhost"}}' \
+          "${{ secrets.GAS_CLIENT_ID }}" \
+          "${{ secrets.GAS_CLIENT_SECRET }}" \
+          "${{ secrets.REFRESH_TOKEN }}" \
+          "${{ secrets.GAS_CLIENT_ID }}" \
+          "${{ secrets.GAS_CLIENT_SECRET }}" \
+          > ~/.clasprc.json
 
       - name: Deploy to Review Environment
         id: deploy_gas
@@ -59,7 +57,7 @@ jobs:
         if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
             const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
@@ -69,12 +67,11 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `
-                ## ✨ Review App Deployed (レビュー用アプリがデプロイされました)
-                AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
+                ## ✨ Review App Deployed
+                The version including the AI agent's fixes can be checked at the URL below.
                 
-                **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
+                **Review Web App URL:** [Open deployed app](${deployUrl})
                 
-                レビュー後、問題がなければPRをマージしてください。
+                After reviewing, please merge the PR if there are no issues.
               `
             });
-
