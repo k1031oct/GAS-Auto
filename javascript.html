@@ -26,6 +26,9 @@
       customDialogInput: document.getElementById('custom-dialog-input'),
       customDialogOk: document.getElementById('custom-dialog-ok'),
       customDialogCancel: document.getElementById('custom-dialog-cancel'),
+      showLogBtn: document.getElementById('show-log-btn'),
+      maximizeLogBtn: document.getElementById('maximize-log-btn'),
+      hideLogBtn: document.getElementById('hide-log-btn'),
     };
 
     // --- State Management ---
@@ -35,7 +38,11 @@
       currentModuleFolderId: '', // ID of the Drive folder for module JSONs
       isDirty: false,
       allModuleDefinitions: [], // Loaded from Drive
-      initialWorkflows: []
+      initialWorkflows: [],
+      logArea: {
+        isMaximized: false,
+        originalHeight: '12rem', // Corresponds to h-48
+      }
     };
 
     let logSortable; // Sortable instance for workflow container
@@ -445,6 +452,11 @@
                 });
             }
         });
+        
+        // Log Area buttons
+        app.maximizeLogBtn.addEventListener('click', toggleMaximizeLog);
+        app.hideLogBtn.addEventListener('click', hideLog);
+        app.showLogBtn.addEventListener('click', showLog);
     };
 
     const handleWorkflowSelect = async () => {
@@ -476,6 +488,35 @@
         } else {
             newWorkflow();
         }
+    };
+
+    const toggleMaximizeLog = () => {
+      state.logArea.isMaximized = !state.logArea.isMaximized;
+      const icon = app.maximizeLogBtn.querySelector('i');
+      if (state.logArea.isMaximized) {
+        state.logArea.originalHeight = app.logArea.style.height || '12rem';
+        app.logArea.style.height = '85vh';
+        icon.classList.remove('fa-window-maximize');
+        icon.classList.add('fa-window-restore');
+        app.maximizeLogBtn.title = '元に戻す';
+      } else {
+        app.logArea.style.height = state.logArea.originalHeight;
+        icon.classList.remove('fa-window-restore');
+        icon.classList.add('fa-window-maximize');
+        app.maximizeLogBtn.title = '最大化';
+      }
+    };
+
+    const hideLog = () => {
+      state.logArea.originalHeight = app.logArea.style.height || '12rem';
+      app.logArea.classList.add('hidden');
+      app.showLogBtn.classList.remove('hidden');
+    };
+
+    const showLog = () => {
+      app.logArea.classList.remove('hidden');
+      app.showLogBtn.classList.add('hidden');
+      app.logArea.style.height = state.logArea.originalHeight;
     };
     
     // --- Initialization ---
