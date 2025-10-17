@@ -480,22 +480,18 @@
     
     // --- Initialization ---
 
-    const init = async () => {
-        showLoader();
-        await loadWorkflows();
-        
-        // Initial setup for the module folder ID (if defined in settings or first load)
-        // In the integrated version, we will load saved settings here
-        state.currentModuleFolderId = ''; // Should load from PropertiesService in final integration
-        app.moduleFolderIdInput.value = state.currentModuleFolderId;
-        
-        // Load initial modules (if folder ID is set, otherwise wait for user input)
-        await loadModuleDefinitionsFromDrive(); 
-        
-        initEventListeners();
-        updateUI();
-        hideLoader();
-    };
+    function init() {
+      google.script.run.withSuccessHandler(data => {
+        state.workflows = data.workflows;
+        if (data.moduleFolderId) {
+          state.currentModuleFolderId = data.moduleFolderId;
+          document.getElementById('module-folder-id').value = data.moduleFolderId;
+          loadModuleDefinitionsFromDrive();
+        }
+        renderWorkflowList();
+        showLoader(false);
+      }).withFailureHandler(showError).getInitialData();
+    }
 
     init();
   });
