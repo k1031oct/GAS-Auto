@@ -18,7 +18,6 @@ jobs:
   run-ai-fix:
     runs-on: ubuntu-latest
     permissions:
-      # Pull Requestを作成するために権限を追加
       contents: write
       pull-requests: write
       issues: write
@@ -38,6 +37,8 @@ jobs:
 
       - name: Run Gemini CLI for Code Fix
         id: gemini_fix
+        # エラーが発生してもワークフローが止まらないようにする
+        continue-on-error: true
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
@@ -59,10 +60,10 @@ jobs:
             Ensure ModuleService dynamically loads JSON definitions from Drive.
             Omit all API secret management functions.
 
-      # ★★★ ここからが追加されたステップです ★★★
       - name: Create Pull Request
-        # Gemini CLIが正常に完了報告を出した場合のみ実行
-        if: success() && contains(steps.gemini_fix.outputs.text, 'All tasks are complete.')
+        id: cpr
+        # if条件を修正: Gemini CLIのステップが成功した場合のみ実行する
+        if: steps.gemini_fix.outcome == 'success'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -81,9 +82,9 @@ jobs:
       - name: Log Completion or Failure
         if: always()
         run: |
-          if [[ "${{ steps.gemini_fix.outcome }}" == "success" && "${{ contains(steps.gemini_fix.outputs.text, 'All tasks are complete.') }}" == "true" ]]; then
-            echo "AI Agent run finished and PR was created for issue #${{ inputs.issue_number }}"
+          if [[ "${{ steps.cpr.outputs.pull-request-number }}" != "" ]]; then
+            echo "AI Agent run finished and PR #${{ steps.cpr.outputs.pull-request-number }} was created for issue #${{ inputs.issue_number }}"
           else
-            echo "AI Agent did not complete the task successfully. No PR was created."
+            echo "AI Agent did not make any changes or failed. No PR was created."
           fi
 
