@@ -137,6 +137,41 @@ function getExecutionLogUrl() {
 }
 
 //================================================================
+// 5. アプリケーション設定の管理
+//================================================================
+
+/**
+ * ユーザー設定を保存する
+ * @param {object} settings 保存する設定オブジェクト
+ */
+function saveSettings(settings) {
+  try {
+    PropertiesService.getUserProperties().setProperty('appSettings', JSON.stringify(settings));
+    Logger.log(`設定を保存しました: ${JSON.stringify(settings)}`);
+  } catch (e) {
+    Logger.log(`設定の保存に失敗しました: ${e.message}`);
+    throw new Error('設定の保存中にエラーが発生しました。');
+  }
+}
+
+/**
+ * ユーザー設定を読み込む
+ * @returns {object} 読み込んだ設定オブジェクト
+ */
+function getSettings() {
+  try {
+    const settingsJson = PropertiesService.getUserProperties().getProperty('appSettings');
+    if (settingsJson) {
+      return JSON.parse(settingsJson);
+    }
+    return {}; // 設定がない場合は空のオブジェクトを返す
+  } catch (e) {
+    Logger.log(`設定の読み込みに失敗しました: ${e.message}`);
+    throw new Error('設定の読み込み中にエラーが発生しました。');
+  }
+}
+
+//================================================================
 // 4. トリガーから直接呼び出されるグローバル関数
 //================================================================
 
