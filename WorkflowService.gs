@@ -195,50 +195,88 @@ var WorkflowService = {
     }
   },
 
-  // ワークフローの実行ロジック (簡略化し、runWorkflowByTriggerから実行される前提)
   runWorkflow: function (payload, executionType = '手動') {
     const startTime = new Date();
     const workflowName = payload.name || '名称未設定のワークフロー';
-    const workflowData = payload.modules;
-
-    let logs = [];
-    const addLog = (message, type = 'info') => {
-        logs.push({ message, type });
-        Logger.log(`[${type}] ${message}`);
-    };
+    const modules = payload.modules || [];
 
     let logContext = LogService.startLog(workflowName, executionType);
     let status = '成功';
-
-    const context = {
-      variables: {},
-      executionResults: {}
-    };
+    let lastReturnValue = null; // 前のモジュールからの返り値を保持
 
     try {
-      addLog('ワークフローの実行を開始します...');
-      // モジュールの実行ロジックは WorkflowService.gs / ModuleFunctions.gs に依存
-      // ここでは簡略化された実行ロジックを想定
-      for(const module of workflowData) {
-          const moduleDef = ModuleService.getModuleById(module.id);
-          if (!moduleDef) {
-              throw new Error(`モジュール「${module.id}」の定義が見つかりません。`);
-          }
-          addLog(`[実行] ${module.name}`, 'system');
-          // ここで ModuleFunctions.gs 内の具体的な関数を呼び出す
-          // 例: ModuleFunctions.execute(module.id, module.settings, context);
+      LogService.addLog(logContext.runId, 'info', `ワークフロー「${workflowName}」の実行を開始します...`);
+
+      for (const moduleConfig of modules) {
+        const moduleDef = ModuleService.getModuleById(moduleConfig.id);
+        if (!moduleDef) {
+          throw new Error(`モジュール「${moduleConfig.id}」の定義が見つかりません。`);
+        }
+        
+        LogService.addLog(logContext.runId, 'system', `[モジュール実行] ${moduleConfig.name} (ID: ${moduleConfig.id})`);
+
+        // モジュールロジックを実行
+        const result = this._executeModuleLogic(moduleConfig.id, moduleConfig.settings, lastReturnValue);
+
+        // 返り値があるモジュールの場合、次のモジュールに渡す
+        if (moduleDef.returnsValue) {
+          lastReturnValue = result;
+          const resultInfo = Array.isArray(result) ? `${result.length}件のアイテム` : String(result);
+          LogService.addLog(logContext.runId, 'info', `  ↪ 結果: ${resultInfo} を次のモジュールに渡します。`);
+        } else {
+          lastReturnValue = null; // 返り値をリセット
+        }
       }
-      addLog('ワークフローの実行が完了しました。', 'success');
+
+      LogService.addLog(logContext.runId, 'success', 'ワークフローの実行が正常に完了しました。');
 
     } catch (e) {
       status = '失敗';
-      addLog(`[致命的なエラー] ${e.message} ワークフローの実行を中断しました。`, 'error');
+      LogService.addLog(logContext.runId, 'error', `[致命的なエラー] ${e.message} ワークフローの実行を中断しました。`);
       Logger.log(e.stack);
     } finally {
       const endTime = new Date();
       const executionTime = (endTime.getTime() - startTime.getTime()) / 1000;
       LogService.endLog(logContext.runId, logContext.summaryRow, status, executionTime);
     }
-    return logs;
   },
+
+  /**
+   * モジュールIDに基づいて実際の処理を実行する
+   * @private
+   * @param {string} moduleId - 実行するモジュールのID
+   * @param {object} configs - モジュールの設定
+   * @param {*} inputValue - 前のモジュールからの入力値
+   * @returns {*} モジュールの処理結果
+   */
+  _executeModuleLogic: function (moduleId, configs, inputValue) {
+    // inputValue は主にファイルIDのリストなどを想定
+    const fileIds = Array.isArray(inputValue) ? inputValue : [];
+
+    switch (moduleId) {
+      // =============================================
+      // オーガナイザー機能
+      // =============================================
+      case 'drive_filter_files':
+        return drive_filter_files(configs, fileIds);
+      
+      case 'drive_convert_files':
+        return drive_convert_files(configs, fileIds);
+
+      case 'drive_archive_files':
+        return drive_archive_files(configs, fileIds);
+
+      // =============================================
+      // ここに他のモジュールIDのcaseを追加していく
+      // =============================================
+      // case 'another_module_id':
+      //   return AnotherModule.run(configs, inputValue);
+
+      default:
+        Logger.log(`モジュールID「${moduleId}」に対応する処理が見つかりません。スキップします。`);
+        // throw new Error(`モジュールID「${moduleId}」に対応する処理が定義されていません。`);
+        return null;
+    }
+  },
+
 };
