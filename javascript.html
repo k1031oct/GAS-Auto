@@ -43,6 +43,7 @@
       settingsModalBackdrop: document.getElementById('settings-modal-backdrop'),
       settingsSaveBtn: document.getElementById('settings-save-btn'),
       settingsCloseBtn: document.getElementById('settings-close-btn'),
+      settingsModuleFolderIdInput: document.getElementById('settings-module-folder-id'),
       darkModeToggle: document.getElementById('dark-mode-toggle'),
     };
 
@@ -63,6 +64,17 @@
     let logSortable; // Sortable instance for workflow container
 
     // --- Helper Functions ---
+
+    const _extractIdFromUrl = (url) => {
+        if (!url) return url; // Return as is if null or empty
+        const regex = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+        const match = url.match(regex);
+        if (match && match[1]) {
+            return match[1];
+        }
+        // If no match, assume the input is already an ID
+        return url;
+    };
 
     const showCustomDialog = (config) => {
       return new Promise((resolve) => {
@@ -227,6 +239,7 @@
       // Load current settings into the modal before showing
       google.script.run
         .withSuccessHandler(settings => {
+          app.settingsModuleFolderIdInput.value = settings.moduleFolderId || '';
           app.darkModeToggle.checked = settings.darkMode || false;
           app.settingsModalBackdrop.classList.remove('hidden');
         })
@@ -239,16 +252,36 @@
     };
 
     const saveSettings = () => {
+      const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
+      const folderId = _extractIdFromUrl(rawFolderId);
+
       const settings = {
+        moduleFolderId: folderId,
         darkMode: app.darkModeToggle.checked,
       };
       showLoader();
       google.script.run
         .withSuccessHandler(() => {
-          hideLoader();
           log('設定を保存しました。', 'success');
           applySettings(settings);
-          closeSettingsModal();
+          state.currentModuleFolderId = folderId;
+          app.moduleFolderIdInput.value = folderId; // メイン画面の入力欄も更新
+
+          // 初回設定時のみモジュールを生成
+          if (folderId) {
+            google.script.run
+              .withSuccessHandler((result) => {
+                log(result, 'success');
+                loadModuleDefinitionsFromDrive(); // 再読み込み
+                hideLoader();
+                closeSettingsModal();
+              })
+              .withFailureHandler(showError)
+              .createInitialModules(folderId);
+          } else {
+            hideLoader();
+            closeSettingsModal();
+          }
         })
         .withFailureHandler(showError)
         .saveSettings(settings);

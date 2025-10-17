@@ -80,5 +80,68 @@ var ModuleService = {
   // 統合後の getInitialData() から ModuleService を呼び出すための関数
   getModules: function () {
     return this.loadModuleDefinitions(this._getDefaultModuleFolderId());
+  },
+
+  /**
+   * 指定されたフォルダに初期モジュールJSONファイルを生成する
+   * @param {string} folderId - ファイルを生成するGoogle DriveのフォルダID
+   * @returns {string} 生成結果のメッセージ
+   */
+  createInitialModules: function (folderId) {
+    const defaultModules = [
+      {
+        "id": "drive_move_file",
+        "name": "ドライブファイルを移動",
+        "description": "指定されたファイルをGoogle Driveの別のフォルダに移動します。",
+        "category": "Google Drive",
+        "icon": "fa-folder-open",
+        "type": "unit",
+        "settings": [
+          { "id": "sourceFileUrl", "name": "移動元ファイルURL", "type": "text", "required": true, "description": "移動するファイルのURLを入力します。" },
+          { "id": "destinationFolderUrl", "name": "移動先フォルダURL", "type": "text", "required": true, "description": "移動先のフォルダのURLを入力します。" }
+        ],
+        "handler": "DriveService.moveFile"
+      },
+      {
+        "id": "sheets_update_cell",
+        "name": "スプレッドシートのセルを更新",
+        "description": "指定されたスプレッドシートのセルに値を書き込みます。",
+        "category": "Google Sheets",
+        "icon": "fa-file-excel",
+        "type": "unit",
+        "settings": [
+          { "id": "spreadsheetUrl", "name": "スプレッドシートURL", "type": "text", "required": true },
+          { "id": "sheetName", "name": "シート名", "type": "text", "required": true },
+          { "id": "cell", "name": "セル（例: A1）", "type": "text", "required": true },
+          { "id": "value", "name": "書き込む値", "type": "text", "required": true }
+        ],
+        "handler": "SheetService.updateCell"
+      }
+    ];
+
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      let createdCount = 0;
+      
+      defaultModules.forEach(module => {
+        const fileName = `${module.id}.json`;
+        const files = folder.getFilesByName(fileName);
+        
+        // 同じ名前のファイルが存在しない場合のみ作成
+        if (!files.hasNext()) {
+          folder.createFile(fileName, JSON.stringify(module, null, 2), MimeType.JSON);
+          createdCount++;
+        }
+      });
+
+      if (createdCount > 0) {
+        return `${createdCount}個の初期モジュールを生成しました。`;
+      } else {
+        return '初期モジュールは既に存在するため、生成をスキップしました。';
+      }
+    } catch (e) {
+      Logger.log(`初期モジュールの生成に失敗しました: ${e.message}`);
+      throw new Error(`初期モジュールの生成に失敗しました。フォルダIDが正しいか、アクセス権があるか確認してください。`);
+    }
   }
 };
