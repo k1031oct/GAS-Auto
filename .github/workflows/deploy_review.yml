@@ -46,8 +46,8 @@ jobs:
         
       - name: Create .clasp.json for Review Environment
         run: |
-          echo "Creating .clasp.json pointed to the review script..."
-          echo '{"scriptId":"${{ secrets.GAS_REVIEW_SCRIPT_ID }}"}' > .clasp.json
+          echo Creating .clasp.json pointed to the review script...
+          printf '{"scriptId":"%s"}' ${{ secrets.GAS_REVIEW_SCRIPT_ID }} > .clasp.json
 
       - name: Deploy to Review Environment
         id: deploy_gas
