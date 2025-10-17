@@ -29,6 +29,14 @@
       showLogBtn: document.getElementById('show-log-btn'),
       maximizeLogBtn: document.getElementById('maximize-log-btn'),
       hideLogBtn: document.getElementById('hide-log-btn'),
+      moduleSettingsBackdrop: document.getElementById('module-settings-backdrop'),
+      moduleSettingsModal: document.getElementById('module-settings-modal'),
+      moduleSettingsTitle: document.getElementById('module-settings-title'),
+      moduleSettingsDescription: document.getElementById('module-settings-description'),
+      moduleSettingsContent: document.getElementById('module-settings-content'),
+      moduleSettingsSaveBtn: document.getElementById('module-settings-save-btn'),
+      moduleSettingsCancelBtn: document.getElementById('module-settings-cancel-btn'),
+      moduleSettingsCloseBtn: document.getElementById('module-settings-close-btn'),
     };
 
     // --- State Management ---
@@ -123,6 +131,90 @@
       updateUI();
     };
 
+    // --- Module Settings Modal ---
+
+    const renderModuleSettingsForm = (module, moduleDef) => {
+      app.moduleSettingsContent.innerHTML = ''; // Clear previous content
+      if (!moduleDef.settings || moduleDef.settings.length === 0) {
+        app.moduleSettingsContent.innerHTML = '<p class="text-gray-500">このモジュールには設定項目がありません。</p>';
+        return;
+      }
+
+      moduleDef.settings.forEach(setting => {
+        const currentValue = module.settings[setting.id] || setting.defaultValue || '';
+        const fieldWrapper = document.createElement('div');
+        fieldWrapper.className = 'mb-6';
+        
+        let fieldHTML = `<label for="setting-${setting.id}" class="block text-sm font-bold text-gray-700 mb-2">${setting.name}</label>`;
+        
+        switch (setting.type) {
+          case 'text':
+          case 'number':
+            fieldHTML += `<input type="${setting.type}" id="setting-${setting.id}" data-id="${setting.id}" value="${currentValue}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" placeholder="${setting.placeholder || ''}">`;
+            break;
+          case 'textarea':
+            fieldHTML += `<textarea id="setting-${setting.id}" data-id="${setting.id}" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
+            break;
+          case 'select':
+            const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+            fieldHTML += `<select id="setting-${setting.id}" data-id="${setting.id}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">${options}</select>`;
+            break;
+          case 'checkbox':
+            fieldHTML += `<label class="flex items-center"><input type="checkbox" id="setting-${setting.id}" data-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"> <span class="ml-2 text-gray-700">${setting.label || ''}</span></label>`;
+            break;
+        }
+        
+        if (setting.description) {
+          fieldHTML += `<p class="text-xs text-gray-500 mt-2">${setting.description}</p>`;
+        }
+        
+        fieldWrapper.innerHTML = fieldHTML;
+        app.moduleSettingsContent.appendChild(fieldWrapper);
+      });
+    };
+
+    const openModuleSettingsModal = (module, moduleDef) => {
+      app.moduleSettingsTitle.textContent = `設定: ${moduleDef.name}`;
+      app.moduleSettingsDescription.textContent = moduleDef.description || '';
+      renderModuleSettingsForm(module, moduleDef);
+      
+      app.moduleSettingsBackdrop.classList.remove('hidden');
+      
+      // Attach event listeners for this specific modal instance
+      const saveHandler = () => {
+        // Logic to save settings will be here
+        const settings = {};
+        app.moduleSettingsContent.querySelectorAll('[data-id]').forEach(el => {
+            const id = el.dataset.id;
+            if (el.type === 'checkbox') {
+                settings[id] = el.checked;
+            } else {
+                settings[id] = el.value;
+            }
+        });
+        module.settings = settings;
+        markDirty();
+        closeModuleSettingsModal();
+      };
+      
+      const cancelHandler = () => {
+        closeModuleSettingsModal();
+      };
+
+      app.moduleSettingsSaveBtn.onclick = saveHandler;
+      app.moduleSettingsCancelBtn.onclick = cancelHandler;
+      app.moduleSettingsCloseBtn.onclick = cancelHandler;
+    };
+
+    const closeModuleSettingsModal = () => {
+      app.moduleSettingsBackdrop.classList.add('hidden');
+      // Clean up listeners to avoid memory leaks
+      app.moduleSettingsSaveBtn.onclick = null;
+      app.moduleSettingsCancelBtn.onclick = null;
+      app.moduleSettingsCloseBtn.onclick = null;
+    };
+
+
     // --- Module & Workflow DOM Rendering (Simplified for illustration) ---
 
     const renderModules = () => {
@@ -160,10 +252,11 @@
 
             // Placeholder for module editing logic (openModal, etc.)
             moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
-                showCustomDialog({
-                    title: `モジュール設定: ${moduleDef.name}`,
-                    message: `このモジュール（ID: ${module.id}）の詳細設定UIをここに表示します。現在はプレースホルダーです。`
-                });
+                const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
+                const moduleDef = state.allModuleDefinitions.find(d => d.id === moduleData.id);
+                if (moduleData && moduleDef) {
+                  openModuleSettingsModal(moduleData, moduleDef);
+                }
             });
             
             moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
@@ -446,10 +539,7 @@
                 // In final implementation, this opens a detailed config modal
                 const moduleData = state.modules.find(m => m.instanceId === moduleEl.dataset.instanceId);
                 const moduleDef = state.allModuleDefinitions.find(d => d.id === moduleData.id);
-                showCustomDialog({
-                    title: `モジュール設定: ${moduleDef.name}`,
-                    message: `このモジュール（ID: ${moduleData.id}）の詳細設定UIをここに表示します。現在はプレースホルダーです。`
-                });
+                openModuleSettingsModal(moduleData, moduleDef);
             }
         });
         
