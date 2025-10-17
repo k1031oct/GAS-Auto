@@ -9,7 +9,6 @@ on:
 
 jobs:
   dispatch-on-comment:
-    # README.mdの記述 (@github-actions /fix) にも対応できるように修正
     if: |
       github.event.sender.type != 'Bot' && 
       (contains(github.event.comment.body, '@gemini-cli /fix') || contains(github.event.comment.body, '@github-actions /fix'))
@@ -23,6 +22,8 @@ jobs:
       prompt: ${{ github.event.comment.body }}
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # ai-code-generator.ymlにPATを渡す
+      GH_PAT: ${{ secrets.GH_PAT }}
 
   dispatch-on-label:
     if: github.event.label.name == 'ready-for-ai'
@@ -36,3 +37,6 @@ jobs:
       prompt: ${{ github.event.issue.body }}
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      # ai-code-generator.ymlにPATを渡す
+      GH_PAT: ${{ secrets.GH_PAT }}
+

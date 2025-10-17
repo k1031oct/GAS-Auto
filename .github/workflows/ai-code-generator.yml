@@ -13,6 +13,9 @@ on:
     secrets:
       GEMINI_API_KEY:
         required: true
+      # PATをSecretとして受け取るように定義
+      GH_PAT:
+        required: true
 
 jobs:
   run-ai-fix:
@@ -37,36 +40,32 @@ jobs:
 
       - name: Run Gemini CLI for Code Fix
         id: gemini_fix
-        # エラーが発生してもワークフローが止まらないようにする
         continue-on-error: true
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           gemini_debug: true
+          # AIが混乱しないように、よりシンプルで具体的な指示に変更
           prompt: |
             You are an expert Google Apps Script developer.
-            Your task is to implement the changes to solve the following request.
+            Your task is to implement the changes to solve the following request by modifying files.
             You MUST strictly adhere to all instructions and constraints in the GEMINI.md file.
-            Use your available tools (like `search_file_content`, `replace_in_file`) to modify the code.
+            First, carefully read the content of the target files to understand the context before making changes.
+            Use your available tools (like `replace_in_file`) to modify the code.
             Do NOT try to use `git` commands by yourself.
-            After finishing all file modifications, you MUST conclude your response with the exact phrase: `All tasks are complete.`
+            After finishing ALL file modifications, you MUST conclude your response with the exact phrase: `All tasks are complete.`
 
             # TASK
             ${{ steps.sanitized_prompt.outputs.prompt }}
 
-            # PROJECT CONTEXT
-            The existing code structure (Code.gs, WorkflowService.gs, etc.) and the UI (index.html) are part of a project to build a workflow automation tool on GAS.
-            Always convert legacy styling to Tailwind CSS.
-            Ensure ModuleService dynamically loads JSON definitions from Drive.
-            Omit all API secret management functions.
-
       - name: Create Pull Request
         id: cpr
-        # if条件を修正: Gemini CLIのステップが成功した場合のみ実行する
+        # Gemini CLIのステップが成功した場合のみ実行
         if: steps.gemini_fix.outcome == 'success'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # GITHUB_TOKENの代わりにPATを使用
+          token: ${{ secrets.GH_PAT }}
           commit-message: "feat(ai): Apply automated fixes for #${{ inputs.issue_number }}"
           title: "🤖 AI Fix for Issue #${{ inputs.issue_number }}"
           body: |
