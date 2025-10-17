@@ -16,37 +16,6 @@ function doGet(e) {
 }
 
 /**
- * 初期データ（モジュール定義、ワークフロー一覧など）を取得する。
- */
-function getInitialData() {
-  try {
-    const modules = ModuleService.getModules();
-    const workflows = WorkflowService.listWorkflows();
-    const triggers = TriggerService.getTriggers();
-    const moduleFolderId = ModuleService._getDefaultModuleFolderId();
-    
-    Logger.log(`[getInitialData] 成功: ${modules.length}個のモジュール、${workflows.length}個のワークフロー、${triggers.length}個のトリガーを返します。`);
-    
-    // API管理機能（Secrets）をオミットしたため、その情報は含めない
-    return {
-      modules: modules,
-      workflows: workflows,
-      triggers: triggers,
-      moduleFolderId: moduleFolderId // フロントエンドに初期フォルダIDを渡す
-    };
-  } catch (error) {
-    Logger.log(`[getInitialData] 致命的なエラー: ${error.toString()}`);
-    return {
-      modules: [],
-      workflows: [],
-      triggers: [],
-      moduleFolderId: '',
-      error: error.message
-    };
-  }
-}
-
-/**
  * モジュール定義をDriveから再読み込みする
  * @param {string} folderId 
  */
@@ -160,17 +129,6 @@ function runWorkflow(payload) {
 
 function getExecutionLogUrl() {
   return LogService.getLogSheetUrl();
-}
-
-// TriggerServiceの関数
-function getTriggers() {
-  return TriggerService.getTriggers();
-}
-function createFlexibleTrigger(config) {
-  return TriggerService.createFlexibleTrigger(config);
-}
-function deleteTrigger(triggerUid) {
-  return TriggerService.deleteTrigger(triggerUid);
 }
 
 //================================================================
