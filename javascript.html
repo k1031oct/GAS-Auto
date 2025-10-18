@@ -233,20 +233,6 @@
                           .createTimeBasedTrigger(state.currentWorkflowName, options);
                       };
                       
-                      // --- initEventListeners ---
-                      const initEventListeners = () => {
-                          // Init SortableJS for module palette (drag source)
-                          new Sortable(app.moduleList, {
-                              group: { name: 'shared', pull: 'clone', put: false },
-                              animation: 150,
-                              sort: false,
-                              filter: 'h3',
-                              preventOnFilter: false,
-                              delay: 300, // 300msの長押しでドラッグ開始
-                              delayOnTouchOnly: true // タッチデバイスのみ遅延を有効化
-                          });
-                          console.log('Sortable for moduleList initialized.');
-                  
                       const onAddModule = (evt, targetModuleArray) => {
                         const item = evt.item; // The cloned element from the palette
                         const draggedModuleId = item.dataset.moduleId;
