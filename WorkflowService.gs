@@ -216,7 +216,7 @@ var WorkflowService = {
         LogService.addLog(logContext.runId, 'system', `[モジュール実行] ${moduleConfig.name} (ID: ${moduleConfig.id})`);
 
         // モジュールロジックを実行
-        const result = this._executeModuleLogic(moduleConfig.id, moduleConfig.settings, lastReturnValue);
+        const result = this._executeModuleLogic(moduleDef, moduleConfig.settings, lastReturnValue);
 
         // 返り値があるモジュールの場合、次のモジュールに渡す
         if (moduleDef.returnsValue) {
@@ -249,51 +249,40 @@ var WorkflowService = {
    * @param {*} inputValue - 前のモジュールからの入力値
    * @returns {*} モジュールの処理結果
    */
-  _executeModuleLogic: function (moduleId, configs, inputValue) {
-    // inputValue は主にファイルIDのリストなどを想定
-    const fileIds = Array.isArray(inputValue) ? inputValue : [];
-
-    switch (moduleId) {
-      // =============================================
-      // オーガナイザー機能 (新しいサービス経由)
-      // =============================================
-      case 'drive_filter_files':
-        return OrganizerService.filterFiles(configs, fileIds);
-      
-      case 'drive_convert_files':
-        return OrganizerService.convertFiles(configs, fileIds);
-
-      case 'drive_archive_files':
-        return OrganizerService.archiveFiles(configs, fileIds);
-
-      // =============================================
-      // 新しいサービスモジュール
-      // =============================================
-      case 'drive_move_file':
-        return DriveService.moveFile(configs);
-      
-      case 'drive_copy_file':
-        return DriveService.copyFile(configs);
-
-      case 'sheets_update_cell':
-        return SheetService.updateCell(configs);
-
-      case 'sheets_append_row':
-        return SheetService.appendRow(configs);
-      
-      case 'gmail_send_email':
-        return GmailService.sendEmail(configs);
-
-      case 'calendar_create_event':
-        return CalendarService.createEvent(configs);
-      
-      case 'docs_create_file':
-        return DocsService.createFile(configs);
-
-      default:
-        Logger.log(`モジュールID「${moduleId}」に対応する処理が見つかりません。スキップします。`);
-        return null;
+  _executeModuleLogic: function (moduleDef, configs, inputValue) {
+    if (!moduleDef || !moduleDef.handler) {
+      throw new Error(`モジュール定義またはハンドラが不正です: ${moduleDef.id}`);
     }
+
+    const handlerParts = moduleDef.handler.split('.');
+    if (handlerParts.length !== 2) {
+      throw new Error(`ハンドラの形式が不正です: ${moduleDef.handler}`);
+    }
+
+    const serviceName = handlerParts[0];
+    const functionName = handlerParts[1];
+
+    // 'this'コンテキストからグローバルサービスオブジェクトを取得
+    const service = this[serviceName];
+
+    if (typeof service !== 'object' || service === null) {
+      throw new Error(`サービス「${serviceName}」が見つかりません。`);
+    }
+
+    const func = service[functionName];
+    if (typeof func !== 'function') {
+      throw new Error(`サービス「${serviceName}」にメソッド「${functionName}」が見つかりません。`);
+    }
+
+    // 互換性のための引数ハンドリング
+    // 従来のオーガナイザーモジュールは2つの引数を期待する
+    if (['OrganizerService'].includes(serviceName)) {
+      const fileIds = Array.isArray(inputValue) ? inputValue : [];
+      return func.call(service, configs, fileIds);
+    }
+    
+    // 新しい標準モジュールは設定オブジェクトのみを期待する
+    return func.call(service, configs);
   },
 
 };
