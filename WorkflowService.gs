@@ -267,14 +267,31 @@ var WorkflowService = {
         return drive_archive_files(configs, fileIds);
 
       // =============================================
-      // ここに他のモジュールIDのcaseを追加していく
+      // 新しいサービスモジュール
       // =============================================
-      // case 'another_module_id':
-      //   return AnotherModule.run(configs, inputValue);
+      case 'drive_move_file':
+        return DriveService.moveFile(configs);
+      
+      case 'drive_copy_file':
+        return DriveService.copyFile(configs);
+
+      case 'sheets_update_cell':
+        return SheetService.updateCell(configs);
+
+      case 'sheets_append_row':
+        return SheetService.appendRow(configs);
+      
+      case 'gmail_send_email':
+        return GmailService.sendEmail(configs);
+
+      case 'calendar_create_event':
+        return CalendarService.createEvent(configs);
+      
+      case 'docs_create_file':
+        return DocsService.createFile(configs);
 
       default:
         Logger.log(`モジュールID「${moduleId}」に対応する処理が見つかりません。スキップします。`);
-        // throw new Error(`モジュールID「${moduleId}」に対応する処理が定義されていません。`);
         return null;
     }
   },
