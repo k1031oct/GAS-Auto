@@ -255,16 +255,16 @@ var WorkflowService = {
 
     switch (moduleId) {
       // =============================================
-      // オーガナイザー機能
+      // オーガナイザー機能 (新しいサービス経由)
       // =============================================
       case 'drive_filter_files':
-        return drive_filter_files(configs, fileIds);
+        return OrganizerService.filterFiles(configs, fileIds);
       
       case 'drive_convert_files':
-        return drive_convert_files(configs, fileIds);
+        return OrganizerService.convertFiles(configs, fileIds);
 
       case 'drive_archive_files':
-        return drive_archive_files(configs, fileIds);
+        return OrganizerService.archiveFiles(configs, fileIds);
 
       // =============================================
       // 新しいサービスモジュール
