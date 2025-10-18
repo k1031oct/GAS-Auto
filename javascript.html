@@ -820,7 +820,7 @@
                 const minHeight = moduleHeader ? moduleHeader.offsetHeight : 60;
 
                 // Dragging the handle (at the top) up should now expand the palette.
-                const newHeight = Math.max(minHeight, currentHeight + dy);
+                const newHeight = Math.max(minHeight, currentHeight - dy);
                 app.modulePalette.style.height = `${newHeight}px`;
               }
             };
@@ -855,8 +855,16 @@
 
             // Set initial heights for mobile view
             if (window.innerWidth < 768) { // md breakpoint
-              app.modulePalette.style.height = '120px'; // Enough for ~2 modules
-              app.logArea.style.height = '80px';      // Enough for header + ~1 log line
+              const moduleFooterMobile = document.getElementById('module-source-footer-mobile');
+              const moduleFooterHeight = moduleFooterMobile.offsetHeight;
+              const logLineHeight = 20; // Approximate height for one log line + header
+              const moduleItemHeight = 40; // Approximate height for one module item
+
+              const logAreaHeight = logLineHeight + moduleFooterHeight + 24; // Added padding
+              app.logArea.style.height = `${logAreaHeight}px`;
+
+              const modulePaletteHeight = (moduleItemHeight * 2) + logAreaHeight;
+              app.modulePalette.style.height = `${modulePaletteHeight}px`;
             }
 
             google.script.run.withSuccessHandler(data => {
