@@ -40,8 +40,32 @@
 
     <!-- Main Content Area -->
     <main class="flex-grow flex flex-col md:flex-row overflow-hidden">
+      <!-- Workflow Editor -->
+      <section id="main-area" class="flex-grow flex flex-col bg-gray-100 md:h-full overflow-hidden md:order-2">
+        <!-- Workflow Title Display (Fixed Header) -->
+        <div class="p-2 md:p-4 border-b border-gray-200 bg-white md:bg-gray-100 flex-shrink-0 border-t md:border-t-0">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-gray-800">ワークフローエディタ</h2>
+            <span id="workflow-name-display" class="text-lg font-mono px-3 py-1 bg-blue-100 text-blue-800 rounded-md">新規ワークフロー</span>
+          </div>
+        </div>
+        <!-- Scrollable Module Area Wrapper -->
+        <div class="flex-grow p-2 md:p-4 overflow-y-auto">
+            <div id="workflow-container" class="space-y-4 min-h-full p-2 md:p-4 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner">
+              <div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
+                <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
+                <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
+              </div>
+            </div>
+        </div>
+      </section>
+
+      <!-- Module Resize Handle (Mobile Only) -->
+      <div id="module-resize-handle" class="w-full h-2 bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors md:hidden"></div>
+
       <!-- Module Palette (Sidebar) -->
-      <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full">
+      <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r-0 md:border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full md:order-1">
         <div class="p-3 md:p-4 border-b">
           <div class="flex justify-between items-center">
             <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
@@ -65,42 +89,7 @@
           </div>
         </div>
       </aside>
-
-      <!-- Workflow Resize Handle (Mobile Only) -->
-      <div id="workflow-resize-handle" class="w-full h-2 bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors md:hidden"></div>
-
-      <!-- Workflow Editor -->
-      <section id="main-area" class="flex-grow flex flex-col bg-gray-100 md:h-full overflow-hidden">
-        <!-- Workflow Title Display (Fixed Header) -->
-        <div class="p-2 md:p-4 border-b border-gray-200 bg-white md:bg-gray-100 flex-shrink-0 border-t md:border-t-0">
-          <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold text-gray-800">ワークフローエディタ</h2>
-            <span id="workflow-name-display" class="text-lg font-mono px-3 py-1 bg-blue-100 text-blue-800 rounded-md">新規ワークフロー</span>
-          </div>
-        </div>
-        <!-- Scrollable Module Area Wrapper -->
-        <div class="flex-grow p-2 md:p-4 overflow-y-auto">
-            <div id="workflow-container" class="space-y-4 min-h-full p-2 md:p-4 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner">
-              <div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
-                <i class="fas fa-arrow-down text-3xl md:text-4xl mb-3 text-gray-300"></i>
-                <p class="text-sm md:text-base">上部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
-                <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
-              </div>
-            </div>
-        </div>
-      </section>
     </main>
-
-    <!-- Module Source Folder Settings (Mobile) -->
-    <div id="module-source-footer-mobile" class="p-3 border-t border-gray-200 bg-gray-50 md:hidden flex-shrink-0">
-      <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-600 block mb-1">
-        カスタムモジュール フォルダID
-      </label>
-      <div class="flex items-center gap-2">
-        <input type="text" id="module-folder-id-mobile" placeholder="Google Drive Folder ID" class="w-full p-2 text-xs border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-        <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex-shrink-0"><i class="fas fa-sync-alt"></i></button>
-      </div>
-    </div>
 
     <!-- Footer (Log Area) -->
     <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-32 md:h-48 flex flex-col">
@@ -114,6 +103,16 @@
           </div>
         </div>
         <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300 scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800"></pre>
+      </div>
+      <!-- Module Source Folder Settings (Mobile) -->
+      <div id="module-source-footer-mobile" class="p-3 border-t border-gray-700 bg-gray-800 md:hidden flex-shrink-0">
+        <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-400 block mb-1">
+          カスタムモジュール フォルダID
+        </label>
+        <div class="flex items-center gap-2">
+          <input type="text" id="module-folder-id-mobile" placeholder="Google Drive Folder ID" class="w-full p-2 text-xs border border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white">
+          <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-2 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors flex-shrink-0"><i class="fas fa-sync-alt"></i></button>
+        </div>
       </div>
     </footer>
   </div>
