@@ -280,15 +280,9 @@ var WorkflowService = {
       throw new Error(`サービス「${serviceName}」にメソッド「${functionName}」が見つかりません。`);
     }
 
-    // 互換性のための引数ハンドリング
-    // 従来のオーガナイザーモジュールは2つの引数を期待する
-    if (['OrganizerService'].includes(serviceName)) {
-      const fileIds = Array.isArray(inputValue) ? inputValue : [];
-      return func.call(service, configs, fileIds);
-    }
-    
-    // 新しい標準モジュールは設定オブジェクトのみを期待する
-    return func.call(service, configs);
+    // 新しい標準モジュールと従来のモジュールの両方に対応するため、
+    // configsとinputValueの両方を渡す。ハンドラ側で不要な引数は無視される。
+    return func.call(service, configs, inputValue);
   },
 
   /**
