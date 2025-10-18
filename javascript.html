@@ -70,6 +70,7 @@
                         mobileSettingsBtn: document.getElementById('mobile-settings-btn'),
                         mobileTriggerBtn: document.getElementById('mobile-trigger-btn'),
                         mobileHistoryBtn: document.getElementById('mobile-history-btn'),
+                        mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
                       };
                   
                       // --- State Management ---
@@ -435,6 +436,7 @@
                         app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
                         app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
                         app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
+                        app.mobileShowLogBtn.addEventListener('click', showLog);
                       };
                   
                       // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
@@ -865,11 +867,13 @@
                         state.logArea.originalHeight = app.logArea.style.height || '16rem';
                         app.logArea.classList.add('hidden');
                         app.showLogBtn.classList.remove('hidden');
+                        app.mobileShowLogBtn.classList.remove('hidden');
                       };
                   
                       const showLog = () => {
                         app.logArea.classList.remove('hidden');
                         app.showLogBtn.classList.add('hidden');
+                        app.mobileShowLogBtn.classList.add('hidden');
                         app.logArea.style.height = state.logArea.originalHeight;
                       };
                       
