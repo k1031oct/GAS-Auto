@@ -859,7 +859,7 @@
               const moduleFooterHeight = moduleFooterMobile.offsetHeight;
 
               // Height for the log area header plus one line of text and padding.
-              const singleLogLineAreaHeight = 60; 
+              const singleLogLineAreaHeight = 90; 
               // Height for the module palette header plus two visible module items.
               const twoModuleItemsAreaHeight = 120;
 
@@ -870,7 +870,7 @@
 
               // Calculate initial height for the module palette.
               // Goal: Show two modules and the entire log area below it.
-              const modulePaletteHeight = twoModuleItemsAreaHeight + logAreaHeight + moduleFooterHeight;
+              const modulePaletteHeight = twoModuleItemsAreaHeight + logAreaHeight;
               app.modulePalette.style.height = `${modulePaletteHeight}px`;
             }
 
