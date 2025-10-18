@@ -488,7 +488,7 @@
                   
                       const openSettingsModal = () => {
                         app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
-                        app.darkModeToggle.checked = state.appSettings.darkMode || false;
+                        app.darkModeToggle.checked = state.appSettings.darkMode;
                         app.settingsModalBackdrop.classList.remove('hidden');
                       };
                   
@@ -1085,23 +1085,24 @@
                           app.modulePalette.style.height = `${modulePaletteHeight}px`;
                         }
             
-                        google.script.run.withSuccessHandler(data => {
-                          if (data.settings) {
-                              state.appSettings = data.settings;
-                              applySettings(data.settings);
-                          }
-                          if (data.workflows) {
-                              updateWorkflowList(data.workflows);
-                          }
-                          if (data.moduleFolderId) {
-                            state.currentModuleFolderId = data.moduleFolderId;
-                            app.moduleFolderIdInput.value = data.moduleFolderId;
-                            app.moduleFolderIdInputMobile.value = data.moduleFolderId;
-                            loadModuleDefinitionsFromDrive();
-                          }
-                          hideLoader();
-                        }).withFailureHandler(showError).getInitialData();
-                      }
+                                    google.script.run.withSuccessHandler(data => {
+                                      state.appSettings = data.settings || {};
+                                      if (typeof state.appSettings.darkMode === 'undefined') {
+                                        state.appSettings.darkMode = true;
+                                      }
+                                      applySettings(state.appSettings);
+                        
+                                      if (data.workflows) {
+                                          updateWorkflowList(data.workflows);
+                                      }
+                                      if (data.moduleFolderId) {
+                                        state.currentModuleFolderId = data.moduleFolderId;
+                                        app.moduleFolderIdInput.value = data.moduleFolderId;
+                                        app.moduleFolderIdInputMobile.value = data.moduleFolderId;
+                                        loadModuleDefinitionsFromDrive();
+                                      }
+                                      hideLoader();
+                                    }).withFailureHandler(showError).getInitialData();                      }
                   
                       init();
                     });
