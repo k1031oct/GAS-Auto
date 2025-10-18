@@ -254,6 +254,7 @@
                               instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
                               name: moduleDef.name,
                               type: moduleDef.type,
+                              enabled: true, // デフォルトで有効
                               settings: {} // Initialize settings object
                           };
       
@@ -552,7 +553,8 @@
               }
               state.modules.forEach((module, index) => {
                   const moduleEl = document.createElement('div');
-                  moduleEl.className = 'bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center cursor-grab hover:shadow-md';
+                  const isEnabled = module.enabled !== false;
+                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''}`;
                   moduleEl.dataset.id = module.instanceId;
                   moduleEl.dataset.moduleId = module.id;
                   const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
@@ -561,18 +563,50 @@
                   const totalSettings = moduleDef.settings ? moduleDef.settings.length : 0;
       
                   moduleEl.innerHTML = `
-                      <div class="flex items-center gap-3 flex-grow">
-                          <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-blue-600"></i>
-                          <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
-                          <span class="text-sm text-gray-500 ml-4">${configuredCount} / ${totalSettings} 個設定済み</span>
-                      </div>
-                      <div class="flex gap-2">
-                          <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
-                          <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                      </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-full rounded-full self-stretch ${isEnabled ? 'bg-blue-500' : 'bg-gray-300'}"></div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600"></i>
+                                    <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
+                                        <div class="relative">
+                                            <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
+                                            <div class="block bg-gray-300 w-10 h-6 rounded-full"></div>
+                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                        </div>
+                                    </label>
+                                    <button data-action="run" class="p-2 text-green-500 hover:text-green-700" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
+                                    <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
+                                    <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                                </div>
+                            </div>
+                            <div class="mt-2 text-sm text-gray-500">
+                                <span>${configuredCount} / ${totalSettings} 個設定済み</span>
+                            </div>
+                        </div>
+                    </div>
                   `;
                   app.workflowContainer.appendChild(moduleEl);
                   
+                  moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
+                      const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
+                      if (moduleData) {
+                          moduleData.enabled = e.target.checked;
+                          markDirty();
+                      }
+                  });
+
+                  moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
+                      const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
+                      if (moduleData) {
+                          runSingleModule(moduleData);
+                      }
+                  });
+
                   moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
                       const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
                       if (!moduleData) {
@@ -738,6 +772,23 @@
               } else {
                   newWorkflow();
               }
+          };
+
+          const runSingleModule = (moduleConfig) => {
+              if (state.isDirty) {
+                  showCustomDialog({ title: 'エラー', message: '変更を保存してから実行してください。', type: 'alert' });
+                  return;
+              }
+              showLoader();
+              log(`--- 単体実行開始: ${moduleConfig.name} ---`, 'system');
+              google.script.run
+                  .withSuccessHandler(logs => {
+                      logs.forEach(l => log(l.message, l.level)); // LogServiceのlevelをそのまま使う
+                      log(`--- 単体実行完了: ${moduleConfig.name} ---`, 'system');
+                      hideLoader();
+                  })
+                  .withFailureHandler(showError)
+                  .runSingleModule(state.currentWorkflowName || '新規ワークフロー', moduleConfig, state.currentModuleFolderId);
           };
       
           const toggleMaximizeLog = () => {

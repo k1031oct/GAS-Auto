@@ -191,6 +191,21 @@ var ModuleService = {
           { "id": "content", "name": "初期コンテンツ", "type": "textarea", "required": false }
         ],
         "handler": "DocsService.createFile"
+      },
+      {
+        "id": "group_container",
+        "name": "グループ化",
+        "description": "複数のモジュールをグループ化して、ワークフローを整理します。",
+        "category": "構造",
+        "icon": "fa-box-open",
+        "type": "container",
+        "settings": [
+          { "id": "groupTitle", "name": "グループタイトル", "type": "text", "defaultValue": "新しいグループ" }
+        ],
+        "handler": "",
+        "branches": [
+          { "id": "modules", "name": "モジュール" }
+        ]
       }
     ];
 

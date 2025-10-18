@@ -208,6 +208,12 @@ var WorkflowService = {
       LogService.addLog(logContext.runId, 'info', `ワークフロー「${workflowName}」の実行を開始します...`);
 
       for (const moduleConfig of modules) {
+        // 'enabled'プロパティのチェック（未定義の場合はtrueとして扱う）
+        if (moduleConfig.enabled === false) {
+          LogService.addLog(logContext.runId, 'info', `[モジュールスキップ] ${moduleConfig.name} (ID: ${moduleConfig.id}) は無効化されています。`);
+          continue;
+        }
+
         const moduleDef = ModuleService.getModuleById(moduleConfig.id);
         if (!moduleDef) {
           throw new Error(`モジュール「${moduleConfig.id}」の定義が見つかりません。`);
@@ -285,4 +291,55 @@ var WorkflowService = {
     return func.call(service, configs);
   },
 
+  /**
+   * 単体のモジュールを実行し、ログを返す
+   * @param {string} workflowName - 現在のワークフロー名
+   * @param {object} moduleConfig - 実行するモジュールの設定
+   * @param {string} moduleFolderId - モジュール定義が保存されているフォルダID
+   * @returns {Array<object>} 実行ログの配列
+   */
+  runSingleModule: function (workflowName, moduleConfig, moduleFolderId) {
+    // モジュール定義をロード
+    if (moduleFolderId) {
+      ModuleService.loadModuleDefinitions(moduleFolderId);
+    }
+
+    const startTime = new Date();
+    const executionType = '単体実行';
+    let logContext = LogService.startLog(workflowName, executionType);
+    let status = '成功';
+
+    try {
+      LogService.addLog(logContext.runId, 'info', `単体実行: モジュール「${moduleConfig.name}」を開始します...`);
+
+      const moduleDef = ModuleService.getModuleById(moduleConfig.id);
+      if (!moduleDef) {
+        throw new Error(`モジュール「${moduleConfig.id}」の定義が見つかりません。`);
+      }
+
+      LogService.addLog(logContext.runId, 'system', `[モジュール実行] ${moduleConfig.name} (ID: ${moduleConfig.id})`);
+
+      // モジュールロジックを実行（入力値はnull）
+      const result = this._executeModuleLogic(moduleDef, moduleConfig.settings, null);
+
+      if (moduleDef.returnsValue) {
+        const resultInfo = Array.isArray(result) ? `${result.length}件のアイテム` : String(result);
+        LogService.addLog(logContext.runId, 'info', `  ↪ 結果: ${resultInfo}`);
+      }
+
+      LogService.addLog(logContext.runId, 'success', 'モジュールの単体実行が正常に完了しました。');
+
+    } catch (e) {
+      status = '失敗';
+      LogService.addLog(logContext.runId, 'error', `[致命的なエラー] ${e.message} モジュールの実行を中断しました。`);
+      Logger.log(e.stack);
+    } finally {
+      const endTime = new Date();
+      const executionTime = (endTime.getTime() - startTime.getTime()) / 1000;
+      LogService.endLog(logContext.runId, logContext.summaryRow, status, executionTime);
+    }
+    
+    // ログを返却
+    return LogService.getLogsByRunId(logContext.runId);
+  },
 };
