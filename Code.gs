@@ -148,6 +148,22 @@ function createInitialModules(folderId) {
 }
 
 //================================================================
+// 4. トリガーサービスの公開関数
+//================================================================
+
+function getTriggersForWorkflow(workflowName) {
+  return TriggerService.getTriggersForWorkflow(workflowName);
+}
+
+function createTimeBasedTrigger(workflowName, options) {
+  return TriggerService.createTimeBasedTrigger(workflowName, options);
+}
+
+function deleteTrigger(triggerUid) {
+  return TriggerService.deleteTrigger(triggerUid);
+}
+
+//================================================================
 // 5. アプリケーション設定の管理
 //================================================================
 

@@ -157,7 +157,7 @@
           app.triggerModalBackdrop.classList.remove('hidden');
         })
         .withFailureHandler(showError)
-        .TriggerService.getTriggersForWorkflow(state.currentWorkflowName);
+        .getTriggersForWorkflow(state.currentWorkflowName);
     };
 
     const closeTriggerModal = () => {
@@ -199,7 +199,7 @@
           openTriggerModal(); // Refresh the list
         })
         .withFailureHandler(showError)
-        .TriggerService.deleteTrigger(uid);
+        .deleteTrigger(uid);
     };
 
     const handleCreateTrigger = () => {
@@ -216,7 +216,7 @@
           openTriggerModal(); // Refresh the list
         })
         .withFailureHandler(showError)
-        .TriggerService.createTimeBasedTrigger(state.currentWorkflowName, options);
+        .createTimeBasedTrigger(state.currentWorkflowName, options);
     };
     
     // --- initEventListeners ---
