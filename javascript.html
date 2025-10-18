@@ -76,7 +76,7 @@
             appSettings: {},
             logArea: {
               isMaximized: false,
-              originalHeight: '12rem',
+              originalHeight: '6rem',
             }
           };
       
@@ -744,7 +744,7 @@
             state.logArea.isMaximized = !state.logArea.isMaximized;
             const icon = app.maximizeLogBtn.querySelector('i');
             if (state.logArea.isMaximized) {
-              state.logArea.originalHeight = app.logArea.style.height || '12rem';
+              state.logArea.originalHeight = app.logArea.style.height || '6rem';
               app.logArea.style.height = '85vh';
               icon.classList.remove('fa-window-maximize');
               icon.classList.add('fa-window-restore');
@@ -758,7 +758,7 @@
           };
       
           const hideLog = () => {
-            state.logArea.originalHeight = app.logArea.style.height || '12rem';
+            state.logArea.originalHeight = app.logArea.style.height || '6rem';
             app.logArea.classList.add('hidden');
             app.showLogBtn.classList.remove('hidden');
           };
@@ -817,7 +817,7 @@
                 const moduleHeader = app.modulePalette.querySelector('.p-3.md\\:p-4.border-b');
                 const logHeight = app.logArea.classList.contains('hidden') ? 0 : app.logArea.offsetHeight;
                 const minHeight = (moduleHeader ? moduleHeader.offsetHeight : 0) + logHeight;
-                const newHeight = Math.max(minHeight, currentHeight + dy);
+                const newHeight = Math.max(minHeight, currentHeight - dy);
                 app.modulePalette.style.height = `${newHeight}px`;
               }
             };
