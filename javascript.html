@@ -259,12 +259,23 @@
                     }
 
                     console.log('onAdd triggered. newModule:', newModule, 'state.modules (before splice):', state.modules);
+                    
+                    // First, remove the temporary clone from the DOM.
+                    evt.item.remove(); 
+                    
+                    // Then, update the state array.
                     state.modules.splice(evt.newIndex, 0, newModule);
-                    evt.item.remove(); // Remove the ghost element
+                    
+                    // Finally, trigger a re-render from the updated state.
                     markDirty();
                 }
             },
-            onUpdate: markDirty, // Module position changed
+            onUpdate: (evt) => {
+                // Move the item in the state array to match the new DOM order.
+                const movedItem = state.modules.splice(evt.oldIndex, 1)[0];
+                state.modules.splice(evt.newIndex, 0, movedItem);
+                markDirty();
+            },
             filter: 'button', // Ignore clicks on buttons
             preventOnFilter: false
         });
