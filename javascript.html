@@ -800,7 +800,14 @@
                 lastY = clientY;
                 const currentHeight = app.logArea.offsetHeight;
                 const logHeader = app.logArea.querySelector('.flex.items-center.justify-between');
-                const minHeight = logHeader ? logHeader.offsetHeight + 24 : 80; // 24px for padding
+                const moduleFooter = document.getElementById('module-source-footer-mobile');
+                let minHeight = logHeader ? logHeader.offsetHeight + 24 : 80; // 24px for padding
+
+                if (moduleFooter && moduleFooter.offsetParent !== null) { // is visible on mobile
+                  const logTextVisibleHeight = 32; // For a couple lines of log text
+                  minHeight = (logHeader ? logHeader.offsetHeight : 0) + logTextVisibleHeight + moduleFooter.offsetHeight;
+                }
+
                 const newHeight = Math.max(minHeight, currentHeight + dy);
                 app.logArea.style.height = `${newHeight}px`;
               } else if (isResizingModule) {
@@ -809,7 +816,7 @@
                 const currentHeight = app.modulePalette.offsetHeight;
                 const moduleHeader = app.modulePalette.querySelector('.p-3.md\\:p-4.border-b');
                 const logHeight = app.logArea.classList.contains('hidden') ? 0 : app.logArea.offsetHeight;
-                const minHeight = moduleHeader ? moduleHeader.offsetHeight + logHeight : 150;
+                const minHeight = (moduleHeader ? moduleHeader.offsetHeight : 0) + logHeight;
                 const newHeight = Math.max(minHeight, currentHeight + dy);
                 app.modulePalette.style.height = `${newHeight}px`;
               }
