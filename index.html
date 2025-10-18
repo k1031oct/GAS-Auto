@@ -61,11 +61,12 @@
         </div>
       </section>
 
-      <!-- Module Resize Handle (Mobile Only) -->
-      <div id="module-resize-handle" class="w-full h-2 bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors md:hidden"></div>
-
       <!-- Module Palette (Sidebar) -->
       <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r-0 md:border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full md:order-1">
+        <!-- Module Resize Handle (Mobile Only) -->
+        <div class="w-full h-2 flex justify-end md:hidden bg-gray-200">
+          <div id="module-resize-handle" class="w-12 h-full bg-gray-300 rounded-b-md cursor-ns-resize hover:bg-gray-400 transition-colors"></div>
+        </div>
         <div class="p-3 md:p-4 border-b">
           <div class="flex justify-between items-center">
             <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
@@ -93,7 +94,9 @@
 
     <!-- Footer (Log Area) -->
     <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-48 md:h-64 flex flex-col">
-      <div id="resize-handle" class="w-full h-2 cursor-ns-resize hover:bg-gray-700 transition-colors"></div>
+      <div class="w-full h-2 flex justify-end">
+        <div id="resize-handle" class="w-12 h-full bg-gray-700 rounded-t-md cursor-ns-resize hover:bg-gray-600 transition-colors"></div>
+      </div>
       <div class="p-3 flex flex-col flex-grow overflow-hidden">
         <div class="flex items-center justify-between mb-1">
           <h3 class="font-mono text-sm font-bold text-gray-200">実行ログ</h3>
