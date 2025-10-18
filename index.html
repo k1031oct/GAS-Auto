@@ -98,12 +98,9 @@
         <div class="w-12 h-1.5 bg-gray-500 rounded-full"></div>
       </div>
       <div class="p-3 flex flex-col flex-grow overflow-hidden">
-        <div class="relative flex items-center justify-center mb-1">
-          <h3 class="absolute left-0 font-mono text-sm font-bold text-gray-200">実行ログ</h3>
-          <div class="flex items-center gap-2">
-            <button id="maximize-log-btn" title="最大化" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-window-maximize"></i></button>
-            <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
-          </div>
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="font-mono text-sm font-bold text-gray-200">実行ログ</h3>
+          <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
         </div>
         <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300 scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800"></pre>
       </div>
