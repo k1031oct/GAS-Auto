@@ -25,6 +25,7 @@
       workflowNameDisplay: document.getElementById('workflow-name-display'),
       dirtyIndicator: document.getElementById('dirty-indicator'),
       resizeHandle: document.getElementById('resize-handle'),
+      workflowResizeHandle: document.getElementById('workflow-resize-handle'),
       customDialog: document.getElementById('custom-dialog'),
       customDialogTitle: document.getElementById('custom-dialog-title'),
       customDialogMessage: document.getElementById('custom-dialog-message'),
@@ -767,8 +768,74 @@
       app.logArea.style.height = state.logArea.originalHeight;
     };
     
+    const initResizing = () => {
+      let isResizingLog = false;
+      let isResizingWorkflow = false;
+      let lastY = 0;
+
+      const startResizeLog = (e) => {
+        e.preventDefault();
+        isResizingLog = true;
+        lastY = e.clientY || e.touches[0].clientY;
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+      };
+
+      const startResizeWorkflow = (e) => {
+        e.preventDefault();
+        isResizingWorkflow = true;
+        lastY = e.clientY || e.touches[0].clientY;
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+      };
+
+      const doResize = (e) => {
+        if (!isResizingLog && !isResizingWorkflow) return;
+        
+        const clientY = e.clientY !== undefined ? e.clientY : e.touches[0].clientY;
+
+        if (isResizingLog) {
+          const dy = lastY - clientY;
+          lastY = clientY;
+          const currentHeight = app.logArea.offsetHeight;
+          const newHeight = Math.max(50, currentHeight + dy); // 50px min height
+          app.logArea.style.height = `${newHeight}px`;
+        } else if (isResizingWorkflow) {
+          const dy = clientY - lastY;
+          lastY = clientY;
+          const currentHeight = app.moduleList.offsetHeight;
+          const newHeight = Math.max(100, currentHeight + dy); // 100px min height
+          app.moduleList.style.height = `${newHeight}px`;
+        }
+      };
+
+      const stopResize = () => {
+        isResizingLog = false;
+        isResizingWorkflow = false;
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+      };
+
+      // Log resize handle
+      app.resizeHandle.addEventListener('mousedown', startResizeLog);
+      app.resizeHandle.addEventListener('touchstart', startResizeLog, { passive: false });
+
+      // Workflow resize handle
+      if (app.workflowResizeHandle) {
+        app.workflowResizeHandle.addEventListener('mousedown', startResizeWorkflow);
+        app.workflowResizeHandle.addEventListener('touchstart', startResizeWorkflow, { passive: false });
+      }
+
+      document.addEventListener('mousemove', doResize);
+      document.addEventListener('touchmove', doResize, { passive: false });
+
+      document.addEventListener('mouseup', stopResize);
+      document.addEventListener('touchend', stopResize);
+    };
+
     function init() {
       initEventListeners();
+      initResizing();
       google.script.run.withSuccessHandler(data => {
         if (data.settings) {
             state.appSettings = data.settings;
