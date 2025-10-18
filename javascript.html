@@ -819,8 +819,8 @@
                 // Min height should be just enough for the header.
                 const minHeight = moduleHeader ? moduleHeader.offsetHeight : 60;
 
-                // Dragging the handle (at the top) up should now expand the palette.
-                const newHeight = Math.max(minHeight, currentHeight - dy);
+                // Corrected logic: Dragging the handle (at the top) up should expand the palette.
+                const newHeight = Math.max(minHeight, currentHeight + dy);
                 app.modulePalette.style.height = `${newHeight}px`;
               }
             };
@@ -857,13 +857,20 @@
             if (window.innerWidth < 768) { // md breakpoint
               const moduleFooterMobile = document.getElementById('module-source-footer-mobile');
               const moduleFooterHeight = moduleFooterMobile.offsetHeight;
-              const logLineHeight = 20; // Approximate height for one log line + header
-              const moduleItemHeight = 40; // Approximate height for one module item
 
-              const logAreaHeight = logLineHeight + moduleFooterHeight + 24; // Added padding
+              // Height for the log area header plus one line of text and padding.
+              const singleLogLineAreaHeight = 60; 
+              // Height for the module palette header plus two visible module items.
+              const twoModuleItemsAreaHeight = 120;
+
+              // Calculate initial height for the log area.
+              // Goal: Show one log line and the module folder ID input area.
+              const logAreaHeight = singleLogLineAreaHeight + moduleFooterHeight;
               app.logArea.style.height = `${logAreaHeight}px`;
 
-              const modulePaletteHeight = (moduleItemHeight * 2) + logAreaHeight;
+              // Calculate initial height for the module palette.
+              // Goal: Show two modules and the entire log area below it.
+              const modulePaletteHeight = twoModuleItemsAreaHeight + logAreaHeight;
               app.modulePalette.style.height = `${modulePaletteHeight}px`;
             }
 
