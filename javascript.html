@@ -245,6 +245,7 @@
                         type: moduleDef.type,
                         settings: {} // Start with empty settings
                     };
+                    console.log('onAdd triggered. newModule:', newModule, 'state.modules (before splice):', state.modules);
                     state.modules.splice(evt.newIndex, 0, newModule);
                     evt.item.remove(); // Remove the ghost element
                     markDirty();
@@ -480,6 +481,7 @@
     };
 
     const renderModules = () => {
+        console.log('renderModules triggered. state.modules:', state.modules);
         app.workflowContainer.innerHTML = '';
         if (state.modules.length === 0) {
             app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-8">
