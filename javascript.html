@@ -45,6 +45,7 @@
       settingsCloseBtn: document.getElementById('settings-close-btn'),
       settingsModuleFolderIdInput: document.getElementById('settings-module-folder-id'),
       darkModeToggle: document.getElementById('dark-mode-toggle'),
+      createInitialModulesBtn: document.getElementById('create-initial-modules-btn'),
     };
 
     // --- State Management ---
@@ -55,6 +56,7 @@
       isDirty: false,
       allModuleDefinitions: [], // Loaded from Drive
       initialWorkflows: [],
+      appSettings: {}, // Holds application settings like darkMode
       logArea: {
         isMaximized: false,
         originalHeight: '12rem', // Corresponds to h-48
@@ -248,15 +250,10 @@
     // --- App Settings Modal ---
 
     const openSettingsModal = () => {
-      // Load current settings into the modal before showing
-      google.script.run
-        .withSuccessHandler(settings => {
-          app.settingsModuleFolderIdInput.value = settings.moduleFolderId || '';
-          app.darkModeToggle.checked = settings.darkMode || false;
-          app.settingsModalBackdrop.classList.remove('hidden');
-        })
-        .withFailureHandler(showError)
-        .getSettings();
+      // サーバー呼び出しをせず、クライアントのstateから直接読み込む
+      app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
+      app.darkModeToggle.checked = state.appSettings.darkMode || false;
+      app.settingsModalBackdrop.classList.remove('hidden');
     };
 
     const closeSettingsModal = () => {
@@ -273,30 +270,38 @@
       };
       showLoader();
       google.script.run
-        .withSuccessHandler(() => {
+        .withSuccessHandler((savedSettings) => {
           log('設定を保存しました。', 'success');
-          applySettings(settings);
+          state.appSettings = savedSettings; // Update state with saved settings
+          applySettings(savedSettings);
           state.currentModuleFolderId = folderId;
           app.moduleFolderIdInput.value = folderId; // メイン画面の入力欄も更新
-
-          // 初回設定時のみモジュールを生成
-          if (folderId) {
-            google.script.run
-              .withSuccessHandler((result) => {
-                log(result, 'success');
-                loadModuleDefinitionsFromDrive(); // 再読み込み
-                hideLoader();
-                closeSettingsModal();
-              })
-              .withFailureHandler(showError)
-              .createInitialModules(folderId);
-          } else {
-            hideLoader();
-            closeSettingsModal();
-          }
+          hideLoader();
+          closeSettingsModal();
         })
         .withFailureHandler(showError)
         .saveSettings(settings);
+    };
+
+    const handleCreateInitialModules = () => {
+      const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
+      const folderId = _extractIdFromUrl(rawFolderId);
+
+      if (!folderId) {
+        showError({ message: 'モジュール保管用フォルダIDが入力されていません。' });
+        return;
+      }
+
+      showLoader();
+      google.script.run
+        .withSuccessHandler((result) => {
+          log(result, 'success');
+          // モジュールが生成された可能性があるので、リストを再読み込み
+          loadModuleDefinitionsFromDrive(); 
+          hideLoader();
+        })
+        .withFailureHandler(showError)
+        .createInitialModules(folderId);
     };
     
     const applySettings = (settings) => {
@@ -307,12 +312,7 @@
         }
     };
 
-    const loadAndApplySettings = () => {
-        google.script.run
-            .withSuccessHandler(applySettings)
-            .withFailureHandler(showError)
-            .getSettings();
-    };
+
 
 
 
@@ -653,6 +653,7 @@
         app.settingsBtn.addEventListener('click', openSettingsModal);
         app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
         app.settingsSaveBtn.addEventListener('click', saveSettings);
+        app.createInitialModulesBtn.addEventListener('click', handleCreateInitialModules);
     };
 
     const handleWorkflowSelect = async () => {
@@ -719,9 +720,12 @@
 
     function init() {
       initEventListeners();
-      loadAndApplySettings();
 
       google.script.run.withSuccessHandler(data => {
+        if (data.settings) {
+            state.appSettings = data.settings;
+            applySettings(data.settings);
+        }
         if (data.workflows) {
             updateWorkflowList(data.workflows);
         }

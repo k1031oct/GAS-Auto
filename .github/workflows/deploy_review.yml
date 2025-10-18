@@ -15,7 +15,6 @@ jobs:
     steps:
       - name: Checkout Code from PR Branch
         uses: actions/checkout@v4
-        # refを削除し、PRブランチ全体をチェックアウトする
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -53,13 +52,11 @@ jobs:
           > ~/.clasprc.json
           echo "Credentials configured."
 
-      # ★★★ ここから追加 ★★★
       - name: Push all files to GAS Editor
         run: |
           echo "Pushing all project files to Google Apps Script..."
           clasp push --force
           echo "Push completed successfully."
-      # ★★★ ここまで追加 ★★★
 
       - name: Deploy to Review Environment
         id: deploy_gas
@@ -76,17 +73,21 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
             
+            // コメントのタイトルを決定
+            // GITHUB_REF_NAME は 'pull/23/merge' のような形式なので、変更があった場合は 'Updated' をつける
+            const title = context.payload.pull_request.commits > 1 ? '✨ Review App Deployed (Updated)' : '✨ Review App Deployed';
+
             github.rest.issues.createComment({
               issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `
-                ## ✨ Review App Deployed
-                The version including the AI agent's fixes can be checked at the URL below.
+                ### ${title}
+                AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
                 
-                **Review Web App URL:** [Open deployed app](${deployUrl})
+                **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
                 
-                After reviewing, please merge the PR if there are no issues.
+                レビュー後、問題がなければPRをマージしてください。
               `
             });
 

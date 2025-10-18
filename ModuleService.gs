@@ -88,6 +88,10 @@ var ModuleService = {
    * @returns {string} 生成結果のメッセージ
    */
   createInitialModules: function (folderId) {
+    if (!folderId) {
+      throw new Error('フォルダIDが指定されていません。処理を中断しました。');
+    }
+
     const defaultModules = [
       {
         "id": "drive_move_file",
