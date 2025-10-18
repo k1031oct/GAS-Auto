@@ -176,13 +176,13 @@
                         }
                         triggers.forEach(trigger => {
                           const triggerEl = document.createElement('div');
-                          triggerEl.className = 'p-2 border rounded-lg flex justify-between items-center';
+                          triggerEl.className = 'p-2 border rounded-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600';
                           triggerEl.innerHTML = `
                             <div>
-                              <p class="font-mono text-sm">${trigger.eventType}</p>
-                              <p class="text-xs text-gray-500">ID: ${trigger.uid}</p>
+                              <p class="font-mono text-sm dark:text-gray-200">${trigger.eventType}</p>
+                              <p class="text-xs text-gray-500 dark:text-gray-400">ID: ${trigger.uid}</p>
                             </div>
-                            <button data-uid="${trigger.uid}" class="delete-trigger-btn p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                            <button data-uid="${trigger.uid}" class="delete-trigger-btn p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                           `;
                           app.triggerList.appendChild(triggerEl);
                         });
@@ -415,32 +415,32 @@
                       const renderModuleSettingsForm = (module, moduleDef) => {
                         app.moduleSettingsContent.innerHTML = '';
                         if (!moduleDef.settings || moduleDef.settings.length === 0) {
-                          app.moduleSettingsContent.innerHTML = '<p class="text-gray-500">このモジュールには設定項目がありません。</p>';
+                          app.moduleSettingsContent.innerHTML = '<p class="text-gray-500 dark:text-gray-400">このモジュールには設定項目がありません。</p>';
                           return;
                         }
                         moduleDef.settings.forEach(setting => {
                           const currentValue = module.settings[setting.id] || setting.defaultValue || '';
                           const fieldWrapper = document.createElement('div');
                           fieldWrapper.className = 'mb-6';
-                          let fieldHTML = `<label for="setting-${setting.id}" class="block text-sm font-bold text-gray-700 mb-2">${setting.name}</label>`;
+                          let fieldHTML = `<label for="setting-${setting.id}" class="block text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">${setting.name}</label>`;
                           switch (setting.type) {
                             case 'text':
                             case 'number':
-                              fieldHTML += `<input type="${setting.type}" id="setting-${setting.id}" data-id="${setting.id}" value="${currentValue}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" placeholder="${setting.placeholder || ''}">`;
+                              fieldHTML += `<input type="${setting.type}" id="setting-${setting.id}" data-id="${setting.id}" value="${currentValue}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">`;
                               break;
                             case 'textarea':
-                              fieldHTML += `<textarea id="setting-${setting.id}" data-id="${setting.id}" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
+                              fieldHTML += `<textarea id="setting-${setting.id}" data-id="${setting.id}" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
                               break;
                             case 'select':
                               const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
-                              fieldHTML += `<select id="setting-${setting.id}" data-id="${setting.id}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white">${options}</select>`;
+                              fieldHTML += `<select id="setting-${setting.id}" data-id="${setting.id}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
                               break;
                             case 'checkbox':
-                              fieldHTML += `<label class="flex items-center"><input type="checkbox" id="setting-${setting.id}" data-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"> <span class="ml-2 text-gray-700">${setting.label || ''}</span></label>`;
+                              fieldHTML += `<label class="flex items-center"><input type="checkbox" id="setting-${setting.id}" data-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
                               break;
                           }
                           if (setting.description) {
-                            fieldHTML += `<p class="text-xs text-gray-500 mt-2">${setting.description}</p>`;
+                            fieldHTML += `<p class="text-xs text-gray-500 mt-2 dark:text-gray-400">${setting.description}</p>`;
                           }
                           fieldWrapper.innerHTML = fieldHTML;
                           app.moduleSettingsContent.appendChild(fieldWrapper);
@@ -658,7 +658,7 @@
                           const isEnabled = module.enabled !== false;
                           const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
                           
-                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''}`;
+                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
                           moduleEl.dataset.id = module.instanceId;
                           moduleEl.dataset.moduleId = module.id;
                   
@@ -671,41 +671,41 @@
                                 <div class="flex-grow">
                                     <div class="flex justify-between items-center">
                                         <div class="flex items-center gap-3">
-                                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600"></i>
-                                            <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
+                                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600 dark:text-gray-400"></i>
+                                            <h3 class="font-bold text-gray-800 dark:text-gray-100">${moduleDef.name}</h3>
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
                                                 <div class="relative">
                                                     <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
-                                                    <div class="block bg-gray-300 w-10 h-6 rounded-full"></div>
+                                                    <div class="block bg-gray-300 w-10 h-6 rounded-full dark:bg-gray-600"></div>
                                                     <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
                                                 </div>
                                             </label>
-                                            <button data-action="run" class="p-2 text-green-500 hover:text-green-700" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
-                                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
-                                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                                            <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
+                                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700 dark:hover:text-blue-400" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
+                                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                                         </div>
                                     </div>
-                                    <div class="mt-2 text-sm text-gray-500">
+                                    <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                         <span>${configuredCount} / ${totalSettings} 個設定済み</span>
                                     </div>`;
                   
                           if (module.type === 'container') {
                               if (module.id === 'condition_branch') {
                                   contentHTML += `
-                                      <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-dashed border-gray-300">
+                                      <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600">
                                           <div>
-                                              <h4 class="font-bold text-sm text-green-600 mb-1">True</h4>
-                                              <div class="module-container-content true-branch min-h-[50px] bg-green-50 p-1 rounded" data-branch="true_modules"></div>
+                                              <h4 class="font-bold text-sm text-green-600 mb-1 dark:text-green-400">True</h4>
+                                              <div class="module-container-content true-branch min-h-[50px] bg-green-50 p-1 rounded dark:bg-green-900/50"></div>
                                           </div>
                                           <div>
-                                              <h4 class="font-bold text-sm text-red-600 mb-1">False</h4>
-                                              <div class="module-container-content false-branch min-h-[50px] bg-red-50 p-1 rounded" data-branch="false_modules"></div>
+                                              <h4 class="font-bold text-sm text-red-600 mb-1 dark:text-red-400">False</h4>
+                                              <div class="module-container-content false-branch min-h-[50px] bg-red-50 p-1 rounded dark:bg-red-900/50"></div>
                                           </div>
                                       </div>`;
                               } else {
-                                  contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 space-y-2 min-h-[50px]"></div>`;
+                                  contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
                               }
                           }
                   
@@ -757,13 +757,13 @@
                           });
                           for (const category in categories) {
                               const catDiv = document.createElement('div');
-                              catDiv.className = 'module-category mb-2 border border-gray-200 rounded-lg overflow-hidden';
-                              catDiv.innerHTML = `<h3 class="font-bold p-2 bg-gray-100 text-gray-700 cursor-pointer">${category}</h3>`;
+                              catDiv.className = 'module-category mb-2 border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700';
+                              catDiv.innerHTML = `<h3 class="font-bold p-2 bg-gray-100 text-gray-700 cursor-pointer dark:bg-gray-700 dark:text-gray-200">${category}</h3>`;
                               categories[category].forEach(m => {
                                   const itemDiv = document.createElement('div');
-                                  itemDiv.className = 'module-item p-2 border-t border-gray-100 cursor-grab flex items-center gap-2 hover:bg-blue-50';
+                                  itemDiv.className = 'module-item p-2 border-t border-gray-100 cursor-grab flex items-center gap-2 hover:bg-blue-50 dark:border-gray-700 dark:hover:bg-gray-600';
                                   itemDiv.dataset.moduleId = m.id;
-                                  itemDiv.innerHTML = `<i class="fas ${m.icon || 'fa-extension'} text-blue-600"></i><span class="text-sm">${m.name}</span>`;
+                                  itemDiv.innerHTML = `<i class="fas ${m.icon || 'fa-extension'} text-blue-600 dark:text-blue-400"></i><span class="text-sm dark:text-gray-300">${m.name}</span>`;
                                   catDiv.appendChild(itemDiv);
                               });
                               app.moduleList.appendChild(catDiv);
