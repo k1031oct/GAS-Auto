@@ -246,77 +246,79 @@
                           });
                           console.log('Sortable for moduleList initialized.');
                   
-        // Init SortableJS for workflow container (drop target)
-        logSortable = new Sortable(app.workflowContainer, {
-            group: 'shared',
-            animation: 150,
-            onAdd: (evt) => {
-                const item = evt.item; // The cloned element from the palette
-                const draggedModuleId = item.dataset.moduleId;
-                const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
+                      const onAddModule = (evt, targetModuleArray) => {
+                        const item = evt.item; // The cloned element from the palette
+                        const draggedModuleId = item.dataset.moduleId;
+                        const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
 
-                if (moduleDef) {
-                    // 1. Create the new data object for the state
-                    const newModuleData = {
-                        id: draggedModuleId,
-                        instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                        name: moduleDef.name,
-                        type: moduleDef.type,
-                        settings: {}
-                    };
+                        if (moduleDef) {
+                            // 1. Create the new data object for the state
+                            const newModuleData = {
+                                id: draggedModuleId,
+                                instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                                name: moduleDef.name,
+                                type: moduleDef.type,
+                                settings: {}
+                            };
+                            
+                            // Initialize default settings
+                            if (moduleDef.settings) {
+                              moduleDef.settings.forEach(setting => {
+                                if (setting.defaultValue !== undefined) {
+                                  newModuleData.settings[setting.id] = setting.defaultValue;
+                                }
+                              });
+                            }
 
-                    // 2. Add the new data to the state array at the correct position
-                    state.modules.splice(evt.newIndex, 0, newModuleData);
+                            // 2. Add the new data to the state array at the correct position
+                            targetModuleArray.splice(evt.newIndex, 0, newModuleData);
 
-                    // 3. Create the real, properly-styled module element
-                    const moduleEl = document.createElement('div');
-                    moduleEl.className = 'bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center cursor-grab hover:shadow-md';
-                    moduleEl.dataset.id = newModuleData.instanceId;
-                    moduleEl.dataset.moduleId = newModuleData.id;
-                    
-                    moduleEl.innerHTML = `
-                        <div class="flex items-center gap-3 flex-grow">
-                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-blue-600"></i>
-                            <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
-                            <span class="text-sm text-gray-500 ml-4">0項目設定済み</span>
-                        </div>
-                        <div class="flex gap-2">
-                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
-                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                        </div>
-                    `;
+                            // 3. Create the real, properly-styled module element
+                            const moduleEl = createModuleElement(newModuleData, targetModuleArray);
 
-                    // 4. Add event listeners to the new element's buttons
-                    moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
-                        openModuleSettingsModal(newModuleData, moduleDef);
-                    });
-                    moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        deleteModule(newModuleData.instanceId);
-                        moduleEl.remove(); // Remove from DOM
-                    });
+                            // 4. Replace the cloned palette item with the real module element
+                            item.replaceWith(moduleEl);
+                            
+                            // If this was the first module in the main container, remove the placeholder text
+                            if (state.modules.length === 1 && targetModuleArray === state.modules) {
+                                const placeholder = app.workflowContainer.querySelector('.workflow-guide');
+                                if(placeholder) placeholder.remove();
+                            }
 
-                    // 5. Replace the cloned palette item with the real module element
-                    item.replaceWith(moduleEl);
-                    
-                    // If this was the first module, remove the placeholder text
-                    if (state.modules.length === 1) {
-                        const placeholder = app.workflowContainer.querySelector('.text-center');
-                        if(placeholder) placeholder.remove();
-                    }
+                            markDirty();
+                        }
+                      };
 
-                    markDirty();
-                }
-            },
-            onUpdate: (evt) => {
-                // Handle re-ordering of modules
-                const movedItem = state.modules.splice(evt.oldIndex, 1)[0];
-                state.modules.splice(evt.newIndex, 0, movedItem);
-                markDirty();
-            },
-            filter: 'button', // Ignore clicks on buttons
-            preventOnFilter: false
-        });
+                      const onUpdateModuleOrder = (evt, targetModuleArray) => {
+                          // Handle re-ordering of modules
+                          const movedItem = targetModuleArray.splice(evt.oldIndex, 1)[0];
+                          targetModuleArray.splice(evt.newIndex, 0, movedItem);
+                          markDirty();
+                      };
+
+                      // --- initEventListeners ---
+                      const initEventListeners = () => {
+                          // Init SortableJS for module palette (drag source)
+                          new Sortable(app.moduleList, {
+                              group: { name: 'shared', pull: 'clone', put: false },
+                              animation: 150,
+                              sort: false,
+                              filter: 'h3',
+                              preventOnFilter: false,
+                              delay: 300, // 300msの長押しでドラッグ開始
+                              delayOnTouchOnly: true // タッチデバイスのみ遅延を有効化
+                          });
+                          console.log('Sortable for moduleList initialized.');
+                  
+                          // Init SortableJS for workflow container (drop target)
+                          logSortable = new Sortable(app.workflowContainer, {
+                              group: 'shared',
+                              animation: 150,
+                              onAdd: (evt) => onAddModule(evt, state.modules),
+                              onUpdate: (evt) => onUpdateModuleOrder(evt, state.modules),
+                              filter: 'button, input, select, textarea, label', // Ignore clicks on form elements and buttons
+                              preventOnFilter: false
+                          });
                           console.log('Sortable for workflowContainer initialized.');
                   
                         // Trigger Modal Listeners
@@ -456,80 +458,6 @@
                         updateUI();
                       };
                       
-                      const renderModuleSettingsForm = (module, moduleDef) => {
-                        app.moduleSettingsContent.innerHTML = '';
-                        if (!moduleDef.settings || moduleDef.settings.length === 0) {
-                          app.moduleSettingsContent.innerHTML = '<p class="text-gray-500 dark:text-gray-400">このモジュールには設定項目がありません。</p>';
-                          return;
-                        }
-                        moduleDef.settings.forEach(setting => {
-                          const currentValue = module.settings[setting.id] || setting.defaultValue || '';
-                          const fieldWrapper = document.createElement('div');
-                          fieldWrapper.className = 'mb-6';
-                          let fieldHTML = `<label for="setting-${setting.id}" class="block text-sm font-bold text-gray-700 mb-2 dark:text-gray-200">${setting.name}</label>`;
-                          switch (setting.type) {
-                            case 'text':
-                            case 'number':
-                              fieldHTML += `<input type="${setting.type}" id="setting-${setting.id}" data-id="${setting.id}" value="${currentValue}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">`;
-                              break;
-                            case 'textarea':
-                              fieldHTML += `<textarea id="setting-${setting.id}" data-id="${setting.id}" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
-                              break;
-                            case 'select':
-                              const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
-                              fieldHTML += `<select id="setting-${setting.id}" data-id="${setting.id}" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
-                              break;
-                            case 'checkbox':
-                              fieldHTML += `<label class="flex items-center"><input type="checkbox" id="setting-${setting.id}" data-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
-                              break;
-                          }
-                          if (setting.description) {
-                            fieldHTML += `<p class="text-xs text-gray-500 mt-2 dark:text-gray-400">${setting.description}</p>`;
-                          }
-                          fieldWrapper.innerHTML = fieldHTML;
-                          app.moduleSettingsContent.appendChild(fieldWrapper);
-                        });
-                      };
-                  
-                      const openModuleSettingsModal = (module, moduleDef) => {
-                        app.moduleSettingsTitle.textContent = `設定: ${moduleDef.name}`;
-                        app.moduleSettingsDescription.textContent = moduleDef.description || '';
-                        renderModuleSettingsForm(module, moduleDef);
-                        app.moduleSettingsBackdrop.classList.remove('hidden');
-                        const saveHandler = () => {
-                          const settings = {};
-                          app.moduleSettingsContent.querySelectorAll('[data-id]').forEach(el => {
-                              const id = el.dataset.id;
-                              if (el.type === 'checkbox') {
-                                  settings[id] = el.checked;
-                              } else {
-                                  settings[id] = el.value;
-                              }
-                          });
-                          console.log('Saving settings to state:', settings);
-                  
-                          const moduleIndex = state.modules.findIndex(m => m.instanceId === module.instanceId);
-                          if (moduleIndex > -1) {
-                              state.modules[moduleIndex].settings = settings;
-                          }
-                          markDirty();
-                          closeModuleSettingsModal();
-                        };
-                        const cancelHandler = () => {
-                          closeModuleSettingsModal();
-                        };
-                        app.moduleSettingsSaveBtn.onclick = saveHandler;
-                        app.moduleSettingsCancelBtn.onclick = cancelHandler;
-                        app.moduleSettingsCloseBtn.onclick = cancelHandler;
-                      };
-                  
-                      const closeModuleSettingsModal = () => {
-                        app.moduleSettingsBackdrop.classList.add('hidden');
-                        app.moduleSettingsSaveBtn.onclick = null;
-                        app.moduleSettingsCancelBtn.onclick = null;
-                        app.moduleSettingsCloseBtn.onclick = null;
-                      };
-                  
                       const openSettingsModal = () => {
                         app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
                         app.darkModeToggle.checked = state.appSettings.darkMode;
@@ -609,84 +537,22 @@
                                 parentElement.appendChild(moduleEl);
                     
                                 if (module.type === 'container') {
-                                    if (module.id === 'condition_branch') {
-                                        const trueBranchContainer = moduleEl.querySelector('.true-branch');
-                                        const falseBranchContainer = moduleEl.querySelector('.false-branch');
+                                    const containerContent = moduleEl.querySelector('.module-container-content');
+                                    if (containerContent) {
+                                        // Make the container a drop target
+                                        new Sortable(containerContent, {
+                                            group: 'shared',
+                                            animation: 150,
+                                            onAdd: (evt) => onAddModule(evt, module.modules),
+                                            onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                        });
                     
-                                        if (trueBranchContainer && falseBranchContainer) {
-                                            // Initialize Sortable for both branches
-                                            ['true', 'false'].forEach(branch => {
-                                                const container = branch === 'true' ? trueBranchContainer : falseBranchContainer;
-                                                const branchModules = module[`${branch}_modules`];
-                                                new Sortable(container, {
-                                                    group: 'shared',
-                                                    animation: 150,
-                                                    onAdd: (evt) => {
-                                                      // ... (logic to add a new module to the branch)
-                                                    },
-                                                    onUpdate: (evt) => {
-                                                      // ... (logic to update module order in the branch)
-                                                    }
-                                                });
-                    
-                                                // Recursively render nested modules
-                                                if (branchModules && branchModules.length > 0) {
-                                                    createModuleTree(branchModules, container, branchModules);
-                                                } else {
-                                                    container.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                                }
-                                            });
-                                        }
-                                    } else {
-                                        const containerContent = moduleEl.querySelector('.module-container-content');
-                                        if (containerContent) {
-                                            // Make the container a drop target
-                                            new Sortable(containerContent, {
-                                                group: 'shared',
-                                                animation: 150,
-                                                onAdd: (evt) => {
-                                                  const draggedModuleId = evt.item.dataset.moduleId;
-                                                  const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
-                                                  if (moduleDef) {
-                                                      const newModule = {
-                                                          id: draggedModuleId,
-                                                          instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                                                          name: moduleDef.name,
-                                                          type: moduleDef.type,
-                                                          enabled: true,
-                                                          settings: {}
-                                                      };
-                                                      if (moduleDef.type === 'container') {
-                                                          newModule.modules = [];
-                                                          if (moduleDef.id === 'condition_branch') {
-                                                              newModule.true_modules = [];
-                                                              newModule.false_modules = [];
-                                                          }
-                                                      }
-                                                      if (moduleDef.settings) {
-                                                          moduleDef.settings.forEach(setting => {
-                                                              newModule.settings[setting.id] = setting.defaultValue !== undefined ? setting.defaultValue : '';
-                                                          });
-                                                      }
-                                                      evt.item.remove();
-                                                      module.modules.splice(evt.newIndex, 0, newModule);
-                                                      markDirty();
-                                                  }
-                                                },
-                                                onUpdate: (evt) => {
-                                                    const movedItem = module.modules.splice(evt.oldIndex, 1)[0];
-                                                    module.modules.splice(evt.newIndex, 0, movedItem);
-                                                    markDirty();
-                                                }
-                                            });
-                        
-                                            // Recursively render nested modules
-                                            if (module.modules && module.modules.length > 0) {
-                                                createModuleTree(module.modules, containerContent, module.modules);
-                                            } else {
-                                                // Show a guide if the container is empty
-                                                containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                            }
+                                        // Recursively render nested modules
+                                        if (module.modules && module.modules.length > 0) {
+                                            createModuleTree(module.modules, containerContent, module.modules);
+                                        } else {
+                                            // Show a guide if the container is empty
+                                            containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
                                         }
                                     }
                                 }
@@ -702,16 +568,45 @@
                           const isEnabled = module.enabled !== false;
                           const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
                           
-                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
+                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
                           moduleEl.dataset.id = module.instanceId;
                           moduleEl.dataset.moduleId = module.id;
                   
-                          const configuredCount = Object.values(module.settings).filter(v => v !== '' && v !== false).length;
-                          const totalSettings = moduleDef.settings ? moduleDef.settings.length : 0;
-                  
+                          let settingsHTML = '';
+                          if (moduleDef.settings && moduleDef.settings.length > 0) {
+                              settingsHTML += '<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">';
+                              moduleDef.settings.forEach(setting => {
+                                  const currentValue = module.settings[setting.id] || setting.defaultValue || '';
+                                  settingsHTML += `<div class="setting-field">`;
+                                  settingsHTML += `<label for="setting-${module.instanceId}-${setting.id}" class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">${setting.name}</label>`;
+                                  
+                                  switch (setting.type) {
+                                      case 'text':
+                                      case 'number':
+                                          settingsHTML += `<input type="${setting.type}" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" value="${currentValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">`;
+                                          break;
+                                      case 'textarea':
+                                          settingsHTML += `<textarea id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
+                                          break;
+                                      case 'select':
+                                          const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+                                          settingsHTML += `<select id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
+                                          break;
+                                      case 'checkbox':
+                                          settingsHTML += `<label class="flex items-center mt-2"><input type="checkbox" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
+                                          break;
+                                  }
+                                  if (setting.description) {
+                                      settingsHTML += `<p class="text-xs text-gray-500 mt-1 dark:text-gray-400">${setting.description}</p>`;
+                                  }
+                                  settingsHTML += `</div>`;
+                              });
+                              settingsHTML += '</div>';
+                          }
+
                           let contentHTML = `
                             <div class="flex items-start gap-3">
-                                <div class="w-2 h-full rounded-full self-stretch ${isEnabled ? 'bg-blue-500' : 'bg-gray-300'}"></div>
+                                <i class="fas fa-grip-vertical text-gray-400 mt-1 cursor-grab"></i>
                                 <div class="flex-grow">
                                     <div class="flex justify-between items-center">
                                         <div class="flex items-center gap-3">
@@ -727,51 +622,38 @@
                                                 </div>
                                             </label>
                                             <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
-                                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700 dark:hover:text-blue-400" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
                                             <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                                         </div>
                                     </div>
-                                    <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                        <span>${configuredCount} / ${totalSettings} 個設定済み</span>
-                                    </div>`;
+                                    <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
+                                    ${settingsHTML}
+                                `;
                   
                           if (module.type === 'container') {
-                              if (module.id === 'condition_branch') {
-                                  contentHTML += `
-                                      <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600">
-                                          <div>
-                                              <h4 class="font-bold text-sm text-green-600 mb-1 dark:text-green-400">True</h4>
-                                              <div class="module-container-content true-branch min-h-[50px] bg-green-50 p-1 rounded dark:bg-green-900/50"></div>
-                                          </div>
-                                          <div>
-                                              <h4 class="font-bold text-sm text-red-600 mb-1 dark:text-red-400">False</h4>
-                                              <div class="module-container-content false-branch min-h-[50px] bg-red-50 p-1 rounded dark:bg-red-900/50"></div>
-                                          </div>
-                                      </div>`;
-                              } else {
-                                  contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
-                              }
+                              contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
                           }
                   
                           contentHTML += `</div></div>`;
                           moduleEl.innerHTML = contentHTML;
                   
                           // --- Attach Event Listeners ---
+                          moduleEl.addEventListener('input', (e) => {
+                            if (e.target.dataset.settingId) {
+                                const settingId = e.target.dataset.settingId;
+                                const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                                module.settings[settingId] = value;
+                                markDirty();
+                            }
+                          });
+
                           moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
                               module.enabled = e.target.checked;
                               markDirty();
+                              renderModules(); // Re-render to apply opacity class
                           });
         
                           moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
                               runSingleModule(module);
-                          });
-        
-                          moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
-                              if (moduleDef) {
-                                openModuleSettingsModal(module, moduleDef);
-                              } else {
-                                showError({ message: `モジュール定義 '${module.id}' が見つかりません。モジュールを再読み込みしてください。` });
-                              }
                           });
               
                           moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
@@ -781,6 +663,7 @@
                               if (index > -1) {
                                   parentModuleArray.splice(index, 1);
                                   markDirty();
+                                  renderModules(); // Re-render to update the UI
                               }
                           });
                   
@@ -827,50 +710,16 @@
                       };
                   
                       const getWorkflowData = () => {
-                        // Recursive function to build the module tree from the DOM
-                        const buildModuleTree = (parentElement) => {
-                          const modules = [];
-                          // Select only direct children module elements
-                          parentElement.childNodes.forEach(node => {
-                            if (node.nodeType === Node.ELEMENT_NODE && node.matches('.bg-white')) {
-                                const instanceId = node.dataset.id;
-                                // Find the module data from the state
-                                const moduleData = findModuleByInstanceId(state.modules, instanceId);
-                                if (moduleData) {
-                                    const newModuleData = { ...moduleData };
-                                    if (newModuleData.type === 'container') {
-                                        if (newModuleData.id === 'condition_branch') {
-                                            const trueBranchContainer = node.querySelector('.true-branch');
-                                            const falseBranchContainer = node.querySelector('.false-branch');
-                                            if (trueBranchContainer) {
-                                                newModuleData.true_modules = buildModuleTree(trueBranchContainer);
-                                            }
-                                            if (falseBranchContainer) {
-                                                newModuleData.false_modules = buildModuleTree(falseBranchContainer);
-                                            }
-                                        } else {
-                                            const containerContent = node.querySelector('.module-container-content');
-                                            if (containerContent) {
-                                                // Recurse into the container
-                                                newModuleData.modules = buildModuleTree(containerContent);
-                                            }
-                                        }
-                                    }
-                                    modules.push(newModuleData);
-                                }
-                            }
-                          });
-                          return modules;
-                        };
-                    
-                        const orderedModules = buildModuleTree(app.workflowContainer);
-                    
-                        console.log('Getting workflow data. Modules being saved:', orderedModules);
+                        // The state is the source of truth, so we just need to clone it.
+                        // The order is already managed by the onUpdate handlers.
+                        const clonedModules = JSON.parse(JSON.stringify(state.modules));
+                        
+                        console.log('Getting workflow data. Modules being saved:', clonedModules);
                     
                         return {
                           name: state.currentWorkflowName || '新規ワークフロー',
                           moduleFolderId: state.currentModuleFolderId,
-                          modules: orderedModules
+                          modules: clonedModules
                         };
                       };
                     
