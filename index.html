@@ -43,10 +43,15 @@
       <!-- Module Palette (Sidebar) -->
       <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full">
         <div class="p-3 md:p-4 border-b">
-          <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
-          <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500">
+          <div class="flex justify-between items-center">
+            <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
+            <button id="toggle-search-btn" class="p-2 md:hidden rounded-full hover:bg-gray-200 transition-colors">
+              <i class="fas fa-search text-gray-600"></i>
+            </button>
+          </div>
+          <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500 hidden md:block">
         </div>
-        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-48 md:h-auto">
+        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-64 md:h-auto">
           <p class="text-center text-sm text-gray-400 p-4">Google Driveからモジュールを読み込み中...</p>
         </div>
         <!-- Module Source Folder Settings (Desktop) -->
