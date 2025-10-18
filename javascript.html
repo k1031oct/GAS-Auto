@@ -237,61 +237,77 @@
                           });
                           console.log('Sortable for moduleList initialized.');
                   
-                          // Init SortableJS for workflow container (drop target)
-                          logSortable = new Sortable(app.workflowContainer, {
-                              group: 'shared',
-                              animation: 150,
-                              delay: 300, // 300msの長押しでドラッグ開始
-                              delayOnTouchOnly: true, // タッチデバイスのみ遅延を有効化
-                              onAdd: (evt) => {
-                                  const draggedModuleId = evt.item.dataset.moduleId;
-                                  const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
-                                  if (moduleDef) {
-                                      const newModule = {
-                                          id: draggedModuleId,
-                                          instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                                          name: moduleDef.name,
-                                          type: moduleDef.type,
-                                          enabled: true, // デフォルトで有効
-                                          settings: {} // Initialize settings object
-                                      };
+        // Init SortableJS for workflow container (drop target)
+        logSortable = new Sortable(app.workflowContainer, {
+            group: 'shared',
+            animation: 150,
+            onAdd: (evt) => {
+                const item = evt.item; // The cloned element from the palette
+                const draggedModuleId = item.dataset.moduleId;
+                const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
 
-                                      if (moduleDef.type === 'container') {
-                                        newModule.modules = [];
-                                        if (moduleDef.id === 'condition_branch') {
-                                            newModule.true_modules = [];
-                                            newModule.false_modules = [];
-                                        }
-                                      }
-                  
-                                      // Populate settings with default values from module definition
-                                      if (moduleDef.settings) {
-                                          moduleDef.settings.forEach(setting => {
-                                              newModule.settings[setting.id] = setting.defaultValue !== undefined ? setting.defaultValue : '';
-                                          });
-                                      }
-                  
-                                      console.log('onAdd triggered. newModule:', newModule, 'state.modules (before splice):', state.modules);
-                                      
-                                      // First, remove the temporary clone from the DOM.
-                                      evt.item.remove(); 
-                                      
-                                      // Then, update the state array.
-                                      state.modules.splice(evt.newIndex, 0, newModule);
-                                      
-                                      // Finally, trigger a re-render from the updated state.
-                                      markDirty();
-                                  }
-                              },
-                              onUpdate: (evt) => {
-                                  // Move the item in the state array to match the new DOM order.
-                                  const movedItem = state.modules.splice(evt.oldIndex, 1)[0];
-                                  state.modules.splice(evt.newIndex, 0, movedItem);
-                                  markDirty();
-                              },
-                              filter: '.workflow-guide',
-                              preventOnFilter: true
-                          });
+                if (moduleDef) {
+                    // 1. Create the new data object for the state
+                    const newModuleData = {
+                        id: draggedModuleId,
+                        instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                        name: moduleDef.name,
+                        type: moduleDef.type,
+                        settings: {}
+                    };
+
+                    // 2. Add the new data to the state array at the correct position
+                    state.modules.splice(evt.newIndex, 0, newModuleData);
+
+                    // 3. Create the real, properly-styled module element
+                    const moduleEl = document.createElement('div');
+                    moduleEl.className = 'bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center cursor-grab hover:shadow-md';
+                    moduleEl.dataset.id = newModuleData.instanceId;
+                    moduleEl.dataset.moduleId = newModuleData.id;
+                    
+                    moduleEl.innerHTML = `
+                        <div class="flex items-center gap-3 flex-grow">
+                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-blue-600"></i>
+                            <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
+                            <span class="text-sm text-gray-500 ml-4">0項目設定済み</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
+                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                        </div>
+                    `;
+
+                    // 4. Add event listeners to the new element's buttons
+                    moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
+                        openModuleSettingsModal(newModuleData, moduleDef);
+                    });
+                    moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteModule(newModuleData.instanceId);
+                        moduleEl.remove(); // Remove from DOM
+                    });
+
+                    // 5. Replace the cloned palette item with the real module element
+                    item.replaceWith(moduleEl);
+                    
+                    // If this was the first module, remove the placeholder text
+                    if (state.modules.length === 1) {
+                        const placeholder = app.workflowContainer.querySelector('.text-center');
+                        if(placeholder) placeholder.remove();
+                    }
+
+                    markDirty();
+                }
+            },
+            onUpdate: (evt) => {
+                // Handle re-ordering of modules
+                const movedItem = state.modules.splice(evt.oldIndex, 1)[0];
+                state.modules.splice(evt.newIndex, 0, movedItem);
+                markDirty();
+            },
+            filter: 'button', // Ignore clicks on buttons
+            preventOnFilter: false
+        });
                           console.log('Sortable for workflowContainer initialized.');
                   
                         // Trigger Modal Listeners
