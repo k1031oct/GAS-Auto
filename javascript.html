@@ -255,6 +255,14 @@
                                           enabled: true, // デフォルトで有効
                                           settings: {} // Initialize settings object
                                       };
+
+                                      if (moduleDef.type === 'container') {
+                                        newModule.modules = [];
+                                        if (moduleDef.id === 'condition_branch') {
+                                            newModule.true_modules = [];
+                                            newModule.false_modules = [];
+                                        }
+                                      }
                   
                                       // Populate settings with default values from module definition
                                       if (moduleDef.settings) {
@@ -538,91 +546,201 @@
                       };
                   
                       const renderModules = () => {
-                          console.log('renderModules triggered. state.modules:', state.modules);
-                          app.workflowContainer.innerHTML = '';
-                          if (state.modules.length === 0) {
-                              app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
-                                  <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
-                                  <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
-                                  <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
-                              </div>`;
-                              return;
-                          }
-                          state.modules.forEach((module, index) => {
-                              const moduleEl = document.createElement('div');
-                              const isEnabled = module.enabled !== false;
-                              moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''}`;
-                              moduleEl.dataset.id = module.instanceId;
-                              moduleEl.dataset.moduleId = module.id;
-                              const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
-                              
-                              const configuredCount = Object.values(module.settings).filter(v => v !== '' && v !== false).length;
-                              const totalSettings = moduleDef.settings ? moduleDef.settings.length : 0;
+                        console.log('renderModules triggered. state.modules:', state.modules);
+                        app.workflowContainer.innerHTML = ''; // Clear the container first
+                    
+                        if (state.modules.length === 0) {
+                            app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
+                                <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
+                                <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                                <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
+                            </div>`;
+                            return;
+                        }
+                    
+                        // Recursive function to create the module tree
+                        const createModuleTree = (modules, parentElement, parentModuleArray) => {
+                            modules.forEach((module, index) => {
+                                const moduleEl = createModuleElement(module, parentModuleArray);
+                                parentElement.appendChild(moduleEl);
+                    
+                                if (module.type === 'container') {
+                                    if (module.id === 'condition_branch') {
+                                        const trueBranchContainer = moduleEl.querySelector('.true-branch');
+                                        const falseBranchContainer = moduleEl.querySelector('.false-branch');
+                    
+                                        if (trueBranchContainer && falseBranchContainer) {
+                                            // Initialize Sortable for both branches
+                                            ['true', 'false'].forEach(branch => {
+                                                const container = branch === 'true' ? trueBranchContainer : falseBranchContainer;
+                                                const branchModules = module[`${branch}_modules`];
+                                                new Sortable(container, {
+                                                    group: 'shared',
+                                                    animation: 150,
+                                                    onAdd: (evt) => {
+                                                      // ... (logic to add a new module to the branch)
+                                                    },
+                                                    onUpdate: (evt) => {
+                                                      // ... (logic to update module order in the branch)
+                                                    }
+                                                });
+                    
+                                                // Recursively render nested modules
+                                                if (branchModules && branchModules.length > 0) {
+                                                    createModuleTree(branchModules, container, branchModules);
+                                                } else {
+                                                    container.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        const containerContent = moduleEl.querySelector('.module-container-content');
+                                        if (containerContent) {
+                                            // Make the container a drop target
+                                            new Sortable(containerContent, {
+                                                group: 'shared',
+                                                animation: 150,
+                                                onAdd: (evt) => {
+                                                  const draggedModuleId = evt.item.dataset.moduleId;
+                                                  const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
+                                                  if (moduleDef) {
+                                                      const newModule = {
+                                                          id: draggedModuleId,
+                                                          instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                                                          name: moduleDef.name,
+                                                          type: moduleDef.type,
+                                                          enabled: true,
+                                                          settings: {}
+                                                      };
+                                                      if (moduleDef.type === 'container') {
+                                                          newModule.modules = [];
+                                                          if (moduleDef.id === 'condition_branch') {
+                                                              newModule.true_modules = [];
+                                                              newModule.false_modules = [];
+                                                          }
+                                                      }
+                                                      if (moduleDef.settings) {
+                                                          moduleDef.settings.forEach(setting => {
+                                                              newModule.settings[setting.id] = setting.defaultValue !== undefined ? setting.defaultValue : '';
+                                                          });
+                                                      }
+                                                      evt.item.remove();
+                                                      module.modules.splice(evt.newIndex, 0, newModule);
+                                                      markDirty();
+                                                  }
+                                                },
+                                                onUpdate: (evt) => {
+                                                    const movedItem = module.modules.splice(evt.oldIndex, 1)[0];
+                                                    module.modules.splice(evt.newIndex, 0, movedItem);
+                                                    markDirty();
+                                                }
+                                            });
+                        
+                                            // Recursively render nested modules
+                                            if (module.modules && module.modules.length > 0) {
+                                                createModuleTree(module.modules, containerContent, module.modules);
+                                            } else {
+                                                // Show a guide if the container is empty
+                                                containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        };
+                    
+                        // Start rendering from the root level
+                        createModuleTree(state.modules, app.workflowContainer, state.modules);
+                      };
                   
-                              moduleEl.innerHTML = `
-                                <div class="flex items-start gap-3">
-                                    <div class="w-2 h-full rounded-full self-stretch ${isEnabled ? 'bg-blue-500' : 'bg-gray-300'}"></div>
-                                    <div class="flex-grow">
-                                        <div class="flex justify-between items-center">
-                                            <div class="flex items-center gap-3">
-                                                <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600"></i>
-                                                <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
-                                            </div>
-                                            <div class="flex items-center gap-2">
-                                                <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
-                                                    <div class="relative">
-                                                        <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
-                                                        <div class="block bg-gray-300 w-10 h-6 rounded-full"></div>
-                                                        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
-                                                    </div>
-                                                </label>
-                                                <button data-action="run" class="p-2 text-green-500 hover:text-green-700" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
-                                                <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
-                                                <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                                            </div>
+                      const createModuleElement = (module, parentModuleArray) => {
+                          const moduleEl = document.createElement('div');
+                          const isEnabled = module.enabled !== false;
+                          const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
+                          
+                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 cursor-grab hover:shadow-md ${!isEnabled ? 'opacity-60' : ''}`;
+                          moduleEl.dataset.id = module.instanceId;
+                          moduleEl.dataset.moduleId = module.id;
+                  
+                          const configuredCount = Object.values(module.settings).filter(v => v !== '' && v !== false).length;
+                          const totalSettings = moduleDef.settings ? moduleDef.settings.length : 0;
+                  
+                          let contentHTML = `
+                            <div class="flex items-start gap-3">
+                                <div class="w-2 h-full rounded-full self-stretch ${isEnabled ? 'bg-blue-500' : 'bg-gray-300'}"></div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center gap-3">
+                                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600"></i>
+                                            <h3 class="font-bold text-gray-800">${moduleDef.name}</h3>
                                         </div>
-                                        <div class="mt-2 text-sm text-gray-500">
-                                            <span>${configuredCount} / ${totalSettings} 個設定済み</span>
+                                        <div class="flex items-center gap-2">
+                                            <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
+                                                <div class="relative">
+                                                    <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
+                                                    <div class="block bg-gray-300 w-10 h-6 rounded-full"></div>
+                                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                                </div>
+                                            </label>
+                                            <button data-action="run" class="p-2 text-green-500 hover:text-green-700" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
+                                            <button data-action="edit" class="p-2 text-blue-500 hover:text-blue-700" title="設定"><i class="fas fa-cog pointer-events-none"></i></button>
+                                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                                         </div>
                                     </div>
-                                </div>
-                              `;
-                              app.workflowContainer.appendChild(moduleEl);
-                              
-                              moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
-                                  const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
-                                  if (moduleData) {
-                                      moduleData.enabled = e.target.checked;
-                                      markDirty();
-                                  }
-                              });
-            
-                              moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
-                                  const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
-                                  if (moduleData) {
-                                      runSingleModule(moduleData);
-                                  }
-                              });
-            
-                              moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
-                                  const moduleData = state.modules.find(m => m.instanceId === module.instanceId);
-                                  if (!moduleData) {
-                                      showError({ message: `内部エラー: モジュールデータが見つかりません (ID: ${module.instanceId})` });
-                                      return;
-                                  }
-                                  const moduleDef = state.allModuleDefinitions.find(d => d.id === moduleData.id);
-                                  if (moduleDef) {
-                                    openModuleSettingsModal(moduleData, moduleDef);
-                                  } else {
-                                    showError({ message: `モジュール定義 '${moduleData.id}' が見つかりません。モジュールを再読み込みしてください。` });
-                                  }
-                              });
+                                    <div class="mt-2 text-sm text-gray-500">
+                                        <span>${configuredCount} / ${totalSettings} 個設定済み</span>
+                                    </div>`;
                   
-                              moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
-                                  e.stopPropagation();
-                                  deleteModule(module.instanceId);
-                              });
+                          if (module.type === 'container') {
+                              if (module.id === 'condition_branch') {
+                                  contentHTML += `
+                                      <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-dashed border-gray-300">
+                                          <div>
+                                              <h4 class="font-bold text-sm text-green-600 mb-1">True</h4>
+                                              <div class="module-container-content true-branch min-h-[50px] bg-green-50 p-1 rounded" data-branch="true_modules"></div>
+                                          </div>
+                                          <div>
+                                              <h4 class="font-bold text-sm text-red-600 mb-1">False</h4>
+                                              <div class="module-container-content false-branch min-h-[50px] bg-red-50 p-1 rounded" data-branch="false_modules"></div>
+                                          </div>
+                                      </div>`;
+                              } else {
+                                  contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 space-y-2 min-h-[50px]"></div>`;
+                              }
+                          }
+                  
+                          contentHTML += `</div></div>`;
+                          moduleEl.innerHTML = contentHTML;
+                  
+                          // --- Attach Event Listeners ---
+                          moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
+                              module.enabled = e.target.checked;
+                              markDirty();
                           });
+        
+                          moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
+                              runSingleModule(module);
+                          });
+        
+                          moduleEl.querySelector('[data-action="edit"]').addEventListener('click', () => {
+                              if (moduleDef) {
+                                openModuleSettingsModal(module, moduleDef);
+                              } else {
+                                showError({ message: `モジュール定義 '${module.id}' が見つかりません。モジュールを再読み込みしてください。` });
+                              }
+                          });
+              
+                          moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                              e.stopPropagation();
+                              // Find and remove the module from its parent array
+                              const index = parentModuleArray.findIndex(m => m.instanceId === module.instanceId);
+                              if (index > -1) {
+                                  parentModuleArray.splice(index, 1);
+                                  markDirty();
+                              }
+                          });
+                  
+                          return moduleEl;
                       };
                   
                       const renderModulePalette = (modulesToRender = state.allModuleDefinitions) => {
@@ -665,22 +783,67 @@
                       };
                   
                       const getWorkflowData = () => {
-                          const orderedInstanceIds = logSortable.toArray();
-                          const orderedModules = orderedInstanceIds.map((instanceId, index) => {
-                              const module = state.modules.find(m => m.instanceId === instanceId);
-                              if (module) {
-                                  module.order = index;
-                              }
-                              return module;
-                          }).filter(Boolean);
-                  
-                          console.log('Getting workflow data. Modules being saved:', orderedModules);
-                  
-                          return {
-                              name: state.currentWorkflowName || '新規ワークフロー',
-                              moduleFolderId: state.currentModuleFolderId,
-                              modules: orderedModules
-                          };
+                        // Recursive function to build the module tree from the DOM
+                        const buildModuleTree = (parentElement) => {
+                          const modules = [];
+                          // Select only direct children module elements
+                          parentElement.childNodes.forEach(node => {
+                            if (node.nodeType === Node.ELEMENT_NODE && node.matches('.bg-white')) {
+                                const instanceId = node.dataset.id;
+                                // Find the module data from the state
+                                const moduleData = findModuleByInstanceId(state.modules, instanceId);
+                                if (moduleData) {
+                                    const newModuleData = { ...moduleData };
+                                    if (newModuleData.type === 'container') {
+                                        if (newModuleData.id === 'condition_branch') {
+                                            const trueBranchContainer = node.querySelector('.true-branch');
+                                            const falseBranchContainer = node.querySelector('.false-branch');
+                                            if (trueBranchContainer) {
+                                                newModuleData.true_modules = buildModuleTree(trueBranchContainer);
+                                            }
+                                            if (falseBranchContainer) {
+                                                newModuleData.false_modules = buildModuleTree(falseBranchContainer);
+                                            }
+                                        } else {
+                                            const containerContent = node.querySelector('.module-container-content');
+                                            if (containerContent) {
+                                                // Recurse into the container
+                                                newModuleData.modules = buildModuleTree(containerContent);
+                                            }
+                                        }
+                                    }
+                                    modules.push(newModuleData);
+                                }
+                            }
+                          });
+                          return modules;
+                        };
+                    
+                        const orderedModules = buildModuleTree(app.workflowContainer);
+                    
+                        console.log('Getting workflow data. Modules being saved:', orderedModules);
+                    
+                        return {
+                          name: state.currentWorkflowName || '新規ワークフロー',
+                          moduleFolderId: state.currentModuleFolderId,
+                          modules: orderedModules
+                        };
+                      };
+                    
+                      // Helper function to find a module by instanceId recursively
+                      const findModuleByInstanceId = (modules, instanceId) => {
+                        for (const module of modules) {
+                          if (module.instanceId === instanceId) {
+                            return module;
+                          }
+                          if (module.type === 'container' && module.modules) {
+                            const found = findModuleByInstanceId(module.modules, instanceId);
+                            if (found) {
+                              return found;
+                            }
+                          }
+                        }
+                        return null;
                       };
                       
                       const loadModuleDefinitionsFromDrive = async () => {
@@ -724,9 +887,26 @@
                           }
                       };
                       
+                      const findAndDeleteModule = (modules, instanceId) => {
+                        for (let i = 0; i < modules.length; i++) {
+                          const module = modules[i];
+                          if (module.instanceId === instanceId) {
+                            modules.splice(i, 1);
+                            return true; // Found and deleted
+                          }
+                          if (module.type === 'container' && module.modules) {
+                            if (findAndDeleteModule(module.modules, instanceId)) {
+                              return true; // Found and deleted in a nested container
+                            }
+                          }
+                        }
+                        return false; // Not found in this branch
+                      };
+
                       const deleteModule = (instanceId) => {
-                          state.modules = state.modules.filter(m => m.instanceId !== instanceId);
-                          markDirty();
+                          if (findAndDeleteModule(state.modules, instanceId)) {
+                              markDirty();
+                          }
                       };
                   
                       const newWorkflow = async () => {
