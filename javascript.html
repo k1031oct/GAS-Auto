@@ -229,6 +229,7 @@
             filter: 'h3',
             preventOnFilter: false,
         });
+        console.log('Sortable for moduleList initialized.');
 
         // Init SortableJS for workflow container (drop target)
         logSortable = new Sortable(app.workflowContainer, {
@@ -255,6 +256,7 @@
             filter: 'button', // Ignore clicks on buttons
             preventOnFilter: false
         });
+        console.log('Sortable for workflowContainer initialized.');
 
       // Trigger Modal Listeners
       app.triggerBtn.addEventListener('click', openTriggerModal);
