@@ -21,11 +21,9 @@
       workflowContainer: document.getElementById('workflow-container'),
       modulePalette: document.getElementById('module-palette'),
       moduleList: document.getElementById('module-list'),
-      moduleSearchBox: document.getElementById('module-search-box'),
-            toggleSearchBtn: document.getElementById('toggle-search-btn'),
-            workflowNameDisplay: document.getElementById('workflow-name-display'),
-            dirtyIndicator: document.getElementById('dirty-indicator'),
-            resizeHandle: document.getElementById('resize-handle'),
+                  moduleSearchBox: document.getElementById('module-search-box'),
+                  toggleSearchBtn: document.getElementById('toggle-search-btn'),
+                  dirtyIndicator: document.getElementById('dirty-indicator'),            resizeHandle: document.getElementById('resize-handle'),
             moduleResizeHandle: document.getElementById('module-resize-handle'),
             customDialog: document.getElementById('custom-dialog'),
             customDialogTitle: document.getElementById('custom-dialog-title'),
@@ -435,7 +433,6 @@
                         app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
                         app.moduleFolderIdInput.value = state.currentModuleFolderId;
                         app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
-                        app.workflowNameDisplay.textContent = state.currentWorkflowName || '新規ワークフロー';
                         app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
                         document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
                         renderModules();
