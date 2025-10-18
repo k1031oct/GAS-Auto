@@ -61,6 +61,15 @@
                         triggerType: document.getElementById('trigger-type'),
                         triggerTimeOptions: document.getElementById('trigger-time-options'),
                         triggerHour: document.getElementById('trigger-hour'),
+
+                        // Hamburger Menu
+                        hamburgerBtn: document.getElementById('hamburger-btn'),
+                        mobileMenu: document.getElementById('mobile-menu'),
+                        mobileNewWorkflowBtn: document.getElementById('mobile-new-workflow-btn'),
+                        mobileDeleteWorkflowBtn: document.getElementById('mobile-delete-workflow-btn'),
+                        mobileSettingsBtn: document.getElementById('mobile-settings-btn'),
+                        mobileTriggerBtn: document.getElementById('mobile-trigger-btn'),
+                        mobileHistoryBtn: document.getElementById('mobile-history-btn'),
                       };
                   
                       // --- State Management ---
@@ -406,6 +415,24 @@
                         app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
                         app.settingsSaveBtn.addEventListener('click', saveSettings);
                         app.createInitialModulesBtn.addEventListener('click', handleCreateInitialModules);
+
+                        // Hamburger Menu Logic
+                        app.hamburgerBtn.addEventListener('click', () => {
+                          app.mobileMenu.classList.toggle('hidden');
+                        });
+
+                        // Click outside to close mobile menu
+                        document.addEventListener('click', (event) => {
+                          if (!app.mobileMenu.contains(event.target) && !app.hamburgerBtn.contains(event.target)) {
+                            app.mobileMenu.classList.add('hidden');
+                          }
+                        });
+
+                        app.mobileNewWorkflowBtn.addEventListener('click', () => app.newWorkflowBtn.click());
+                        app.mobileDeleteWorkflowBtn.addEventListener('click', () => app.deleteWorkflowBtn.click());
+                        app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
+                        app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
+                        app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
                       };
                   
                       // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
@@ -415,6 +442,7 @@
                       const updateUI = () => {
                         app.runBtn.disabled = state.modules.length === 0;
                         app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
+                        app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
                         app.moduleFolderIdInput.value = state.currentModuleFolderId;
                         app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
                         app.workflowNameDisplay.textContent = state.currentWorkflowName || '新規ワークフロー';
