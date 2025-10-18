@@ -41,16 +41,16 @@
     <!-- Main Content Area -->
     <main class="flex-grow flex flex-col md:flex-row overflow-hidden">
       <!-- Module Palette (Sidebar) -->
-      <aside id="module-palette" class="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 h-80 md:h-full">
+      <aside id="module-palette" class="w-full md:w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full">
         <div class="p-3 md:p-4 border-b">
           <h2 class="text-md font-bold text-gray-700">モジュールライブラリ</h2>
           <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
-        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto">
+        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-48 md:h-auto">
           <p class="text-center text-sm text-gray-400 p-4">Google Driveからモジュールを読み込み中...</p>
         </div>
-        <!-- Module Source Folder Settings -->
-        <div id="module-source-footer" class="p-3 border-t border-gray-200 flex-shrink-0 bg-gray-50">
+        <!-- Module Source Folder Settings (Desktop) -->
+        <div id="module-source-footer" class="p-3 border-t border-gray-200 flex-shrink-0 bg-gray-50 hidden md:block">
           <label for="module-folder-id" class="text-xs font-bold text-gray-600 block mb-1">
             カスタムモジュール フォルダID
           </label>
@@ -62,7 +62,7 @@
       </aside>
 
       <!-- Workflow Editor -->
-      <section id="main-area" class="flex-grow p-2 md:p-4 overflow-y-auto bg-gray-50">
+      <section id="main-area" class="flex-grow p-2 md:p-4 overflow-y-auto bg-gray-100 border-t-4 border-dashed border-gray-300 md:border-t-0 md:border-l-4">
         <!-- Workflow Title Display -->
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-gray-800">ワークフローエディタ</h2>
@@ -70,13 +70,24 @@
         </div>
         <div id="workflow-container" class="space-y-4 min-h-[50vh] p-2 md:p-4 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner">
           <div class="text-center text-gray-500 p-4 md:p-8">
-            <i class="fas fa-arrow-left text-3xl md:text-4xl mb-3 text-gray-300"></i>
-            <p class="text-sm md:text-base">左側のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+            <i class="fas fa-arrow-down text-3xl md:text-4xl mb-3 text-gray-300"></i>
+            <p class="text-sm md:text-base">上部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
             <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
           </div>
         </div>
       </section>
     </main>
+
+    <!-- Module Source Folder Settings (Mobile) -->
+    <div id="module-source-footer-mobile" class="p-3 border-t border-gray-200 bg-gray-50 md:hidden flex-shrink-0">
+      <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-600 block mb-1">
+        カスタムモジュール フォルダID
+      </label>
+      <div class="flex items-center gap-2">
+        <input type="text" id="module-folder-id-mobile" placeholder="Google Drive Folder ID" class="w-full p-2 text-xs border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+        <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex-shrink-0"><i class="fas fa-sync-alt"></i></button>
+      </div>
+    </div>
 
     <!-- Footer (Log Area) -->
     <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-32 md:h-48 flex flex-col">

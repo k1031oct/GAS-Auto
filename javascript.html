@@ -16,6 +16,8 @@
       loader: document.getElementById('loader'),
       moduleFolderIdInput: document.getElementById('module-folder-id'),
       reloadModulesBtn: document.getElementById('reload-modules-btn'),
+      moduleFolderIdInputMobile: document.getElementById('module-folder-id-mobile'),
+      reloadModulesBtnMobile: document.getElementById('reload-modules-btn-mobile'),
       workflowContainer: document.getElementById('workflow-container'),
       moduleList: document.getElementById('module-list'),
       workflowNameDisplay: document.getElementById('workflow-name-display'),
@@ -281,7 +283,9 @@
       // ... (all existing listeners)
       app.newWorkflowBtn.addEventListener('click', newWorkflow);
       app.reloadModulesBtn.addEventListener('click', loadModuleDefinitionsFromDrive);
+      app.reloadModulesBtnMobile.addEventListener('click', loadModuleDefinitionsFromDrive);
       app.moduleFolderIdInput.addEventListener('change', markDirty);
+      app.moduleFolderIdInputMobile.addEventListener('change', markDirty);
       app.workflowSelector.addEventListener('change', handleWorkflowSelect);
       app.saveWorkflowBtn.addEventListener('click', async () => {
             let workflowName = state.currentWorkflowName;
@@ -356,6 +360,7 @@
       app.runBtn.disabled = state.modules.length === 0;
       app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
       app.moduleFolderIdInput.value = state.currentModuleFolderId;
+      app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
       app.workflowNameDisplay.textContent = state.currentWorkflowName || '新規ワークフロー';
       app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
       document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
@@ -366,7 +371,7 @@
       state.isDirty = true;
       updateUI();
     };
-
+    
     const renderModuleSettingsForm = (module, moduleDef) => {
       app.moduleSettingsContent.innerHTML = '';
       if (!moduleDef.settings || moduleDef.settings.length === 0) {
@@ -466,6 +471,7 @@
           applySettings(savedSettings);
           state.currentModuleFolderId = folderId;
           app.moduleFolderIdInput.value = folderId;
+          app.moduleFolderIdInputMobile.value = folderId;
           hideLoader();
           closeSettingsModal();
         })
@@ -504,8 +510,8 @@
         app.workflowContainer.innerHTML = '';
         if (state.modules.length === 0) {
             app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-8">
-                <i class="fas fa-arrow-left text-4xl mb-3 text-gray-300"></i>
-                <p>左側のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                <i class="fas fa-arrow-down text-4xl mb-3 text-gray-300"></i>
+                <p>上部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
             </div>`;
             return;
         }
@@ -600,7 +606,7 @@
     };
     
     const loadModuleDefinitionsFromDrive = async () => {
-        const folderId = app.moduleFolderIdInput.value.trim();
+        const folderId = app.moduleFolderIdInput.offsetParent ? app.moduleFolderIdInput.value.trim() : app.moduleFolderIdInputMobile.value.trim();
         if (!folderId) {
             state.allModuleDefinitions = [];
             renderModulePalette();
@@ -729,6 +735,7 @@
         if (data.moduleFolderId) {
           state.currentModuleFolderId = data.moduleFolderId;
           app.moduleFolderIdInput.value = data.moduleFolderId;
+          app.moduleFolderIdInputMobile.value = data.moduleFolderId;
           loadModuleDefinitionsFromDrive();
         }
         hideLoader();
