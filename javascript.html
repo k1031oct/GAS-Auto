@@ -239,6 +239,8 @@
         logSortable = new Sortable(app.workflowContainer, {
             group: 'shared',
             animation: 150,
+            delay: 300, // 300msの長押しでドラッグ開始
+            delayOnTouchOnly: true, // タッチデバイスのみ遅延を有効化
             onAdd: (evt) => {
                 const draggedModuleId = evt.item.dataset.moduleId;
                 const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
