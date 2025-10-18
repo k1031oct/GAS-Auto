@@ -66,14 +66,26 @@
     // --- Helper Functions ---
 
     const _extractIdFromUrl = (url) => {
-        if (!url) return url; // Return as is if null or empty
-        const regex = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
-        const match = url.match(regex);
-        if (match && match[1]) {
-            return match[1];
+        if (!url) return null;
+        // Regex for standard Drive URLs
+        const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+        const match1 = url.match(regex1);
+        if (match1 && match1[1]) {
+            return match1[1];
         }
-        // If no match, assume the input is already an ID
-        return url;
+        // Regex for the /file/d/.../edit format
+        const regex2 = /\/file\/d\/(.*?)\//;
+        const match2 = url.match(regex2);
+        if (match2 && match2[1]) {
+            return match2[1];
+        }
+        // If no URL pattern matches, assume the input might be a raw ID.
+        // A basic sanity check for length and invalid characters.
+        if (url.length > 20 && !url.includes('/') && !url.includes('.')) {
+            return url;
+        }
+        // If it's not a recognized URL and not a plausible raw ID, return null.
+        return null;
     };
 
     const showCustomDialog = (config) => {

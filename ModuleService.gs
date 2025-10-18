@@ -39,7 +39,7 @@ var ModuleService = {
       return [];
     }
 
-    const jsonFiles = folder.getFilesByType(MimeType.JSON);
+    const jsonFiles = folder.getFilesByType("application/json");
     
     while (jsonFiles.hasNext()) {
       const file = jsonFiles.next();
@@ -103,6 +103,20 @@ var ModuleService = {
         "handler": "DriveService.moveFile"
       },
       {
+        "id": "drive_copy_file",
+        "name": "ドライブファイルをコピー",
+        "description": "指定されたファイルをGoogle Driveの別の場所にコピーします。",
+        "category": "Google Drive",
+        "icon": "fa-copy",
+        "type": "unit",
+        "settings": [
+          { "id": "sourceFileUrl", "name": "コピー元ファイルURL", "type": "text", "required": true },
+          { "id": "destinationFolderUrl", "name": "コピー先フォルダURL", "type": "text", "required": true },
+          { "id": "newFileName", "name": "新しいファイル名（任意）", "type": "text", "required": false }
+        ],
+        "handler": "DriveService.copyFile"
+      },
+      {
         "id": "sheets_update_cell",
         "name": "スプレッドシートのセルを更新",
         "description": "指定されたスプレッドシートのセルに値を書き込みます。",
@@ -116,6 +130,63 @@ var ModuleService = {
           { "id": "value", "name": "書き込む値", "type": "text", "required": true }
         ],
         "handler": "SheetService.updateCell"
+      },
+      {
+        "id": "sheets_append_row",
+        "name": "スプレッドシートに行を追加",
+        "description": "指定されたシートの末尾に新しい行を追加します。",
+        "category": "Google Sheets",
+        "icon": "fa-file-excel",
+        "type": "unit",
+        "settings": [
+          { "id": "spreadsheetUrl", "name": "スプレッドシートURL", "type": "text", "required": true },
+          { "id": "sheetName", "name": "シート名", "type": "text", "required": true },
+          { "id": "rowData", "name": "追加する行データ（カンマ区切り）", "type": "text", "required": true }
+        ],
+        "handler": "SheetService.appendRow"
+      },
+      {
+        "id": "gmail_send_email",
+        "name": "Gmailでメールを送信",
+        "description": "指定された宛先にメールを送信します。",
+        "category": "Gmail",
+        "icon": "fa-envelope",
+        "type": "unit",
+        "settings": [
+          { "id": "recipient", "name": "宛先メールアドレス", "type": "text", "required": true },
+          { "id": "subject", "name": "件名", "type": "text", "required": true },
+          { "id": "body", "name": "本文", "type": "textarea", "required": true }
+        ],
+        "handler": "GmailService.sendEmail"
+      },
+      {
+        "id": "calendar_create_event",
+        "name": "カレンダーに予定を作成",
+        "description": "Googleカレンダーに新しい予定を作成します。",
+        "category": "Google Calendar",
+        "icon": "fa-calendar-alt",
+        "type": "unit",
+        "settings": [
+          { "id": "calendarId", "name": "カレンダーID（通常はメールアドレス）", "type": "text", "required": true, "defaultValue": "primary" },
+          { "id": "title", "name": "予定のタイトル", "type": "text", "required": true },
+          { "id": "startTime", "name": "開始時刻 (例: 2023/10/28 10:00)", "type": "text", "required": true },
+          { "id": "endTime", "name": "終了時刻 (例: 2023/10/28 11:00)", "type": "text", "required": true }
+        ],
+        "handler": "CalendarService.createEvent"
+      },
+      {
+        "id": "docs_create_file",
+        "name": "Googleドキュメントを作成",
+        "description": "指定されたフォルダに新しいGoogleドキュメントを作成します。",
+        "category": "Google Docs",
+        "icon": "fa-file-word",
+        "type": "unit",
+        "settings": [
+          { "id": "folderUrl", "name": "作成先フォルダURL", "type": "text", "required": true },
+          { "id": "fileName", "name": "ドキュメント名", "type": "text", "required": true },
+          { "id": "content", "name": "初期コンテンツ", "type": "textarea", "required": false }
+        ],
+        "handler": "DocsService.createFile"
       }
     ];
 
@@ -129,7 +200,7 @@ var ModuleService = {
         
         // 同じ名前のファイルが存在しない場合のみ作成
         if (!files.hasNext()) {
-          folder.createFile(fileName, JSON.stringify(module, null, 2), MimeType.JSON);
+          folder.createFile(fileName, JSON.stringify(module, null, 2), "application/json");
           createdCount++;
         }
       });
@@ -141,7 +212,7 @@ var ModuleService = {
       }
     } catch (e) {
       Logger.log(`初期モジュールの生成に失敗しました: ${e.message}`);
-      throw new Error(`初期モジュールの生成に失敗しました。フォルダIDが正しいか、アクセス権があるか確認してください。`);
+      throw new Error(`初期モジュールの生成に失敗しました: ${e.message}`);
     }
   }
 };
