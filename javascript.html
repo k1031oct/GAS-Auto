@@ -1088,7 +1088,7 @@
                                     google.script.run.withSuccessHandler(data => {
                                       state.appSettings = data.settings || {};
                                       if (typeof state.appSettings.darkMode === 'undefined') {
-                                        state.appSettings.darkMode = true;
+                                        state.appSettings.darkMode = false;
                                       }
                                       applySettings(state.appSettings);
                         

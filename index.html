@@ -16,6 +16,10 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
   <?!= include('javascript.html'); ?>
 <style>
+    /* Resetting default margin */
+    body {
+      margin: 0;
+    }
     /* Custom scrollbar for webkit browsers */
     .scrollbar::-webkit-scrollbar {
       width: 8px;
@@ -35,14 +39,13 @@
     }
 
     /* Dark mode toggle transition */
-    #dark-mode-toggle:checked + div .dot {
+    #dark-mode-toggle:checked ~ .dot {
       transform: translateX(1.5rem);
-      background-color: #3B82F6; /* blue-500 */
     }
-    #dark-mode-toggle:checked + div {
+    #dark-mode-toggle:checked ~ .block {
         background-color: #4F46E5; /* indigo-600 */
     }
-    .dark #dark-mode-toggle:checked + div {
+    .dark #dark-mode-toggle:checked ~ .block {
         background-color: #3730A3; /* indigo-800 */
     }
   </style>
@@ -100,7 +103,7 @@
       <!-- Module Palette (Sidebar) -->
       <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r-0 md:border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full md:order-1 dark:bg-gray-800 dark:border-gray-700">
         <!-- Module Resize Handle (Mobile Only) -->
-        <div id="module-resize-handle" class="w-full h-4 flex items-center justify-center md:hidden bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors">
+        <div id="module-resize-handle" class="w-full h-4 flex items-center justify-center md:hidden bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:hover:bg-gray-600">
           <div class="w-12 h-1.5 bg-gray-400 rounded-full"></div>
         </div>
         <div class="p-3 md:p-4 border-b dark:border-gray-700">
