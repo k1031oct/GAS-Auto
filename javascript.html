@@ -221,7 +221,41 @@
     
     // --- initEventListeners ---
     const initEventListeners = () => {
-      // ... (add new listeners to existing function)
+        // Init SortableJS for module palette (drag source)
+        new Sortable(app.moduleList, {
+            group: { name: 'shared', pull: 'clone', put: false },
+            animation: 150,
+            sort: false,
+            filter: 'h3',
+            preventOnFilter: false,
+        });
+
+        // Init SortableJS for workflow container (drop target)
+        logSortable = new Sortable(app.workflowContainer, {
+            group: 'shared',
+            animation: 150,
+            onAdd: (evt) => {
+                const draggedModuleId = evt.item.dataset.moduleId;
+                const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
+                if (moduleDef) {
+                    const newModule = {
+                        id: draggedModuleId,
+                        instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                        name: moduleDef.name,
+                        type: moduleDef.type,
+                        settings: {} // Start with empty settings
+                    };
+                    state.modules.splice(evt.newIndex, 0, newModule);
+                    evt.item.remove(); // Remove the ghost element
+                    markDirty();
+                }
+            },
+            onUpdate: markDirty, // Module position changed
+            filter: 'button', // Ignore clicks on buttons
+            preventOnFilter: false
+        });
+
+      // Trigger Modal Listeners
       app.triggerBtn.addEventListener('click', openTriggerModal);
       app.triggerCloseBtn.addEventListener('click', closeTriggerModal);
       app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
@@ -455,7 +489,7 @@
         state.modules.forEach((module, index) => {
             const moduleEl = document.createElement('div');
             moduleEl.className = 'bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center cursor-grab hover:shadow-md';
-            moduleEl.dataset.instanceId = module.instanceId;
+            moduleEl.dataset.id = module.instanceId;
             moduleEl.dataset.moduleId = module.id;
             const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle' };
             moduleEl.innerHTML = `
@@ -524,24 +558,19 @@
     };
 
     const getWorkflowData = () => {
-        const modules = Array.from(app.workflowContainer.children).map((el, index) => {
-            const moduleId = el.dataset.moduleId;
-            const instanceId = el.dataset.instanceId;
-            const moduleDef = state.allModuleDefinitions.find(d => d.id === moduleId);
-            const existingModule = state.modules.find(m => m.instanceId === instanceId);
-            return {
-                id: moduleId,
-                instanceId: instanceId,
-                name: moduleDef ? moduleDef.name : 'Unknown Module',
-                type: moduleDef ? moduleDef.type : 'unit',
-                settings: existingModule ? existingModule.settings : {},
-                order: index
-            };
-        });
+        const orderedInstanceIds = logSortable.toArray();
+        const orderedModules = orderedInstanceIds.map((instanceId, index) => {
+            const module = state.modules.find(m => m.instanceId === instanceId);
+            if (module) {
+                module.order = index;
+            }
+            return module;
+        }).filter(Boolean);
+
         return {
             name: state.currentWorkflowName || '新規ワークフロー',
             moduleFolderId: state.currentModuleFolderId,
-            modules: modules
+            modules: orderedModules
         };
     };
     
