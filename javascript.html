@@ -264,6 +264,10 @@
       app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
       app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
 
+      app.maximizeLogBtn.addEventListener('click', toggleMaximizeLog);
+      app.hideLogBtn.addEventListener('click', hideLog);
+      app.showLogBtn.addEventListener('click', showLog);
+
       // ... (all existing listeners)
       app.newWorkflowBtn.addEventListener('click', newWorkflow);
       app.reloadModulesBtn.addEventListener('click', loadModuleDefinitionsFromDrive);
