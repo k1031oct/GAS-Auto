@@ -76,7 +76,7 @@
             appSettings: {},
             logArea: {
               isMaximized: false,
-              originalHeight: '12rem',
+              originalHeight: '16rem',
             }
           };
       
@@ -744,7 +744,7 @@
             state.logArea.isMaximized = !state.logArea.isMaximized;
             const icon = app.maximizeLogBtn.querySelector('i');
             if (state.logArea.isMaximized) {
-              state.logArea.originalHeight = app.logArea.style.height || '12rem';
+state.logArea.originalHeight = app.logArea.style.height || '16rem';
               app.logArea.style.height = '85vh';
               icon.classList.remove('fa-window-maximize');
               icon.classList.add('fa-window-restore');
@@ -758,7 +758,7 @@
           };
       
           const hideLog = () => {
-            state.logArea.originalHeight = app.logArea.style.height || '12rem';
+            state.logArea.originalHeight = app.logArea.style.height || '16rem';
             app.logArea.classList.add('hidden');
             app.showLogBtn.classList.remove('hidden');
           };
