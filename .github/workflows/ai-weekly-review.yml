@@ -1,0 +1,59 @@
+name: 🤖 AI Weekly Code Review
+on:
+  schedule:
+    # 日本時間の毎週日曜日 午前3時に実行 (UTCでは土曜日の18:00)
+    - cron: '0 18 * * 6'
+  workflow_dispatch: # 手動実行も可能にする
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Gemini CLI for Code Analysis
+        id: gemini_analysis
+        uses: google-github-actions/run-gemini-cli@v0
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: |
+            ## Role
+            You are a senior software architect specializing in Google Apps Script and modern web applications. Your mission is to conduct a thorough review of the entire repository. Your goal is NOT to write or fix code, but to identify potential issues, suggest improvements, and point out architectural inconsistencies. You will then generate a detailed review report in Markdown format.
+
+            ## Analysis Checklist
+            Please review the entire codebase based on the following criteria:
+
+            - **[ ] Architectural Inconsistency**: Are there any remnants of the old static design from "Organizer" or "Builder"? Does all new logic follow the dynamic, module-driven architecture of "Automater" (loading from JSON)?
+            - **[ ] Separation of Concerns**: Are the roles of each server-side service (WorkflowService.gs, ModuleService.gs, etc.) clearly defined? Is there any functional overlap or ambiguity?
+            - **[ ] Client-Server Communication**: Are the `google.script.run` calls between `javascript.html` and `Code.gs` efficient? Are there any unnecessary or redundant server calls?
+            - **[ ] Naming Conventions and Consistency**: Are function names, variable names, file names, and CSS classes consistent across the project?
+            - **[ ] Error Handling**: Is error handling robust and consistent on both the client and server sides? Are user-friendly error messages being returned?
+            - **[ ] State Management**: Is the client-side state management (the `state` object) efficient? Are you re-fetching data from the server unnecessarily?
+
+            ## Output Format
+            Your final output must be ONLY the Markdown report. For each point you raise, please provide:
+            1.  A clear description of the issue.
+            2.  A concrete suggestion for improvement.
+            3.  The relevant file path(s) and line number(s).
+
+      - name: Create GitHub Issue from Report
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const analysisReport = `${{ steps.gemini_analysis.outputs.result }}`;
+            const today = new Date().toLocaleDateString('ja-JP', { timeZone: 'Asia/Tokyo' });
+            const issueTitle = `【AI定例レビュー】${today}のアーキテクチャ健全性レポート`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: issueTitle,
+              body: analysisReport,
+              labels: ['needs-review', 'ai-generated']
+            });
