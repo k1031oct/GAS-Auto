@@ -206,6 +206,22 @@ var ModuleService = {
         "branches": [
           { "id": "modules", "name": "モジュール" }
         ]
+      },
+      {
+        "id": "condition_branch",
+        "name": "条件分岐",
+        "description": "条件に応じて、実行するモジュールを分岐させます。",
+        "category": "構造",
+        "icon": "fa-code-branch",
+        "type": "container",
+        "settings": [
+          { "id": "condition", "name": "条件", "type": "text", "defaultValue": "" }
+        ],
+        "handler": "",
+        "branches": [
+          { "id": "true_modules", "name": "Trueの場合" },
+          { "id": "false_modules", "name": "Falseの場合" }
+        ]
       }
     ];
 

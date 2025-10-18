@@ -202,13 +202,11 @@ var WorkflowService = {
 
     let logContext = LogService.startLog(workflowName, executionType);
     let status = '成功';
-    let lastReturnValue = null; // 前のモジュールからの返り値を保持
+    let lastReturnValue = null;
 
-    try {
-      LogService.addLog(logContext.runId, 'info', `ワークフロー「${workflowName}」の実行を開始します...`);
-
-      for (const moduleConfig of modules) {
-        // 'enabled'プロパティのチェック（未定義の場合はtrueとして扱う）
+    // Recursive execution function
+    const executeModulesRecursive = (moduleList) => {
+      for (const moduleConfig of moduleList) {
         if (moduleConfig.enabled === false) {
           LogService.addLog(logContext.runId, 'info', `[モジュールスキップ] ${moduleConfig.name} (ID: ${moduleConfig.id}) は無効化されています。`);
           continue;
@@ -221,21 +219,46 @@ var WorkflowService = {
         
         LogService.addLog(logContext.runId, 'system', `[モジュール実行] ${moduleConfig.name} (ID: ${moduleConfig.id})`);
 
-        // モジュールロジックを実行
-        const result = this._executeModuleLogic(moduleDef, moduleConfig.settings, lastReturnValue);
-
-        // 返り値があるモジュールの場合、次のモジュールに渡す
-        if (moduleDef.returnsValue) {
-          lastReturnValue = result;
-          const resultInfo = Array.isArray(result) ? `${result.length}件のアイテム` : String(result);
-          LogService.addLog(logContext.runId, 'info', `  ↪ 結果: ${resultInfo} を次のモジュールに渡します。`);
+        if (moduleDef.type === 'container') {
+          if (moduleDef.id === 'condition_branch') {
+            const condition = moduleConfig.settings.condition;
+            LogService.addLog(logContext.runId, 'info', `  ↪ 条件「${condition}」を評価します...`);
+            // Simple evaluation: "true" string evaluates to true, everything else to false.
+            if (condition === 'true') {
+              LogService.addLog(logContext.runId, 'info', `  ↪ 条件がTrueのため、Trueブランチを実行します。`);
+              if (moduleConfig.true_modules && moduleConfig.true_modules.length > 0) {
+                executeModulesRecursive(moduleConfig.true_modules);
+              }
+            } else {
+              LogService.addLog(logContext.runId, 'info', `  ↪ 条件がFalseのため、Falseブランチを実行します。`);
+              if (moduleConfig.false_modules && moduleConfig.false_modules.length > 0) {
+                executeModulesRecursive(moduleConfig.false_modules);
+              }
+            }
+          } else {
+            LogService.addLog(logContext.runId, 'info', `  ↪ グループ「${moduleConfig.name}」内のモジュールを実行します...`);
+            if (moduleConfig.modules && moduleConfig.modules.length > 0) {
+              executeModulesRecursive(moduleConfig.modules);
+            }
+            LogService.addLog(logContext.runId, 'info', `  ↪ グループ「${moduleConfig.name}」の実行が完了しました。`);
+          }
         } else {
-          lastReturnValue = null; // 返り値をリセット
+          const result = this._executeModuleLogic(moduleDef, moduleConfig.settings, lastReturnValue);
+          if (moduleDef.returnsValue) {
+            lastReturnValue = result;
+            const resultInfo = Array.isArray(result) ? `${result.length}件のアイテム` : String(result);
+            LogService.addLog(logContext.runId, 'info', `  ↪ 結果: ${resultInfo} を次のモジュールに渡します。`);
+          } else {
+            lastReturnValue = null;
+          }
         }
       }
+    };
 
+    try {
+      LogService.addLog(logContext.runId, 'info', `ワークフロー「${workflowName}」の実行を開始します...`);
+      executeModulesRecursive(modules);
       LogService.addLog(logContext.runId, 'success', 'ワークフローの実行が正常に完了しました。');
-
     } catch (e) {
       status = '失敗';
       LogService.addLog(logContext.runId, 'error', `[致命的なエラー] ${e.message} ワークフローの実行を中断しました。`);
