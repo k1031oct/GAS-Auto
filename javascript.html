@@ -804,20 +804,23 @@
                 let minHeight = logHeader ? logHeader.offsetHeight + 24 : 80; // 24px for padding
 
                 if (moduleFooter && moduleFooter.offsetParent !== null) { // is visible on mobile
-                  const logTextVisibleHeight = 32; // For a couple lines of log text
-                  minHeight = (logHeader ? logHeader.offsetHeight : 0) + logTextVisibleHeight + moduleFooter.offsetHeight;
+                  const headerPaddingAndMargin = 28; // p-3's vertical padding (24px) + header's mb-1 (4px)
+                  minHeight = (logHeader ? logHeader.offsetHeight : 0) + headerPaddingAndMargin + moduleFooter.offsetHeight;
                 }
 
                 const newHeight = Math.max(minHeight, currentHeight + dy);
                 app.logArea.style.height = `${newHeight}px`;
               } else if (isResizingModule) {
-                const dy = lastY - clientY;
+                const dy = lastY - clientY; // Drag up -> dy > 0
                 lastY = clientY;
                 const currentHeight = app.modulePalette.offsetHeight;
                 const moduleHeader = app.modulePalette.querySelector('.p-3.md\\:p-4.border-b');
-                const logHeight = app.logArea.classList.contains('hidden') ? 0 : app.logArea.offsetHeight;
-                const minHeight = (moduleHeader ? moduleHeader.offsetHeight : 0) + logHeight;
-                const newHeight = Math.max(minHeight, currentHeight + dy);
+                
+                // Min height should be just enough for the header.
+                const minHeight = moduleHeader ? moduleHeader.offsetHeight : 60;
+
+                // Dragging the handle (at the top) up should shrink the palette.
+                const newHeight = Math.max(minHeight, currentHeight - dy);
                 app.modulePalette.style.height = `${newHeight}px`;
               }
             };
