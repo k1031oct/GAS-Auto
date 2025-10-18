@@ -298,7 +298,7 @@
                           console.log('Sortable for moduleList initialized.');
                   
                           // Init SortableJS for workflow container (drop target)
-                          logSortable = new Sortable(app.workflowContainer, {
+                          const logSortable = new Sortable(app.workflowContainer, {
                               group: 'shared',
                               animation: 150,
                               onAdd: (evt) => onAddModule(evt, state.modules),
