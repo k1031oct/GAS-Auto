@@ -278,8 +278,8 @@
                 state.modules.splice(evt.newIndex, 0, movedItem);
                 markDirty();
             },
-            filter: 'button', // Ignore clicks on buttons
-            preventOnFilter: false
+            filter: '.workflow-guide',
+            preventOnFilter: true
         });
         console.log('Sortable for workflowContainer initialized.');
 
@@ -522,9 +522,10 @@
         console.log('renderModules triggered. state.modules:', state.modules);
         app.workflowContainer.innerHTML = '';
         if (state.modules.length === 0) {
-            app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-8">
-                <i class="fas fa-arrow-down text-4xl mb-3 text-gray-300"></i>
-                <p>上部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+            app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
+                <i class="fas fa-arrow-down text-3xl md:text-4xl mb-3 text-gray-300"></i>
+                <p class="text-sm md:text-base">上部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
             </div>`;
             return;
         }
