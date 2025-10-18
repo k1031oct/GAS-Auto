@@ -20,6 +20,8 @@
       reloadModulesBtnMobile: document.getElementById('reload-modules-btn-mobile'),
       workflowContainer: document.getElementById('workflow-container'),
       moduleList: document.getElementById('module-list'),
+      moduleSearchBox: document.getElementById('module-search-box'),
+      toggleSearchBtn: document.getElementById('toggle-search-btn'),
       workflowNameDisplay: document.getElementById('workflow-name-display'),
       dirtyIndicator: document.getElementById('dirty-indicator'),
       resizeHandle: document.getElementById('resize-handle'),
@@ -292,6 +294,23 @@
       app.maximizeLogBtn.addEventListener('click', toggleMaximizeLog);
       app.hideLogBtn.addEventListener('click', hideLog);
       app.showLogBtn.addEventListener('click', showLog);
+
+      // Search Logic
+      app.toggleSearchBtn.addEventListener('click', () => {
+        app.moduleSearchBox.classList.toggle('hidden');
+        if (!app.moduleSearchBox.classList.contains('hidden')) {
+          app.moduleSearchBox.focus();
+        }
+      });
+
+      app.moduleSearchBox.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filteredModules = state.allModuleDefinitions.filter(m => 
+          m.name.toLowerCase().includes(searchTerm) || 
+          (m.description && m.description.toLowerCase().includes(searchTerm))
+        );
+        renderModulePalette(filteredModules);
+      });
 
       // ... (all existing listeners)
       app.newWorkflowBtn.addEventListener('click', newWorkflow);
@@ -573,14 +592,14 @@
         });
     };
 
-    const renderModulePalette = () => {
+    const renderModulePalette = (modulesToRender = state.allModuleDefinitions) => {
         app.moduleList.innerHTML = '';
-        if (state.allModuleDefinitions.length === 0) {
-            app.moduleList.innerHTML = `<p class="text-center text-sm text-red-400 p-4">モジュールの読み込みに失敗しました。フォルダIDを確認してください。</p>`;
+        if (modulesToRender.length === 0) {
+            app.moduleList.innerHTML = `<p class="text-center text-sm text-red-400 p-4">該当するモジュールが見つかりません。</p>`;
             return;
         }
         const categories = {};
-        state.allModuleDefinitions.forEach(m => {
+        modulesToRender.forEach(m => {
             const cat = m.category || '未分類';
             if (!categories[cat]) categories[cat] = [];
             categories[cat].push(m);
