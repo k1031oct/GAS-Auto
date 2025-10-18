@@ -246,8 +246,16 @@
                         instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
                         name: moduleDef.name,
                         type: moduleDef.type,
-                        settings: {} // Start with empty settings
+                        settings: {} // Initialize settings object
                     };
+
+                    // Populate settings with default values from module definition
+                    if (moduleDef.settings) {
+                        moduleDef.settings.forEach(setting => {
+                            newModule.settings[setting.id] = setting.defaultValue !== undefined ? setting.defaultValue : '';
+                        });
+                    }
+
                     console.log('onAdd triggered. newModule:', newModule, 'state.modules (before splice):', state.modules);
                     state.modules.splice(evt.newIndex, 0, newModule);
                     evt.item.remove(); // Remove the ghost element
@@ -409,9 +417,12 @@
                 settings[id] = el.value;
             }
         });
-        console.log('Saving settings to state:', newSettings);
+        console.log('Saving settings to state:', settings);
 
         const moduleIndex = state.modules.findIndex(m => m.instanceId === module.instanceId);
+        if (moduleIndex > -1) {
+            state.modules[moduleIndex].settings = settings;
+        }
         markDirty();
         closeModuleSettingsModal();
       };
