@@ -400,7 +400,9 @@
                 settings[id] = el.value;
             }
         });
-        module.settings = settings;
+        console.log('Saving settings to state:', newSettings);
+
+        const moduleIndex = state.modules.findIndex(m => m.instanceId === module.instanceId);
         markDirty();
         closeModuleSettingsModal();
       };
@@ -566,6 +568,8 @@
             }
             return module;
         }).filter(Boolean);
+
+        console.log('Getting workflow data. Modules being saved:', orderedModules);
 
         return {
             name: state.currentWorkflowName || '新規ワークフロー',
