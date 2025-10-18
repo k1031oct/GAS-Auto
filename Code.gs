@@ -132,6 +132,15 @@ function runWorkflow(payload) {
   }
 }
 
+function runSingleModule(workflowName, moduleConfig, moduleFolderId) {
+  try {
+    return WorkflowService.runSingleModule(workflowName, moduleConfig, moduleFolderId);
+  } catch (e) {
+    Logger.log(e.stack);
+    throw new Error(`単体実行エラー: ${e.message}.`);
+  }
+}
+
 function getExecutionLogUrl() {
   return LogService.getLogSheetUrl();
 }
