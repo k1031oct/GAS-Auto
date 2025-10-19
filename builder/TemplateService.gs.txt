@@ -1,0 +1,88 @@
+/**
+ * @file TemplateService.gs
+ * @description テンプレートからのシート作成機能を担当する (シンプル版)
+ * @overview 「ファイルのコピー」ロジックを参考に、makeCopyメソッドを利用して堅牢性を高めた実装。
+ */
+var TemplateService = {
+
+  /**
+   * Templatesフォルダ内のテンプレートファイル名一覧を取得する
+   * @returns {Array<string>} テンプレートファイル名の配列
+   */
+  listTemplates: function () {
+    try {
+      const appDataFolders = DriveApp.getFoldersByName('WorkflowBuilder AppData');
+      if (!appDataFolders.hasNext()) {
+        Logger.log("WorkflowBuilder AppData フォルダが見つかりません。");
+        return [];
+      }
+      const appDataFolder = appDataFolders.next();
+
+      const templateFolders = appDataFolder.getFoldersByName('Templates');
+      if (!templateFolders.hasNext()) {
+        Logger.log("Templates フォルダが見つかりません。");
+        return [];
+      }
+      const templateFolder = templateFolders.next();
+
+      const files = templateFolder.getFiles();
+      const templateNames = [];
+      while (files.hasNext()) {
+        templateNames.push(files.next().getName());
+      }
+      return templateNames.sort();
+    } catch (e) {
+      Logger.log(`テンプレートの取得に失敗しました: ${e.message}`);
+      throw new Error(`テンプレート一覧の取得に失敗しました。エラー: ${e.message}`);
+    }
+  },
+
+  /**
+   * テンプレートを元に新しいスプレッドシートを作成する (シンプル版)
+   * @param {string} templateName - 使用するテンプレートのファイル名
+   * @param {string} newFileName - 作成する新しいスプレッドシートのファイル名
+   * @param {string} workflowName - 保存先となるワークフロー名
+   * @returns {string} 作成されたスプレッドシートのURL
+   */
+  createSheetFromTemplate: function (templateName, newFileName, workflowName) {
+    if (!workflowName) {
+      throw new Error('ファイル保存先の対象となるワークフローが保存されていません。');
+    }
+
+    const sanitizedFileName = newFileName.replace(/[\\/?*[\]]/g, '_').trim();
+    if (!sanitizedFileName) {
+      throw new Error('新しいスプレッドシート名が空か、無効な文字のみで構成されています。');
+    }
+
+    try {
+      const appDataFolder = DriveApp.getFoldersByName('WorkflowBuilder AppData').next();
+      const templateFolder = appDataFolder.getFoldersByName('Templates').next();
+      const templateFiles = templateFolder.getFilesByName(templateName);
+
+      if (!templateFiles.hasNext()) {
+        throw new Error(`テンプレート「${templateName}」が見つかりません。`);
+      }
+      const templateFile = templateFiles.next();
+
+      const workflowFolder = WorkflowService._getWorkflowFolder(workflowName);
+
+      const newSheetFile = templateFile.makeCopy(sanitizedFileName, workflowFolder);
+
+      Logger.log(`「${workflowName}」フォルダに、テンプレート「${templateName}」から「${sanitizedFileName}」を作成しました。`);
+
+      return newSheetFile.getUrl();
+
+    } catch (e) {
+      Logger.log(`テンプレートからのシート作成中にエラーが発生しました: ${e.message}`);
+      throw new Error(`シートの作成に失敗しました。エラー: ${e.message}`);
+    }
+  }
+};
+
+function listTemplates() {
+  return TemplateService.listTemplates();
+}
+
+function createSheetFromTemplate(templateName, newFileName, workflowName) {
+  return TemplateService.createSheetFromTemplate(templateName, newFileName, workflowName);
+}

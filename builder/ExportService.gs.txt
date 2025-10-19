@@ -1,0 +1,444 @@
+/**
+ * @file ExportService.gs
+ * @description ワークフロー定義を実行可能なGoogle Apps Scriptコードを含むGoogleドキュメントを生成します。
+ */
+var ExportService = {
+
+
+  /**
+   * ワークフローのペイロードからGASコードを含むドキュメントを生成するメイン関数。
+   * @param {object} payload - {name: string, modules: Array<object>}
+   * @returns {string} 生成されたGoogleドキュメントのURL。
+   */
+  generate: function (payload) {
+    const workflowName = payload.name || '名称未設定のワークフロー';
+    const modules = payload.modules || [];
+
+    const functionName = `実行_${workflowName.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+
+    const workflowFolder = WorkflowService._getWorkflowFolder(workflowName);
+    const docName = `【GASコード】${workflowName}`;
+
+    const existingFiles = workflowFolder.getFilesByName(docName);
+    if (existingFiles.hasNext()) {
+      existingFiles.next().setTrashed(true);
+    }
+
+    const doc = DocumentApp.create(docName);
+    const docFile = DriveApp.getFileById(doc.getId());
+    workflowFolder.addFile(docFile);
+    DriveApp.getRootFolder().removeFile(docFile);
+
+    const body = doc.getBody();
+    this._setDocumentStyles(body);
+
+    body.appendParagraph(`GAS書き出しコード: ${workflowName}`).setHeading(DocumentApp.ParagraphHeading.TITLE);
+    body.appendParagraph(`このドキュメントには、指定されたワークフローを実行するためのGoogle Apps Scriptコードが含まれています。`);
+    body.appendParagraph(`生成日時: ${new Date().toLocaleString('ja-JP')}`).setHeading(DocumentApp.ParagraphHeading.SUBTITLE);
+    body.appendHorizontalRule();
+
+    body.appendParagraph('実行コード').setHeading(DocumentApp.ParagraphHeading.HEADING1);
+
+    let code = `function ${functionName}() {\n`;
+    code += `  // --- 実行コンテキスト ---\n`;
+    code += `  const context = {\n`;
+    code += `    variables: {},\n`;
+    code += `    executionResults: {}\n`;
+    code += `  };\n\n`;
+    code += `  // --- ヘルパー関数 ---\n`;
+    code += `  const _V = (value) => {\n`;
+    code += `    if (typeof value !== 'string') {\n`;
+    code += `      return value;\n`;
+    code += `    }\n`;
+    code += `    // 文字列内のすべてのプレースホルダを置換する\n`;
+    code += `    return value.replace(/{{(.*?)}}/g, (match, varName) => {\n`;
+    code += `      const trimmedName = varName.trim();\n`;
+    code += `      // 変数が存在すればその値で置換し、なければ空文字で置換する\n`;
+    code += `      return context.variables.hasOwnProperty(trimmedName) ? context.variables[trimmedName] : '';\n`;
+    code += `    });\n`;
+    code += `  };\n\n`;
+
+    code += this._processModules(modules, 2);
+
+    code += `\n    Logger.log("ワークフローは正常に終了しました。");\n\n`;
+    code += `  } catch (e) {\n`;
+    code += `    Logger.log("ワークフローの実行中にエラーが発生しました: " + e.toString() + "\\n" + e.stack);\n`;
+    code += `  }\n`;
+    code += `}\n`;
+
+    const codeBlock = body.appendParagraph(code);
+    const style = {};
+    style[DocumentApp.Attribute.FONT_FAMILY] = 'Consolas';
+    style[DocumentApp.Attribute.BACKGROUND_COLOR] = '#F3F3F3';
+    style[DocumentApp.Attribute.PADDING_LEFT] = 18;
+    style[DocumentApp.Attribute.PADDING_RIGHT] = 18;
+    codeBlock.setAttributes(style);
+
+    doc.saveAndClose();
+    return doc.getUrl();
+  },
+
+
+  /**
+   * モジュールの配列を再帰的に処理し、GASコードに変換します。
+   * @param {Array<object>} modules - 処理するモジュールの配列。
+   * @param {number} indentLevel - 現在のインデントレベル。
+   * @returns {string} モジュール用に生成されたコード。
+   */
+  _processModules: function (modules, indentLevel) {
+    let code = '';
+    const indent = '  '.repeat(indentLevel);
+
+    modules.forEach((module, index) => {
+      if (module.settings && module.settings.isEnabled === false) {
+        code += `\n${indent}// --- ステップ: ${module.name} (スキップ) ---\n`;
+        return;
+      }
+
+      code += `\n${indent}// --- ステップ: ${module.name} ---\n`;
+      code += this._generateModuleCode(module, indent, indentLevel);
+    });
+
+    return code;
+  },
+
+
+  /**
+   * 単一のモジュールのGASコードを生成します。
+   * @param {object} module - モジュールデータ。
+   * @param {string} indent - 現在のインデントレベルの文字列。
+   * @param {number} indentLevel - 現在のインデントレベル。
+   * @returns {string} モジュール用に生成されたGASコード。
+   */
+  _generateModuleCode: function (module, indent, indentLevel) {
+    const s = module.settings;
+    let code = '';
+
+    switch (module.id) {
+      // --- ワークフロー制御 ---
+      case 'control_if_else':
+        const operatorMap = {
+          equals: '==', not_equals: '!=', contains: '.includes(', greater_than: '>', less_than: '<'
+        };
+        let condition;
+        if (s.operator === 'is_blank') {
+          condition = `!_V("${s.sourceValue || ''}")`;
+        } else if (s.operator === 'is_not_blank') {
+          condition = `!!_V("${s.sourceValue || ''}")`;
+        } else if (s.operator === 'contains' || s.operator === 'not_contains') {
+          condition = `String(_V("${s.sourceValue || ''}")).includes(_V("${s.comparisonValue || ''}"))`;
+          if (s.operator === 'not_contains') condition = `!(${condition})`;
+        } else {
+          condition = `_V("${s.sourceValue || ''}") ${operatorMap[s.operator]} _V("${s.comparisonValue || ''}")`;
+        }
+        code += `${indent}if (${condition}) {\n`;
+        code += this._processModules(s.ifModules, indentLevel + 1);
+        code += `${indent}} else {\n`;
+        code += this._processModules(s.elseModules, indentLevel + 1);
+        code += `${indent}}\n`;
+        break;
+      case 'control_for_each':
+        code += `${indent}let loopList = [];\n`;
+        if (s.sourceType === 'range') {
+          code += `${indent}const loop_ss = SpreadsheetApp.openByUrl(_V("${s.sourceUrl || ''}"));\n`;
+          code += `${indent}const loop_sheet = loop_ss.getSheetByName(_V("${s.sourceSheet || ''}"));\n`;
+          code += `${indent}loopList = loop_sheet.getRange(_V("${s.sourceRange || ''}")).getValues();\n`;
+        } else if (s.sourceType === 'text') {
+          code += `${indent}loopList = _V("${s.listText || ''}").split(',').map(item => [item.trim()]);\n`;
+        } else {
+          code += `${indent}loopList = context.executionResults["${s.sourceModuleInstanceId || ''}"] || [];\n`;
+        }
+        code += `${indent}loopList.forEach((item, index) => {\n`;
+        code += `${indent}  context.variables["item"] = item[0];\n`;
+        code += `${indent}  context.variables["row_values"] = item;\n`;
+        code += `${indent}  context.variables["index"] = index;\n`;
+        code += this._processModules(s.loopModules, indentLevel + 1);
+        code += `${indent}});\n`;
+        break;
+      case 'control_try_catch':
+        code += `${indent}try {\n`;
+        code += this._processModules(s.tryModules, indentLevel + 1);
+        code += `${indent}} catch (e) {\n`;
+        code += `${indent}  Logger.log("Try-Catchブロックでエラーを検知: " + e.toString());\n`;
+        code += `${indent}  context.variables["error_message"] = e.message;\n`;
+        code += this._processModules(s.catchModules, indentLevel + 1);
+        code += `${indent}}\n`;
+        break;
+      case 'control_group':
+        code += `${indent}// ▼▼▼ グループ: ${s.groupName || '名称未設定'} ▼▼▼\n`;
+        code += this._processModules(s.groupModules, indentLevel);
+        code += `${indent}// ▲▲▲ グループ終了 ▲▲▲\n`;
+        break;
+
+      default:
+        code += this._generateSingleModuleCode(module, indent);
+        break;
+    }
+
+    return code;
+  },
+
+  _generateSingleModuleCode: function (module, indent) {
+    const s = module.settings;
+    let code = '';
+
+    const getFileNameCode = (settings, varPrefix) => {
+      if (settings.fileNameSourceType === 'cell') {
+        return `
+${indent}const ${varPrefix}_ss = SpreadsheetApp.openByUrl(_V("${settings.fileNameSourceUrl || ''}"));
+${indent}const ${varPrefix}_sheet = ${varPrefix}_ss.getSheetByName(_V("${settings.fileNameSourceSheet || ''}"));
+${indent}const ${varPrefix}_fileName = ${varPrefix}_sheet.getRange(_V("${settings.fileNameSourceCell || ''}")).getValue().toString();`;
+      }
+      return `\n${indent}const ${varPrefix}_fileName = _V("${settings.newFileName || ''}");`;
+    };
+
+    const getGmailOptionsCode = (settings) => {
+      let optionsCode = `${indent}const mailOptions = {\n`;
+      if (settings.cc) optionsCode += `${indent}  cc: _V("${settings.cc}"),\n`;
+      if (settings.bcc) optionsCode += `${indent}  bcc: _V("${settings.bcc}"),\n`;
+      if (settings.attachmentFolderId) {
+        optionsCode += `${indent}  attachments: DriveApp.getFolderById(_V("${settings.attachmentFolderId}")).getFiles()\n`;
+      }
+      optionsCode += `${indent}};\n`;
+      return optionsCode;
+    }
+
+    switch (module.id) {
+      case 'log_message':
+        code += `${indent}Logger.log("ワークフローログ: " + _V("${s.logMessage || ''}"));\n`;
+        break;
+      case 'control_set_variable':
+        if (s.valueSourceType === 'manual') {
+          code += `${indent}context.variables["${s.variableName || ''}"] = _V("${s.variableValue || ''}");\n`;
+        } else if (s.valueSourceType === 'fromCell') {
+          code += `${indent}const var_ss = SpreadsheetApp.openByUrl(_V("${s.sourceUrl || ''}"));\n`;
+          code += `${indent}const var_sheet = var_ss.getSheetByName(_V("${s.sourceSheet || ''}"));\n`;
+          code += `${indent}context.variables["${s.variableName || ''}"] = var_sheet.getRange(_V("${s.sourceCell || ''}")).getValue();\n`;
+        } else {
+          code += `${indent}context.variables["${s.variableName || ''}"] = context.executionResults["${s.sourceModuleInstanceId || ''}"];\n`;
+        }
+        break;
+      case 'control_run_workflow':
+        code += `${indent}// 「別のワークフローを実行」モジュールは、トリガーを利用するため直接的なコード変換はサポートされません。\n`;
+        code += `${indent}Logger.log("TODO: ワークフロー「${s.workflowToRun || ''}」を手動で呼び出すか、別の方法で実装してください。");\n`;
+        break;
+      case 'control_noop': code += `${indent}// 処理を終了します。\n`; break;
+
+      // --- Drive ---
+      case 'drive_create_folder':
+        code += `${indent}const parentFolder = ${s.parentFolderId ? `DriveApp.getFolderById(_V("${s.parentFolderId}"))` : 'DriveApp.getRootFolder()'};\n`;
+        code += `${indent}const newFolder = parentFolder.createFolder(_V("${s.newFolderName || ''}"));\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = newFolder.getUrl();\n`;
+        break;
+      case 'drive_copy_file':
+        code += getFileNameCode(s, 'copy');
+        code += `${indent}const sourceFile_copy = DriveApp.getFileById(_V("${s.sourceFileId || ''}"));\n`;
+        code += `${indent}const destFolder_copy = DriveApp.getFolderById(_V("${s.destFolderId || ''}"));\n`;
+        code += `${indent}const newFile_copy = sourceFile_copy.makeCopy(copy_fileName, destFolder_copy);\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = newFile_copy.getUrl();\n`;
+        break;
+      case 'drive_delete_folder_files':
+        code += `${indent}const delFolder = DriveApp.getFolderById(_V("${s.folderId || ''}"));\n`;
+        code += `${indent}const delFiles = delFolder.getFiles();\n`;
+        code += `${indent}while (delFiles.hasNext()) { delFiles.next().setTrashed(true); }\n`;
+        break;
+      case 'drive_delete_files_by_type':
+        code += `${indent}const delTypeFolder = DriveApp.getFolderById(_V("${s.folderId || ''}"));\n`;
+        code += `${indent}const delTypeFiles = delTypeFolder.getFilesByType(_V("${s.mimeType || ''}"));\n`;
+        code += `${indent}while (delTypeFiles.hasNext()) { delTypeFiles.next().setTrashed(true); }\n`;
+        break;
+      case 'drive_list_files_to_sheet':
+        code += `${indent}const listFolder = DriveApp.getFolderById(_V("${s.folderId || ''}"));\n`;
+        code += `${indent}const list = [];\n`;
+        code += `${indent}const listFiles = listFolder.getFiles();\n`;
+        code += `${indent}while (listFiles.hasNext()) { const file = listFiles.next(); list.push([file.getName(), file.getUrl()]); }\n`;
+        code += `${indent}const list_ss = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}"));\n`;
+        code += `${indent}const list_sheet = list_ss.getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}if (list.length > 0) list_sheet.getRange(_V("${s.startCell || 'A1'}")).offset(0, 0, list.length, 2).setValues(list);\n`;
+        break;
+      case 'drive_convert_excel_to_sheets':
+        code += `${indent}const excelFolder = DriveApp.getFolderById(_V("${s.sourceFolderId || ''}"));\n`;
+        code += `${indent}const excelFiles = excelFolder.getFilesByType(MimeType.MICROSOFT_EXCEL);\n`;
+        code += `${indent}let newSheetUrl = '';\n`;
+        code += `${indent}while (excelFiles.hasNext()) {\n`;
+        code += `${indent}  const file = excelFiles.next();\n`;
+        code += `${indent}  const newFile = Drive.Files.insert({ title: file.getName().replace(/\\.xlsx?$/, ''), parents: [{id: _V("${s.destFolderId || ''}")}] }, file.getBlob(), { convert: true });\n`;
+        code += `${indent}  if (!newSheetUrl) newSheetUrl = newFile.alternateLink;\n`;
+        code += `${indent}}\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = newSheetUrl;\n`;
+        break;
+
+      // --- Sheets ---
+      case 'sheets_create_new':
+        code += getFileNameCode(s, 'newss');
+        code += `${indent}const newSs = SpreadsheetApp.create(newss_fileName);\n`;
+        code += `${indent}if (_V("${s.destFolderId}")) {\n`;
+        code += `${indent}  const newSsFile = DriveApp.getFileById(newSs.getId());\n`;
+        code += `${indent}  DriveApp.getFolderById(_V("${s.destFolderId}")).addFile(newSsFile);\n`;
+        code += `${indent}  DriveApp.getRootFolder().removeFile(newSsFile);\n`;
+        code += `${indent}}\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = newSs.getUrl();\n`;
+        break;
+      case 'sheets_to_pdf':
+        code += getFileNameCode(s, 'pdf');
+        code += `${indent}const pdf_ss = SpreadsheetApp.openByUrl(_V("${s.spreadsheetUrl || ''}"));\n`;
+        code += `${indent}const pdf_sheet = pdf_ss.getSheetByName(_V("${s.sheetName || ''}"));\n`;
+        code += `${indent}const pdf_url = 'https://docs.google.com/spreadsheets/d/' + pdf_ss.getId() + '/export?';\n`;
+        code += `${indent}let pdf_options = 'exportFormat=pdf&format=pdf' + '&gid=' + pdf_sheet.getSheetId();\n`;
+        code += `${indent}pdf_options += '&portrait=' + _V("${s.pdfOrientation || 'false'}");\n`;
+        code += `${indent}pdf_options += '&size=' + _V("${s.pdfSize || 'A4'}");\n`;
+        code += `${indent}pdf_options += '&scale=' + _V("${s.pdfScale || '4'}");\n`;
+        code += `${indent}const pdf_res = UrlFetchApp.fetch(pdf_url + pdf_options, { headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() } });\n`;
+        code += `${indent}const pdf_blob = pdf_res.getBlob().setName(pdf_fileName + '.pdf');\n`;
+        code += `${indent}const pdf_folder = DriveApp.getFolderById(_V("${s.destFolderId || ''}"));\n`;
+        code += `${indent}const pdf_file = pdf_folder.createFile(pdf_blob);\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = pdf_file.getUrl();\n`;
+        break;
+      case 'sheets_to_excel':
+        code += getFileNameCode(s, 'excel');
+        code += `${indent}const excel_ssId = SpreadsheetApp.openByUrl(_V("${s.spreadsheetUrl || ''}")).getId();\n`;
+        code += `${indent}const excel_url = 'https://docs.google.com/spreadsheets/d/' + excel_ssId + '/export?format=xlsx';\n`;
+        code += `${indent}const excel_res = UrlFetchApp.fetch(excel_url, { headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() } });\n`;
+        code += `${indent}const excel_blob = excel_res.getBlob().setName(excel_fileName + '.xlsx');\n`;
+        code += `${indent}const excel_folder = DriveApp.getFolderById(_V("${s.destFolderId || ''}"));\n`;
+        code += `${indent}const excel_file = excel_folder.createFile(excel_blob);\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = excel_file.getUrl();\n`;
+        break;
+      case 'sheets_copy_values':
+        code += `${indent}const sourceSs_cp = SpreadsheetApp.openByUrl(_V("${s.sourceUrl || ''}"));\n`;
+        code += `${indent}const sourceSheet_cp = sourceSs_cp.getSheetByName(_V("${s.sourceSheet || ''}"));\n`;
+        code += `${indent}const sourceRange_cp = sourceSheet_cp.getRange(_V("${s.sourceRange || ''}"));\n`;
+        code += `${indent}const targetSs_cp = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}"));\n`;
+        code += `${indent}const targetSheet_cp = targetSs_cp.getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}const targetRange_cp = targetSheet_cp.getRange(_V("${s.targetRange || ''}"));\n`;
+        code += `${indent}sourceRange_cp.copyTo(targetRange_cp);\n`;
+        break;
+      case 'sheets_clear_values':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).getRange(_V("${s.targetRange || ''}")).clearContent();\n`;
+        break;
+      case 'sheets_import_csv':
+        code += `${indent}const csv_folder = DriveApp.getFolderById(_V("${s.folderId || ''}"));\n`;
+        code += `${indent}const csv_files = csv_folder.getFilesByType(MimeType.CSV);\n`;
+        code += `${indent}if (csv_files.hasNext()) {\n`;
+        code += `${indent}  const csv_file = csv_files.next();\n`;
+        code += `${indent}  const csv_data = csv_file.getBlob().getDataAsString(_V("${s.charset || 'shift-jis'}"));\n`;
+        code += `${indent}  const csv_values = Utilities.parseCsv(csv_data);\n`;
+        code += `${indent}  if (csv_values.length > 0) {\n`;
+        code += `${indent}    const csv_sheet = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}    csv_sheet.getRange(1, 1, csv_values.length, csv_values[0].length).setValues(csv_values);\n`;
+        code += `${indent}  }\n`;
+        code += `${indent}}\n`;
+        break;
+      case 'sheets_insert_image':
+        code += `${indent}const img_blob = DriveApp.getFileById(_V("${s.fileId || ''}")).getBlob();\n`;
+        code += `${indent}const img_sheet = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}const img = SpreadsheetApp.newCellImage().setSourceUrl('data:' + img_blob.getContentType() + ';base64,' + Utilities.base64Encode(img_blob.getBytes())).build();\n`;
+        code += `${indent}img_sheet.getRange(_V("${s.targetCell || ''}")).setValue(img);\n`;
+        break;
+      case 'sheets_insert_rows_before':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).insertRowsBefore(parseInt(_V("${s.startRow || '1'}")), parseInt(_V("${s.numRows || '1'}")));\n`;
+        break;
+      case 'sheets_insert_rows_after':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).insertRowsAfter(parseInt(_V("${s.startRow || '1'}")), parseInt(_V("${s.numRows || '1'}")));\n`;
+        break;
+      case 'sheets_delete_rows':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).deleteRows(parseInt(_V("${s.startRow || '1'}")), parseInt(_V("${s.numRows || '1'}")));\n`;
+        break;
+      case 'sheets_insert_cols_before':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).insertColumnsBefore(parseInt(_V("${s.startCol || '1'}")), parseInt(_V("${s.numCols || '1'}")));\n`;
+        break;
+      case 'sheets_insert_cols_after':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).insertColumnsAfter(parseInt(_V("${s.startCol || '1'}")), parseInt(_V("${s.numCols || '1'}")));\n`;
+        break;
+      case 'sheets_delete_cols':
+        code += `${indent}SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}")).deleteColumns(parseInt(_V("${s.startCol || '1'}")), parseInt(_V("${s.numCols || '1'}")));\n`;
+        break;
+      case 'sheets_hide_rows_by_value':
+        code += `${indent}const hide_sheet = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}const hide_values = hide_sheet.getRange(_V("${s.column || 'A'}") + "1:" + _V("${s.column || 'A'}") + hide_sheet.getLastRow()).getValues();\n`;
+        code += `${indent}for (var i = 0; i < hide_values.length; i++) {\n`;
+        code += `${indent}  if (hide_values[i][0] == _V("${s.valueToHide || ''}")) {\n`;
+        code += `${indent}    hide_sheet.hideRows(i + 1);\n`;
+        code += `${indent}  }\n`;
+        code += `${indent}}\n`;
+        break;
+      case 'sheets_unhide_rows':
+        code += `${indent}const unhide_sheet = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}const unhide_range = unhide_sheet.getRange(_V("${s.targetRange || 'A1'}"));\n`;
+        code += `${indent}unhide_sheet.unhideRow(unhide_range);\n`;
+        break;
+
+      // --- Gmail ---
+      case 'gmail_send_email':
+        code += getGmailOptionsCode(s);
+        code += `${indent}GmailApp.sendEmail(_V("${s.to || ''}"), _V("${s.subject || ''}"), _V("${s.body || ''}"), mailOptions);\n`;
+        break;
+      case 'gmail_create_draft':
+        code += getGmailOptionsCode(s);
+        code += `${indent}GmailApp.createDraft(_V("${s.to || ''}"), _V("${s.subject || ''}"), _V("${s.body || ''}"), mailOptions);\n`;
+        break;
+      case 'gmail_fetch_attachments':
+        code += `${indent}const threads = GmailApp.search(_V("${s.searchQuery || ''}"));\n`;
+        code += `${indent}const destFolder_attach = DriveApp.getFolderById(_V("${s.destFolderId || ''}"));\n`;
+        code += `${indent}threads.forEach(thread => {\n`;
+        code += `${indent}  thread.getMessages().forEach(message => {\n`;
+        code += `${indent}    if (${s.markAsRead}) message.markRead();\n`;
+        code += `${indent}    if (${s.removeStar}) message.unstar();\n`;
+        code += `${indent}    message.getAttachments().forEach(attachment => destFolder_attach.createFile(attachment));\n`;
+        code += `${indent}  });\n`;
+        code += `${indent}});\n`;
+        break;
+
+      // --- その他 ---
+      case 'slides_refresh_charts':
+        code += `${indent}SlidesApp.openByUrl(_V("${s.slidesUrl || ''}")).getSlides().forEach(s => s.getSheetsCharts().forEach(c => c.refresh()));\n`;
+        break;
+      case 'calendar_get_holidays_to_sheet':
+        code += `${indent}const holiday_sheet = SpreadsheetApp.openByUrl(_V("${s.targetUrl || ''}")).getSheetByName(_V("${s.targetSheet || ''}"));\n`;
+        code += `${indent}const holiday_cal = CalendarApp.getCalendarById('ja.japanese#holiday@group.v.calendar.google.com');\n`;
+        code += `${indent}const holiday_events = holiday_cal.getEvents(new Date(_V("${s.startDate || ''}")), new Date(_V("${s.endDate || ''}")));\n`;
+        code += `${indent}const holiday_list = holiday_events.map((e, i) => [i + 1, e.getAllDayStartDate(), e.getTitle()]);\n`;
+        code += `${indent}if (holiday_list.length > 0) holiday_sheet.getRange(2, 1, holiday_list.length, 3).setValues(holiday_list);\n`;
+        break;
+      case 'chat_post':
+        code += `${indent}const chat_payload = { 'text': _V("${s.message || ''}") };\n`;
+        code += `${indent}const chat_options = { 'method': 'post', 'contentType': 'application/json; charset=UTF-8', 'payload': JSON.stringify(chat_payload) };\n`;
+        code += `${indent}UrlFetchApp.fetch(_V("${s.webhookUrl || ''}"), chat_options);\n`;
+        break;
+      case 'utils_extract_id_from_url':
+        code += `${indent}const url_to_extract = _V("${s.sourceUrl || ''}");\n`;
+        code += `${indent}const regex = /(?:\\/d\\/|\\/folders\\/|id=)([a-zA-Z0-9-_]{20,})/; \n`;
+        code += `${indent}const match = url_to_extract.match(regex);\n`;
+        code += `${indent}const extractedId = match ? match[1] : null;\n`;
+        code += `${indent}if (extractedId) {\n`;
+        code += `${indent}  const out_ss = SpreadsheetApp.openByUrl(_V("${s.outputUrl || ''}"));\n`;
+        code += `${indent}  const out_sheet = out_ss.getSheetByName(_V("${s.outputSheet || ''}"));\n`;
+        code += `${indent}  out_sheet.getRange(_V("${s.outputCell || ''}")).setValue(extractedId);\n`;
+        code += `${indent}}\n`;
+        code += `${indent}context.executionResults["${module.instanceId}"] = extractedId;\n`;
+        break;
+      case 'custom_run_script':
+        code += `${indent}// ▼▼▼ カスタムスクリプト実行 ▼▼▼\n`;
+        code += `${indent}// 注意: このコードは、元の実行環境とは異なるコンテキストで動作します。\n`;
+        code += `${indent}// 'variables'は'context.variables'に、'secrets'は手動で設定する必要があります。\n`;
+        code += (s.userCode || '').split('\n').map(line => `${indent}${line}`).join('\n') + '\n';
+        code += `${indent}// ▲▲▲ カスタムスクリプトここまで ▲▲▲\n`;
+        break;
+      default:
+        code += `${indent}// モジュールID「${module.id}」のコード生成はまだ実装されていません。\n`;
+        break;
+    }
+
+    code += `${indent}Logger.log("ステップ「${module.name}」が完了しました。");\n`;
+    return code;
+  },
+
+  _setDocumentStyles: function (body) {
+    body.setPageWidth(1600);
+    body.setPageHeight(2200);
+    const style = {};
+    style[DocumentApp.Attribute.FONT_FAMILY] = 'Meiryo';
+    style[DocumentApp.Attribute.FONT_SIZE] = 10;
+    body.setAttributes(style);
+  }
+};

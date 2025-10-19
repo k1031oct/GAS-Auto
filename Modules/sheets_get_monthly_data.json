@@ -1,0 +1,32 @@
+{
+  "id": "sheets_get_monthly_data",
+  "name": "月次フォルダからデータ取得",
+  "icon": "calendar_month",
+  "category": "Google Sheets",
+  "description": "ルートフォルダ内の「年フォルダ」>「月フォルダ」から、その月で最終更新されたスプレッドシートのデータを取得し貼り付けます。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "rootFolderId", "name": "ルートフォルダID", "type": "text", "required": true },
+    { "id": "targetYear", "name": "対象年 (例: 2024)", "type": "text", "required": true },
+    { "id": "targetMonth", "name": "対象月 (例: 10)", "type": "text", "required": true },
+    { "id": "sourceSheetName", "name": "取得元シート名", "type": "text", "required": true },
+    { "id": "sourceRangeNotation", "name": "データ取得範囲 (A1形式)", "type": "text", "placeholder": "例: A2:Z", "required": true },
+    { "id": "targetUrl", "name": "貼り付け先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheetName", "name": "貼り付け先シート名", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "get_monthly_data",
+      "func": "core.sheetsGetMonthlyData",
+      "args": {
+        "rootFolderId": "{{rootFolderId}}",
+        "targetYear": "{{targetYear}}",
+        "targetMonth": "{{targetMonth}}",
+        "sourceSheetName": "{{sourceSheetName}}",
+        "sourceRangeNotation": "{{sourceRangeNotation}}",
+        "targetUrl": "{{targetUrl}}",
+        "targetSheetName": "{{targetSheetName}}"
+      }
+    }
+  ]
+}

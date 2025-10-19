@@ -1,0 +1,24 @@
+{
+  "id": "sheets_to_excel",
+  "name": "Excel形式で出力",
+  "icon": "file_download",
+  "category": "Google Sheets",
+  "description": "スプレッドシートをExcel形式(.xlsx)で出力し、指定したフォルダに保存します。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "spreadsheetUrl", "name": "対象のスプレッドシートURL", "type": "text", "required": true },
+    { "id": "destFolderId", "name": "出力先フォルダID", "type": "text", "required": true },
+    { "id": "newFileName", "name": "Excelファイル名", "type": "text", "required": true, "placeholder": "拡張子なしで入力" }
+  ],
+  "logic": [
+    {
+      "step_id": "export_to_excel",
+      "func": "core.sheetsToExcel",
+      "args": {
+        "spreadsheetUrl": "{{spreadsheetUrl}}",
+        "destFolderId": "{{destFolderId}}",
+        "newFileName": "{{newFileName}}"
+      }
+    }
+  ]
+}

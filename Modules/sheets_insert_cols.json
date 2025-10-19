@@ -1,0 +1,27 @@
+{
+  "id": "sheets_insert_cols",
+  "name": "列を挿入",
+  "icon": "view_column",
+  "category": "Google Sheets",
+  "description": "指定した位置に列を挿入します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "startCol", "name": "基準の列番号", "type": "number", "required": true },
+    { "id": "numCols", "name": "挿入する列数", "type": "number", "defaultValue": 1, "required": true },
+    { "id": "after", "name": "基準列の右に挿入", "type": "checkbox", "defaultValue": false, "label": "基準列の右（After）に挿入する（チェックなしは左）" }
+  ],
+  "logic": [
+    {
+      "step_id": "insert_cols",
+      "func": "core.sheetsInsertCols",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "startCol": "{{startCol}}",
+        "numCols": "{{numCols}}",
+        "after": "{{after}}"
+      }
+    }
+  ]
+}

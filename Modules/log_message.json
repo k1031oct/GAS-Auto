@@ -1,0 +1,19 @@
+{
+  "id": "log_message",
+  "name": "ログを出力",
+  "icon": "speaker_notes",
+  "category": "ユーティリティ",
+  "description": "指定したメッセージを実行ログに出力します。",
+  "settings": [
+    { "id": "logMessage", "name": "ログメッセージ", "type": "textarea", "required": true, "placeholder": "例: 顧客 {{customer_name}} の処理を開始します。" }
+  ],
+  "logic": [
+    {
+      "step_id": "log_the_message",
+      "func": "core.log",
+      "args": {
+        "message": "{{logMessage}}"
+      }
+    }
+  ]
+}

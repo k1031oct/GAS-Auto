@@ -1,0 +1,42 @@
+{
+  "id": "sheets_to_pdf",
+  "name": "PDFとして出力",
+  "icon": "picture_as_pdf",
+  "category": "Google Sheets",
+  "description": "スプレッドシートの特定のシートをPDFとして出力し、指定したフォルダに保存します。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "spreadsheetUrl", "name": "対象シートのURL", "type": "text", "required": true },
+    { "id": "sheetName", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "newFileName", "name": "PDFファイル名", "type": "text", "required": true, "placeholder": "拡張子なしで入力" },
+    { "id": "destFolderId", "name": "出力先フォルダID", "type": "text", "required": true },
+    { "id": "pdfSettingsMode", "name": "PDF出力設定", "type": "radio", "options": [{ "label": "簡易", "value": "simple" }, { "label": "詳細", "value": "advanced" }], "defaultValue": "simple" },
+    { "id": "pdfRange", "name": "出力範囲 (例: A1:F10)", "type": "text", "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfOrientation", "name": "用紙の向き", "type": "select", "options": [{ "label": "横", "value": "false" }, { "label": "縦", "value": "true" }], "defaultValue": "false", "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfSize", "name": "用紙サイズ", "type": "select", "options": [{"label":"A3","value":"A3"}, {"label":"A4","value":"A4"}, {"label":"A5","value":"A5"}, {"label":"B4","value":"B4"}, {"label":"B5","value":"B5"}], "defaultValue": "A4", "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfScale", "name": "スケール", "type": "select", "options": [{ "label": "ページに合わせる", "value": "4" }, { "label": "幅に合わせる", "value": "2" }, { "label": "高さに合わせる", "value": "3" }, { "label": "標準 (100%)", "value": "1" }], "defaultValue": "4", "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfPrintTitle", "name": "ファイル名を表示", "type": "checkbox", "defaultValue": false, "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfSheetNames", "name": "シート名を表示", "type": "checkbox", "defaultValue": false, "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } },
+    { "id": "pdfGridlines", "name": "グリッドラインを表示", "type": "checkbox", "defaultValue": false, "showsWhen": { "id": "pdfSettingsMode", "value": "advanced" } }
+  ],
+  "logic": [
+    {
+      "step_id": "export_to_pdf",
+      "func": "core.sheetsToPdf",
+      "args": {
+        "spreadsheetUrl": "{{spreadsheetUrl}}",
+        "sheetName": "{{sheetName}}",
+        "newFileName": "{{newFileName}}",
+        "destFolderId": "{{destFolderId}}",
+        "pdfSettingsMode": "{{pdfSettingsMode}}",
+        "pdfRange": "{{pdfRange}}",
+        "pdfOrientation": "{{pdfOrientation}}",
+        "pdfSize": "{{pdfSize}}",
+        "pdfScale": "{{pdfScale}}",
+        "pdfPrintTitle": "{{pdfPrintTitle}}",
+        "pdfSheetNames": "{{pdfSheetNames}}",
+        "pdfGridlines": "{{pdfGridlines}}"
+      }
+    }
+  ]
+}

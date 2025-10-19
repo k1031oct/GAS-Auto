@@ -1,0 +1,41 @@
+{
+  "id": "control_run_workflow_once",
+  "name": "指定日時にワークフローを実行",
+  "icon": "update",
+  "category": "ワークフロー制御",
+  "description": "指定した日時に、選択したワークフローを1回だけ実行するトリガーを作成します。",
+  "settings": [
+    { "id": "workflowToRun", "name": "実行するワークフロー名", "type": "select", "optionsSource": "workflows", "required": true },
+    {
+      "id": "executionTimeSource",
+      "name": "実行日時の取得元",
+      "type": "radio",
+      "options": [
+        { "label": "手入力", "value": "manual" },
+        { "label": "セルから取得", "value": "fromCell" },
+        { "label": "前のモジュールの実行結果", "value": "fromModuleResult" }
+      ],
+      "defaultValue": "manual"
+    },
+    { "id": "executionTimeManual", "name": "実行日時 (手入力)", "type": "text", "placeholder": "例: 2025-12-24 09:00:00", "showsWhen": { "id": "executionTimeSource", "value": "manual" } },
+    { "id": "sourceUrl", "name": "セル指定: シートURL", "type": "text", "showsWhen": { "id": "executionTimeSource", "value": "fromCell" } },
+    { "id": "sourceSheet", "name": "セル指定: シート名", "type": "text", "showsWhen": { "id": "executionTimeSource", "value": "fromCell" } },
+    { "id": "sourceCell", "name": "セル指定: セル", "type": "text", "placeholder": "例: A1", "showsWhen": { "id": "executionTimeSource", "value": "fromCell" } },
+    { "id": "executionTimeFromModule", "name": "前のモジュールの結果を利用", "type": "text", "placeholder": "{{outputs.step_id.result}}", "showsWhen": { "id": "executionTimeSource", "value": "fromModuleResult" } }
+  ],
+  "logic": [
+    {
+      "step_id": "create_one_time_trigger",
+      "func": "core.createOneTimeTrigger",
+      "args": {
+        "workflowToRun": "{{workflowToRun}}",
+        "executionTimeSource": "{{executionTimeSource}}",
+        "executionTimeManual": "{{executionTimeManual}}",
+        "sourceUrl": "{{sourceUrl}}",
+        "sourceSheet": "{{sourceSheet}}",
+        "sourceCell": "{{sourceCell}}",
+        "executionTimeFromModule": "{{executionTimeFromModule}}"
+      }
+    }
+  ]
+}

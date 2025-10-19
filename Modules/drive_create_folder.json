@@ -1,0 +1,22 @@
+{
+  "id": "drive_create_folder",
+  "name": "フォルダを新規作成",
+  "icon": "create_new_folder",
+  "category": "Google Drive",
+  "description": "Google Driveに新しいフォルダを作成します。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "parentFolderId", "name": "親フォルダのID（任意）", "type": "text", "required": false, "placeholder": "空欄の場合はマイドライブ直下" },
+    { "id": "newFolderName", "name": "新しいフォルダ名", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "create_folder",
+      "func": "core.driveCreateFolder",
+      "args": {
+        "parentFolderId": "{{parentFolderId}}",
+        "newFolderName": "{{newFolderName}}"
+      }
+    }
+  ]
+}

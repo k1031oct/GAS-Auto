@@ -1,0 +1,23 @@
+{
+  "id": "sheets_clear_values",
+  "name": "セルの値を削除",
+  "icon": "clear_all",
+  "category": "Google Sheets",
+  "description": "指定された範囲のセルの値を削除します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "targetRange", "name": "対象範囲 (A1形式)", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "clear_values",
+      "func": "core.sheetsClearValues",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "targetRange": "{{targetRange}}"
+      }
+    }
+  ]
+}

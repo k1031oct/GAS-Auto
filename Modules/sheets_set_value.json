@@ -1,0 +1,25 @@
+{
+  "id": "sheets_set_value",
+  "name": "セルに値を設定",
+  "icon": "edit_square",
+  "category": "Google Sheets",
+  "description": "指定されたセルに値または数式を設定します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "targetCell", "name": "対象セル (例: A1)", "type": "text", "required": true },
+    { "id": "valueToSet", "name": "設定する値または数式", "type": "textarea", "required": true, "placeholder": "例: こんにちは、または =TODAY()" }
+  ],
+  "logic": [
+    {
+      "step_id": "set_value",
+      "func": "core.sheetsSetValue",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "targetCell": "{{targetCell}}",
+        "valueToSet": "{{valueToSet}}"
+      }
+    }
+  ]
+}

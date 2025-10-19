@@ -1,31 +1,29 @@
 {
-  "id": "drive_copy_file",
-  "name": "ファイルをコピー",
-  "icon": "file_copy",
-  "category": "Google Drive",
-  "description": "ファイルをコピーします。新しいファイル名は直接入力するか、スプレッドシートのセルから取得できます。",
+  "id": "sheets_create_new",
+  "name": "新規スプレッドシート作成",
+  "icon": "add_circle_outline",
+  "category": "Google Sheets",
+  "description": "新しいスプレッドシートを作成します。ファイル名は直接入力するか、セルから取得できます。",
   "returnsValue": true,
   "settings": [
-    { "id": "sourceFileId", "name": "コピー元ファイルID", "type": "text", "required": true },
-    { "id": "destFolderId", "name": "コピー先フォルダID", "type": "text", "required": true },
     { "id": "fileNameSourceType", "name": "ファイル名指定方法", "type": "radio", "options": [{ "label": "手入力", "value": "direct" }, { "label": "セルから取得", "value": "cell" }], "defaultValue": "direct" },
     { "id": "newFileName", "name": "ファイル名（手入力）", "type": "text", "showsWhen": { "id": "fileNameSourceType", "value": "direct" } },
     { "id": "fileNameSourceUrl", "name": "セル指定: シートURL", "type": "text", "showsWhen": { "id": "fileNameSourceType", "value": "cell" } },
     { "id": "fileNameSourceSheet", "name": "セル指定: シート名", "type": "text", "showsWhen": { "id": "fileNameSourceType", "value": "cell" } },
-    { "id": "fileNameSourceCell", "name": "セル指定: セル", "type": "text", "placeholder": "例: A1", "showsWhen": { "id": "fileNameSourceType", "value": "cell" } }
+    { "id": "fileNameSourceCell", "name": "セル指定: セル", "type": "text", "placeholder": "例: A1", "showsWhen": { "id": "fileNameSourceType", "value": "cell" } },
+    { "id": "destFolderId", "name": "保存先フォルダID (任意)", "type": "text", "placeholder": "空欄の場合はマイドライブ直下", "required": false }
   ],
   "logic": [
     {
-      "step_id": "copy_file_smart",
-      "func": "core.driveCopyFile",
+      "step_id": "create_new_sheet",
+      "func": "core.sheetsCreateNew",
       "args": {
-        "sourceFileId": "{{sourceFileId}}",
-        "destFolderId": "{{destFolderId}}",
         "fileNameSourceType": "{{fileNameSourceType}}",
         "newFileName": "{{newFileName}}",
         "fileNameSourceUrl": "{{fileNameSourceUrl}}",
         "fileNameSourceSheet": "{{fileNameSourceSheet}}",
-        "fileNameSourceCell": "{{fileNameSourceCell}}"
+        "fileNameSourceCell": "{{fileNameSourceCell}}",
+        "destFolderId": "{{destFolderId}}"
       }
     }
   ]

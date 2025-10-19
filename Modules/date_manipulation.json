@@ -1,0 +1,94 @@
+{
+  "id": "date_manipulation",
+  "name": "日付・時刻を操作",
+  "icon": "date_range",
+  "category": "ユーティリティ",
+  "description": "基準日に対して様々な日付計算を行い、結果を返します。日本の祝日カレンダーに対応しています。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "baseDate", "name": "基準日 (yyyy-mm-dd形式)", "type": "text", "placeholder": "空欄の場合は今日の日付", "required": false },
+    {
+      "id": "operation",
+      "name": "操作の種類",
+      "type": "radio",
+      "options": [
+        { "label": "期間の加算/減算", "value": "add_subtract" },
+        { "label": "月のN番目の曜日を探す", "value": "find_nth_weekday" }
+      ],
+      "defaultValue": "add_subtract"
+    },
+    { "id": "amount", "name": "期間", "type": "number", "defaultValue": "1", "showsWhen": { "id": "operation", "value": "add_subtract" } },
+    {
+      "id": "unit",
+      "name": "単位",
+      "type": "select",
+      "options": [
+        { "label": "日", "value": "days" },
+        { "label": "営業日", "value": "business_days" },
+        { "label": "週", "value": "weeks" },
+        { "label": "月", "value": "months" },
+        { "label": "年", "value": "years" }
+      ],
+      "defaultValue": "days",
+      "showsWhen": { "id": "operation", "value": "add_subtract" }
+    },
+    {
+      "id": "calculationMode",
+      "name": "後/前",
+      "type": "select",
+      "options": [
+        { "label": "後", "value": "add" },
+        { "label": "前", "value": "subtract" }
+      ],
+      "defaultValue": "add",
+      "showsWhen": { "id": "operation", "value": "add_subtract" }
+    },
+    {
+      "id": "nthWeekdayN",
+      "name": "月の",
+      "type": "select",
+      "options": [
+        { "label": "第1", "value": "1" },
+        { "label": "第2", "value": "2" },
+        { "label": "第3", "value": "3" },
+        { "label": "第4", "value": "4" },
+        { "label": "最終", "value": "last" }
+      ],
+      "defaultValue": "1",
+      "showsWhen": { "id": "operation", "value": "find_nth_weekday" } 
+    },
+    {
+      "id": "nthWeekdayDay",
+      "name": "曜日",
+      "type": "select",
+      "options": [
+        { "label": "月曜日", "value": "1" },
+        { "label": "火曜日", "value": "2" },
+        { "label": "水曜日", "value": "3" },
+        { "label": "木曜日", "value": "4" },
+        { "label": "金曜日", "value": "5" },
+        { "label": "土曜日", "value": "6" },
+        { "label": "日曜日", "value": "0" }
+      ],
+      "defaultValue": "1",
+      "showsWhen": { "id": "operation", "value": "find_nth_weekday" } 
+    },
+    { "id": "outputFormat", "name": "出力フォーマット", "type": "text", "defaultValue": "yyyy-MM-dd", "description": "例: yyyy-MM-dd HH:mm:ss" }
+  ],
+  "logic": [
+    {
+      "step_id": "manipulate_date",
+      "func": "core.dateManipulation",
+      "args": {
+        "baseDate": "{{baseDate}}",
+        "operation": "{{operation}}",
+        "amount": "{{amount}}",
+        "unit": "{{unit}}",
+        "calculationMode": "{{calculationMode}}",
+        "nthWeekdayN": "{{nthWeekdayN}}",
+        "nthWeekdayDay": "{{nthWeekdayDay}}",
+        "outputFormat": "{{outputFormat}}"
+      }
+    }
+  ]
+}

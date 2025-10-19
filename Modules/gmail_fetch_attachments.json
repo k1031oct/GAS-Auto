@@ -1,0 +1,39 @@
+{
+  "id": "gmail_fetch_attachments",
+  "name": "Gmailの添付ファイルを取得",
+  "icon": "attach_file",
+  "category": "Gmail",
+  "description": "Gmailを検索し、条件に一致したメールから添付ファイルを指定したフォルダに保存します。",
+  "settings": [
+    { "id": "queryMode", "name": "検索モード", "type": "radio", "options": [{ "label": "通常", "value": "simple" }, { "label": "上級者", "value": "advanced" }], "defaultValue": "simple" },
+    { "id": "from", "name": "差出人 (From)", "type": "text", "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "subject", "name": "件名 (Subject)", "type": "text", "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "includes", "name": "含む単語", "type": "text", "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "has:attachment", "name": "添付ファイルあり", "type": "checkbox", "defaultValue": true, "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "is:unread", "name": "未読メールのみ", "type": "checkbox", "defaultValue": false, "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "is:starred", "name": "スター付き", "type": "checkbox", "defaultValue": false, "showsWhen": { "id": "queryMode", "value": "simple" } },
+    { "id": "searchQuery", "name": "検索クエリ（直接入力）", "type": "textarea", "placeholder": "has:attachment is:unread", "showsWhen": { "id": "queryMode", "value": "advanced" } },
+    { "id": "destFolderId", "name": "保存先フォルダID", "type": "text", "required": true },
+    { "id": "markAsRead", "name": "既読にする", "type": "checkbox", "defaultValue": false },
+    { "id": "removeStar", "name": "スターを外す", "type": "checkbox", "defaultValue": false }
+  ],
+  "logic": [
+    {
+      "step_id": "fetch_attachments",
+      "func": "core.gmailFetchAttachments",
+      "args": {
+        "queryMode": "{{queryMode}}",
+        "from": "{{from}}",
+        "subject": "{{subject}}",
+        "includes": "{{includes}}",
+        "has:attachment": "{{has:attachment}}",
+        "is:unread": "{{is:unread}}",
+        "is:starred": "{{is:starred}}",
+        "searchQuery": "{{searchQuery}}",
+        "destFolderId": "{{destFolderId}}",
+        "markAsRead": "{{markAsRead}}",
+        "removeStar": "{{removeStar}}"
+      }
+    }
+  ]
+}

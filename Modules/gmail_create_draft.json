@@ -1,9 +1,9 @@
 {
-  "id": "gmail_send_email",
-  "name": "Gmailを送信する",
-  "icon": "send",
+  "id": "gmail_create_draft",
+  "name": "Gmailの下書きを作成",
+  "icon": "drafts",
   "category": "Gmail",
-  "description": "Gmailでメールを送信します。CC, BCC, 添付ファイルも指定可能です。",
+  "description": "Gmailの下書きを作成します。添付ファイルも指定可能です。",
   "settings": [
     { "id": "to", "name": "宛先 (To)", "type": "text", "required": true },
     { "id": "subject", "name": "件名", "type": "text", "required": true },
@@ -14,8 +14,8 @@
   ],
   "logic": [
     {
-      "step_id": "send_email",
-      "func": "core.gmailSendEmail",
+      "step_id": "create_draft",
+      "func": "core.gmailCreateDraft",
       "args": {
         "to": "{{to}}",
         "subject": "{{subject}}",

@@ -1,0 +1,25 @@
+{
+  "id": "calendar_get_holidays_to_sheet",
+  "name": "祝日リストを取得",
+  "icon": "event",
+  "category": "Google Calendar",
+  "description": "指定された期間の日本の祝日を取得し、スプレッドシートに書き出します。",
+  "settings": [
+    { "id": "startDate", "name": "開始日 (YYYY-MM-DD)", "type": "text", "required": true },
+    { "id": "endDate", "name": "終了日 (YYYY-MM-DD)", "type": "text", "required": true },
+    { "id": "targetUrl", "name": "出力先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "出力先シート名", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "get_holidays",
+      "func": "core.calendarGetHolidays",
+      "args": {
+        "startDate": "{{startDate}}",
+        "endDate": "{{endDate}}",
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}"
+      }
+    }
+  ]
+}

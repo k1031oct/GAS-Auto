@@ -1,0 +1,25 @@
+{
+  "id": "sheets_delete_rows",
+  "name": "行を削除",
+  "icon": "delete",
+  "category": "Google Sheets",
+  "description": "指定した範囲の行を削除します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "startRow", "name": "開始行番号", "type": "number", "required": true },
+    { "id": "numRows", "name": "削除する行数", "type": "number", "defaultValue": 1, "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "delete_rows",
+      "func": "core.sheetsDeleteRows",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "startRow": "{{startRow}}",
+        "numRows": "{{numRows}}"
+      }
+    }
+  ]
+}

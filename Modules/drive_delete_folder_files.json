@@ -1,0 +1,19 @@
+{
+  "id": "drive_delete_folder_files",
+  "name": "フォルダ内ファイルを全て削除",
+  "icon": "folder_delete",
+  "category": "Google Drive",
+  "description": "指定したフォルダ内にある、すべてのファイルをゴミ箱に移動します。",
+  "settings": [
+    { "id": "folderId", "name": "対象フォルダID", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "delete_folder_files",
+      "func": "core.driveTrashAllFilesinFolder",
+      "args": {
+        "folderId": "{{folderId}}"
+      }
+    }
+  ]
+}

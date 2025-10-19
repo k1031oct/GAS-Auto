@@ -1,0 +1,117 @@
+/**
+ * @file PresetService.gs
+ * @description モジュールプリセットの保存、読み込み、一覧取得を担当する。
+ */
+var PresetService = {
+  _APP_FOLDER_NAME: 'WorkflowBuilder AppData',
+  _PRESET_FOLDER_NAME: 'Presets',
+  _FOLDER_ID_KEY: 'WORKFLOW_APP_PRESET_FOLDER_ID',
+
+
+  /**
+   * プリセット保存用の専用フォルダを取得または作成する
+   */
+  _getPresetFolder: function () {
+    const userProperties = PropertiesService.getUserProperties();
+    let folderId = userProperties.getProperty(this._FOLDER_ID_KEY);
+
+    if (folderId) {
+      try {
+        const folder = DriveApp.getFolderById(folderId);
+        if (!folder.isTrashed()) {
+          return folder;
+        }
+      } catch (e) { }
+    }
+
+    let appDataFolder;
+    const appDataFolders = DriveApp.getFoldersByName(this._APP_FOLDER_NAME);
+    if (appDataFolders.hasNext()) {
+      appDataFolder = appDataFolders.next();
+    } else {
+      appDataFolder = DriveApp.getRootFolder().createFolder(this._APP_FOLDER_NAME);
+    }
+
+    const presetFolders = appDataFolder.getFoldersByName(this._PRESET_FOLDER_NAME);
+    if (presetFolders.hasNext()) {
+      const folder = presetFolders.next();
+      userProperties.setProperty(this._FOLDER_ID_KEY, folder.getId());
+      return folder;
+    } else {
+      const newFolder = appDataFolder.createFolder(this._PRESET_FOLDER_NAME);
+      userProperties.setProperty(this._FOLDER_ID_KEY, newFolder.getId());
+      return newFolder;
+    }
+  },
+
+
+  /**
+   * プリセットをJSONファイルとしてGoogle Driveに保存する
+   */
+  savePreset: function (presetName, presetData) {
+    if (!presetName) {
+      throw new Error('プリセット名が指定されていません。');
+    }
+    const folder = this._getPresetFolder();
+    const fileName = `${presetName}.json`;
+    const content = JSON.stringify(presetData, null, 2);
+
+    const files = folder.getFilesByName(fileName);
+    if (files.hasNext()) {
+      files.next().setContent(content);
+    } else {
+      folder.createFile(fileName, content, MimeType.PLAIN_TEXT);
+    }
+    return `プリセット「${presetName}」を保存しました。`;
+  },
+
+
+  /**
+   * 指定されたプリセットを読み込む
+   */
+  loadPreset: function (presetName) {
+    const folder = this._getPresetFolder();
+    const files = folder.getFilesByName(`${presetName}.json`);
+    if (files.hasNext()) {
+      return JSON.parse(files.next().getBlob().getDataAsString());
+    }
+    return null;
+  },
+
+
+  /**
+   * 保存されているすべてのプリセット名の一覧を取得する
+   */
+  listPresets: function () {
+    const folder = this._getPresetFolder();
+    const files = folder.getFilesByType(MimeType.PLAIN_TEXT);
+    const presetNames = [];
+    while (files.hasNext()) {
+      let file = files.next();
+      if (file.getName().endsWith('.json')) {
+        presetNames.push(file.getName().replace('.json', ''));
+      }
+    }
+    return presetNames.sort();
+  },
+
+    /**
+   * 指定されたプリセットを削除する
+   * @param {string} presetName - 削除するプリセットのファイル名
+   * @returns {string} 成功メッセージ
+   */
+  deletePreset: function (presetName) {
+    if (!presetName) {
+      throw new Error('削除するプリセット名が指定されていません。');
+    }
+    const folder = this._getPresetFolder();
+    const files = folder.getFilesByName(`${presetName}.json`);
+
+    if (files.hasNext()) {
+      files.next().setTrashed(true);
+      return `プリセット「${presetName}」を削除しました。`;
+    } else {
+      throw new Error(`プリセット「${presetName}」が見つかりませんでした。`);
+    }
+  }
+};

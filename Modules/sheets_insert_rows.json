@@ -1,0 +1,27 @@
+{
+  "id": "sheets_insert_rows",
+  "name": "行を挿入",
+  "icon": "table_rows",
+  "category": "Google Sheets",
+  "description": "指定した位置に行を挿入します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "startRow", "name": "基準の行番号", "type": "number", "required": true },
+    { "id": "numRows", "name": "挿入する行数", "type": "number", "defaultValue": 1, "required": true },
+    { "id": "after", "name": "基準行の下に挿入", "type": "checkbox", "defaultValue": false, "label": "基準行の下（After）に挿入する（チェックなしは上）" }
+  ],
+  "logic": [
+    {
+      "step_id": "insert_rows",
+      "func": "core.sheetsInsertRows",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "startRow": "{{startRow}}",
+        "numRows": "{{numRows}}",
+        "after": "{{after}}"
+      }
+    }
+  ]
+}

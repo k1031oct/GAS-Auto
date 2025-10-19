@@ -1,0 +1,22 @@
+{
+  "id": "drive_convert_excel_to_sheets",
+  "name": "ExcelをGoogleSheetに変換",
+  "icon": "transform",
+  "category": "Google Drive",
+  "description": "指定フォルダ内のExcelファイルをGoogleスプレッドシートに変換します。フォルダ内に複数ある場合、最初の1つが対象になります。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "sourceFolderId", "name": "Excel格納元フォルダID", "type": "text", "required": true },
+    { "id": "destFolderId", "name": "変換後シートの保存先フォルダID", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "convert_excel",
+      "func": "core.driveConvertExcelToSheets",
+      "args": {
+        "sourceFolderId": "{{sourceFolderId}}",
+        "destFolderId": "{{destFolderId}}"
+      }
+    }
+  ]
+}

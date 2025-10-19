@@ -1,0 +1,29 @@
+{
+  "id": "sheets_append_block",
+  "name": "最終行に追記",
+  "icon": "dataset",
+  "category": "Google Sheets",
+  "description": "前のモジュールの結果や指定範囲のデータブロックを、基準列の最終行を元に追記します。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートのURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "valueSourceType", "name": "値のソース", "type": "radio", "options": [ { "label": "JSON手入力", "value": "manualJson" } ], "defaultValue": "manualJson" },
+    { "id": "jsonData", "name": "JSONデータ", "type": "textarea", "placeholder": "[[\"値1\", \"値2\"], [\"値3\", \"値4\"]]]", "showsWhen": { "id": "valueSourceType", "value": "manualJson" } },
+    { "id": "referenceColumn", "name": "基準列 (最終行を判定する列)", "type": "text", "placeholder": "例: A", "required": true },
+    { "id": "pasteStartColumn", "name": "貼付開始列", "type": "text", "placeholder": "例: A", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "append_block",
+      "func": "core.sheetsAppendBlock",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "valueSourceType": "{{valueSourceType}}",
+        "jsonData": "{{jsonData}}",
+        "referenceColumn": "{{referenceColumn}}",
+        "pasteStartColumn": "{{pasteStartColumn}}"
+      }
+    }
+  ]
+}

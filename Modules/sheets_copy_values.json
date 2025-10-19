@@ -1,0 +1,33 @@
+{
+  "id": "sheets_copy_values",
+  "name": "範囲コピーペースト",
+  "icon": "content_copy",
+  "category": "Google Sheets",
+  "description": "指定したスプレッドシートの範囲を、値・書式を選択して別のセルにコピーします。",
+  "settings": [
+    { "id": "sourceUrl", "name": "コピー元スプレッドシートURL", "type": "text", "required": true },
+    { "id": "sourceSheet", "name": "コピー元シート名", "type": "text", "required": true },
+    { "id": "sourceRange", "name": "コピー元範囲 (A1表記)", "type": "text", "required": true, "placeholder": "A1:C10" },
+    { "id": "targetUrl", "name": "貼付先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "貼付先シート名", "type": "text", "required": true },
+    { "id": "targetStartCell", "name": "貼付先開始セル (A1表記)", "type": "text", "required": true, "placeholder": "E1" },
+    { "id": "copyValues", "name": "値 をコピーする", "type": "checkbox", "defaultValue": true },
+    { "id": "copyFormats", "name": "書式 をコピーする", "type": "checkbox", "defaultValue": false }
+  ],
+  "logic": [
+    {
+      "step_id": "copy_values",
+      "func": "core.sheetsCopyValues",
+      "args": {
+        "sourceUrl": "{{sourceUrl}}",
+        "sourceSheet": "{{sourceSheet}}",
+        "sourceRange": "{{sourceRange}}",
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "targetStartCell": "{{targetStartCell}}",
+        "copyValues": "{{copyValues}}",
+        "copyFormats": "{{copyFormats}}"
+      }
+    }
+  ]
+}

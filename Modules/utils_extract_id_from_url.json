@@ -1,0 +1,32 @@
+{
+  "id": "utils_extract_id_from_url",
+  "name": "URLからIDを抽出しセルに書き込み",
+  "icon": "vpn_key",
+  "category": "ユーティリティ",
+  "description": "URLからIDを抽出し、指定したスプレッドシートのセルに書き込みます。",
+  "returnsValue": true,
+  "settings": [
+    { "id": "sourceUrl", "name": "抽出元のURL", "type": "text", "required": true },
+    { "id": "outputUrl", "name": "出力先シートのURL", "type": "text", "required": true },
+    { "id": "outputSheet", "name": "出力先シート名", "type": "text", "required": true },
+    { "id": "outputCell", "name": "出力先セル (例: A1)", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{sourceUrl}}" },
+      "resultTo": "extractedId"
+    },
+    {
+      "step_id": "set_value_in_sheet",
+      "func": "core.sheetsSetValue",
+      "args": {
+        "targetUrl": "{{outputUrl}}",
+        "targetSheet": "{{outputSheet}}",
+        "targetCell": "{{outputCell}}",
+        "valueToSet": "{{outputs.extractedId}}"
+      }
+    }
+  ]
+}

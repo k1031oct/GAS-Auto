@@ -1,0 +1,571 @@
+/**
+ * @file Code.gs
+ * @description Webアプリのメインファイル。各サービスへの橋渡しを行う。
+ */
+
+
+//================================================================
+// 1. Webアプリのメインエントリーポイント
+//================================================================
+
+function doGet(e) {
+  return HtmlService.createTemplateFromFile('index')
+    .evaluate()
+    .setTitle('GAS Workflow Builder')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function getInitialData() {
+  try {
+    const modules = ModuleService.getModules();
+    const workflows = WorkflowService.listWorkflows();
+    const triggers = TriggerService.getTriggers();
+    const settings = SettingsService.getSettings();
+    let presets = [];
+
+    try {
+      if (typeof PresetService !== 'undefined' && typeof PresetService.listPresets === 'function') {
+        presets = PresetService.listPresets();
+      }
+    } catch (e) {
+      Logger.log(`プリセットの読み込み中にエラーが発生しました: ${e.message}。処理を続行します。`);
+    }
+
+    Logger.log(`[getInitialData] 成功: ${modules.length}個のモジュール、${workflows.length}個のワークフロー、${triggers.length}個のトリガー、${presets.length}個のプリセットを返します。`);
+    return {
+      modules: modules,
+      workflows: workflows,
+      triggers: triggers,
+      presets: presets,
+      settings: settings
+    };
+  } catch (error) {
+    Logger.log(`[getInitialData] 致命的なエラー: ${error.toString()}`);
+    return {
+      modules: [],
+      workflows: [],
+      triggers: [],
+      presets: [],
+      settings: {}
+    };
+  }
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+
+
+//================================================================
+// 2. 内部ヘルパー関数
+//================================================================
+
+function _extractIdFromUrl(url) {
+  if (!url) return null;
+  const regex = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+  const match = url.match(regex);
+  if (match && match[1]) {
+    return match[1];
+  }
+  const regex2 = /\/file\/d\/(.*?)\//;
+  const match2 = url.match(regex2);
+  if (match2 && match2[1]) {
+    return match2[1];
+  }
+  return null;
+}
+
+function _resolveFileName(params) {
+  if (params.fileNameSourceType === 'cell') {
+    if (!params.fileNameSourceUrl || !params.fileNameSourceSheet || !params.fileNameSourceCell) {
+      throw new Error("ファイル名を取得するためのURL、シート名、またはセルが指定されていません。");
+    }
+    const ss = SpreadsheetApp.openByUrl(params.fileNameSourceUrl);
+    const sheet = ss.getSheetByName(params.fileNameSourceSheet);
+    const value = sheet.getRange(params.fileNameSourceCell).getValue();
+    return value.toString();
+  } else {
+    return params.newFileName || '';
+  }
+}
+
+function _checkRangeIntersection(eventRange, configuredRangeStr) {
+  const sheet = eventRange.getSheet();
+  const configuredRange = sheet.getRange(configuredRangeStr);
+  const r1 = {
+    top: eventRange.getRow(),
+    bottom: eventRange.getLastRow(),
+    left: eventRange.getColumn(),
+    right: eventRange.getLastColumn()
+  };
+  const r2 = {
+    top: configuredRange.getRow(),
+    bottom: configuredRange.getLastRow(),
+    left: configuredRange.getColumn(),
+    right: configuredRange.getLastColumn()
+  };
+  const intersects = !(r2.left > r1.right || r2.right < r1.left || r2.top > r1.bottom || r2.bottom < r1.top);
+  return intersects;
+}
+
+function _findModuleRecursive(modules, condition) {
+  for (const module of modules) {
+    if (condition(module)) {
+      return module;
+    }
+    if (module.type === 'container' && module.settings) {
+      for (const key in module.settings) {
+        if (key.endsWith('Modules') && Array.isArray(module.settings[key])) {
+          const found = _findModuleRecursive(module.settings[key], condition);
+          if (found) {
+            return found;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function getWorkflowFolderUrl(workflowName) {
+  if (!workflowName) {
+    throw new Error("ワークフローが選択されていません。");
+  }
+  try {
+    const workflowFolder = WorkflowService._getWorkflowFolder(workflowName);
+    return workflowFolder.getUrl();
+  } catch (e) {
+    Logger.log(`フォルダURLの取得に失敗: ${e.message}`);
+    throw new Error(`ワークフロー「${workflowName}」のフォルダが見つかりませんでした。一度保存されているか確認してください。`);
+  }
+}
+
+//================================================================
+// 3. クライアント(JavaScript)から呼び出される公開関数
+//================================================================
+
+function getSheetNamesFromUrl(url) {
+  if (!url) {
+    throw new Error("URLが入力されていません。");
+  }
+  try {
+    const spreadsheetId = _extractIdFromUrl(url);
+    if (!spreadsheetId) {
+      throw new Error("URLから有効なIDを抽出できませんでした。");
+    }
+    const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
+    const sheets = spreadsheet.getSheets();
+    return sheets.map(sheet => sheet.getSheetName());
+  } catch (e) {
+    Logger.log(`シート名の取得に失敗: ${e.message}`);
+    throw new Error(`シート名の取得に失敗しました。URLが正しいか、アクセス権があるか確認してください。`);
+  }
+}
+
+function runSingleModule(moduleData) {
+  try {
+    return WorkflowService.runSingleModule(moduleData);
+  } catch (e) {
+    Logger.log(e);
+    throw new Error(`単一モジュール実行エラー: ${e.message}`);
+  }
+}
+
+function listWorkflows() {
+  return WorkflowService.listWorkflows();
+}
+
+function loadWorkflow(workflowName) {
+  return WorkflowService.loadWorkflow(workflowName);
+}
+
+function saveWorkflow(workflowName, workflowData) {
+  return WorkflowService.saveWorkflow(workflowName, workflowData);
+}
+
+function deleteWorkflow(workflowName) {
+  return WorkflowService.deleteWorkflow(workflowName);
+}
+
+function runWorkflow(payload) {
+  try {
+    return WorkflowService.runWorkflow(payload);
+  } catch (e) {
+    Logger.log(e);
+    throw new Error(`サーバーサイドエラー: ${e.message}.`);
+  }
+}
+
+function createFlexibleTrigger(config) {
+  return TriggerService.createFlexibleTrigger(config);
+}
+
+function updateFlexibleTrigger(config) {
+  return TriggerService.updateFlexibleTrigger(config);
+}
+
+function getTriggers() {
+  return TriggerService.getTriggers();
+}
+
+function deleteTrigger(triggerUid) {
+  return TriggerService.deleteTrigger(triggerUid);
+}
+
+function savePreset(presetName, presetData) {
+  return PresetService.savePreset(presetName, presetData);
+}
+
+function loadPreset(presetName) {
+  return PresetService.loadPreset(presetName);
+}
+
+function listPresets() {
+  return PresetService.listPresets();
+}
+
+
+
+//================================================================
+// 4. トリガーから直接呼び出されるグローバル関数
+//================================================================
+
+function executeWorkflowByTrigger(e) {
+  const triggerId = e.triggerUid;
+  if (!triggerId) {
+    Logger.log('トリガーIDがイベントオブジェクトに含まれていません。処理を中断します。');
+    return;
+  }
+
+  const properties = PropertiesService.getUserProperties();
+
+
+  const configStr = properties.getProperty(`config_${triggerId}`);
+  if (!configStr) {
+    Logger.log(`トリガー実行エラー: トリガーID「${triggerId}」に対応する設定が見つかりませんでした。`);
+    return;
+  }
+  const config = JSON.parse(configStr);
+
+  const workflowName = config.workflowName;
+  if (!workflowName) {
+    Logger.log(`トリガー実行エラー: 設定内にワークフロー名が見つかりませんでした。(ID: ${triggerId})`);
+    return;
+  }
+
+  if (e.source && e.changeType) {
+    const activeSheetName = e.source.getActiveSheet().getName();
+    if (config.sheetName && config.sheetName !== activeSheetName) {
+      Logger.log(`シート名が不一致のためスキップ: [設定: ${config.sheetName}, 実際: ${activeSheetName}]`);
+      return;
+    }
+    if (config.range && !_checkRangeIntersection(e.range, config.range)) {
+      Logger.log(`範囲が不一致のためスキップ: [設定: ${config.range}, 実際: ${e.range.getA1Notation()}]`);
+      return;
+    }
+  }
+
+  Logger.log(`トリガー実行: 「${workflowName}」を開始します。(トリガーID: ${triggerId})`);
+  const workflowData = WorkflowService.loadWorkflow(workflowName);
+
+  if (workflowData) {
+    const payload = {
+      name: workflowName,
+      modules: workflowData
+    };
+
+    if (config.triggerType === 'EVENT_GMAIL_NEW' && config.gmailQuery) {
+      Logger.log(`Gmailトリガーを検出。検索クエリを上書きします: ${config.gmailQuery}`);
+      const gmailModule = _findModuleRecursive(payload.modules, module => module.id === 'gmail_fetch_attachments');
+      if (gmailModule) {
+        gmailModule.settings.searchQuery = config.gmailQuery;
+        Logger.log(`モジュール「${gmailModule.name}」の検索クエリを「${config.gmailQuery}」に設定しました。`);
+      } else {
+        Logger.log(`警告: Gmailトリガーが設定されていますが、ワークフロー内に「Gmailの添付ファイルを取得」モジュールが見つかりませんでした。`);
+      }
+    }
+
+    try {
+      WorkflowService.runWorkflow(payload, 'トリガー');
+    } catch (err) {
+      Logger.log(`トリガー実行中にエラーが発生しました: ${err.toString()}`);
+    }
+  } else {
+    Logger.log(`トリガー実行エラー: 実行対象のワークフロー「${workflowName}」が見つかりませんでした。`);
+  }
+}
+
+
+function executeCalledWorkflow(e) {
+  const triggerId = e.triggerUid;
+  const propKey = `trigger_${triggerId}`;
+  const properties = PropertiesService.getUserProperties();
+  const workflowName = properties.getProperty(propKey);
+  properties.deleteProperty(propKey);
+
+  const allTriggers = ScriptApp.getProjectTriggers();
+  for (const trigger of allTriggers) {
+    if (trigger.getUniqueId() === triggerId) {
+      ScriptApp.deleteTrigger(trigger);
+      break;
+    }
+  }
+
+  if (workflowName) {
+    Logger.log(`呼び出し実行: 「${workflowName}」を開始します。`);
+    const workflowData = WorkflowService.loadWorkflow(workflowName);
+    if (workflowData) {
+      try {
+        WorkflowService.runWorkflow(workflowData);
+      } catch (err) {
+        Logger.log(`呼び出し実行中にエラーが発生しました: ${err.toString()}`);
+      }
+    } else {
+      Logger.log(`呼び出し実行エラー: 実行対象のワークフロー「${workflowName}」が見つかりませんでした。`);
+    }
+  } else {
+    Logger.log(`呼び出し実行エラー: トリガーID「${triggerId}」に対応するワークフロー名が見つかりません。`);
+  }
+}
+
+function executeOneTimeWorkflow(e) {
+  const triggerUid = e.triggerUid;
+  if (!triggerUid) {
+    Logger.log('1回限りトリガーの実行エラー: イベントオブジェクトにトリガーIDが含まれていません。');
+    return;
+  }
+
+  const properties = PropertiesService.getUserProperties();
+  const propKey = `ONETIME_${triggerUid}`;
+  const workflowName = properties.getProperty(propKey);
+
+  if (!workflowName) {
+    Logger.log(`1回限りトリガーの実行エラー: トリガーID「${triggerUid}」に対応するワークフロー名が見つかりませんでした。`);
+    _deleteTriggerById(triggerUid);
+    return;
+  }
+
+  try {
+    Logger.log(`1回限りトリガー実行: 「${workflowName}」を開始します。(トリガーID: ${triggerUid})`);
+    const workflowData = WorkflowService.loadWorkflow(workflowName);
+    if (workflowData) {
+      const payload = {
+        name: workflowName,
+        modules: workflowData
+      };
+      WorkflowService.runWorkflow(payload, '1回限りトリガー');
+    } else {
+      Logger.log(`実行対象のワークフロー「${workflowName}」が見つかりませんでした。`);
+    }
+  } catch (err) {
+    Logger.log(`1回限りトリガーのワークフロー実行中にエラーが発生しました: ${err.toString()}`);
+  } finally {
+    _deleteTriggerById(triggerUid);
+    properties.deleteProperty(propKey);
+    Logger.log(`1回限りのトリガー(ID: ${triggerUid})と関連プロパティを削除しました。`);
+  }
+}
+
+
+/**
+ * 指定されたIDのトリガーを削除するヘルパー関数
+ * @private
+ * @param {string} triggerUid - 削除するトリガーのユニークID
+ */
+function _deleteTriggerById(triggerUid) {
+  const allTriggers = ScriptApp.getProjectTriggers();
+  for (const trigger of allTriggers) {
+    if (trigger.getUniqueId() === triggerUid) {
+      ScriptApp.deleteTrigger(trigger);
+      break;
+    }
+  }
+}
+
+
+
+//================================================================
+// 5. 認証情報（Secrets）管理
+//================================================================
+
+
+function getSecretKeys() {
+  const userProperties = PropertiesService.getUserProperties();
+  const keys = userProperties.getKeys();
+  const secretKeys = keys.filter(key => key.startsWith('SECRET_')).map(key => key.substring(7));
+  return secretKeys.sort();
+}
+
+function saveSecret(key, value) {
+  if (!key || !value) {
+    throw new Error('名前と値の両方を入力してください。');
+  }
+  const userProperties = PropertiesService.getUserProperties();
+  userProperties.setProperty('SECRET_' + key, value);
+  return `認証情報「${key}」を保存しました。`;
+}
+
+function deleteSecret(key) {
+  if (!key) {
+    throw new Error('削除する認証情報の名前を指定してください。');
+  }
+  const userProperties = PropertiesService.getUserProperties();
+  userProperties.deleteProperty('SECRET_' + key);
+  return `認証情報「${key}」を削除しました。`;
+}
+
+function getHistory() {
+  return LogService.getSummaryLogs(50);
+}
+
+function getExecutionLogUrl() {
+  return LogService.getLogSheetUrl();
+}
+
+function generateDocumentation(payload) {
+  if (!payload || !payload.modules || payload.modules.length === 0) {
+    throw new Error('仕様書を生成するためのワークフローデータが空です。');
+  }
+  return DocumentationService.generate(payload);
+}
+
+function exportAsGas(payload) {
+  if (!payload || !payload.modules || payload.modules.length === 0) {
+    throw new Error('コードを生成するためのワークフローデータが空です。');
+  }
+  return ExportService.generate(payload);
+}
+
+function processWorkflowQueue() {
+  const queueFolder = WorkflowService._getQueueFolder();
+  const files = queueFolder.getFiles();
+
+  if (!files.hasNext()) {
+    return;
+  }
+
+  const file = files.next();
+  const fileContent = file.getBlob().getDataAsString();
+
+  try {
+    const job = JSON.parse(fileContent);
+    const workflowName = job.workflowName;
+
+    if (workflowName) {
+      Logger.log(`キューからジョブを取得: ワークフロー「${workflowName}」を実行します。`);
+      const workflowData = WorkflowService.loadWorkflow(workflowName);
+
+      if (workflowData) {
+        const payload = {
+          name: workflowName,
+          modules: workflowData
+        };
+        WorkflowService.runWorkflow(payload, 'キュー');
+      } else {
+        Logger.log(`エラー: キュー内のジョブで指定されたワークフロー「${workflowName}」が見つかりません。`);
+      }
+    }
+    file.setTrashed(true);
+
+  } catch (e) {
+    Logger.log(`キューのジョブファイル処理中にエラーが発生しました。ファイル名: ${file.getName()}, エラー: ${e.message}`);
+  }
+}
+
+function testTriggerFileCreation() {
+  try {
+    DriveApp.getRootFolder().createFile('trigger_test_file.txt', 'このファイルはトリガーによって作成されました: ' + new Date());
+    Logger.log("【成功】テストトリガーによるファイル作成に成功しました。");
+  } catch (e) {
+    Logger.log(`【失敗】テストトリガーによるファイル作成に失敗しました。エラー: ${e.message}`);
+  }
+}
+
+function getAppSettings() {
+  ReservationService._getReservationSheet();
+  return SettingsService.getSettings();
+}
+
+function saveAppSettings(newSettings) {
+  return SettingsService.saveSettings(newSettings);
+}
+
+function processReservationQueue() {
+  const sheet = ReservationService._getReservationSheet().getSheetByName('予約リスト');
+  if (!sheet) {
+    Logger.log('予約リストシートが見つかりませんでした。');
+    return;
+  }
+
+  const dataRange = sheet.getDataRange();
+  if (dataRange.getNumRows() < 2) return;
+  const values = dataRange.offset(1, 0, dataRange.getNumRows() - 1).getValues();
+
+  const currentTime = new Date();
+  let changesMade = false;
+
+  for (let i = 0; i < values.length; i++) {
+    const row = values[i];
+    const status = row[1];
+
+    if (status === '予約中') {
+      const executionTime = new Date(row[2]);
+      if (executionTime <= currentTime) {
+        changesMade = true;
+        const jobId = row[0];
+        const targetUrl = row[3];
+        const targetSheetName = row[4];
+        const targetCell = row[5];
+        const valueToSet = row[6];
+
+        try {
+          if (!targetUrl || !targetSheetName || !targetCell) {
+            throw new Error('URL、シート名、セルのいずれかが未入力です。');
+          }
+
+          const targetSs = SpreadsheetApp.openByUrl(targetUrl);
+          const targetSheet = targetSs.getSheetByName(targetSheetName);
+          if (!targetSheet) {
+            throw new Error(`シート「${targetSheetName}」が見つかりません。`);
+          }
+
+          const targetRange = targetSheet.getRange(targetCell);
+
+          if (String(valueToSet).startsWith('=')) {
+            targetRange.setFormula(valueToSet);
+          } else {
+            targetRange.setValue(valueToSet);
+          }
+
+          values[i][1] = '完了';
+          values[i][7] = '正常に実行されました。'
+          Logger.log(`予約ジョブ [${jobId}] が正常に完了しました。`);
+
+        } catch (e) {
+          values[i][1] = 'エラー';
+          values[i][7] = e.message;
+          Logger.log(`予約ジョブ [${jobId}] の実行中にエラーが発生しました: ${e.message}`);
+        }
+      }
+    }
+  }
+
+  if (changesMade) {
+    sheet.getRange(2, 1, values.length, values[0].length).setValues(values);
+  }
+}
+
+function getReservationSheetUrl() {
+  return ReservationService.getReservationSheetUrl();
+}
+
+function setupPollingTrigger(settings) {
+  const savedSettings = SettingsService.saveSettings(settings);
+  SettingsService.setupPollingTrigger(savedSettings.isPollingEnabled, savedSettings.pollingInterval);
+  return savedSettings;
+}
+
+function deletePreset(presetName) {
+  return PresetService.deletePreset(presetName);
+}

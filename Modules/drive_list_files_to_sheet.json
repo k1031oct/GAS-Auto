@@ -1,0 +1,48 @@
+{
+  "id": "drive_list_files_to_sheet",
+  "name": "ファイル一覧を出力",
+  "icon": "list_alt",
+  "category": "Google Drive",
+  "description": "指定されたフォルダ内のファイルとサブフォルダの一覧を指定のスプレッドシートに書き出します。",
+  "settings": [
+    { "id": "folderId", "name": "対象フォルダID", "type": "text", "required": true },
+    { "id": "targetUrl", "name": "出力先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "出力先シート名（任意）", "type": "text", "required": false, "description": "無指定の場合はアクティブシート" },
+    { "id": "startCell", "name": "出力開始セル（任意）", "type": "text", "required": false, "defaultValue": "A1" }
+  ],
+  "logic": [
+    {
+      "step_id": "list_files",
+      "func": "core.driveListFiles",
+      "args": { "folderId": "{{folderId}}" },
+      "resultTo": "fileList"
+    },
+    {
+      "step_id": "extract_sheet_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{targetUrl}}" },
+      "resultTo": "spreadsheetId"
+    },
+    {
+      "step_id": "open_spreadsheet",
+      "func": "core.sheetsOpenById",
+      "args": { "spreadsheetId": "{{outputs.spreadsheetId}}" },
+      "resultTo": "spreadsheetObj"
+    },
+    {
+      "step_id": "get_sheet",
+      "func": "core.sheetsGetSheet",
+      "args": { "spreadsheet": "{{outputs.spreadsheetObj}}", "sheetName": "{{targetSheet}}" },
+      "resultTo": "sheetObj"
+    },
+    {
+      "step_id": "set_values",
+      "func": "core.sheetsSetValues",
+      "args": {
+        "sheet": "{{outputs.sheetObj}}",
+        "startCell": "{{startCell}}",
+        "values": "{{outputs.fileList}}"
+      }
+    }
+  ]
+}

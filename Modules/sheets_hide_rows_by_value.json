@@ -1,0 +1,25 @@
+{
+  "id": "sheets_hide_rows_by_value",
+  "name": "条件で行を非表示",
+  "icon": "visibility_off",
+  "category": "Google Sheets",
+  "description": "指定した列の値が特定の値と一致する行を非表示にします。",
+  "settings": [
+    { "id": "targetUrl", "name": "対象スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "対象シート名", "type": "text", "required": true },
+    { "id": "column", "name": "条件判定する列 (A, B..)", "type": "text", "required": true },
+    { "id": "valueToHide", "name": "非表示にする値", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "hide_rows",
+      "func": "core.sheetsHideRowsByValue",
+      "args": {
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "column": "{{column}}",
+        "valueToHide": "{{valueToHide}}"
+      }
+    }
+  ]
+}

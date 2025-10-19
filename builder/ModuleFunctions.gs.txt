@@ -1,0 +1,1356 @@
+/**
+ * @file ModuleFunctions.gs
+ * @description 個別のモジュール機能を実行する関数を格納する。
+ */
+
+/**
+ * [control_run_workflow_once] 指定された日時に一度だけ実行されるトリガーを作成する
+ * @param {object} settings - モジュールの設定
+ * @param {object} context - ワークフロー全体の実行コンテキスト
+ * @returns {string} 予約完了メッセージ
+ */
+function module_control_run_workflow_once(settings, context) {
+  const workflowName = settings.workflowToRun;
+  if (!workflowName) {
+    throw new Error("実行するワークフロー名が指定されていません。");
+  }
+
+  let executionTimeValue;
+  const source = settings.executionTimeSource || 'manual';
+
+  switch (source) {
+    case 'manual':
+      executionTimeValue = settings.executionTimeManual;
+      break;
+    case 'fromCell':
+      if (!settings.sourceUrl || !settings.sourceSheet || !settings.sourceCell) {
+        throw new Error("実行日時を取得するためのURL、シート名、またはセルが指定されていません。");
+      }
+      const ss = SpreadsheetApp.openByUrl(settings.sourceUrl);
+      const sheet = ss.getSheetByName(settings.sourceSheet);
+      if (!sheet) {
+        throw new Error(`シート「${settings.sourceSheet}」が見つかりません。`);
+      }
+      executionTimeValue = sheet.getRange(settings.sourceCell).getValue();
+      break;
+    case 'fromModuleResult':
+      const sourceInstanceId = settings.sourceModuleInstanceId;
+      if (context.executionResults.hasOwnProperty(sourceInstanceId)) {
+        executionTimeValue = context.executionResults[sourceInstanceId];
+      } else {
+        throw new Error(`値の取得元モジュール(ID: ${sourceInstanceId})の実行結果が見つかりませんでした。`);
+      }
+      break;
+    default:
+      throw new Error(`不明な実行日時の取得元です: ${source}`);
+  }
+
+  if (!executionTimeValue) {
+    throw new Error("実行日時が取得できませんでした。");
+  }
+
+  const executionDate = new Date(executionTimeValue);
+  if (isNaN(executionDate.getTime())) {
+    throw new Error(`無効な日時の形式です: ${executionTimeValue}`);
+  }
+
+  if (executionDate.getTime() <= new Date().getTime()) {
+    throw new Error("実行日時は未来の日時を指定してください。");
+  }
+
+  return TriggerService.createOneTimeTrigger(workflowName, executionDate);
+}
+
+
+
+//================================================
+// 制御フロー
+//================================================
+/**
+ * [control_run_workflow] 他のワークフローの実行指示書をキューに追加する
+ * @param {object} params - {workflowToRun}
+ * @returns {string} 予約完了メッセージ
+ */
+function module_control_run_workflow(params) {
+  if (!params.workflowToRun) {
+    throw new Error('実行するワークフロー名が指定されていません。');
+  }
+
+  const queueFolder = WorkflowService._getQueueFolder();
+  const job = {
+    workflowName: params.workflowToRun,
+    requestedAt: new Date().toISOString()
+  };
+
+  const fileName = `job-${new Date().getTime()}-${Math.random().toString(36).substring(2, 9)}.json`;
+
+  queueFolder.createFile(fileName, JSON.stringify(job, null, 2), MimeType.PLAIN_TEXT);
+
+  return `ワークフロー「${params.workflowToRun}」の実行をキューに追加しました。`;
+}
+
+
+/**
+ * [control_if_else] 条件を評価し、結果(true/false)とログを返す
+ * @param {object} settings - モジュールの設定
+ * @param {object} variables - ワークフロー内の変数
+ * @returns {{isTrue: boolean, log: string}} - 評価結果とログメッセージ
+ */
+function module_control_if_else(settings, variables) {
+  const sourceValue = WorkflowService._resolveVariablesInSettings({ val: settings.sourceValue }, variables).val;
+  const comparisonValue = WorkflowService._resolveVariablesInSettings({ val: settings.comparisonValue }, variables).val;
+  const operator = settings.operator;
+
+
+  let isTrue = false;
+  switch (operator) {
+    case 'equals': isTrue = (sourceValue == comparisonValue); break;
+    case 'not_equals': isTrue = (sourceValue != comparisonValue); break;
+    case 'is_blank': isTrue = (sourceValue === '' || sourceValue === null || sourceValue === undefined); break;
+    case 'is_not_blank': isTrue = (sourceValue !== '' && sourceValue !== null && sourceValue !== undefined); break;
+    case 'contains': isTrue = (String(sourceValue).includes(String(comparisonValue))); break;
+    case 'not_contains': isTrue = (!String(sourceValue).includes(String(comparisonValue))); break;
+    case 'greater_than': isTrue = (Number(sourceValue) > Number(comparisonValue)); break;
+    case 'less_than': isTrue = (Number(sourceValue) < Number(comparisonValue)); break;
+    default:
+      throw new Error(`不明な比較演算子です: ${operator}`);
+  }
+
+
+  const log = `  -> 条件評価: [${sourceValue}] ${operator} [${comparisonValue}] -> ${isTrue}\n`;
+  return { isTrue, log };
+}
+
+
+/**
+ * [control_for_each] 設定に基づき、繰り返しのための配列を返す
+ * @param {object} settings - モジュールの設定
+ * @param {object} context - ワークフローの実行コンテキスト
+ * @returns {{list: Array, log: string}} - 繰り返し処理に使う配列とログ
+ */
+function module_control_for_each(settings, context) {
+  const sourceType = settings.sourceType || 'range';
+  let list = [];
+  let log = '';
+
+
+  const resolvedSettings = WorkflowService._resolveVariablesInSettings(settings, context.variables);
+  switch (sourceType) {
+    case 'range':
+      if (!resolvedSettings.sourceUrl || !resolvedSettings.sourceRange) {
+        throw new Error("繰り返し(For Each)のURLまたは範囲が指定されていません。");
+      }
+      const ss = SpreadsheetApp.openByUrl(resolvedSettings.sourceUrl);
+      const sheet = ss.getSheetByName(resolvedSettings.sourceSheet);
+      if (!sheet) {
+        throw new Error(`シート「${resolvedSettings.sourceSheet}」が見つかりません。`);
+      }
+      list = sheet.getRange(resolvedSettings.sourceRange).getValues();
+      log = `  -> ${list.length}行のデータを取得しました。\n`;
+      break;
+    case 'text':
+      if (!resolvedSettings.listText) {
+        list = [];
+      } else {
+        list = resolvedSettings.listText.split(',').map(item => [item.trim()]);
+      }
+      log = `  -> ${list.length}個のテキスト項目を取得しました。\n`;
+      break;
+    case 'module_result':
+      const sourceInstanceId = resolvedSettings.sourceModuleInstanceId;
+      if (context.executionResults.hasOwnProperty(sourceInstanceId)) {
+        const result = context.executionResults[sourceInstanceId];
+        if (Array.isArray(result)) {
+          list = result;
+        } else {
+          throw new Error(`モジュール(ID: ${sourceInstanceId})の実行結果は配列ではありません。`);
+        }
+      } else {
+        throw new Error(`値の取得元モジュール(ID: ${sourceInstanceId})が見つかりません。`);
+      }
+      log = `  -> ${list.length}個の項目を前のモジュールから取得しました。\n`;
+      break;
+  }
+  return { list, log };
+}
+
+
+/**
+ * [control_try_catch] エラー処理コンテナのプレースホルダー
+ */
+function module_control_try_catch(settings) {
+  return 'エラー監視ブロックを実行します。';
+}
+
+
+/**
+ * [control_group] グループコンテナのプレースホルダー
+ */
+function module_control_group(settings) {
+  return `グループ「${settings.groupName || '名称未設定'}」の処理を開始します。`;
+}
+
+
+
+//================================================
+// 値操作
+//================================================
+
+
+/**
+ * [sheets_copy_values] スプレッドシート間で、選択されたタイプ（値、関数、書式）をコピー＆ペーストする
+ * @param {object} params - {sourceUrl, sourceSheet, sourceRange, targetUrl, targetSheet, targetStartCell, copyValues, copyFormulas, copyFormats}
+ * @returns {object} 成功を示すオブジェクト
+ */
+function module_sheets_copy_values(params) {
+    if (!params.sourceUrl || !params.targetUrl) {
+        throw new Error("ソースまたはターゲットのスプレッドシートURLが指定されていません。");
+    }
+
+    try {
+        const ss = SpreadsheetApp.openByUrl(params.sourceUrl);
+        const sourceSheet = ss.getSheetByName(params.sourceSheet);
+        if (!sourceSheet) {
+            throw new Error(`ソースシート「${params.sourceSheet}」が見つかりません。`);
+        }
+        const targetSs = SpreadsheetApp.openByUrl(params.targetUrl);
+        const targetSheet = targetSs.getSheetByName(params.targetSheet);
+        if (!targetSheet) {
+            throw new Error(`ターゲットシート「${params.targetSheet}」が見つかりません。`);
+        }
+
+        const sourceRange = sourceSheet.getRange(params.sourceRange); 
+        const targetCell = targetSheet.getRange(params.targetStartCell);
+        
+        const copyValues = params.copyValues || false;
+        const copyFormulas = params.copyFormulas || false;
+        const copyFormats = params.copyFormats || false;
+
+        if (!copyValues && !copyFormulas && !copyFormats) {
+            throw new Error("コピーする内容（値、関数、書式）が何も選択されていません。");
+        }
+
+        const numRows = sourceRange.getNumRows();
+        const numColumns = sourceRange.getNumColumns();
+        const targetRange = targetSheet.getRange(
+            targetCell.getRow(), 
+            targetCell.getColumn(), 
+            numRows, 
+            numColumns
+        );
+
+        let copiedTypes = [];
+        
+        if (copyValues) {
+            const values = sourceRange.getValues();
+            targetRange.setValues(values);
+            copiedTypes.push('値（Value）');
+        }
+        
+        if (copyFormulas) {
+            const formulas = sourceRange.getFormulas();
+            targetRange.setFormulas(formulas);
+            copiedTypes.push('関数/数式（Formula）');
+        }
+        
+        if (copyFormats) {
+            sourceRange.copyTo(targetCell, {formatOnly: true}); 
+            copiedTypes.push('書式（Format）');
+        }
+        
+        return {
+            success: true,
+            message: `範囲「${params.sourceRange}」からセル「${params.targetStartCell}」へ、${copiedTypes.join('、')}をコピーしました。`
+        };
+
+    } catch (e) {
+        throw new Error(`範囲コピーペーストモジュールでエラーが発生しました: ${e.message}`);
+    }
+}
+
+
+/**
+ * [sheets_insert_image] Google Drive上の画像をスプレッドシートのセルに挿入する
+ * @param {object} params - {fileId, targetUrl, targetSheet, targetCell}
+ */
+function module_sheets_insert_image(params) {
+  const fileId = params.fileId;
+  if (!fileId) return;
+  const tgt = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  const blob = DriveApp.getFileById(fileId).getBlob();
+  const img = SpreadsheetApp.newCellImage().setSourceUrl(`data:${blob.getContentType()};base64,${Utilities.base64Encode(blob.getBytes())}`).build();
+  tgt.getRange(params.targetCell).setValue(img);
+}
+
+
+/**
+ * [sheets_clear_values] 指定された範囲のセルの値を削除する
+ * @param {object} params - {targetUrl, targetSheet, targetRange}
+ */
+function module_sheets_clear_values(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.getRange(params.targetRange).clearContent();
+}
+
+/**
+ * [sheets_set_value] 指定されたセルに値を設定する
+ * @param {object} params - {targetUrl, targetSheet, targetCell, valueToSet}
+ * @returns {string} 完了メッセージ
+ */
+function module_sheets_set_value(params) {
+  if (!params.targetUrl || !params.targetSheet || !params.targetCell) {
+    throw new Error("URL、シート名、またはセルが指定されていません。");
+  }
+  const ss = SpreadsheetApp.openByUrl(params.targetUrl);
+  const sheet = ss.getSheetByName(params.targetSheet);
+  if (!sheet) {
+    throw new Error(`シート「${params.targetSheet}」が見つかりません。`);
+  }
+  const range = sheet.getRange(params.targetCell);
+  const value = params.valueToSet || '';
+
+  if (value.toString().startsWith('=')) {
+    range.setFormula(value);
+  } else {
+    range.setValue(value);
+  }
+  return `セル ${params.targetCell} に値を設定しました。`;
+}
+
+
+/**
+ * [sheets_import_csv] 指定されたCSVファイルをシートにインポートする
+ * @param {object} params - {folderId, targetUrl, targetSheet, charset}
+ */
+function module_sheets_import_csv(params) {
+  const folder = DriveApp.getFolderById(params.folderId);
+  const files = folder.getFilesByType(MimeType.CSV);
+  if (files.hasNext()) {
+    const file = files.next();
+    const csvData = file.getBlob().getDataAsString(params.charset || 'shift-jis');
+    const values = Utilities.parseCsv(csvData);
+    if (values.length > 0) {
+      const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+      sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
+    }
+  }
+}
+
+
+
+//================================================
+// 行列操作
+//================================================
+
+
+/**
+ * [sheets_insert_rows_before] 指定行の上に新しい行を挿入する
+ * @param {object} params - {targetUrl, targetSheet, startRow, numRows}
+ */
+function module_sheets_insert_rows_before(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.insertRowsBefore(parseInt(params.startRow), parseInt(params.numRows));
+}
+
+
+/**
+ * [sheets_insert_rows_after] 指定行の下に新しい行を挿入する
+ * @param {object} params - {targetUrl, targetSheet, startRow, numRows}
+ */
+function module_sheets_insert_rows_after(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.insertRowsAfter(parseInt(params.startRow), parseInt(params.numRows));
+}
+
+
+/**
+ * [sheets_delete_rows] 指定された行を削除する
+ * @param {object} params - {targetUrl, targetSheet, startRow, numRows}
+ */
+function module_sheets_delete_rows(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.deleteRows(parseInt(params.startRow), parseInt(params.numRows));
+}
+
+
+/**
+ * [sheets_insert_cols_before] 指定列の左に新しい列を挿入する
+ * @param {object} params - {targetUrl, targetSheet, startCol, numCols}
+ */
+function module_sheets_insert_cols_before(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.insertColumnsBefore(parseInt(params.startCol), parseInt(params.numCols));
+}
+
+
+/**
+ * [sheets_insert_cols_after] 指定列の右に新しい列を挿入する
+ * @param {object} params - {targetUrl, targetSheet, startCol, numCols}
+ */
+function module_sheets_insert_cols_after(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.insertColumnsAfter(parseInt(params.startCol), parseInt(params.numCols));
+}
+
+
+/**
+ * [sheets_delete_cols] 指定された列を削除する
+ * @param {object} params - {targetUrl, targetSheet, startCol, numCols}
+ */
+function module_sheets_delete_cols(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  sheet.deleteColumns(parseInt(params.startCol), parseInt(params.numCols));
+}
+
+
+/**
+ * [sheets_unhide_rows] 指定範囲の非表示行を再表示する
+ * @param {object} params - {targetUrl, targetSheet, targetRange}
+ */
+function module_sheets_unhide_rows(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  const range = sheet.getRange(params.targetRange);
+  sheet.unhideRow(range);
+}
+
+
+/**
+ * [sheets_hide_rows_by_value] 指定列の値に基づいて行を非表示にする
+ * @param {object} params - {targetUrl, targetSheet, column, valueToHide}
+ */
+function module_sheets_hide_rows_by_value(params) {
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  const values = sheet.getRange(params.column + "1:" + params.column + sheet.getLastRow()).getValues();
+  for (var i = 0; i < values.length; i++) {
+    if (values[i][0] == params.valueToHide) {
+      sheet.hideRows(i + 1);
+    }
+  }
+}
+
+
+
+//================================================
+// ファイル操作
+//================================================
+
+
+/**
+ * [drive_create_folder] Google Driveに新しいフォルダを作成する
+ * @param {object} params - { parentFolderId, newFolderName }
+ * @returns {string} 作成された新しいフォルダのURL
+ */
+function module_drive_create_folder(params) {
+  if (!params.newFolderName) {
+    throw new Error('新しいフォルダ名が指定されていません。');
+  }
+  let parentFolder;
+  if (params.parentFolderId) {
+    parentFolder = DriveApp.getFolderById(params.parentFolderId);
+  } else {
+    parentFolder = DriveApp.getRootFolder();
+  }
+  const newFolder = parentFolder.createFolder(params.newFolderName);
+  return newFolder.getUrl();
+}
+
+
+/**
+ * [drive_copy_file] Google Driveのファイルを複製する
+ * @param {object} params - {sourceFileId, destFolderId, newFileName, ...}
+ * @returns {string} 作成された新しいファイルのURL
+ */
+function module_drive_copy_file(params) {
+  const finalFileName = _resolveFileName(params);
+  const tempFile = DriveApp.getFileById(params.sourceFileId);
+  const destFolder = DriveApp.getFolderById(params.destFolderId);
+  const newFile = tempFile.makeCopy(finalFileName, destFolder);
+  return newFile.getUrl();
+}
+
+
+/**
+ * [drive_delete_folder_files] フォルダ内のすべてのファイルを削除（ゴミ箱へ移動）する
+ * @param {object} params - {folderId}
+ */
+function module_drive_delete_folder_files(params) {
+  const folder = DriveApp.getFolderById(params.folderId);
+  const files = folder.getFiles();
+  while (files.hasNext()) {
+    files.next().setTrashed(true);
+  }
+}
+
+
+/**
+ * [drive_delete_files_by_type] 指定した種類のファイルのみを削除する
+ * @param {object} params - {folderId, mimeType}
+ */
+function module_drive_delete_files_by_type(params) {
+  const folder = DriveApp.getFolderById(params.folderId);
+  const files = folder.getFilesByType(params.mimeType);
+  while (files.hasNext()) {
+    files.next().setTrashed(true);
+  }
+}
+
+
+/**
+ * [drive_convert_excel_to_sheets] ExcelをGoogleSheetに変換する (修正版)
+ * @param {object} params - { sourceFolderId, destFolderId }
+ * @returns {string | null} 変換後に作成された最初のGoogle SheetのURL。ファイルがなければnullを返す。
+ */
+function module_drive_convert_excel_to_sheets(params) {
+  const sourceFolder = DriveApp.getFolderById(params.sourceFolderId);
+  const destFolder = DriveApp.getFolderById(params.destFolderId);
+  const files = sourceFolder.getFilesByType(MimeType.MICROSOFT_EXCEL);
+  let newFileUrl = null;
+
+  if (!files.hasNext()) {
+    Logger.log('変換対象のExcelファイルが見つかりませんでした。');
+    return null;
+  }
+
+  while (files.hasNext()) {
+    const file = files.next();
+    const blob = file.getBlob();
+
+    const resource = {
+      title: file.getName().replace(/\.xlsx?$/, ''),
+      parents: [{ id: destFolder.getId() }]
+    };
+
+    const options = {
+      convert: true
+    };
+
+    try {
+      const newFile = Drive.Files.insert(resource, blob, options);
+
+      if (newFile && newFile.alternateLink) {
+        newFileUrl = newFile.alternateLink;
+        Logger.log(`Excelの変換が完了しました。返り値のURL: ${newFileUrl}`);
+        return newFileUrl;
+      }
+    } catch (e) {
+      Logger.log(`ファイル「${file.getName()}」の変換中にエラーが発生しました: ${e.toString()}`);
+    }
+  }
+
+  if (!newFileUrl) {
+    Logger.log('すべてのExcelファイルの変換に失敗したか、有効なURLを取得できませんでした。');
+  }
+  return newFileUrl;
+}
+
+
+
+//================================================
+// データ取得
+//================================================
+
+
+/**
+ * [drive_list_files_to_sheet] フォルダ内のファイル一覧を指定シートに出力する
+ * @param {object} params - {folderId, targetUrl, targetSheet, startCell}
+ */
+function module_drive_list_files_to_sheet(params) {
+  const folder = DriveApp.getFolderById(params.folderId);
+  const list = [];
+  const files = folder.getFiles();
+  while (files.hasNext()) {
+    const file = files.next();
+    list.push([file.getName(), file.getUrl()]);
+  }
+  const childFolders = folder.getFolders();
+  while (childFolders.hasNext()) {
+    const folder = childFolders.next();
+    list.push([folder.getName(), folder.getUrl()]);
+  }
+
+  if (list.length > 0) {
+    const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+    sheet.getRange(params.startCell).offset(0, 0, list.length, list[0].length).setValues(list);
+  }
+}
+
+
+/**
+ * [gmail_fetch_attachments] Gmailの検索結果から添付ファイルを取得する
+ * @param {object} params - {searchQuery, destFolderId, markAsRead, removeStar}
+ */
+function module_gmail_fetch_attachments(params) {
+  const folder = DriveApp.getFolderById(params.destFolderId);
+  const threads = GmailApp.search(params.searchQuery);
+  const messages = GmailApp.getMessagesForThreads(threads);
+  for (var thread of messages) {
+    for (var message of thread) {
+      if (params.markAsRead) {
+        message.markRead();
+      }
+      if (params.removeStar) {
+        message.unstar();
+      }
+      var attachments = message.getAttachments();
+      for (var attachment of attachments) {
+        folder.createFile(attachment);
+      }
+    }
+  }
+}
+
+
+/**
+ * [slides_refresh_charts] Googleスライド内のグラフをすべて更新する (修正版)
+ * @param {object} params - {slidesUrl}
+ * @returns {string} 実行結果のサマリーメッセージ
+ */
+function module_slides_refresh_charts(params) {
+  if (!params.slidesUrl) {
+    throw new Error("スライドのURLが指定されていません。");
+  }
+
+  // URLからIDを抽出して、より確実にファイルを開く
+  const presentationId = _extractIdFromUrl(params.slidesUrl);
+  if (!presentationId) {
+    throw new Error("URLから有効なスライドのIDを抽出できませんでした。");
+  }
+
+  let presentation;
+  try {
+    presentation = SlidesApp.openById(presentationId);
+  } catch (e) {
+    throw new Error(`スライドを開けませんでした。URLが正しいか、アクセス権があるか確認してください。エラー: ${e.message}`);
+  }
+
+  const slides = presentation.getSlides();
+  let successCount = 0;
+  let errorCount = 0;
+  let totalCharts = 0;
+
+  slides.forEach((slide, slideIndex) => {
+    const charts = slide.getSheetsCharts();
+    totalCharts += charts.length;
+
+    charts.forEach((chart, chartIndex) => {
+      try {
+        chart.refresh();
+        successCount++;
+        Logger.log(`スライド ${slideIndex + 1} のグラフ ${chartIndex + 1} を更新しました。`);
+      } catch (e) {
+        errorCount++;
+        // エラーが発生しても処理を止めずにログに残す
+        Logger.log(`エラー: スライド ${slideIndex + 1} のグラフ ${chartIndex + 1} の更新に失敗しました。理由: ${e.message}`);
+      }
+    });
+  });
+
+  if (totalCharts === 0) {
+    return "更新対象のリンクされたグラフは見つかりませんでした。";
+  }
+
+  let summary = `${successCount}個のグラフを正常に更新しました。`;
+  if (errorCount > 0) {
+    summary += ` ${errorCount}個のグラフでエラーが発生しました。詳細はログを確認してください。`;
+  }
+
+  return summary;
+}
+
+
+/**
+ * [calendar_get_holidays_to_sheet] 指定期間の日本の祝日をシートに出力する
+ * @param {object} params - {startDate, endDate, targetUrl, targetSheet}
+ */
+function module_calendar_get_holidays_to_sheet(params) {
+  const startDate = new Date(params.startDate);
+  const endDate = new Date(params.endDate);
+  const sheet = SpreadsheetApp.openByUrl(params.targetUrl).getSheetByName(params.targetSheet);
+  const holidayCalendarId = 'ja.japanese#holiday@group.v.calendar.google.com';
+  const calendar = CalendarApp.getCalendarById(holidayCalendarId);
+  const events = calendar.getEvents(startDate, endDate);
+  sheet.clear();
+  const headers = ['No', '日付', 'タイトル'];
+  sheet.appendRow(headers);
+  const holidayList = events.map((event, i) => {
+    return [(i + 1), event.getAllDayStartDate(), event.getTitle()];
+  });
+  if (holidayList.length > 0) {
+    sheet.getRange(2, 1, holidayList.length, headers.length).setValues(holidayList);
+  }
+}
+
+
+/**
+ * [sheets_get_monthly_data] ルートフォルダ > 年 > 月 の階層から、
+ * その月で最終更新されたスプレッドシートのデータを取得し、指定シートに貼り付ける。
+ * @param {object} params - モジュールの設定
+ * @returns {string} 転送完了メッセージ
+ */
+function module_sheets_get_monthly_data(params) {
+    // -----------------------------------------------------------------
+    // 1. 設定値の検証と整形
+    // -----------------------------------------------------------------
+    if (!params.rootFolderId || !params.targetYear || !params.targetMonth || !params.sourceSheetName || !params.sourceRangeNotation || !params.targetUrl || !params.targetSheetName) {
+        throw new Error("モジュール設定に不足している項目があります。全ての項目が入力されているか確認してください。");
+    }
+
+    const targetYear = String(params.targetYear);
+    const targetMonth = String(params.targetMonth).padStart(2, '0'); // 月を2桁の文字列に整形
+    const rootFolderId = params.rootFolderId;
+    const sourceSheetName = params.sourceSheetName;
+    const sourceRangeNotation = params.sourceRangeNotation;
+    const destinationSsUrl = params.targetUrl;
+    const destinationSheetName = params.targetSheetName;
+
+    let targetFile;
+    let latestUpdateTime = new Date(0);
+
+    // -----------------------------------------------------------------
+    // 2. DriveAppによる対象ファイルの検索
+    // -----------------------------------------------------------------
+    try {
+        const rootFolder = DriveApp.getFolderById(rootFolderId);
+
+        // 年フォルダの検索
+        const yearFolders = rootFolder.getFoldersByName(targetYear);
+        if (!yearFolders.hasNext()) {
+            throw new Error(`年フォルダ「${targetYear}」が見つかりません。`);
+        }
+        const yearFolder = yearFolders.next();
+
+        // 月フォルダの検索
+        const monthFolders = yearFolder.getFoldersByName(targetMonth);
+        if (!monthFolders.hasNext()) {
+            throw new Error(`月フォルダ「${targetMonth}」が見つかりません。`);
+        }
+        const monthFolder = monthFolders.next();
+
+        // 月フォルダ内のスプレッドシートを検索し、最終更新版を特定
+        const files = monthFolder.getFilesByType(MimeType.GOOGLE_SHEETS);
+        while (files.hasNext()) {
+            const file = files.next();
+            const lastUpdated = file.getLastUpdated();
+            
+            // 最終更新日時が最も新しいファイルを選ぶ
+            if (lastUpdated > latestUpdateTime) {
+                latestUpdateTime = lastUpdated;
+                targetFile = file;
+            }
+        }
+
+        if (!targetFile) {
+            throw new Error(`月フォルダ「${targetMonth}」内にスプレッドシート形式のファイルが見つかりません。`);
+        }
+    } catch (e) {
+        // DriveApp関連のエラーメッセージを分かりやすくする
+        Logger.log(`フォルダ・ファイル検索エラー: ${e.message}`);
+        throw new Error(`フォルダ/ファイル検索エラー: ${e.message} (ID/パスが正しいか確認してください)`);
+    }
+
+    const sourceSsId = targetFile.getId();
+    const sourceFileName = targetFile.getName();
+    Logger.log(`対象ファイル特定: ${sourceFileName} (ID: ${sourceSsId}, 最終更新: ${latestUpdateTime.toLocaleString()})`);
+
+    // -----------------------------------------------------------------
+    // 3. データ取得
+    // -----------------------------------------------------------------
+    let data;
+    try {
+        const sourceSs = SpreadsheetApp.openById(sourceSsId);
+        const sourceSheet = sourceSs.getSheetByName(sourceSheetName);
+
+        if (!sourceSheet) {
+            throw new Error(`取得元シート「${sourceSheetName}」がスプレッドシート「${sourceFileName}」内に見つかりません。`);
+        }
+
+        const sourceRange = sourceSheet.getRange(sourceRangeNotation);
+        data = sourceRange.getValues();
+    } catch (e) {
+        Logger.log(`データ取得エラー: ${e.message}`);
+        throw new Error(`データ取得エラー: ${e.message} (シート名または範囲指定が正しいか確認してください)`);
+    }
+
+    if (data.length === 0 || data[0].length === 0) {
+        return `ファイル「${sourceFileName}」の範囲「${sourceRangeNotation}」からデータが取得できませんでした。`;
+    }
+
+    // -----------------------------------------------------------------
+    // 4. データ貼り付け
+    // -----------------------------------------------------------------
+    try {
+        const destinationSs = SpreadsheetApp.openByUrl(destinationSsUrl);
+        const destinationSheet = destinationSs.getSheetByName(destinationSheetName);
+        
+        if (!destinationSheet) {
+            throw new Error(`貼り付け先シート「${destinationSheetName}」がスプレッドシート「${destinationSsUrl}」内に見つかりません。`);
+        }
+
+        // データの行数と列数を取得し、A1セルを起点として貼り付け
+        const numRows = data.length;
+        const numCols = data[0].length;
+
+        // 貼り付け先範囲をクリアする場合はここで行う (ここではクリアしない例)
+        // destinationSheet.clearContents(); 
+
+        destinationSheet.getRange(1, 1, numRows, numCols).setValues(data);
+
+        return `ファイル「${sourceFileName}」から ${numRows}行 × ${numCols}列 のデータを、シート「${destinationSheetName}」の A1セルを起点に転送しました。`;
+    } catch (e) {
+        Logger.log(`データ貼り付けエラー: ${e.message}`);
+        throw new Error(`データ貼り付けエラー: ${e.message} (貼り付け先URL/シート名が正しいか、アクセス権があるか確認してください)`);
+    }
+}
+
+
+//================================================
+// データ出力
+//================================================
+
+
+/**
+ * [sheets_to_pdf] スプレッドシートをPDFとして出力する
+ * @param {object} params - モジュール設定
+ * @returns {string} 作成されたPDFファイルのURL
+ */
+function module_sheets_to_pdf(params) {
+  const finalFileName = _resolveFileName(params);
+  const ss = SpreadsheetApp.openByUrl(params.spreadsheetUrl);
+  const sheet = ss.getSheetByName(params.sheetName);
+  if (!sheet) {
+    throw new Error(`シート「${params.sheetName}」が見つかりません。`);
+  }
+  const sheetId = sheet.getSheetId();
+  const url = `https://docs.google.com/spreadsheets/d/${ss.getId()}/export?`;
+
+  let options = 'exportFormat=pdf&format=pdf' +
+    '&gid=' + sheetId;
+
+  if (params.pdfSettingsMode === 'advanced') {
+    options += '&portrait=' + (params.pdfOrientation || 'false');
+    options += '&size=' + (params.pdfSize || 'A4');
+    options += '&scale=' + (params.pdfScale || '4');
+    options += '&printtitle=' + (params.pdfPrintTitle || false);
+    options += '&sheetnames=' + (params.pdfSheetNames || false);
+    options += '&gridlines=' + (params.pdfGridlines || false);
+    if (params.pdfRange) options += '&range=' + encodeURIComponent(params.pdfRange);
+    if (params.pdfMarginTop) options += '&top_margin=' + params.pdfMarginTop;
+    if (params.pdfMarginBottom) options += '&bottom_margin=' + params.pdfMarginBottom;
+    if (params.pdfMarginLeft) options += '&left_margin=' + params.pdfMarginLeft;
+    if (params.pdfMarginRight) options += '&right_margin=' + params.pdfMarginRight;
+  } else {
+    options += '&portrait=true&size=A4&fitw=true&gridlines=false';
+  }
+
+  const requestUrl = url + options;
+  const token = ScriptApp.getOAuthToken();
+  const fetchParams = {
+    headers: { 'Authorization': 'Bearer ' + token },
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(requestUrl, fetchParams);
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error(`PDFのエクスポートに失敗しました。ステータス: ${response.getResponseCode()}, メッセージ: ${response.getContentText()}`);
+  }
+
+  const blob = response.getBlob().setName(`${finalFileName}.pdf`);
+  const pdfFile = DriveApp.getFolderById(params.destFolderId).createFile(blob);
+  return pdfFile.getUrl();
+}
+
+
+/**
+ * [sheets_to_excel] スプレッドシートをExcelとして出力する
+ * @param {object} params - {spreadsheetUrl, destFolderId, newFileName, ...}
+ * @returns {string} 作成されたExcelファイルのURL
+ */
+function module_sheets_to_excel(params) {
+  const finalFileName = _resolveFileName(params);
+  if (!finalFileName) {
+    throw new Error('ファイル名が取得できませんでした。');
+  }
+  const ssId = _extractIdFromUrl(params.spreadsheetUrl);
+  if (!ssId) {
+    throw new Error('URLから有効なスプレッドシートIDを抽出できませんでした。');
+  }
+  const url = `https://docs.google.com/spreadsheets/d/${ssId}/export?format=xlsx`;
+  const response = UrlFetchApp.fetch(url, { headers: { 'Authorization': 'Bearer ' + ScriptApp.getOAuthToken() } });
+  const blob = response.getBlob().setName(`${finalFileName}.xlsx`);
+  const excelFile = DriveApp.getFolderById(params.destFolderId).createFile(blob);
+  return excelFile.getUrl();
+}
+
+
+/**
+ * [gmail_create_draft] Gmailの下書きを作成する
+ * @param {object} params - {to, subject, body, cc, bcc, attachmentFolderId}
+ */
+function module_gmail_create_draft(params) {
+  const options = {
+    cc: params.cc || '',
+    bcc: params.bcc || ''
+  };
+  if (params.attachmentFolderId) {
+    const folder = DriveApp.getFolderById(params.attachmentFolderId);
+    const files = folder.getFiles();
+    const attachments = [];
+    while (files.hasNext()) {
+      attachments.push(files.next().getBlob());
+    }
+    options.attachments = attachments;
+  }
+  GmailApp.createDraft(params.to, params.subject, params.body, options);
+}
+
+
+/**
+ * [gmail_send_email] Gmailを送信する
+ * @param {object} params - {to, subject, body, cc, bcc, attachmentFolderId}
+ */
+function module_gmail_send_email(params) {
+  const options = {
+    cc: params.cc || '',
+    bcc: params.bcc || ''
+  };
+  if (params.attachmentFolderId) {
+    const folder = DriveApp.getFolderById(params.attachmentFolderId);
+    const files = folder.getFiles();
+    const attachments = [];
+    while (files.hasNext()) {
+      attachments.push(files.next().getBlob());
+    }
+    options.attachments = attachments;
+  }
+  GmailApp.sendEmail(params.to, params.subject, params.body, options);
+}
+
+
+/**
+ * [chat_post] 指定のGoogle Chatスペースにメッセージを投稿する
+ * @param {object} params - {webhookUrl, message}
+ * @returns {string} 投稿完了メッセージ
+ */
+function module_chat_post(params) {
+  if (!params.webhookUrl) {
+    throw new Error('Chatに投稿するためのWebhook URLが設定されていません。');
+  }
+  if (!params.message) {
+    throw new Error('Chatに投稿するメッセージが設定されていません。');
+  }
+
+
+  const webhook_url = params.webhookUrl;
+
+
+  const message = {
+    'text': params.message
+  };
+  const options = {
+    'method': 'POST',
+    'contentType': 'application/json; charset=UTF-8',
+    'payload': JSON.stringify(message)
+  };
+
+
+  UrlFetchApp.fetch(webhook_url, options);
+
+
+  return 'Chatにメッセージを投稿しました。';
+}
+
+
+/**
+ * [sheets_create_new] 新しいGoogleスプレッドシートを作成する
+ * @param {object} params - { newFileName, destFolderId, ... }
+ * @returns {string} 作成されたファイルのURL
+ */
+function module_sheets_create_new(params) {
+  const finalFileName = _resolveFileName(params);
+  if (!finalFileName) {
+    throw new Error('ファイル名が取得できませんでした。');
+  }
+  const newSs = SpreadsheetApp.create(finalFileName);
+  SpreadsheetApp.flush();
+  const newFile = DriveApp.getFileById(newSs.getId());
+  if (params.destFolderId) {
+    const destFolder = DriveApp.getFolderById(params.destFolderId);
+    newFile.moveTo(destFolder);
+  }
+  return newFile.getUrl();
+}
+
+
+
+//================================================
+// ユーティリティ
+//================================================
+/**
+ * [utils_extract_id_from_url] URLからIDを抽出し、指定のセルに書き込む
+ * @param {object} params - { sourceUrl, outputUrl, outputSheet, outputCell }
+ * @returns {string} 抽出されたID
+ */
+function module_utils_extract_id_from_url(params) {
+  const url = params.sourceUrl;
+  if (!url) {
+    throw new Error('抽出元のURLが入力されていません。');
+  }
+
+
+  const extractedId = _extractIdFromUrl(url);
+  if (!extractedId) {
+    throw new Error('有効なGoogle DriveのURLからIDを抽出できませんでした。');
+  }
+  const outputSs = SpreadsheetApp.openByUrl(params.outputUrl);
+  const outputSheet = outputSs.getSheetByName(params.outputSheet);
+  outputSheet.getRange(params.outputCell).setValue(extractedId);
+
+
+  return extractedId;
+}
+
+
+/**
+ * [custom_run_script] ユーザー定義のGASコードを実行する
+ * @param {object} params - { userCode: "..." }
+ * @param {object} context - ワークフロー全体の実行コンテキスト
+ * @returns {any} ユーザーコードがreturnした値
+ */
+function module_custom_run_script(params, context) {
+  if (!params.userCode) {
+    return 'ユーザーコードが入力されていません。';
+  }
+
+  const userProperties = PropertiesService.getUserProperties();
+  const allKeys = userProperties.getKeys();
+  const secrets = {};
+  allKeys.forEach(key => {
+    if (key.startsWith('SECRET_')) {
+      const secretName = key.substring(7);
+      secrets[secretName] = userProperties.getProperty(key);
+    }
+  });
+
+  const services = {
+    SpreadsheetApp: SpreadsheetApp,
+    DriveApp: DriveApp,
+    GmailApp: GmailApp,
+    CalendarApp: CalendarApp,
+    SlidesApp: SlidesApp,
+    UrlFetchApp: UrlFetchApp,
+    Utilities: Utilities,
+    Logger: Logger
+  };
+
+  const variables = context.variables;
+
+  try {
+    const sandboxedFunction = new Function('variables', 'services', 'secrets', params.userCode);
+
+    const result = sandboxedFunction(variables, services, secrets);
+
+    if (result !== undefined) {
+      return result;
+    }
+
+    return 'スクリプトが正常に完了しました。';
+
+  } catch (e) {
+    Logger.log(`カスタムスクリプト実行エラー: ${e.toString()}`);
+    throw new Error(`カスタムスクリプトの実行中にエラーが発生しました: ${e.message}`);
+  }
+}
+
+
+/**
+ * [control_set_variable] 変数に値を設定する
+ * @param {object} settings - モジュールの設定
+ * @param {object} context - ワークフロー全体の実行コンテキスト
+ * @returns {string} 成功メッセージ
+ */
+function module_control_set_variable(settings, context) {
+  const varName = settings.variableName;
+  if (!varName) {
+    throw new Error('変数名が指定されていません。');
+  }
+
+  let valueToSet;
+  const valueSourceType = settings.valueSourceType || 'manual';
+
+  switch (valueSourceType) {
+    case 'fromModuleResult':
+      const sourceInstanceId = settings.sourceModuleInstanceId;
+      if (!sourceInstanceId) {
+        throw new Error('値の取得元モジュールが選択されていません。');
+      }
+      if (context.executionResults.hasOwnProperty(sourceInstanceId)) {
+        valueToSet = context.executionResults[sourceInstanceId];
+      } else {
+        throw new Error(`値の取得元モジュール(ID: ${sourceInstanceId})の実行結果が見つかりませんでした。モジュールの順序が正しいか確認してください。`);
+      }
+      break;
+
+    case 'fromCell':
+      if (!settings.sourceUrl || !settings.sourceSheet || !settings.sourceCell) {
+        throw new Error("値を取得するためのURL、シート名、またはセルが指定されていません。");
+      }
+      const ss = SpreadsheetApp.openByUrl(settings.sourceUrl);
+      const sheet = ss.getSheetByName(settings.sourceSheet);
+      if (!sheet) {
+        throw new Error(`シート「${settings.sourceSheet}」が見つかりませんでした。`);
+      }
+      const range = sheet.getRange(settings.sourceCell);
+      valueToSet = range.getValue();
+      break;
+
+    case 'manual':
+    default:
+      valueToSet = settings.variableValue;
+      break;
+  }
+
+  context.variables[varName] = valueToSet;
+
+  let valueForLog = '(空)';
+  if (valueToSet !== null && valueToSet !== undefined) {
+    valueForLog = String(valueToSet).length > 50 ? String(valueToSet).substring(0, 50) + '...' : valueToSet;
+  }
+
+  return `変数「${varName}」に値「${valueForLog}」を設定しました。`;
+}
+
+
+/**
+ * [log_message] 指定されたメッセージをログに出力する
+ * @param {object} params - { logMessage }
+ * @returns {string} ログに出力したメッセージ
+ */
+function module_log_message(params) {
+  const message = params.logMessage || '(空のメッセージ)';
+  Logger.log(`[Workflow Log] ${message}`);
+  return message;
+}
+
+
+/**
+ * [date_manipulation] 日付を操作し、フォーマットされた文字列を返す
+ * @param {object} params - モジュール設定
+ * @returns {string} 計算後のフォーマットされた日付文字列
+ */
+function module_date_manipulation(params) {
+  const baseDate = params.baseDate ? new Date(params.baseDate.replace(' ', 'T')) : new Date();
+
+  if (isNaN(baseDate.getTime())) {
+    throw new Error(`基準日の形式が無効です: ${params.baseDate}`);
+  }
+
+  let resultDate;
+  const operation = params.operation || 'add_subtract';
+
+  if (operation === 'add_subtract') {
+    const amount = parseInt(params.amount, 10);
+    const mode = params.calculationMode || 'add';
+    const direction = (mode === 'subtract') ? -1 : 1;
+    const unit = params.unit || 'days';
+
+    resultDate = new Date(baseDate.getTime());
+
+    switch (unit) {
+      case 'days':
+        resultDate.setDate(resultDate.getDate() + (amount * direction));
+        break;
+      case 'weeks':
+        resultDate.setDate(resultDate.getDate() + (amount * 7 * direction));
+        break;
+      case 'months':
+        resultDate.setMonth(resultDate.getMonth() + (amount * direction));
+        break;
+      case 'years':
+        resultDate.setFullYear(resultDate.getFullYear() + (amount * direction));
+        break;
+      case 'business_days':
+        resultDate = _addBusinessDays(baseDate, amount * direction);
+        break;
+      default:
+        throw new Error(`不明な単位です: ${unit}`);
+    }
+  } else if (operation === 'find_nth_weekday') {
+    const dateForNthWeekday = new Date(baseDate.getTime());
+    dateForNthWeekday.setHours(0, 0, 0, 0);
+
+    const targetMonth = dateForNthWeekday.getMonth();
+    const targetYear = dateForNthWeekday.getFullYear();
+    const n = params.nthWeekdayN;
+    const dayOfWeek = parseInt(params.nthWeekdayDay, 10);
+
+    if (n === 'last') {
+      const lastDay = new Date(targetYear, targetMonth + 1, 0);
+      resultDate = new Date(lastDay.getTime());
+      while (resultDate.getDay() !== dayOfWeek) {
+        resultDate.setDate(resultDate.getDate() - 1);
+      }
+    } else {
+      const firstDay = new Date(targetYear, targetMonth, 1);
+      resultDate = new Date(firstDay.getTime());
+      let count = 0;
+      while (resultDate.getMonth() === targetMonth) {
+        if (resultDate.getDay() === dayOfWeek) {
+          count++;
+          if (count == parseInt(n, 10)) {
+            break;
+          }
+        }
+        resultDate.setDate(resultDate.getDate() + 1);
+      }
+    }
+  } else {
+    throw new Error(`不明な操作です: ${operation}`);
+  }
+
+  const outputFormat = params.outputFormat || 'yyyy-MM-dd HH:mm:ss';
+  const timezone = Session.getScriptTimeZone();
+  return Utilities.formatDate(resultDate, timezone, outputFormat);
+}
+
+
+/**
+ * 基準日に営業日を加算/減算するヘルパー関数
+ * @private
+ * @param {Date} startDate - 開始日
+ * @param {number} days - 加算する営業日数 (負数で減算)
+ * @returns {Date} 計算後の日付
+ */
+function _addBusinessDays(startDate, days) {
+  let date = new Date(startDate.getTime());
+  const direction = days > 0 ? 1 : -1;
+  let daysToAdd = Math.abs(days);
+
+  const startYear = startDate.getFullYear();
+  const endYearEstimate = new Date(startDate.getTime() + days * 1.5 * 24 * 60 * 60 * 1000).getFullYear();
+
+  let holidays = [];
+  for (let year = Math.min(startYear, endYearEstimate); year <= Math.max(startYear, endYearEstimate); year++) {
+    holidays.push(..._getJapaneseHolidays(year));
+  }
+  const holidaySet = new Set(holidays.map(h => h.getTime()));
+
+  while (daysToAdd > 0) {
+    date.setDate(date.getDate() + direction);
+    const day = date.getDay();
+    if (day !== 0 && day !== 6 && !holidaySet.has(date.getTime())) {
+      daysToAdd--;
+    }
+  }
+  return date;
+}
+
+
+/**
+ * 日本の祝日を取得するヘルパー関数
+ * @private
+ * @param {number} year - 対象年
+ * @returns {Array<Date>} 祝日のDateオブジェクトの配列
+ */
+function _getJapaneseHolidays(year) {
+  try {
+    const calendar = CalendarApp.getCalendarById('ja.japanese#holiday@group.v.calendar.google.com');
+    const events = calendar.getEvents(new Date(year, 0, 1), new Date(year, 11, 31));
+    return events.map(event => {
+      const d = event.getAllDayStartDate();
+      d.setHours(0, 0, 0, 0); // 時刻をリセット
+      return d;
+    });
+  } catch (e) {
+    Logger.log(`祝日カレンダーの取得に失敗しました: ${e.toString()}`);
+    return [];
+  }
+}
+
+/**
+ * [reservation_add_job] 予約管理シートに新しいジョブを追加する
+ * @param {object} settings - モジュールの設定
+ * @returns {string} 完了メッセージ
+ */
+function module_reservation_add_job(settings) {
+  return ReservationService.addJob(settings);
+}
+
+/**
+ * [sheets_append_block] 前のモジュールから受け取った値のブロックを、基準列の最終行から追記する
+ * @param {object} params - モジュールの設定
+ * @param {object} context - ワークフロー全体の実行コンテキスト
+ * @returns {string} 完了メッセージ
+ */
+function module_sheets_append_block(params, context) {
+  if (!params.targetUrl || !params.targetSheet) {
+    throw new Error("対象のURLまたはシート名が指定されていません。");
+  }
+
+  let values;
+
+  const valueSourceType = params.valueSourceType || 'fromModuleResult';
+  switch (valueSourceType) {
+    case 'fromModuleResult':
+      if (!params.sourceModuleInstanceId) {
+        throw new Error("値のソースとなるモジュールが選択されていません。");
+      }
+      values = context.executionResults[params.sourceModuleInstanceId];
+      if (!values || !Array.isArray(values)) {
+        throw new Error("ソースモジュールから有効なデータ（配列）が返されませんでした。");
+      }
+      break;
+    case 'fromRange':
+      if (!params.sourceUrl || !params.sourceSheet || !params.sourceRange) {
+        throw new Error("取得元のURL、シート名、または範囲が指定されていません。");
+      }
+      const sourceSs = SpreadsheetApp.openByUrl(params.sourceUrl);
+      const sourceSheet = sourceSs.getSheetByName(params.sourceSheet);
+      if (!sourceSheet) throw new Error(`取得元シート「${params.sourceSheet}」が見つかりません。`);
+      values = sourceSheet.getRange(params.sourceRange).getValues();
+      break;
+    case 'manualJson':
+      try {
+        values = JSON.parse(params.jsonData || '[]');
+        if (!Array.isArray(values)) throw new Error("JSONは配列である必要があります。");
+      } catch (e) {
+        throw new Error(`JSONの解析に失敗しました: ${e.message}`);
+      }
+      break;
+    default:
+      throw new Error(`不明な値のソースタイプです: ${valueSourceType}`);
+  }
+
+  if (!values || values.length === 0 || !Array.isArray(values[0])) {
+    throw new Error("ソースから有効なデータブロック（二次元配列）を取得できませんでした。");
+  }
+
+  const ss = SpreadsheetApp.openByUrl(params.targetUrl);
+  const sheet = ss.getSheetByName(params.targetSheet);
+  if (!sheet) {
+    throw new Error(`シート「${params.targetSheet}」が見つかりません。`);
+  }
+
+  const refColumnLetter = params.referenceColumn || 'A';
+  const pasteStartColumnLetter = params.pasteStartColumn || 'A';
+
+  const refColumnIndex = sheet.getRange(`${refColumnLetter}1`).getColumn();
+
+  const allColValues = sheet.getRange(1, refColumnIndex, sheet.getMaxRows(), 1).getValues();
+  let lastRow = 0;
+  for (let i = allColValues.length - 1; i >= 0; i--) {
+    if (allColValues[i][0] !== '') {
+      lastRow = i + 1;
+      break;
+    }
+  }
+  const targetRow = lastRow + 1;
+
+  const pasteStartColumnIndex = sheet.getRange(`${pasteStartColumnLetter}1`).getColumn();
+  const numRows = values.length;
+  const numCols = values[0].length;
+
+  sheet.getRange(targetRow, pasteStartColumnIndex, numRows, numCols).setValues(values);
+
+  return `シート「${params.targetSheet}」の ${targetRow} 行目から ${numRows} 行のデータを追記しました。`;
+}

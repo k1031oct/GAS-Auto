@@ -1,0 +1,19 @@
+{
+  "id": "slides_refresh_charts",
+  "name": "スライドのグラフを更新",
+  "icon": "refresh",
+  "category": "Google Slides",
+  "description": "指定されたGoogleスライド内の、スプレッドシートにリンクされたすべてのグラフを更新します。",
+  "settings": [
+    { "id": "slidesUrl", "name": "スライドのURL", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "refresh_charts",
+      "func": "core.slidesRefreshCharts",
+      "args": {
+        "slidesUrl": "{{slidesUrl}}"
+      }
+    }
+  ]
+}

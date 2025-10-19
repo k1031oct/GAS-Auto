@@ -1,0 +1,25 @@
+{
+  "id": "sheets_import_csv",
+  "name": "CSVをインポート",
+  "icon": "file_upload",
+  "category": "Google Sheets",
+  "description": "指定したフォルダにあるCSVファイルをシートにインポートします。フォルダ内に複数CSVがある場合、最初の1つが対象になります。",
+  "settings": [
+    { "id": "folderId", "name": "CSV格納フォルダID", "type": "text", "required": true },
+    { "id": "targetUrl", "name": "貼付先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "貼付先シート名", "type": "text", "required": true },
+    { "id": "charset", "name": "文字コード(任意)", "type": "text", "placeholder": "UTF-8", "required": false }
+  ],
+  "logic": [
+    {
+      "step_id": "import_csv",
+      "func": "core.sheetsImportCsv",
+      "args": {
+        "folderId": "{{folderId}}",
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "charset": "{{charset}}"
+      }
+    }
+  ]
+}

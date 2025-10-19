@@ -1,0 +1,25 @@
+{
+  "id": "sheets_insert_image",
+  "name": "セルに画像を挿入",
+  "icon": "image",
+  "category": "Google Sheets",
+  "description": "Google Drive上の画像ファイルを指定したセルに挿入します。",
+  "settings": [
+    { "id": "fileId", "name": "画像ファイルID", "type": "text", "required": true },
+    { "id": "targetUrl", "name": "貼付先スプレッドシートURL", "type": "text", "required": true },
+    { "id": "targetSheet", "name": "貼付先シート名", "type": "text", "required": true },
+    { "id": "targetCell", "name": "貼付先セル", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "insert_image",
+      "func": "core.sheetsInsertImage",
+      "args": {
+        "fileId": "{{fileId}}",
+        "targetUrl": "{{targetUrl}}",
+        "targetSheet": "{{targetSheet}}",
+        "targetCell": "{{targetCell}}"
+      }
+    }
+  ]
+}

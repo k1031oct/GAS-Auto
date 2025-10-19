@@ -1,0 +1,21 @@
+{
+  "id": "chat_post",
+  "name": "Chatにメッセージ投稿",
+  "icon": "chat",
+  "category": "Google Chat",
+  "description": "指定されたWebhook URLを使用して、Google Chatにメッセージを投稿します。",
+  "settings": [
+    { "id": "webhookUrl", "name": "Webhook URL", "type": "text", "required": true },
+    { "id": "message", "name": "メッセージ", "type": "textarea", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "post_to_chat",
+      "func": "core.chatPostMessage",
+      "args": {
+        "webhookUrl": "{{webhookUrl}}",
+        "message": "{{message}}"
+      }
+    }
+  ]
+}
