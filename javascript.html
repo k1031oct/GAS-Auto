@@ -722,7 +722,8 @@
                                                       `;
                         
                                                       const modulesContainer = document.createElement('div');
-                                                      modulesContainer.className = 'category-modules p-2 space-y-2'; // Initially visible
+                                                      // Initially hidden, will be toggled by click
+                                                      modulesContainer.className = 'category-modules p-2 space-y-2 hidden';
                         
                                                       categories[category].forEach(m => {
                                                           const moduleCard = document.createElement('div');
