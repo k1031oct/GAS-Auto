@@ -351,7 +351,8 @@
                         
                                               const updateSelectionActionsUI = () => {
                                                 const count = state.selectedInstanceIds.length;
-                                                if (count === 0) {
+                                                const hasModules = state.modules.length > 0;
+                                                if (count === 0 || !hasModules) {
                                                   app.selectionActions.classList.add('hidden');
                                                 } else {
                                                   app.selectionActions.classList.remove('hidden');
@@ -638,7 +639,8 @@
                                               const updateUI = () => {
                                                 const hasModules = state.modules.length > 0;
                                                 app.runBtn.disabled = !hasModules;
-                                                document.getElementById('floating-buttons').classList.toggle('hidden', !hasModules);
+                                                app.expandAllBtn.classList.toggle('hidden', !hasModules);
+                                                app.collapseAllBtn.classList.toggle('hidden', !hasModules);
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
