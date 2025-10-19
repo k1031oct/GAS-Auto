@@ -653,6 +653,12 @@
                                                 app.floatingButtons.classList.remove('hidden');
                                                 app.expandAllBtn.classList.remove('hidden');
                                                 app.collapseAllBtn.classList.remove('hidden');
+                                                // Temporary debug styles
+                                                app.expandAllBtn.style.backgroundColor = 'red';
+                                                app.expandAllBtn.style.zIndex = '9999';
+                                                app.expandAllBtn.style.position = 'fixed'; // To ensure it's not affected by parent overflow
+                                                app.expandAllBtn.style.top = '10px';
+                                                app.expandAllBtn.style.right = '10px';
                                                 console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
