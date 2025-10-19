@@ -654,7 +654,8 @@
                                                   moduleEl.innerHTML = contentHTML;
                                           
                                                   // --- Attach Event Listeners ---
-                                                  moduleEl.addEventListener('input', (e) => {
+                                                  // Use 'change' instead of 'input' to prevent re-rendering on every keystroke
+                                                  moduleEl.addEventListener('change', (e) => {
                                                     if (e.target.dataset.settingId) {
                                                         const settingId = e.target.dataset.settingId;
                                                         const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
