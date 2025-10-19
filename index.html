@@ -119,20 +119,18 @@
 
       <!-- Module Palette (Sidebar) -->
       <aside id="module-palette" class="w-full md:w-72 bg-white border-b border-r-0 md:border-r border-gray-200 flex flex-col flex-shrink-0 md:h-full md:order-1 dark:bg-gray-800 dark:border-gray-700 shadow-lg">
-        <!-- Module Resize Handle (Mobile Only) -->
-        <div id="module-resize-handle" class="w-full h-4 flex items-center justify-center md:hidden bg-gray-200 cursor-ns-resize hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:hover:bg-gray-600 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-          ···
-        </div>
-        <div class="p-3 md:p-4 border-b dark:border-gray-700">
-          <div class="flex justify-between items-center">
-            <h2 class="text-md font-bold text-gray-700 dark:text-gray-200">モジュールライブラリ</h2>
-            <button id="toggle-search-btn" class="p-2 md:hidden rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600">
-              <i class="fas fa-search text-gray-600 dark:text-gray-400"></i>
-            </button>
-          </div>
-          <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500 hidden md:block dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
-        </div>
-        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-64 md:h-auto select-none">
+              <div id="module-palette-header" class="p-3 md:p-4 border-b dark:border-gray-700 md:cursor-default cursor-pointer">
+                <div class="flex justify-between items-center">
+                  <h2 class="text-md font-bold text-gray-700 dark:text-gray-200">モジュールライブラリ</h2>
+                  <div class="flex items-center">
+                    <button id="toggle-search-btn" class="p-2 md:hidden rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600">
+                      <i class="fas fa-search text-gray-600 dark:text-gray-400"></i>
+                    </button>
+                    <i id="module-palette-toggle-icon" class="fas fa-chevron-down transition-transform md:hidden ml-2"></i>
+                  </div>
+                </div>
+                <input type="text" id="module-search-box" placeholder="モジュールを検索..." class="w-full p-2 border border-gray-300 rounded-lg mt-2 focus:ring-blue-500 focus:border-blue-500 hidden md:block dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">
+              </div>        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-64 md:h-auto select-none">
           <p class="text-center text-sm text-gray-400 p-4">Google Driveからモジュールを読み込み中...</p>
         </div>
         <!-- Module Source Folder Settings (Desktop) -->
