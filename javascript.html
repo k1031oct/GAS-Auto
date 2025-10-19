@@ -311,6 +311,15 @@
                                                       .saveWorkflow(workflowName, workflowData);
                                               };
                         
+                                              const setCollapseStateRecursive = (modules, isCollapsed) => {
+                                                modules.forEach(module => {
+                                                  module.isCollapsed = isCollapsed;
+                                                  if (module.type === 'container' && module.modules) {
+                                                    setCollapseStateRecursive(module.modules, isCollapsed);
+                                                  }
+                                                });
+                                              };
+                        
                                               // --- initEventListeners ---
                                               const initEventListeners = () => {
                                                   // Init SortableJS for workflow container (drop target)
@@ -325,11 +334,11 @@
                                                   console.log('Sortable for workflowContainer initialized.');
 
                                                 app.collapseAllBtn.addEventListener('click', () => {
-                                                  state.modules.forEach(m => m.isCollapsed = true);
+                                                  setCollapseStateRecursive(state.modules, true);
                                                   renderModules();
                                                 });
                                                 app.expandAllBtn.addEventListener('click', () => {
-                                                  state.modules.forEach(m => m.isCollapsed = false);
+                                                  setCollapseStateRecursive(state.modules, false);
                                                   renderModules();
                                                 });
                                           
