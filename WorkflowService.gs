@@ -283,29 +283,13 @@ var WorkflowService = {
       throw new Error(`モジュール定義またはハンドラが不正です: ${moduleDef.id}`);
     }
 
-    const handlerParts = moduleDef.handler.split('.');
-    if (handlerParts.length !== 2) {
-      throw new Error(`ハンドラの形式が不正です: ${moduleDef.handler}`);
+    // FunctionRegistryを使用してハンドラを実行
+    try {
+      return FunctionRegistry.run(moduleDef.handler, configs, inputValue);
+    } catch (e) {
+      // エラーメッセージに詳細を追加して再スロー
+      throw new Error(`ハンドラ「${moduleDef.handler}」の実行中にエラーが発生しました: ${e.message}`);
     }
-
-    const serviceName = handlerParts[0];
-    const functionName = handlerParts[1];
-
-    // 'this'コンテキストからグローバルサービスオブジェクトを取得
-    const service = this[serviceName];
-
-    if (typeof service !== 'object' || service === null) {
-      throw new Error(`サービス「${serviceName}」が見つかりません。`);
-    }
-
-    const func = service[functionName];
-    if (typeof func !== 'function') {
-      throw new Error(`サービス「${serviceName}」にメソッド「${functionName}」が見つかりません。`);
-    }
-
-    // 新しい標準モジュールと従来のモジュールの両方に対応するため、
-    // configsとinputValueの両方を渡す。ハンドラ側で不要な引数は無視される。
-    return func.call(service, configs, inputValue);
   },
 
   /**
