@@ -3,6 +3,68 @@
   "dependencies": {},
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
+  "files": [
+    {
+      "name": "FunctionRegistry",
+      "source": "FunctionRegistry.gs"
+    },
+    {
+      "name": "LogService",
+      "source": "LogService.gs"
+    },
+    {
+      "name": "SheetService",
+      "source": "SheetService.gs"
+    },
+    {
+      "name": "DriveService",
+      "source": "DriveService.gs"
+    },
+    {
+      "name": "GmailService",
+      "source": "GmailService.gs"
+    },
+    {
+      "name": "CalendarService",
+      "source": "CalendarService.gs"
+    },
+    {
+      "name": "DocsService",
+      "source": "DocsService.gs"
+    },
+    {
+      "name": "ModuleService",
+      "source": "ModuleService.gs"
+    },
+    {
+      "name": "WorkflowService",
+      "source": "WorkflowService.gs"
+    },
+    {
+      "name": "TriggerService",
+      "source": "TriggerService.gs"
+    },
+    {
+      "name": "OrganizerService",
+      "source": "OrganizerService.gs"
+    },
+    {
+      "name": "Code",
+      "source": "Code.gs"
+    },
+    {
+      "name": "Tests GasT",
+      "source": "Tests/GasT.gs"
+    },
+    {
+      "name": "Tests UnitTests",
+      "source": "Tests/UnitTests.gs"
+    },
+    {
+      "name": "Tests TestRunner",
+      "source": "Tests/TestRunner.gs"
+    }
+  ],
   "oauthScopes": [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/script.external_request",
