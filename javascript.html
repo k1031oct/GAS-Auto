@@ -80,6 +80,8 @@
                         floatingButtons: document.getElementById('floating-buttons'),
                                               };
                                           
+                                              console.log('Debug: app.expandAllBtn after definition:', app.expandAllBtn);
+
                                               // --- State Management ---
                                               let state = {
                                                 // ... (existing state)
@@ -650,16 +652,18 @@
                                                 console.log(`  Has modules: ${hasModules}`);
                                                 app.runBtn.disabled = !hasModules;
                                                 // For debugging: ensure these are always visible
-                                                app.floatingButtons.classList.remove('hidden');
-                                                app.expandAllBtn.classList.remove('hidden');
-                                                app.collapseAllBtn.classList.remove('hidden');
-                                                // Temporary debug styles
-                                                app.expandAllBtn.style.backgroundColor = 'red';
-                                                app.expandAllBtn.style.zIndex = '9999';
-                                                app.expandAllBtn.style.position = 'fixed'; // To ensure it's not affected by parent overflow
-                                                app.expandAllBtn.style.top = '10px';
-                                                app.expandAllBtn.style.right = '10px';
-                                                console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
+                                                if (app.floatingButtons) app.floatingButtons.classList.remove('hidden');
+                                                if (app.expandAllBtn) {
+                                                  app.expandAllBtn.classList.remove('hidden');
+                                                  // Temporary debug styles
+                                                  app.expandAllBtn.style.backgroundColor = 'red';
+                                                  app.expandAllBtn.style.zIndex = '9999';
+                                                  app.expandAllBtn.style.position = 'fixed'; // To ensure it's not affected by parent overflow
+                                                  app.expandAllBtn.style.top = '10px';
+                                                  app.expandAllBtn.style.right = '10px';
+                                                }
+                                                if (app.collapseAllBtn) app.collapseAllBtn.classList.remove('hidden');
+                                                console.log(`  Expand All button hidden: ${app.expandAllBtn ? app.expandAllBtn.classList.contains('hidden') : 'N/A'}, Collapse All button hidden: ${app.collapseAllBtn ? app.collapseAllBtn.classList.contains('hidden') : 'N/A'}`);
                                                 console.log('Debug: app.expandAllBtn element:', app.expandAllBtn);
                                                 if (app.expandAllBtn) {
                                                   console.log('Debug: app.expandAllBtn computed style:', window.getComputedStyle(app.expandAllBtn));
