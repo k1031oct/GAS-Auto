@@ -73,8 +73,12 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
             
-            // コメントのタイトルを決定
-            // GITHUB_REF_NAME は 'pull/23/merge' のような形式なので、変更があった場合は 'Updated' をつける
+            // Get the diff of the PR
+            const diff_url = context.payload.pull_request.diff_url;
+            const result = await github.request(diff_url);
+            const diff = result.data;
+
+            // Determine the comment title
             const title = context.payload.pull_request.commits > 1 ? '✨ Review App Deployed (Updated)' : '✨ Review App Deployed';
 
             github.rest.issues.createComment({
@@ -86,6 +90,11 @@ jobs:
                 AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
                 
                 **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
+                
+                #### 修正概要
+                \`\`\`diff
+                ${diff}
+                \`\`\`
                 
                 レビュー後、問題がなければPRをマージしてください。
               `
