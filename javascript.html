@@ -104,7 +104,7 @@
                                               // ... (existing helper functions: _extractIdFromUrl, showCustomDialog, log, showError, showLoader, hideLoader)
                                               const _extractIdFromUrl = (url) => {
                                                   if (!url) return null;
-                                                  const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0--9-_]{20,})/;
+                                                  const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9_-]{20,})/;
                                                   const match1 = url.match(regex1);
                                                   if (match1 && match1[1]) {
                                                       return match1[1];

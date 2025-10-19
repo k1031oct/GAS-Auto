@@ -39,7 +39,7 @@ function include(filename) {
 
 function _extractIdFromUrl(url) {
   if (!url) return null;
-  const regex = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+  const regex = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9_-]{20,})/;
   const match = url.match(regex);
   if (match && match[1]) {
     return match[1];
