@@ -25,7 +25,16 @@ var ModuleService = {
       Logger.log("モジュールフォルダIDが未指定です。カスタムモジュールはロードされません。");
       return [];
     }
-    
+
+    const cache = CacheService.getScriptCache();
+    const cacheKey = `modules_cache_${folderId}`;
+    const cachedModules = cache.get(cacheKey);
+
+    if (cachedModules) {
+      Logger.log('キャッシュからモジュールをロードしました。');
+      return JSON.parse(cachedModules);
+    }
+
     // ユーザープロパティにフォルダIDを保存
     PropertiesService.getUserProperties().setProperty(this._DEFAULT_MODULE_FOLDER_KEY, folderId);
 
@@ -62,8 +71,10 @@ var ModuleService = {
         Logger.log(`JSONファイル「${file.getName()}」の解析に失敗しました: ${e.message}`);
       }
     }
-
-    Logger.log(`Driveから ${loadedModules.length} 個のカスタムモジュールをロードしました。`);
+    
+    // データをキャッシュに保存（有効期限10分）
+    cache.put(cacheKey, JSON.stringify(loadedModules), 600); 
+    Logger.log(`Driveから ${loadedModules.length} 個のカスタムモジュールをロードし、キャッシュに保存しました。`);
     return loadedModules;
   },
   
