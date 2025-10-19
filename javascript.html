@@ -323,15 +323,15 @@
                                               // --- initEventListeners ---
                                               const initEventListeners = () => {
                                                   // Init SortableJS for workflow container (drop target)
-                                                  const logSortable = new Sortable(app.workflowContainer, {
+                                                  new Sortable(app.workflowContainer, {
                                                       group: 'shared',
                                                       animation: 150,
+                                                      handle: '.handle',
                                                       onAdd: (evt) => onAddModule(evt, state.modules),
                                                       onUpdate: (evt) => onUpdateModuleOrder(evt, state.modules),
                                                       filter: 'button, input, select, textarea, label', // Ignore clicks on form elements and buttons
                                                       preventOnFilter: false
                                                   });
-                                                  console.log('Sortable for workflowContainer initialized.');
 
                                                 app.collapseAllBtn.addEventListener('click', () => {
                                                   setCollapseStateRecursive(state.modules, true);
@@ -527,7 +527,6 @@
                                               };
                                           
                                               const renderModules = () => {
-                                                console.log('renderModules triggered. state.modules:', state.modules);
                                                 app.workflowContainer.innerHTML = ''; // Clear the container first
                                             
                                                 if (state.modules.length === 0) {
@@ -552,6 +551,7 @@
                                                                 new Sortable(containerContent, {
                                                                     group: 'shared',
                                                                     animation: 150,
+                                                                    handle: '.handle',
                                                                     onAdd: (evt) => onAddModule(evt, module.modules),
                                                                     onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
                                                                 });
@@ -584,7 +584,7 @@
                                           
                                                   let settingsHTML = '';
                                                   if (moduleDef.settings && moduleDef.settings.length > 0) {
-                                                      settingsHTML += `<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700" ${isCollapsed ? 'style="display:none;"' : ''}>`;
+                                                      settingsHTML += `<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">`;
                                                       moduleDef.settings.forEach(setting => {
                                                           const currentValue = module.settings[setting.id] || setting.defaultValue || '';
                                                           settingsHTML += `<div class="setting-field">`;
@@ -616,7 +616,9 @@
                         
                                                   let contentHTML = `
                                                     <div class="flex items-start gap-3">
-                                                        <i class="fas fa-grip-vertical text-gray-400 mt-1 cursor-grab"></i>
+                                                        <div class="flex-shrink-0 pt-1">
+                                                          <i class="fas fa-grip-vertical text-gray-400 cursor-grab handle"></i>
+                                                        </div>
                                                         <div class="flex-grow">
                                                             <div class="flex justify-between items-center">
                                                                 <div class="flex items-center gap-3">
@@ -638,12 +640,14 @@
                                                                     <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                                                                 </div>
                                                             </div>
-                                                            <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400" ${isCollapsed ? 'style="display:none;"' : ''}>${moduleDef.description || ''}</div>
-                                                            ${settingsHTML}
+                                                            <div class="module-content-wrapper ${isCollapsed ? 'hidden' : ''}">
+                                                              <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
+                                                              ${settingsHTML}
+                                                            </div>
                                                         `;
                                           
                                                   if (module.type === 'container') {
-                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]" ${isCollapsed ? 'style="display:none;"' : ''}></div>`;
+                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
                                                   }
                                           
                                                   contentHTML += `</div></div>`;
@@ -1045,10 +1049,3 @@
                                               init();
                                             });
                                           </script>
-                                          
-                                    
-                              
-                        
-                  
-            
-      

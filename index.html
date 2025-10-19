@@ -48,6 +48,17 @@
     .dark #dark-mode-toggle:checked ~ .block {
         background-color: #3730A3; /* indigo-800 */
     }
+
+    /* Module toggle switch */
+    .module-toggle-checkbox:checked ~ .dot {
+      transform: translateX(1rem);
+    }
+    .module-toggle-checkbox:checked + .block {
+        background-color: #4F46E5; /* indigo-600 */
+    }
+    .dark .module-toggle-checkbox:checked + .block {
+        background-color: #3730A3; /* indigo-800 */
+    }
   </style>
 </head>
 
@@ -102,8 +113,6 @@
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-2">
               <h2 class="text-md font-bold text-gray-800 dark:text-gray-100">ワークフローエディタ</h2>
-              <button id="collapse-all-btn" title="すべて折りたたむ" class="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-compress-alt"></i></button>
-              <button id="expand-all-btn" title="すべて展開" class="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-expand-alt"></i></button>
             </div>
             <select id="workflow-selector" class="border border-gray-300 rounded-lg px-2 py-1 md:px-3 md:py-1.5 bg-white shadow-sm text-sm focus:ring-2 focus:ring-blue-500 transition-all dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400">
               <option value="">-- 新規ワークフロー --</option>
@@ -111,13 +120,22 @@
           </div>
         </div>
         <!-- Scrollable Module Area Wrapper -->
-        <div class="flex-grow p-2 md:p-4 overflow-y-auto">
+        <div class="flex-grow p-2 md:p-4 overflow-y-auto relative">
             <div id="workflow-container" class="space-y-4 min-h-full p-2 md:p-4 border-2 border-dashed border-gray-300 rounded-xl bg-white shadow-inner dark:bg-gray-900 dark:border-gray-600">
               <div class="text-center text-gray-500 p-4 md:p-8 workflow-guide dark:text-gray-400">
                 <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
                 <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
                 <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
               </div>
+            </div>
+            <!-- Floating Action Buttons -->
+            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 space-y-2">
+              <button id="expand-all-btn" title="すべて展開" class="w-12 h-12 rounded-full bg-white shadow-lg hover:bg-gray-100 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 flex items-center justify-center">
+                <i class="fas fa-expand-alt text-xl"></i>
+              </button>
+              <button id="collapse-all-btn" title="すべて折りたたむ" class="w-12 h-12 rounded-full bg-white shadow-lg hover:bg-gray-100 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 flex items-center justify-center">
+                <i class="fas fa-compress-alt text-xl"></i>
+              </button>
             </div>
         </div>
       </section>
