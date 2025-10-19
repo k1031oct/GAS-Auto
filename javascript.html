@@ -36,6 +36,9 @@
             customDialogCancel: document.getElementById('custom-dialog-cancel'),
                         showLogBtn: document.getElementById('show-log-btn'),
                         hideLogBtn: document.getElementById('hide-log-btn'),
+                        selectionActions: document.getElementById('selection-actions'),
+                        groupBtn: document.getElementById('group-btn'),
+                        branchBtn: document.getElementById('branch-btn'),
                         moduleSettingsBackdrop: document.getElementById('module-settings-backdrop'),
                         moduleSettingsModal: document.getElementById('module-settings-modal'),
                         moduleSettingsTitle: document.getElementById('module-settings-title'),
@@ -81,6 +84,7 @@
                                                 // ... (existing state)
                                                 currentWorkflowName: '',
                                                 modules: [],
+                                                selectedInstanceIds: [],
                                                 currentModuleFolderId: '',
                                                 isDirty: false,
                                                 allModuleDefinitions: [],
@@ -324,6 +328,17 @@
                                                 });
                                               };
                         
+                                              const updateSelectionActionsUI = () => {
+                                                const count = state.selectedInstanceIds.length;
+                                                if (count === 0) {
+                                                  app.selectionActions.classList.add('hidden');
+                                                } else {
+                                                  app.selectionActions.classList.remove('hidden');
+                                                  app.groupBtn.classList.toggle('hidden', count < 2);
+                                                  app.branchBtn.classList.toggle('hidden', count !== 1);
+                                                }
+                                              };
+                        
                                               // --- initEventListeners ---
                                               const initEventListeners = () => {
                                                   // Init SortableJS for workflow container (drop target)
@@ -336,6 +351,143 @@
                                                       filter: 'button, input, select, textarea, label', // Ignore clicks on form elements and buttons
                                                       preventOnFilter: false
                                                   });
+
+                                                app.workflowContainer.addEventListener('click', (e) => {
+                                                  if (e.target === app.workflowContainer) {
+                                                    state.selectedInstanceIds = [];
+                                                    renderModules();
+                                                    updateSelectionActionsUI();
+                                                  }
+                                                });
+
+                                                app.groupBtn.addEventListener('click', () => {
+                                                  if (state.selectedInstanceIds.length < 2) return;
+                        
+                                                  // Define a generic group module on-the-fly
+                                                  const groupModuleDef = {
+                                                    id: 'group_container',
+                                                    name: 'グループ',
+                                                    description: '複数のモジュールをまとめるコンテナです。',
+                                                    icon: 'fa-object-group',
+                                                    type: 'container',
+                                                    settings: [
+                                                      { id: 'groupName', name: 'グループ名', type: 'text', defaultValue: '名称未設定グループ' }
+                                                    ]
+                                                  };
+                        
+                                                  // Add this definition to the list if it doesn't exist, so it can be rendered
+                                                  if (!state.allModuleDefinitions.find(m => m.id === groupModuleDef.id)) {
+                                                    state.allModuleDefinitions.push(groupModuleDef);
+                                                  }
+                        
+                                                  const newGroupModule = {
+                                                    id: groupModuleDef.id,
+                                                    instanceId: `${groupModuleDef.id}_${Date.now()}`,
+                                                    name: groupModuleDef.name,
+                                                    type: groupModuleDef.type,
+                                                    settings: { groupName: '名称未設定グループ' },
+                                                    modules: [] // This will hold the selected modules
+                                                  };
+                        
+                                                  let insertionPoint = null; // { parentArray: Array, index: number }
+                                                  const extractedModules = [];
+                        
+                                                  // Recursive function to find and remove selected modules
+                                                  const findAndExtractSelected = (moduleArray) => {
+                                                    for (let i = moduleArray.length - 1; i >= 0; i--) {
+                                                      const module = moduleArray[i];
+                                                      if (state.selectedInstanceIds.includes(module.instanceId)) {
+                                                        // Found a selected module, extract it
+                                                        const [extracted] = moduleArray.splice(i, 1);
+                                                        extractedModules.unshift(extracted); // Add to start to maintain order
+                                                        // Record the position of the *first* selected item found
+                                                        insertionPoint = { parentArray: moduleArray, index: i };
+                                                      } else if (module.type === 'container' && module.modules) {
+                                                        findAndExtractSelected(module.modules);
+                                                      }
+                                                    }
+                                                  };
+                        
+                                                  findAndExtractSelected(state.modules);
+                        
+                                                  if (insertionPoint) {
+                                                    // Add the extracted modules into the new group
+                                                    newGroupModule.modules = extractedModules;
+                                                    // Insert the new group at the recorded position
+                                                    insertionPoint.parentArray.splice(insertionPoint.index, 0, newGroupModule);
+                                                  }
+                        
+                                                  // Clean up and re-render
+                                                  state.selectedInstanceIds = [];
+                                                  markDirty();
+                                                  renderModules();
+                                                  updateSelectionActionsUI();
+                                                });
+                        
+                                                app.branchBtn.addEventListener('click', () => {
+                                                  if (state.selectedInstanceIds.length !== 1) return;
+                                                  const selectedInstanceId = state.selectedInstanceIds[0];
+                        
+                                                  const branchModuleDef = {
+                                                    id: 'condition_branch',
+                                                    name: '条件分岐',
+                                                    description: '条件に応じて実行パスを切り替えます。',
+                                                    icon: 'fa-code-branch',
+                                                    type: 'container', // Special container type
+                                                    settings: [
+                                                      { id: 'operand', name: '対象', type: 'text', placeholder: '例: {{module_1.output}}' },
+                                                      { id: 'operator', name: '比較', type: 'select', options: [ {value: 'eq', label: '次と等しい'}, {value: 'neq', label: '次と等しくない'}, {value: 'gt', label: '次より大きい'} ] },
+                                                      { id: 'value', name: '値', type: 'text', placeholder: '比較する値' }
+                                                    ]
+                                                  };
+                        
+                                                  if (!state.allModuleDefinitions.find(m => m.id === branchModuleDef.id)) {
+                                                    state.allModuleDefinitions.push(branchModuleDef);
+                                                  }
+                        
+                                                  const newBranchModule = {
+                                                    id: branchModuleDef.id,
+                                                    instanceId: `${branchModuleDef.id}_${Date.now()}`,
+                                                    name: branchModuleDef.name,
+                                                    type: branchModuleDef.type,
+                                                    settings: {},
+                                                    true_modules: [],
+                                                    false_modules: []
+                                                  };
+                        
+                                                  let foundModuleInfo = null;
+                        
+                                                  const findModuleAndGetSiblings = (moduleArray) => {
+                                                    for (let i = 0; i < moduleArray.length; i++) {
+                                                      const module = moduleArray[i];
+                                                      if (module.instanceId === selectedInstanceId) {
+                                                        foundModuleInfo = { parentArray: moduleArray, index: i };
+                                                        return;
+                                                      }
+                                                      if (module.type === 'container' && module.modules) {
+                                                        findModuleAndGetSiblings(module.modules);
+                                                        if (foundModuleInfo) return;
+                                                      }
+                                                    }
+                                                  };
+                        
+                                                  findModuleAndGetSiblings(state.modules);
+                        
+                                                  if (foundModuleInfo) {
+                                                    const { parentArray, index } = foundModuleInfo;
+                                                    // Get all modules after the selected one
+                                                    const subsequentModules = parentArray.splice(index + 1);
+                                                    // Put them in the 'true' branch
+                                                    newBranchModule.true_modules = subsequentModules;
+                                                    // Insert the branch module right after the selected module
+                                                    parentArray.splice(index + 1, 0, newBranchModule);
+                                                  }
+                        
+                                                  state.selectedInstanceIds = [];
+                                                  markDirty();
+                                                  renderModules();
+                                                  updateSelectionActionsUI();
+                                                });
 
                                                 app.collapseAllBtn.addEventListener('click', () => {
                                                   setCollapseStateRecursive(state.modules, true);
@@ -549,23 +701,51 @@
                                                         parentElement.appendChild(moduleEl);
                                             
                                                         if (module.type === 'container') {
-                                                            const containerContent = moduleEl.querySelector('.module-container-content');
-                                                            if (containerContent) {
-                                                                // Make the container a drop target
-                                                                new Sortable(containerContent, {
-                                                                    group: 'shared',
-                                                                    animation: 150,
-                                                                    handle: '.handle',
-                                                                    onAdd: (evt) => onAddModule(evt, module.modules),
-                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                                            if (module.id === 'condition_branch') {
+                                                                const trueContainer = moduleEl.querySelector('.true-branch-dropzone');
+                                                                const falseContainer = moduleEl.querySelector('.false-branch-dropzone');
+                                            
+                                                                // Init Sortable for TRUE branch
+                                                                new Sortable(trueContainer, {
+                                                                    group: 'shared', animation: 150, handle: '.handle',
+                                                                    onAdd: (evt) => onAddModule(evt, module.true_modules),
+                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.true_modules)
                                                                 });
                                             
-                                                                // Recursively render nested modules
-                                                                if (module.modules && module.modules.length > 0) {
-                                                                    createModuleTree(module.modules, containerContent, module.modules);
+                                                                // Init Sortable for FALSE branch
+                                                                new Sortable(falseContainer, {
+                                                                    group: 'shared', animation: 150, handle: '.handle',
+                                                                    onAdd: (evt) => onAddModule(evt, module.false_modules),
+                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.false_modules)
+                                                                });
+                                            
+                                                                // Recursively render modules in both branches
+                                                                if (module.true_modules && module.true_modules.length > 0) {
+                                                                    createModuleTree(module.true_modules, trueContainer, module.true_modules);
                                                                 } else {
-                                                                    // Show a guide if the container is empty
-                                                                    containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                    trueContainer.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                }
+                                                                if (module.false_modules && module.false_modules.length > 0) {
+                                                                    createModuleTree(module.false_modules, falseContainer, module.false_modules);
+                                                                } else {
+                                                                    falseContainer.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                }
+                                            
+                                                            } else {
+                                                                // Standard container logic
+                                                                const containerContent = moduleEl.querySelector('.module-container-content');
+                                                                if (containerContent) {
+                                                                    new Sortable(containerContent, {
+                                                                        group: 'shared', animation: 150, handle: '.handle',
+                                                                        onAdd: (evt) => onAddModule(evt, module.modules),
+                                                                        onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                                                    });
+                                            
+                                                                    if (module.modules && module.modules.length > 0) {
+                                                                        createModuleTree(module.modules, containerContent, module.modules);
+                                                                    } else {
+                                                                        containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -580,9 +760,10 @@
                                                   const moduleEl = document.createElement('div');
                                                   const isEnabled = module.enabled !== false;
                                                   const isCollapsed = module.isCollapsed === true;
+                                                  const isSelected = state.selectedInstanceIds.includes(module.instanceId);
                                                   const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
                                                   
-                                                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700 max-w-3xl mx-auto`;
+                                                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} ${isSelected ? 'module-selected' : ''} dark:bg-gray-800 dark:border-gray-700 max-w-3xl mx-auto`;
                                                   moduleEl.dataset.id = module.instanceId;
                                                   moduleEl.dataset.moduleId = module.id;
                                           
@@ -651,13 +832,45 @@
                                                         `;
                                           
                                                   if (module.type === 'container') {
-                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
+                                                      if (module.id === 'condition_branch') {
+                                                        contentHTML += `
+                                                          <div class="branch-container mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 grid grid-cols-2 gap-4">
+                                                            <div class="branch-true">
+                                                              <h4 class="font-bold text-green-600 dark:text-green-400 text-center mb-2">True</h4>
+                                                              <div class="module-container-content true-branch-dropzone bg-green-50 dark:bg-green-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
+                                                            </div>
+                                                            <div class="branch-false">
+                                                              <h4 class="font-bold text-red-600 dark:text-red-400 text-center mb-2">False</h4>
+                                                              <div class="module-container-content false-branch-dropzone bg-red-50 dark:bg-red-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
+                                                            </div>
+                                                          </div>
+                                                        `;
+                                                      } else {
+                                                        contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
+                                                      }
                                                   }
                                           
                                                   contentHTML += `</div></div>`;
                                                   moduleEl.innerHTML = contentHTML;
                                           
                                                   // --- Attach Event Listeners ---
+                                                  moduleEl.addEventListener('click', (e) => {
+                                                    // Prevent selection when clicking on interactive elements
+                                                    if (e.target.closest('button, input, select, textarea, label, .handle')) {
+                                                      return;
+                                                    }
+                                                    e.stopPropagation(); // Prevent container click from firing
+                                                    const instanceId = module.instanceId;
+                                                    const index = state.selectedInstanceIds.indexOf(instanceId);
+                                                    if (index > -1) {
+                                                      state.selectedInstanceIds.splice(index, 1);
+                                                    } else {
+                                                      state.selectedInstanceIds.push(instanceId);
+                                                    }
+                                                    renderModules(); // Re-render to apply the selected class
+                                                    updateSelectionActionsUI();
+                                                  });
+
                                                   // Use 'change' instead of 'input' to prevent re-rendering on every keystroke
                                                   moduleEl.addEventListener('change', (e) => {
                                                     if (e.target.dataset.settingId) {
@@ -880,6 +1093,8 @@
                                                   }
                                                   state.currentWorkflowName = '';
                                                   state.modules = [];
+                                                  state.selectedInstanceIds = [];
+                                                  updateSelectionActionsUI();
                                                   state.isDirty = false;
                                                   app.workflowSelector.value = '';
                                                   updateUI();
@@ -907,6 +1122,10 @@
                                                           return;
                                                       }
                                                   }
+                                                  
+                                                  state.selectedInstanceIds = [];
+                                                  updateSelectionActionsUI();
+
                                                   if (workflowName) {
                                                       showLoader();
                                                       google.script.run
