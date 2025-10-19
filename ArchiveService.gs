@@ -66,18 +66,19 @@ function processAndArchiveFile(file, archiveFolderName) {
     if (!newSheet) return;
 
     // Determine the date of the file
-    const fileDate = getFileDate(file.getName()) || new Date();
+    const fileDate = getFileDate(file.getName()) || file.getLastUpdated();
     
     // Get or create the target archive folder
     const targetFolder = getOrCreateArchiveFolder(archiveFolderName, fileDate);
 
-    // Check for existing files and handle replacement logic
-    const existingFiles = targetFolder.getFiles();
+    // Check for existing file with the same name
+    const newSheetName = newSheet.getName();
+    const existingFiles = targetFolder.getFilesByName(newSheetName);
     let shouldMoveFile = true;
 
     if (existingFiles.hasNext()) {
       const existingFile = existingFiles.next();
-      const existingFileDate = getFileDate(existingFile.getName()) || existingFile.getDateCreated();
+      const existingFileDate = getFileDate(existingFile.getName()) || existingFile.getLastUpdated();
 
       if (fileDate.getTime() > existingFileDate.getTime()) {
         // New file is newer, remove the old one
