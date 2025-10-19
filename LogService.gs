@@ -210,5 +210,24 @@ var LogService = {
     } catch (e) {
       Logger.log('ダッシュボードシートの作成に失敗しました: ' + e.message);
     }
+  },
+
+  getDetailLogsByRunId: function(runId) {
+    const ss = this._getLogSpreadsheet();
+    const detailSheet = ss.getSheetByName(this._DETAIL_SHEET_NAME);
+    const data = detailSheet.getDataRange().getValues();
+    
+    const logs = [];
+    // ヘッダー行をスキップしてループ
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === runId) { // 実行IDが一致するかチェック
+        logs.push({
+          // フロントエンドで使いやすいようにオブジェクトに変換
+          level: data[i][5] === '成功' ? 'success' : (data[i][5] === '失敗' ? 'error' : 'info'),
+          message: `[${data[i][3]}] ${data[i][6]}` // [モジュール名] 詳細
+        });
+      }
+    }
+    return logs;
   }
 };

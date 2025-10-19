@@ -346,6 +346,6 @@ var WorkflowService = {
     }
     
     // ログを返却
-    return LogService.getLogsByRunId(logContext.runId);
+    return LogService.getDetailLogsByRunId(logContext.runId);
   },
 };
