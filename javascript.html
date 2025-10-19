@@ -660,6 +660,10 @@
                                                 app.expandAllBtn.style.top = '10px';
                                                 app.expandAllBtn.style.right = '10px';
                                                 console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
+                                                console.log('Debug: app.expandAllBtn element:', app.expandAllBtn);
+                                                if (app.expandAllBtn) {
+                                                  console.log('Debug: app.expandAllBtn computed style:', window.getComputedStyle(app.expandAllBtn));
+                                                }
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
