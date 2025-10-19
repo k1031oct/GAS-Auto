@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    .wizard-step { display: none; }
+    .wizard-step.active { display: block; }
+    .progress-container { margin-top: 20px; margin-bottom: 20px; }
+    .step-title { font-weight: bold; margin-bottom: 15px; }
+    .preloader-wrapper {
+      display: none;
+      margin: 20px auto;
+    }
+    .preloader-wrapper.active {
+      display: block;
+    }
+    .folder-picker-btn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #picked-folder-name {
+      margin-left: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress-container">
+      <div class="progress">
+        <div class="determinate" style="width: 33%"></div>
+      </div>
+    </div>
+
+    <div id="wizard-step-1" class="wizard-step active">
+      <div class="step-title">Step 1: Select Source Folder and Search Term</div>
+      <p>Specify the folder to search for Excel files and the keyword to identify them.</p>
+      <div class="input-field">
+        <a id="pick-folder-btn" class="waves-effect waves-light btn folder-picker-btn">
+          <i class="material-icons left">folder_open</i> Select Source Folder
+        </a>
+        <span id="picked-folder-name">No folder selected</span>
+        <input type="hidden" id="sourceFolderId">
+      </div>
+      <div class="input-field">
+        <input id="searchTerm" type="text" class="validate">
+        <label for="searchTerm">Search Term (in filename)</label>
+      </div>
+      <button class="btn waves-effect waves-light right" id="next-step-1">Next <i class="material-icons right">arrow_forward</i></button>
+    </div>
+
+    <div id="wizard-step-2" class="wizard-step">
+      <div class="step-title">Step 2: Define Archive Folder</div>
+      <p>Enter the name for the main folder where your archives will be stored. This folder will be created in your Google Drive's root directory if it doesn't exist.</p>
+      <div class="input-field">
+        <input id="archiveFolderName" type="text" class="validate">
+        <label for="archiveFolderName">Archive Root Folder Name</label>
+      </div>
+      <button class="btn-flat waves-effect waves-light" id="prev-step-2">Back</button>
+      <button class="btn waves-effect waves-light right" id="next-step-2">Next <i class="material-icons right">arrow_forward</i></button>
+    </div>
+
+    <div id="wizard-step-3" class="wizard-step">
+      <div class="step-title">Step 3: Review and Save</div>
+      <p>Please review the settings below. A new module will be created to run this archiving task automatically every day.</p>
+      <ul>
+        <li><strong>Source Folder:</strong> <span id="review-sourceFolder"></span></li>
+        <li><strong>Search Term:</strong> <span id="review-searchTerm"></span></li>
+        <li><strong>Archive Folder Name:</strong> <span id="review-archiveFolderName"></span></li>
+      </ul>
+      <div class="preloader-wrapper small">
+        <div class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-flat waves-effect waves-light" id="prev-step-3">Back</button>
+      <button class="btn waves-effect waves-light right" id="save-settings">Save & Create Module <i class="material-icons right">save</i></button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let currentStep = 1;
+      const steps = document.querySelectorAll('.wizard-step');
+      const progressBar = document.querySelector('.determinate');
+
+      function updateWizard() {
+        steps.forEach((step, index) => {
+          step.classList.toggle('active', index + 1 === currentStep);
+        });
+        progressBar.style.width = (currentStep / steps.length * 100) + '%';
+      }
+
+      function getPicker() {
+        return new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(picker => resolve(picker))
+            .withFailureHandler(reject)
+            .createPicker();
+        });
+      }
+
+      document.getElementById('pick-folder-btn').addEventListener('click', async () => {
+        try {
+          const picker = await getPicker();
+          picker.setCallback(data => {
+            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+              const folder = data[google.picker.Response.DOCUMENTS][0];
+              document.getElementById('sourceFolderId').value = folder.id;
+              document.getElementById('picked-folder-name').textContent = folder.name;
+            }
+          }).build().setVisible(true);
+        } catch (err) {
+          M.toast({ html: 'Could not open folder picker: ' + err });
+        }
+      });
+
+      document.getElementById('next-step-1').addEventListener('click', () => {
+        if (!document.getElementById('sourceFolderId').value || !document.getElementById('searchTerm').value) {
+          M.toast({ html: 'Please select a folder and enter a search term.' });
+          return;
+        }
+        currentStep = 2;
+        updateWizard();
+      });
+
+      document.getElementById('prev-step-2').addEventListener('click', () => {
+        currentStep = 1;
+        updateWizard();
+      });
+
+      document.getElementById('next-step-2').addEventListener('click', () => {
+        if (!document.getElementById('archiveFolderName').value) {
+          M.toast({ html: 'Please enter an archive folder name.' });
+          return;
+        }
+        document.getElementById('review-sourceFolder').textContent = document.getElementById('picked-folder-name').textContent;
+        document.getElementById('review-searchTerm').textContent = document.getElementById('searchTerm').value;
+        document.getElementById('review-archiveFolderName').textContent = document.getElementById('archiveFolderName').value;
+        currentStep = 3;
+        updateWizard();
+      });
+
+      document.getElementById('prev-step-3').addEventListener('click', () => {
+        currentStep = 2;
+        updateWizard();
+      });
+
+      document.getElementById('save-settings').addEventListener('click', () => {
+        const preloader = document.querySelector('.preloader-wrapper');
+        preloader.classList.add('active');
+
+        const settings = {
+          sourceFolderId: document.getElementById('sourceFolderId').value,
+          searchTerm: document.getElementById('searchTerm').value,
+          archiveFolderName: document.getElementById('archiveFolderName').value
+        };
+
+        const moduleName = `AutoArchive_${settings.archiveFolderName.replace(/\s/g, '_')}`;
+        
+        const moduleDefinition = {
+          id: `module_${Date.now()}`,
+          name: `Excel Archiver: ${settings.archiveFolderName}`,
+          description: `Automatically archives Excel files matching '${settings.searchTerm}' from a specific folder.`,
+          handler: 'archiveExcelFilesHandler',
+          trigger: {
+            type: 'time-based',
+            frequency: 'daily',
+            hour: 2
+          },
+          settings: [
+            { id: 'sourceFolderId', name: 'Source Folder ID', type: 'string', value: settings.sourceFolderId },
+            { id: 'searchTerm', name: 'Search Term', type: 'string', value: settings.searchTerm },
+            { id: 'archiveFolderName', name: 'Archive Folder Name', type: 'string', value: settings.archiveFolderName }
+          ]
+        };
+
+        google.script.run
+          .withSuccessHandler(() => {
+            preloader.classList.remove('active');
+            M.toast({ html: 'Module created successfully! The page will now reload.' });
+            setTimeout(() => google.script.host.close(), 2000);
+          })
+          .withFailureHandler((err) => {
+            preloader.classList.remove('active');
+            M.toast({ html: 'Error: ' + err });
+          })
+          .saveNewModule(moduleDefinition, moduleName);
+      });
+
+      updateWizard();
+    });
+  </script>
+</body>
+</html>

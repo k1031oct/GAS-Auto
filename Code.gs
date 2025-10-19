@@ -256,3 +256,78 @@ function executeWorkflowByTrigger(e) {
     Logger.log(`トリガー実行エラー: 実行対象のワークフロー「${workflowName}」が見つかりませんでした。`);
   }
 }
+
+//================================================================
+// 6. 新機能：Excel自動アーカイブ
+//================================================================
+
+/**
+ * Excel自動アーカイブ設定ウィザードのUIを表示する
+ */
+function showArchiveWizard() {
+  const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate()
+      .setWidth(600)
+      .setHeight(500);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Excel自動アーカイブ設定');
+}
+
+/**
+ * Google Picker APIを使用してフォルダ選択ダイアログを作成・表示する
+ * @returns {object} Picker Builder
+ */
+function createPicker() {
+  const apiKey = PropertiesService.getScriptProperties().getProperty('GCP_API_KEY');
+  if (!apiKey) {
+    throw new Error('GCP API Key is not set. Please ask the administrator to set the "GCP_API_KEY" in the script properties.');
+  }
+  const oauthToken = ScriptApp.getOAuthToken();
+  const view = new google.picker.View(google.picker.ViewId.FOLDERS);
+  view.setMimeTypes("application/vnd.google-apps.folder");
+  
+  const picker = google.picker.PickerBuilder()
+      .enableFeature(google.picker.Feature.NAV_HIDDEN)
+      .setAppId(ScriptApp.getProjectKey()) // Apps Script Project Key
+      .setOAuthToken(oauthToken)
+      .addView(view)
+      .setDeveloperKey(apiKey); // GCP API Key
+  
+  return picker;
+}
+
+/**
+ * 新しいモジュール定義をJSONファイルとして保存する
+ * @param {object} moduleDefinition - 保存するモジュールの定義オブジェクト
+ * @param {string} moduleName - ファイル名 (拡張子なし)
+ */
+function saveNewModule(moduleDefinition, moduleName) {
+  const folderId = ModuleService._getDefaultModuleFolderId();
+  if (!folderId) {
+    throw new Error('モジュールフォルダが設定されていません。先に「設定」からフォルダIDを登録してください。');
+  }
+  
+  try {
+    const folder = DriveApp.getFolderById(folderId);
+    const fileName = `${moduleName}.json`;
+    
+    // 既存のファイルを検索
+    const files = folder.getFilesByName(fileName);
+    if (files.hasNext()) {
+      // 存在する場合は上書きする
+      const file = files.next();
+      file.setContent(JSON.stringify(moduleDefinition, null, 2));
+      Logger.log(`モジュール「${fileName}」を更新しました。`);
+    } else {
+      // 存在しない場合は新規作成
+      folder.createFile(fileName, JSON.stringify(moduleDefinition, null, 2), 'application/json');
+      Logger.log(`新しいモジュール「${fileName}」を作成しました。`);
+    }
+    
+    // キャッシュをクリア
+    const cache = CacheService.getScriptCache();
+    cache.remove(`modules_cache_${folderId}`);
+
+  } catch (e) {
+    Logger.log(`モジュールの保存に失敗しました: ${e.message}`);
+    throw new Error(`モジュールの保存に失敗しました: ${e.message}`);
+  }
+}
