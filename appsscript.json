@@ -3,6 +3,20 @@
   "dependencies": {},
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
+  "fileOrder": [
+    "FunctionRegistry.gs",
+    "LogService.gs",
+    "SheetService.gs",
+    "DriveService.gs",
+    "GmailService.gs",
+    "CalendarService.gs",
+    "DocsService.gs",
+    "ModuleService.gs",
+    "WorkflowService.gs",
+    "TriggerService.gs",
+    "OrganizerService.gs",
+    "Code.gs"
+  ],
   "oauthScopes": [
     "https://www.googleapis.com/auth/drive",
     "https://www.googleapis.com/auth/script.external_request",
