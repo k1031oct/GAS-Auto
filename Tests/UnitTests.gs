@@ -92,3 +92,37 @@ GasT.describe('ModuleService', function() {
     this['PropertiesService'] = originalPropertiesService;
   });
 });
+
+
+GasT.describe('LogService', function() {
+  GasT.it('should add a detail log via addLog', function() {
+    let capturedArgs = null;
+    const originalWriteDetailLog = LogService.writeDetailLog;
+    LogService.writeDetailLog = function(...args) {
+      capturedArgs = args;
+    };
+
+    LogService._workflowNames = {}; // Reset state
+
+    const workflowName = 'Test Workflow';
+    const logContext = LogService.startLog(workflowName, 'Manual');
+    const runId = logContext.runId;
+    const message = 'This is a test message';
+
+    LogService.addLog(runId, 'info', message);
+
+    GasT.assert(capturedArgs !== null, true, 'writeDetailLog should have been called.');
+    if (capturedArgs) {
+      GasT.assert(capturedArgs[0], runId, 'Argument 1 (runId) should match.');
+      GasT.assert(capturedArgs[1], workflowName, 'Argument 2 (workflowName) should match.');
+      GasT.assert(capturedArgs[2], 'Workflow Engine', 'Argument 3 (moduleName) should be "Workflow Engine".');
+      GasT.assert(capturedArgs[3], '', 'Argument 4 (instanceId) should be empty.');
+      GasT.assert(capturedArgs[4], '情報', 'Argument 5 (status) should be "情報".');
+      GasT.assert(capturedArgs[5], message, 'Argument 6 (message) should match.');
+    }
+
+    // Cleanup
+    LogService.writeDetailLog = originalWriteDetailLog;
+    delete LogService._workflowNames[runId];
+  });
+});

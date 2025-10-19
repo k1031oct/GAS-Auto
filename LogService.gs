@@ -8,6 +8,7 @@ var LogService = {
   _SUMMARY_SHEET_NAME: 'Summary',
   _DETAIL_SHEET_NAME: 'Detail',
   _LOG_FILE_ID_KEY: 'AUTOMATOR_APP_LOG_FILE_ID',
+  _workflowNames: {},
 
   _getLogSpreadsheet: function () {
     const userProperties = PropertiesService.getUserProperties();
@@ -83,10 +84,24 @@ var LogService = {
     const ss = this._getLogSpreadsheet();
     const summarySheet = ss.getSheetByName(this._SUMMARY_SHEET_NAME);
     const runId = `run-${new Date().getTime()}-${Math.random().toString(36).substring(2, 8)}`;
+    this._workflowNames[runId] = workflowName;
     const startTime = new Date();
     summarySheet.appendRow([runId, startTime, workflowName, type, '実行中...', '', '']);
     const summaryRow = summarySheet.getLastRow();
     return { runId: runId, summaryRow: summaryRow };
+  },
+
+  addLog: function (runId, level, message) {
+    const workflowName = this._workflowNames[runId] || '不明';
+    const statusMap = {
+      'system': '情報',
+      'info': '情報',
+      'success': '成功',
+      'error': '失敗',
+      'skip': 'スキップ'
+    };
+    const status = statusMap[level] || '情報';
+    this.writeDetailLog(runId, workflowName, 'Workflow Engine', '', status, message);
   },
 
   writeDetailLog: function (runId, workflowName, moduleName, instanceId, status, message) {
@@ -106,6 +121,7 @@ var LogService = {
     const linkFormula = `=HYPERLINK("${detailLinkUrl}", "詳細表示")`;
     const range = summarySheet.getRange(summaryRow, 5, 1, 3);
     range.setValues([[status, executionTime, linkFormula]]);
+    delete this._workflowNames[runId]; // Clean up
   },
 
   getSummaryLogs: function (limit) {
