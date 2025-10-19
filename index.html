@@ -312,6 +312,20 @@
     </div>
   </div>
 
+
+  <!-- Archive Wizard Modal -->
+  <div id="archive-wizard-backdrop" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-2 md:p-4">
+    <div id="archive-wizard-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh] dark:bg-gray-800">
+      <header class="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0 dark:border-gray-700">
+        <h2 class="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">Excel自動アーカイブ設定</h2>
+        <button id="archive-wizard-close-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600"><i class="fas fa-times text-gray-600 dark:text-gray-300"></i></button>
+      </header>
+      <main id="archive-wizard-content" class="p-4 md:p-6 flex-grow overflow-y-auto">
+        <!-- Content from ArchiveWizard.html will be injected here -->
+      </main>
+    </div>
+  </div>
+
   <!-- Custom Dialog (Modal replacement) -->
   <div id="custom-dialog-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-[60] p-2 md:p-4">
     <div id="custom-dialog" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden dark:bg-gray-800">
