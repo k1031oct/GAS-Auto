@@ -245,6 +245,7 @@
                                               };
                                               
                                               const onAddModule = (evt, targetModuleArray) => {
+                                                console.log('onAddModule called.');
                                                 const item = evt.item; // The cloned element from the palette
                                                 const draggedModuleId = item.dataset.moduleId;
                                                 const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
@@ -295,6 +296,7 @@
                                                     }
                         
                                                     markDirty();
+                                                    console.log('  Module added. Current state.modules.length:', state.modules.length);
                                                     setTimeout(drawConnectors, 50);
                                                 }
                                               };
@@ -350,14 +352,19 @@
                                               };
                         
                                               const updateSelectionActionsUI = () => {
+                                                console.log('updateSelectionActionsUI called.');
                                                 const count = state.selectedInstanceIds.length;
                                                 const hasModules = state.modules.length > 0;
+                                                console.log(`  Selected modules count: ${count}, Has modules: ${hasModules}`);
                                                 if (count === 0 || !hasModules) {
                                                   app.selectionActions.classList.add('hidden');
+                                                  console.log('  Hiding selection actions.');
                                                 } else {
                                                   app.selectionActions.classList.remove('hidden');
+                                                  console.log('  Showing selection actions.');
                                                   app.groupBtn.classList.toggle('hidden', count < 2);
                                                   app.branchBtn.classList.toggle('hidden', count !== 1);
+                                                  console.log(`  Group button hidden: ${app.groupBtn.classList.contains('hidden')}, Branch button hidden: ${app.branchBtn.classList.contains('hidden')}`);
                                                 }
                                               };
                         
@@ -637,10 +644,13 @@
                                               // This is a simplified representation to show where the new logic is added.
                                               // The full content of the file will be written.
                                               const updateUI = () => {
+                                                console.log('updateUI called.');
                                                 const hasModules = state.modules.length > 0;
+                                                console.log(`  Has modules: ${hasModules}`);
                                                 app.runBtn.disabled = !hasModules;
                                                 app.expandAllBtn.classList.toggle('hidden', !hasModules);
                                                 app.collapseAllBtn.classList.toggle('hidden', !hasModules);
+                                                console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
@@ -1035,8 +1045,10 @@
                                           
                                                   // --- Attach Event Listeners ---
                                                   moduleEl.addEventListener('click', (e) => {
+                                                    console.log('Module element clicked.');
                                                     // Prevent selection when clicking on interactive elements
                                                     if (e.target.closest('button, input, select, textarea, label, .handle')) {
+                                                      console.log('  Clicked on interactive element, preventing selection.');
                                                       return;
                                                     }
                                                     e.stopPropagation(); // Prevent container click from firing
@@ -1044,8 +1056,10 @@
                                                     const index = state.selectedInstanceIds.indexOf(instanceId);
                                                     if (index > -1) {
                                                       state.selectedInstanceIds.splice(index, 1);
+                                                      console.log(`  Module ${instanceId} deselected. Current selected count: ${state.selectedInstanceIds.length}`);
                                                     } else {
                                                       state.selectedInstanceIds.push(instanceId);
+                                                      console.log(`  Module ${instanceId} selected. Current selected count: ${state.selectedInstanceIds.length}`);
                                                     }
                                                     renderModules(); // Re-render to apply the selected class
                                                     updateSelectionActionsUI();
@@ -1478,6 +1492,7 @@
                                                 }
                                     
                                                             google.script.run.withSuccessHandler(data => {
+                                                              console.log('Initial data loaded.', data);
                                                               state.appSettings = data.settings || {};
                                                               if (typeof state.appSettings.darkMode === 'undefined') {
                                                                 state.appSettings.darkMode = false;
