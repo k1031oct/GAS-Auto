@@ -254,6 +254,10 @@
                                                         type: moduleDef.type,
                                                         settings: {}
                                                     };
+                                                    // If the module is a container, initialize its 'modules' array.
+                                                    if (newModuleData.type === 'container') {
+                                                      newModuleData.modules = [];
+                                                    }
                                                     
                                                     // Initialize default settings
                                                     if (moduleDef.settings) {
