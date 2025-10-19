@@ -1509,7 +1509,10 @@
                                                                 loadModuleDefinitionsFromDrive();
                                                               }
                                                               hideLoader();
-                                                            }).withFailureHandler(showError).getInitialData();                      }
+                                                            }).withFailureHandler(showError).getInitialData();
+                                                updateUI();
+                                                updateSelectionActionsUI();
+                                              }
                                           
                                               init();
                                             });
