@@ -68,947 +68,953 @@
                         mobileSettingsBtn: document.getElementById('mobile-settings-btn'),
                         mobileTriggerBtn: document.getElementById('mobile-trigger-btn'),
                         mobileHistoryBtn: document.getElementById('mobile-history-btn'),
-                        mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
-                      };
-                  
-                      // --- State Management ---
-                      let state = {
-                        // ... (existing state)
-                        currentWorkflowName: '',
-                        modules: [],
-                        currentModuleFolderId: '',
-                        isDirty: false,
-                        allModuleDefinitions: [],
-                        initialWorkflows: [],
-                        appSettings: {},
-                        logArea: {
-                          originalHeight: '16rem',
-                        }
-                      };
-                  
-                      // ... (existing helper functions: _extractIdFromUrl, showCustomDialog, log, showError, showLoader, hideLoader)
-                      const _extractIdFromUrl = (url) => {
-                          if (!url) return null;
-                          const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
-                          const match1 = url.match(regex1);
-                          if (match1 && match1[1]) {
-                              return match1[1];
-                          }
-                          const regex2 = /\/file\/d\/(.*?)\//;
-                          const match2 = url.match(regex2);
-                          if (match2 && match2[1]) {
-                              return match2[1];
-                          }
-                          if (url.length > 20 && !url.includes('/') && !url.includes('.')) {
-                              return url;
-                          }
-                          return null;
-                      };
-                  
-                      const showCustomDialog = (config) => {
-                        return new Promise((resolve) => {
-                          app.customDialogTitle.textContent = config.title;
-                          app.customDialogMessage.textContent = config.message;
-                          app.customDialogInput.classList.add('hidden');
-                          app.customDialogCancel.classList.remove('hidden');
-                          if (config.type === 'prompt') {
-                            app.customDialogInput.classList.remove('hidden');
-                            app.customDialogInput.value = config.defaultValue || '';
-                          } else if (config.type === 'alert') {
-                            app.customDialogCancel.classList.add('hidden');
-                          }
-                          const dialogBackdrop = document.getElementById('custom-dialog-backdrop');
-                          dialogBackdrop.classList.remove('hidden');
-                          const onOk = () => {
-                            cleanup();
-                            resolve(config.type === 'prompt' ? app.customDialogInput.value : true);
-                          };
-                          const onCancel = () => {
-                            cleanup();
-                            resolve(config.type === 'prompt' ? null : false);
-                          };
-                          const cleanup = () => {
-                            dialogBackdrop.classList.add('hidden');
-                            app.customDialogOk.removeEventListener('click', onOk);
-                            app.customDialogCancel.removeEventListener('click', onCancel);
-                          };
-                          app.customDialogOk.addEventListener('click', onOk);
-                          app.customDialogCancel.addEventListener('click', onCancel);
-                        });
-                      };
-                  
-                      const log = (message, type = 'info') => {
-                        const timestamp = new Date().toLocaleTimeString();
-                        let color = 'text-gray-300';
-                        if (type === 'error') color = 'text-red-400';
-                        if (type === 'success') color = 'text-green-400';
-                        if (type === 'system') color = 'text-yellow-400';
-                        app.logContent.innerHTML += `<div class="${color}"><span class="text-gray-500">${timestamp}</span> ${message}</div>`;
-                        app.logContent.scrollTop = app.logContent.scrollHeight;
-                      };
-                      
-                      const showError = (error) => {
-                        log(`エラー: ${error.message || error}`, 'error');
-                        hideLoader();
-                      };
-                      
-                      const showLoader = () => app.loader.classList.remove('hidden');
-                      const hideLoader = () => app.loader.classList.add('hidden');
-                  
-                      // --- Trigger Modal Logic ---
-                      const openTriggerModal = () => {
-                        if (!state.currentWorkflowName) {
-                          showCustomDialog({ title: 'エラー', message: 'トリガーを設定する前に、ワークフローを保存してください。', type: 'alert' });
-                          return;
-                        }
-                        showLoader();
-                        google.script.run
-                          .withSuccessHandler(triggers => {
-                            hideLoader();
-                            renderTriggers(triggers);
-                            app.triggerModalBackdrop.classList.remove('hidden');
-                          })
-                          .withFailureHandler(showError)
-                          .getTriggersForWorkflow(state.currentWorkflowName);
-                      };
-                  
-                      const closeTriggerModal = () => {
-                        app.triggerModalBackdrop.classList.add('hidden');
-                      };
-                  
-                      const renderTriggers = (triggers) => {
-                        app.triggerList.innerHTML = '';
-                        if (triggers.length === 0) {
-                          app.triggerList.innerHTML = '<p class="text-sm text-gray-500">このワークフローのトリガーはありません。</p>';
-                          return;
-                        }
-                        triggers.forEach(trigger => {
-                          const triggerEl = document.createElement('div');
-                          triggerEl.className = 'p-2 border rounded-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600';
-                          triggerEl.innerHTML = `
-                            <div>
-                              <p class="font-mono text-sm dark:text-gray-200">${trigger.eventType}</p>
-                              <p class="text-xs text-gray-500 dark:text-gray-400">ID: ${trigger.uid}</p>
-                            </div>
-                            <button data-uid="${trigger.uid}" class="delete-trigger-btn p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                          `;
-                          app.triggerList.appendChild(triggerEl);
-                        });
-                  
-                        app.triggerList.querySelectorAll('.delete-trigger-btn').forEach(btn => {
-                          btn.addEventListener('click', (e) => handleDeleteTrigger(e.currentTarget.dataset.uid));
-                        });
-                      };
-                  
-                      const handleDeleteTrigger = async (uid) => {
-                        const confirmed = await showCustomDialog({ title: '確認', message: `本当にこのトリガー (ID: ${uid}) を削除しますか？`, type: 'confirm' });
-                        if (!confirmed) return;
-                  
-                        showLoader();
-                        google.script.run
-                          .withSuccessHandler(message => {
-                            log(message, 'success');
-                            openTriggerModal(); // Refresh the list
-                          })
-                          .withFailureHandler(showError)
-                          .deleteTrigger(uid);
-                      };
-                  
-                      const handleCreateTrigger = () => {
-                        const options = {
-                          type: app.triggerType.value,
-                          hour: parseInt(app.triggerHour.value, 10),
-                          // Add more options for other types here
-                        };
-                  
-                        showLoader();
-                        google.script.run
-                          .withSuccessHandler(message => {
-                            log(message, 'success');
-                            openTriggerModal(); // Refresh the list
-                          })
-                          .withFailureHandler(showError)
-                          .createTimeBasedTrigger(state.currentWorkflowName, options);
-                      };
-                      
-                      const onAddModule = (evt, targetModuleArray) => {
-                        const item = evt.item; // The cloned element from the palette
-                        const draggedModuleId = item.dataset.moduleId;
-                        const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
-
-                        if (moduleDef) {
-                            // 1. Create the new data object for the state
-                            const newModuleData = {
-                                id: draggedModuleId,
-                                instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                                name: moduleDef.name,
-                                type: moduleDef.type,
-                                settings: {}
-                            };
-                            
-                            // Initialize default settings
-                            if (moduleDef.settings) {
-                              moduleDef.settings.forEach(setting => {
-                                if (setting.defaultValue !== undefined) {
-                                  newModuleData.settings[setting.id] = setting.defaultValue;
-                                }
-                              });
-                            }
-
-                            // 2. Add the new data to the state array at the correct position
-                            targetModuleArray.splice(evt.newIndex, 0, newModuleData);
-
-                            // 3. Create the real, properly-styled module element
-                            const moduleEl = createModuleElement(newModuleData, targetModuleArray);
-
-                            // 4. Replace the cloned palette item with the real module element
-                            item.replaceWith(moduleEl);
-                            
-                            // If this was the first module in the main container, remove the placeholder text
-                            if (state.modules.length === 1 && targetModuleArray === state.modules) {
-                                const placeholder = app.workflowContainer.querySelector('.workflow-guide');
-                                if(placeholder) placeholder.remove();
-                            }
-
-                            markDirty();
-                        }
-                      };
-
-                      const onUpdateModuleOrder = (evt, targetModuleArray) => {
-                          // Handle re-ordering of modules
-                          const movedItem = targetModuleArray.splice(evt.oldIndex, 1)[0];
-                          targetModuleArray.splice(evt.newIndex, 0, movedItem);
-                          markDirty();
-                      };
-
-                      // --- initEventListeners ---
-                      const initEventListeners = () => {
-                          // Init SortableJS for module palette (drag source)
-                          new Sortable(app.moduleList, {
-                              group: { name: 'shared', pull: 'clone', put: false },
-                              animation: 150,
-                              sort: false, // Do not sort items in the palette
-                              draggable: '.module-card', // Only module cards are draggable
-                              delay: 0, // 100msの長押しでドラッグ開始
-                              delayOnTouchOnly: true // タッチデバイスのみ遅延を有効化
-                          });
-                          console.log('Sortable for moduleList initialized.');
-                  
-                          // Init SortableJS for workflow container (drop target)
-                          const logSortable = new Sortable(app.workflowContainer, {
-                              group: 'shared',
-                              animation: 150,
-                              onAdd: (evt) => onAddModule(evt, state.modules),
-                              onUpdate: (evt) => onUpdateModuleOrder(evt, state.modules),
-                              filter: 'button, input, select, textarea, label', // Ignore clicks on form elements and buttons
-                              preventOnFilter: false
-                          });
-                          console.log('Sortable for workflowContainer initialized.');
-                  
-                        // Trigger Modal Listeners
-                        app.triggerBtn.addEventListener('click', openTriggerModal);
-                        app.triggerCloseBtn.addEventListener('click', closeTriggerModal);
-                        app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
-                        app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
-                  
-                        app.hideLogBtn.addEventListener('click', hideLog);
-                        app.showLogBtn.addEventListener('click', showLog);
-                  
-                        // Search Logic
-                        app.toggleSearchBtn.addEventListener('click', () => {
-                          app.moduleSearchBox.classList.toggle('hidden');
-                          if (!app.moduleSearchBox.classList.contains('hidden')) {
-                            app.moduleSearchBox.focus();
-                          }
-                        });
-                  
-                        app.moduleSearchBox.addEventListener('input', (e) => {
-                          const searchTerm = e.target.value.toLowerCase();
-                          const filteredModules = state.allModuleDefinitions.filter(m => 
-                            m.name.toLowerCase().includes(searchTerm) || 
-                            (m.description && m.description.toLowerCase().includes(searchTerm))
-                          );
-                          renderModulePalette(filteredModules);
-                        });
-                  
-                        // ... (all existing listeners)
-                        app.newWorkflowBtn.addEventListener('click', newWorkflow);
-                        app.reloadModulesBtn.addEventListener('click', loadModuleDefinitionsFromDrive);
-                        app.reloadModulesBtnMobile.addEventListener('click', loadModuleDefinitionsFromDrive);
-                        app.moduleFolderIdInput.addEventListener('change', markDirty);
-                        app.moduleFolderIdInputMobile.addEventListener('change', markDirty);
-                        app.workflowSelector.addEventListener('change', handleWorkflowSelect);
-                        app.saveWorkflowBtn.addEventListener('click', async () => {
-                              let workflowName = state.currentWorkflowName;
-                              if (!workflowName) {
-                                  workflowName = await showCustomDialog({ title: 'ワークフロー名の入力', message: 'ワークフロー名を入力してください:', type: 'prompt' });
-                                  if (!workflowName) return;
-                              }
-                              const workflowData = getWorkflowData();
-                              showLoader();
-                              google.script.run
-                                  .withSuccessHandler(response => {
-                                      state.currentWorkflowName = workflowName;
-                                      state.isDirty = false;
-                                      loadWorkflows();
-                                      setTimeout(() => { app.workflowSelector.value = workflowName; }, 100);
-                                      hideLoader();
-                                      log(response, 'success');
-                                  })
-                                  .withFailureHandler(showError)
-                                  .saveWorkflow(workflowName, workflowData);
-                          });
-                        app.deleteWorkflowBtn.addEventListener('click', async () => {
-                              if (!state.currentWorkflowName) return;
-                              const confirmed = await showCustomDialog({ title: '確認', message: `本当にワークフロー「${state.currentWorkflowName}」を削除しますか？`, type: 'confirm' });
-                              if (!confirmed) return;
-                              showLoader();
-                              google.script.run
-                                  .withSuccessHandler(response => {
-                                      hideLoader();
-                                      log(response, 'success');
-                                      newWorkflow();
-                                      loadWorkflows();
-                                  })
-                                  .withFailureHandler(showError)
-                                  .deleteWorkflow(state.currentWorkflowName);
-                          });
-                        app.runBtn.addEventListener('click', () => {
-                              if (state.isDirty) { showCustomDialog({ title: 'エラー', message: '変更を保存してから実行してください。', type: 'alert' }); return; }
-                              const payload = getWorkflowData();
-                              showLoader();
-                              log('--- 実行開始 ---', 'system');
-                              google.script.run
-                                  .withSuccessHandler(logs => {
-                                      logs.forEach(l => log(l.message, l.type));
-                                      log('--- 実行完了 ---', 'system');
-                                      hideLoader();
-                                  })
-                                  .withFailureHandler(showError)
-                                  .runWorkflow(payload);
-                          });
-                        app.historyBtn.addEventListener('click', () => {
-                              showLoader();
-                              google.script.run
-                                  .withSuccessHandler(url => {
-                                      hideLoader();
-                                      if (url) { window.open(url, '_blank'); } else { showError({ message: 'ログシートのURLを取得できませんでした。' }); }
-                                  })
-                                  .withFailureHandler(showError)
-                                  .getExecutionLogUrl();
-                          });
-                        app.settingsBtn.addEventListener('click', openSettingsModal);
-                        app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
-                        app.settingsSaveBtn.addEventListener('click', saveSettings);
-                        app.createInitialModulesBtn.addEventListener('click', handleCreateInitialModules);
-
-                        // Hamburger Menu Logic
-                        app.hamburgerBtn.addEventListener('click', () => {
-                          app.mobileMenu.classList.toggle('hidden');
-                        });
-
-                        // Click outside to close mobile menu
-                        document.addEventListener('click', (event) => {
-                          if (!app.mobileMenu.contains(event.target) && !app.hamburgerBtn.contains(event.target)) {
-                            app.mobileMenu.classList.add('hidden');
-                          }
-                        });
-
-                        app.mobileNewWorkflowBtn.addEventListener('click', () => app.newWorkflowBtn.click());
-                        app.mobileDeleteWorkflowBtn.addEventListener('click', () => app.deleteWorkflowBtn.click());
-                        app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
-                        app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
-                        app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
-                        app.mobileShowLogBtn.addEventListener('click', showLog);
-                      };
-                  
-                      // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
-                      // All other functions remain the same as the previous version.
-                      // This is a simplified representation to show where the new logic is added.
-                      // The full content of the file will be written.
-                      const updateUI = () => {
-                        app.runBtn.disabled = state.modules.length === 0;
-                        app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
-                        app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
-                        app.moduleFolderIdInput.value = state.currentModuleFolderId;
-                        app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
-                        app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
-                        document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
-                        renderModules();
-                      };
-                  
-                      const markDirty = () => {
-                        state.isDirty = true;
-                        updateUI();
-                      };
-                      
-                      const openSettingsModal = () => {
-                        app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
-                        app.darkModeToggle.checked = state.appSettings.darkMode;
-                        app.settingsModalBackdrop.classList.remove('hidden');
-                      };
-                  
-                      const closeSettingsModal = () => {
-                        app.settingsModalBackdrop.classList.add('hidden');
-                      };
-                  
-                      const saveSettings = () => {
-                        const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
-                        const folderId = _extractIdFromUrl(rawFolderId);
-                        const settings = {
-                          moduleFolderId: folderId,
-                          darkMode: app.darkModeToggle.checked,
-                        };
-                        showLoader();
-                        google.script.run
-                          .withSuccessHandler((savedSettings) => {
-                            log('設定を保存しました。', 'success');
-                            state.appSettings = savedSettings;
-                            applySettings(savedSettings);
-                            state.currentModuleFolderId = folderId;
-                            app.moduleFolderIdInput.value = folderId;
-                            app.moduleFolderIdInputMobile.value = folderId;
-                            hideLoader();
-                            closeSettingsModal();
-                          })
-                          .withFailureHandler(showError)
-                          .saveSettings(settings);
-                      };
-                  
-                      const handleCreateInitialModules = () => {
-                        const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
-                        const folderId = _extractIdFromUrl(rawFolderId);
-                        if (!folderId) {
-                          showError({ message: 'モジュール保管用フォルダIDが入力されていません。' });
-                          return;
-                        }
-                        showLoader();
-                        google.script.run
-                          .withSuccessHandler((result) => {
-                            log(result, 'success');
-                            loadModuleDefinitionsFromDrive(); 
-                            hideLoader();
-                          })
-                          .withFailureHandler(showError)
-                          .createInitialModules(folderId);
-                      };
-                      
-                      const applySettings = (settings) => {
-                          if (settings.darkMode) {
-                              document.documentElement.classList.add('dark');
-                          } else {
-                              document.documentElement.classList.remove('dark');
-                          }
-                      };
-                  
-                      const renderModules = () => {
-                        console.log('renderModules triggered. state.modules:', state.modules);
-                        app.workflowContainer.innerHTML = ''; // Clear the container first
-                    
-                        if (state.modules.length === 0) {
-                            app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
-                                <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
-                                <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
-                                <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
-                            </div>`;
-                            return;
-                        }
-                    
-                        // Recursive function to create the module tree
-                        const createModuleTree = (modules, parentElement, parentModuleArray) => {
-                            modules.forEach((module, index) => {
-                                const moduleEl = createModuleElement(module, parentModuleArray);
-                                parentElement.appendChild(moduleEl);
-                    
-                                if (module.type === 'container') {
-                                    const containerContent = moduleEl.querySelector('.module-container-content');
-                                    if (containerContent) {
-                                        // Make the container a drop target
-                                        new Sortable(containerContent, {
-                                            group: 'shared',
-                                            animation: 150,
-                                            onAdd: (evt) => onAddModule(evt, module.modules),
-                                            onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
-                                        });
-                    
-                                        // Recursively render nested modules
-                                        if (module.modules && module.modules.length > 0) {
-                                            createModuleTree(module.modules, containerContent, module.modules);
-                                        } else {
-                                            // Show a guide if the container is empty
-                                            containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                        }
-                                    }
-                                }
-                            });
-                        };
-                    
-                        // Start rendering from the root level
-                        createModuleTree(state.modules, app.workflowContainer, state.modules);
-                      };
-                  
-                      const createModuleElement = (module, parentModuleArray) => {
-                          const moduleEl = document.createElement('div');
-                          const isEnabled = module.enabled !== false;
-                          const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
-                          
-                          moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
-                          moduleEl.dataset.id = module.instanceId;
-                          moduleEl.dataset.moduleId = module.id;
-                  
-                          let settingsHTML = '';
-                          if (moduleDef.settings && moduleDef.settings.length > 0) {
-                              settingsHTML += '<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">';
-                              moduleDef.settings.forEach(setting => {
-                                  const currentValue = module.settings[setting.id] || setting.defaultValue || '';
-                                  settingsHTML += `<div class="setting-field">`;
-                                  settingsHTML += `<label for="setting-${module.instanceId}-${setting.id}" class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">${setting.name}</label>`;
-                                  
-                                  switch (setting.type) {
-                                      case 'text':
-                                      case 'number':
-                                          settingsHTML += `<input type="${setting.type}" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" value="${currentValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">`;
-                                          break;
-                                      case 'textarea':
-                                          settingsHTML += `<textarea id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
-                                          break;
-                                      case 'select':
-                                          const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
-                                          settingsHTML += `<select id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
-                                          break;
-                                      case 'checkbox':
-                                          settingsHTML += `<label class="flex items-center mt-2"><input type="checkbox" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
-                                          break;
-                                  }
-                                  if (setting.description) {
-                                      settingsHTML += `<p class="text-xs text-gray-500 mt-1 dark:text-gray-400">${setting.description}</p>`;
-                                  }
-                                  settingsHTML += `</div>`;
-                              });
-                              settingsHTML += '</div>';
-                          }
-
-                          let contentHTML = `
-                            <div class="flex items-start gap-3">
-                                <i class="fas fa-grip-vertical text-gray-400 mt-1 cursor-grab"></i>
-                                <div class="flex-grow">
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex items-center gap-3">
-                                            <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600 dark:text-gray-400"></i>
-                                            <h3 class="font-bold text-gray-800 dark:text-gray-100">${moduleDef.name}</h3>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
-                                                <div class="relative">
-                                                    <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
-                                                    <div class="block bg-gray-300 w-10 h-6 rounded-full dark:bg-gray-600"></div>
-                                                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
-                                                </div>
-                                            </label>
-                                            <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
-                                            <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
-                                    ${settingsHTML}
-                                `;
-                  
-                          if (module.type === 'container') {
-                              contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
-                          }
-                  
-                          contentHTML += `</div></div>`;
-                          moduleEl.innerHTML = contentHTML;
-                  
-                          // --- Attach Event Listeners ---
-                          moduleEl.addEventListener('input', (e) => {
-                            if (e.target.dataset.settingId) {
-                                const settingId = e.target.dataset.settingId;
-                                const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-                                module.settings[settingId] = value;
-                                markDirty();
-                            }
-                          });
-
-                          moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
-                              module.enabled = e.target.checked;
-                              markDirty();
-                              renderModules(); // Re-render to apply opacity class
-                          });
-        
-                          moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
-                              runSingleModule(module);
-                          });
-              
-                          moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
-                              e.stopPropagation();
-                              // Find and remove the module from its parent array
-                              const index = parentModuleArray.findIndex(m => m.instanceId === module.instanceId);
-                              if (index > -1) {
-                                  parentModuleArray.splice(index, 1);
-                                  markDirty();
-                                  renderModules(); // Re-render to update the UI
-                              }
-                          });
-                  
-                          return moduleEl;
-                      };
-                  
-                      const renderModulePalette = (modulesToRender = state.allModuleDefinitions) => {
-                          app.moduleList.innerHTML = '';
-                          if (modulesToRender.length === 0) {
-                              app.moduleList.innerHTML = `<p class="text-center text-sm text-red-400 p-4">該当するモジュールが見つかりません。</p>`;
-                              return;
-                          }
-                          const categories = {};
-                          modulesToRender.forEach(m => {
-                              const cat = m.category || '未分類';
-                              if (!categories[cat]) categories[cat] = [];
-                              categories[cat].push(m);
-                          });
-
-                          for (const category in categories) {
-                              const categoryCard = document.createElement('div');
-                              categoryCard.className = 'category-card bg-white dark:bg-gray-800 rounded-lg mb-3 border border-gray-200 dark:border-gray-700';
-
-                              const categoryHeader = document.createElement('div');
-                              categoryHeader.className = 'category-header flex justify-between items-center p-2 cursor-pointer bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600';
-                              categoryHeader.innerHTML = `
-                                  <h4 class="font-bold text-gray-800 dark:text-gray-100">${category}</h4>
-                                  <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
-                              `;
-
-                              const modulesContainer = document.createElement('div');
-                              modulesContainer.className = 'category-modules p-2 space-y-2'; // Initially visible
-
-                              categories[category].forEach(m => {
-                                  const moduleCard = document.createElement('div');
-                                  moduleCard.className = 'module-card bg-gray-50 dark:bg-gray-700 p-2 rounded-md shadow-md cursor-grab flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-gray-600';
-                                  moduleCard.dataset.moduleId = m.id;
-                                  moduleCard.innerHTML = `
-                                      <i class="fas ${m.icon || 'fa-extension'} text-blue-600 dark:text-blue-400"></i>
-                                      <span class="text-sm font-medium text-gray-800 dark:text-gray-300">${m.name}</span>
-                                  `;
-                                  modulesContainer.appendChild(moduleCard);
-                              });
-
-                              categoryCard.appendChild(categoryHeader);
-                              categoryCard.appendChild(modulesContainer);
-                              app.moduleList.appendChild(categoryCard);
-
-                              // Add click listener for accordion
-                              categoryHeader.addEventListener('click', () => {
-                                  modulesContainer.classList.toggle('hidden');
-                                  categoryHeader.querySelector('i').classList.toggle('rotate-180');
-                              });
-                          }
-                      };
-                  
-                      const updateWorkflowList = (workflowNames) => {
-                          app.workflowSelector.innerHTML = '<option value="">-- 新規ワークフロー --</option>';
-                          state.initialWorkflows = workflowNames;
-                          workflowNames.forEach(name => {
-                              const option = document.createElement('option');
-                              option.value = name;
-                              option.textContent = name;
-                              app.workflowSelector.appendChild(option);
-                          });
-                          if (state.currentWorkflowName) app.workflowSelector.value = state.currentWorkflowName;
-                      };
-                  
-                      const getWorkflowData = () => {
-                        // The state is the source of truth, so we just need to clone it.
-                        // The order is already managed by the onUpdate handlers.
-                        const clonedModules = JSON.parse(JSON.stringify(state.modules));
+                                                modulePaletteHeader: document.getElementById('module-palette-header'),
+                                                modulePaletteToggleIcon: document.getElementById('module-palette-toggle-icon'),
+                                                mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
+                                              };
+                                          
+                                              // --- State Management ---
+                                              let state = {
+                                                // ... (existing state)
+                                                currentWorkflowName: '',
+                                                modules: [],
+                                                currentModuleFolderId: '',
+                                                isDirty: false,
+                                                allModuleDefinitions: [],
+                                                initialWorkflows: [],
+                                                appSettings: {},
+                                                logArea: {
+                                                  originalHeight: '16rem',
+                                                },
+                                                modulePalette: {
+                                                  isMinimized: true,
+                                                  minHeight: '60px', // Header height
+                                                  maxHeight: '40vh',
+                                                }
+                                              };
+                                          
+                                              // ... (existing helper functions: _extractIdFromUrl, showCustomDialog, log, showError, showLoader, hideLoader)
+                                              const _extractIdFromUrl = (url) => {
+                                                  if (!url) return null;
+                                                  const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+                                                  const match1 = url.match(regex1);
+                                                  if (match1 && match1[1]) {
+                                                      return match1[1];
+                                                  }
+                                                  const regex2 = /\/file\/d\/(.*?)\//;
+                                                  const match2 = url.match(regex2);
+                                                  if (match2 && match2[1]) {
+                                                      return match2[1];
+                                                  }
+                                                  if (url.length > 20 && !url.includes('/') && !url.includes('.')) {
+                                                      return url;
+                                                  }
+                                                  return null;
+                                              };
+                                          
+                                              const showCustomDialog = (config) => {
+                                                return new Promise((resolve) => {
+                                                  app.customDialogTitle.textContent = config.title;
+                                                  app.customDialogMessage.textContent = config.message;
+                                                  app.customDialogInput.classList.add('hidden');
+                                                  app.customDialogCancel.classList.remove('hidden');
+                                                  if (config.type === 'prompt') {
+                                                    app.customDialogInput.classList.remove('hidden');
+                                                    app.customDialogInput.value = config.defaultValue || '';
+                                                  } else if (config.type === 'alert') {
+                                                    app.customDialogCancel.classList.add('hidden');
+                                                  }
+                                                  const dialogBackdrop = document.getElementById('custom-dialog-backdrop');
+                                                  dialogBackdrop.classList.remove('hidden');
+                                                  const onOk = () => {
+                                                    cleanup();
+                                                    resolve(config.type === 'prompt' ? app.customDialogInput.value : true);
+                                                  };
+                                                  const onCancel = () => {
+                                                    cleanup();
+                                                    resolve(config.type === 'prompt' ? null : false);
+                                                  };
+                                                  const cleanup = () => {
+                                                    dialogBackdrop.classList.add('hidden');
+                                                    app.customDialogOk.removeEventListener('click', onOk);
+                                                    app.customDialogCancel.removeEventListener('click', onCancel);
+                                                  };
+                                                  app.customDialogOk.addEventListener('click', onOk);
+                                                  app.customDialogCancel.addEventListener('click', onCancel);
+                                                });
+                                              };
+                                          
+                                              const log = (message, type = 'info') => {
+                                                const timestamp = new Date().toLocaleTimeString();
+                                                let color = 'text-gray-300';
+                                                if (type === 'error') color = 'text-red-400';
+                                                if (type === 'success') color = 'text-green-400';
+                                                if (type === 'system') color = 'text-yellow-400';
+                                                app.logContent.innerHTML += `<div class="${color}"><span class="text-gray-500">${timestamp}</span> ${message}</div>`;
+                                                app.logContent.scrollTop = app.logContent.scrollHeight;
+                                              };
+                                              
+                                              const showError = (error) => {
+                                                log(`エラー: ${error.message || error}`, 'error');
+                                                hideLoader();
+                                              };
+                                              
+                                              const showLoader = () => app.loader.classList.remove('hidden');
+                                              const hideLoader = () => app.loader.classList.add('hidden');
+                                          
+                                              // --- Trigger Modal Logic ---
+                                              const openTriggerModal = () => {
+                                                if (!state.currentWorkflowName) {
+                                                  showCustomDialog({ title: 'エラー', message: 'トリガーを設定する前に、ワークフローを保存してください。', type: 'alert' });
+                                                  return;
+                                                }
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(triggers => {
+                                                    hideLoader();
+                                                    renderTriggers(triggers);
+                                                    app.triggerModalBackdrop.classList.remove('hidden');
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .getTriggersForWorkflow(state.currentWorkflowName);
+                                              };
+                                          
+                                              const closeTriggerModal = () => {
+                                                app.triggerModalBackdrop.classList.add('hidden');
+                                              };
+                                          
+                                              const renderTriggers = (triggers) => {
+                                                app.triggerList.innerHTML = '';
+                                                if (triggers.length === 0) {
+                                                  app.triggerList.innerHTML = '<p class="text-sm text-gray-500">このワークフローのトリガーはありません。</p>';
+                                                  return;
+                                                }
+                                                triggers.forEach(trigger => {
+                                                  const triggerEl = document.createElement('div');
+                                                  triggerEl.className = 'p-2 border rounded-lg flex justify-between items-center dark:bg-gray-700 dark:border-gray-600';
+                                                  triggerEl.innerHTML = `
+                                                    <div>
+                                                      <p class="font-mono text-sm dark:text-gray-200">${trigger.eventType}</p>
+                                                      <p class="text-xs text-gray-500 dark:text-gray-400">ID: ${trigger.uid}</p>
+                                                    </div>
+                                                    <button data-uid="${trigger.uid}" class="delete-trigger-btn p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                                                  `;
+                                                  app.triggerList.appendChild(triggerEl);
+                                                });
+                                          
+                                                app.triggerList.querySelectorAll('.delete-trigger-btn').forEach(btn => {
+                                                  btn.addEventListener('click', (e) => handleDeleteTrigger(e.currentTarget.dataset.uid));
+                                                });
+                                              };
+                                          
+                                              const handleDeleteTrigger = async (uid) => {
+                                                const confirmed = await showCustomDialog({ title: '確認', message: `本当にこのトリガー (ID: ${uid}) を削除しますか？`, type: 'confirm' });
+                                                if (!confirmed) return;
+                                          
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(message => {
+                                                    log(message, 'success');
+                                                    openTriggerModal(); // Refresh the list
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .deleteTrigger(uid);
+                                              };
+                                          
+                                              const handleCreateTrigger = () => {
+                                                const options = {
+                                                  type: app.triggerType.value,
+                                                  hour: parseInt(app.triggerHour.value, 10),
+                                                  // Add more options for other types here
+                                                };
+                                          
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(message => {
+                                                    log(message, 'success');
+                                                    openTriggerModal(); // Refresh the list
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .createTimeBasedTrigger(state.currentWorkflowName, options);
+                                              };
+                                              
+                                              const onAddModule = (evt, targetModuleArray) => {
+                                                const item = evt.item; // The cloned element from the palette
+                                                const draggedModuleId = item.dataset.moduleId;
+                                                const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
                         
-                        console.log('Getting workflow data. Modules being saved:', clonedModules);
-                    
-                        return {
-                          name: state.currentWorkflowName || '新規ワークフロー',
-                          moduleFolderId: state.currentModuleFolderId,
-                          modules: clonedModules
-                        };
-                      };
-                    
-                      // Helper function to find a module by instanceId recursively
-                      const findModuleByInstanceId = (modules, instanceId) => {
-                        for (const module of modules) {
-                          if (module.instanceId === instanceId) {
-                            return module;
-                          }
-                          if (module.type === 'container' && module.modules) {
-                            const found = findModuleByInstanceId(module.modules, instanceId);
-                            if (found) {
-                              return found;
-                            }
-                          }
-                        }
-                        return null;
-                      };
-                      
-                      const loadModuleDefinitionsFromDrive = async () => {
-                          const folderId = app.moduleFolderIdInput.offsetParent ? app.moduleFolderIdInput.value.trim() : app.moduleFolderIdInputMobile.value.trim();
-                          if (!folderId) {
-                              state.allModuleDefinitions = [];
-                              renderModulePalette();
-                              return;
-                          }
-                          showLoader();
-                          try {
-                              const definitions = await new Promise((resolve, reject) => {
-                                  google.script.run
-                                      .withSuccessHandler(resolve)
-                                      .withFailureHandler(reject)
-                                      .loadModuleDefinitions(folderId);
-                              });
-                              state.currentModuleFolderId = folderId;
-                              state.allModuleDefinitions = definitions;
-                              log(`Driveから ${definitions.length} 個のモジュール定義を読み込みました。`, 'success');
-                          } catch (error) {
-                              state.allModuleDefinitions = [];
-                              showError(error);
-                          } finally {
-                              renderModulePalette();
-                              hideLoader();
-                          }
-                      };
-                  
-                      const loadWorkflows = async () => {
-                          try {
-                              const workflows = await new Promise((resolve, reject) => {
-                                  google.script.run
-                                      .withSuccessHandler(resolve)
-                                      .withFailureHandler(reject)
-                                      .listWorkflows();
-                              });
-                              updateWorkflowList(workflows);
-                          } catch (error) {
-                              showError(error);
-                          }
-                      };
-                      
-                      const findAndDeleteModule = (modules, instanceId) => {
-                        for (let i = 0; i < modules.length; i++) {
-                          const module = modules[i];
-                          if (module.instanceId === instanceId) {
-                            modules.splice(i, 1);
-                            return true; // Found and deleted
-                          }
-                          if (module.type === 'container' && module.modules) {
-                            if (findAndDeleteModule(module.modules, instanceId)) {
-                              return true; // Found and deleted in a nested container
-                            }
-                          }
-                        }
-                        return false; // Not found in this branch
-                      };
-
-                      const deleteModule = (instanceId) => {
-                          if (findAndDeleteModule(state.modules, instanceId)) {
-                              markDirty();
-                          }
-                      };
-                  
-                      const newWorkflow = async () => {
-                          if (state.isDirty) {
-                              const confirmed = await showCustomDialog({ title: '確認', message: '未保存の変更があります。破棄しますか？', type: 'confirm' });
-                              if (!confirmed) return;
-                          }
-                          state.currentWorkflowName = '';
-                          state.modules = [];
-                          state.isDirty = false;
-                          app.workflowSelector.value = '';
-                          updateUI();
-                          log('新規ワークフローを作成しました。', 'system');
-                      };
-                  
-                      const handleWorkflowSelect = async () => {
-                          const workflowName = app.workflowSelector.value;
-                          if (state.isDirty) {
-                              const confirmed = await showCustomDialog({ title: '確認', message: '未保存の変更があります。破棄しますか？', type: 'confirm' });
-                              if (!confirmed) {
-                                  app.workflowSelector.value = state.currentWorkflowName;
-                                  return;
-                              }
-                          }
-                          if (workflowName) {
-                              showLoader();
-                              google.script.run
-                                  .withSuccessHandler(data => {
-                                      state.currentWorkflowName = workflowName;
-                                      state.currentModuleFolderId = data.moduleFolderId || '';
-                                      state.modules = data.modules || [];
-                                      state.isDirty = false;
-                                      loadModuleDefinitionsFromDrive();
-                                      updateUI();
-                                      hideLoader();
-                                      log(`ワークフロー「${workflowName}」を読み込みました。`, 'system');
-                                  })
-                                  .withFailureHandler(showError)
-                                  .loadWorkflow(workflowName);
-                          } else {
-                              newWorkflow();
-                          }
-                      };
-            
-                      const runSingleModule = (moduleConfig) => {
-                          if (state.isDirty) {
-                              showCustomDialog({ title: 'エラー', message: '変更を保存してから実行してください。', type: 'alert' });
-                              return;
-                          }
-                          showLoader();
-                          log(`--- 単体実行開始: ${moduleConfig.name} ---`, 'system');
-                          google.script.run
-                              .withSuccessHandler(logs => {
-                                  logs.forEach(l => log(l.message, l.level)); // LogServiceのlevelをそのまま使う
-                                  log(`--- 単体実行完了: ${moduleConfig.name} ---`, 'system');
-                                  hideLoader();
-                              })
-                              .withFailureHandler(showError)
-                              .runSingleModule(state.currentWorkflowName || '新規ワークフロー', moduleConfig, state.currentModuleFolderId);
-                      };
-                  
-                      const hideLog = () => {
-                        state.logArea.originalHeight = app.logArea.style.height || '16rem';
-                        app.logArea.classList.add('hidden');
-                        app.showLogBtn.classList.remove('hidden');
-                        app.mobileShowLogBtn.classList.remove('hidden');
-                      };
-                  
-                      const showLog = () => {
-                        app.logArea.classList.remove('hidden');
-                        app.showLogBtn.classList.add('hidden');
-                        app.mobileShowLogBtn.classList.add('hidden');
-                        app.logArea.style.height = state.logArea.originalHeight;
-                      };
-                      
-                      const initResizing = () => {
-                        let isResizingLog = false;
-                        let isResizingModule = false;
-                        let lastY = 0;
-                  
-                        const startResizeLog = (e) => {
-                          e.preventDefault();
-                          isResizingLog = true;
-                          lastY = e.clientY || e.touches[0].clientY;
-                          document.body.style.cursor = 'ns-resize';
-                          document.body.style.userSelect = 'none';
-                        };
-                  
-                        const startResizeModule = (e) => {
-                          e.preventDefault();
-                          isResizingModule = true;
-                          lastY = e.clientY || e.touches[0].clientY;
-                          document.body.style.cursor = 'ns-resize';
-                          document.body.style.userSelect = 'none';
-                        };
-                  
-                        const doResize = (e) => {
-                          if (!isResizingLog && !isResizingModule) return;
-                          
-                          const clientY = e.clientY !== undefined ? e.clientY : e.touches[0].clientY;
-                  
-                          if (isResizingLog) {
-                            const dy = lastY - clientY;
-                            lastY = clientY;
-                            const currentHeight = app.logArea.offsetHeight;
-                            const logHeader = app.logArea.querySelector('.flex.items-center.justify-between');
-                            const moduleFooter = document.getElementById('module-source-footer-mobile');
-                            let minHeight = logHeader ? logHeader.offsetHeight + 24 : 80; // 24px for padding
-            
-                            if (moduleFooter && moduleFooter.offsetParent !== null) { // is visible on mobile
-                              const headerPaddingAndMargin = 28; // p-3's vertical padding (24px) + header's mb-1 (4px)
-                              minHeight = (logHeader ? logHeader.offsetHeight : 0) + headerPaddingAndMargin + moduleFooter.offsetHeight;
-                            }
-            
-                            const newHeight = Math.max(minHeight, currentHeight + dy);
-                            app.logArea.style.height = `${newHeight}px`;
-                          } else if (isResizingModule) {
-                            const dy = lastY - clientY; // Drag up -> dy > 0
-                            lastY = clientY;
-                            const currentHeight = app.modulePalette.offsetHeight;
-                            const moduleHeader = app.modulePalette.querySelector('.p-3.md\\:p-4.border-b');
-                            
-                            // Min height should be just enough for the header.
-                            const minHeight = moduleHeader ? moduleHeader.offsetHeight : 60;
-            
-                            // Corrected logic: Dragging the handle (at the top) up should expand the palette.
-                            const newHeight = Math.max(minHeight, currentHeight + dy);
-                            app.modulePalette.style.height = `${newHeight}px`;
-                          }
-                        };
-                  
-                        const stopResize = () => {
-                          isResizingLog = false;
-                          isResizingModule = false;
-                          document.body.style.cursor = 'default';
-                          document.body.style.userSelect = 'auto';
-                        };
-                  
-                        // Log resize handle
-                        app.resizeHandle.addEventListener('mousedown', startResizeLog);
-                        app.resizeHandle.addEventListener('touchstart', startResizeLog, { passive: false });
-                  
-                        // Module resize handle
-                        if (app.moduleResizeHandle) {
-                          app.moduleResizeHandle.addEventListener('mousedown', startResizeModule);
-                          app.moduleResizeHandle.addEventListener('touchstart', startResizeModule, { passive: false });
-                        }
-                  
-                        document.addEventListener('mousemove', doResize);
-                        document.addEventListener('touchmove', doResize, { passive: false });
-                  
-                        document.addEventListener('mouseup', stopResize);
-                        document.addEventListener('touchend', stopResize);
-                      };
-                  
-                      function init() {
-                        initEventListeners();
-                        initResizing();
-            
-                        // Set initial heights for mobile view
-                        if (window.innerWidth < 768) { // md breakpoint
-                          const moduleFooterMobile = document.getElementById('module-source-footer-mobile');
-                          const moduleFooterHeight = moduleFooterMobile.offsetHeight;
-            
-                          // Height for the log area header plus one line of text and padding.
-                          const singleLogLineAreaHeight = 90; 
-                          // Height for the module palette header plus two visible module items.
-                          const twoModuleItemsAreaHeight = 120;
-            
-                          // Calculate initial height for the log area.
-                          // Goal: Show one log line and the module folder ID input area.
-                          const logAreaHeight = singleLogLineAreaHeight + moduleFooterHeight;
-                          app.logArea.style.height = `${logAreaHeight}px`;
-            
-                          // Calculate initial height for the module palette.
-                          // Goal: Show two modules and the entire log area below it.
-                          const modulePaletteHeight = twoModuleItemsAreaHeight + logAreaHeight;
-                          app.modulePalette.style.height = `${modulePaletteHeight}px`;
-                        }
-            
-                                    google.script.run.withSuccessHandler(data => {
-                                      state.appSettings = data.settings || {};
-                                      if (typeof state.appSettings.darkMode === 'undefined') {
-                                        state.appSettings.darkMode = false;
-                                      }
-                                      applySettings(state.appSettings);
+                                                if (moduleDef) {
+                                                    // 1. Create the new data object for the state
+                                                    const newModuleData = {
+                                                        id: draggedModuleId,
+                                                        instanceId: `${draggedModuleId}_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                                                        name: moduleDef.name,
+                                                        type: moduleDef.type,
+                                                        settings: {}
+                                                    };
+                                                    
+                                                    // Initialize default settings
+                                                    if (moduleDef.settings) {
+                                                      moduleDef.settings.forEach(setting => {
+                                                        if (setting.defaultValue !== undefined) {
+                                                          newModuleData.settings[setting.id] = setting.defaultValue;
+                                                        }
+                                                      });
+                                                    }
                         
-                                      if (data.workflows) {
-                                          updateWorkflowList(data.workflows);
-                                      }
-                                      if (data.moduleFolderId) {
-                                        state.currentModuleFolderId = data.moduleFolderId;
-                                        app.moduleFolderIdInput.value = data.moduleFolderId;
-                                        app.moduleFolderIdInputMobile.value = data.moduleFolderId;
-                                        loadModuleDefinitionsFromDrive();
-                                      }
-                                      hideLoader();
-                                    }).withFailureHandler(showError).getInitialData();                      }
-                  
-                      init();
-                    });
-                  </script>
+                                                    // 2. Add the new data to the state array at the correct position
+                                                    targetModuleArray.splice(evt.newIndex, 0, newModuleData);
+                        
+                                                    // 3. Create the real, properly-styled module element
+                                                    const moduleEl = createModuleElement(newModuleData, targetModuleArray);
+                        
+                                                    // 4. Replace the cloned palette item with the real module element
+                                                    item.replaceWith(moduleEl);
+                                                    
+                                                    // If this was the first module in the main container, remove the placeholder text
+                                                    if (state.modules.length === 1 && targetModuleArray === state.modules) {
+                                                        const placeholder = app.workflowContainer.querySelector('.workflow-guide');
+                                                        if(placeholder) placeholder.remove();
+                                                    }
+                        
+                                                    markDirty();
+                                                }
+                                              };
+                        
+                                              const onUpdateModuleOrder = (evt, targetModuleArray) => {
+                                                  // Handle re-ordering of modules
+                                                  const movedItem = targetModuleArray.splice(evt.oldIndex, 1)[0];
+                                                  targetModuleArray.splice(evt.newIndex, 0, movedItem);
+                                                  markDirty();
+                                              };
+                        
+                                              // --- initEventListeners ---
+                                              const initEventListeners = () => {
+                                                  // Init SortableJS for module palette (drag source)
+                                                  new Sortable(app.moduleList, {
+                                                      group: { name: 'shared', pull: 'clone', put: false },
+                                                      animation: 150,
+                                                      sort: false, // Do not sort items in the palette
+                                                      draggable: '.module-card', // Only module cards are draggable
+                                                      delay: 100, // 100msの長押しでドラッグ開始
+                                                      delayOnTouchOnly: true, // タッチデバイスのみ遅延を有効化
+                                                      onStart: () => {
+                                                        if (window.innerWidth < 768) {
+                                                          minimizeModulePalette();
+                                                        }
+                                                      },
+                                                      onEnd: () => {
+                                                        if (window.innerWidth < 768) {
+                                                          setTimeout(maximizeModulePalette, 100);
+                                                        }
+                                                      }
+                                                  });
+                                                  console.log('Sortable for moduleList initialized.');
+                                          
+                                                  // Init SortableJS for workflow container (drop target)
+                                                  const logSortable = new Sortable(app.workflowContainer, {
+                                                      group: 'shared',
+                                                      animation: 150,
+                                                      onAdd: (evt) => onAddModule(evt, state.modules),
+                                                      onUpdate: (evt) => onUpdateModuleOrder(evt, state.modules),
+                                                      filter: 'button, input, select, textarea, label', // Ignore clicks on form elements and buttons
+                                                      preventOnFilter: false
+                                                  });
+                                                  console.log('Sortable for workflowContainer initialized.');
+                                          
+                                                // Trigger Modal Listeners
+                                                app.triggerBtn.addEventListener('click', openTriggerModal);
+                                                app.triggerCloseBtn.addEventListener('click', closeTriggerModal);
+                                                app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
+                                                app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
+                                          
+                                                app.hideLogBtn.addEventListener('click', hideLog);
+                                                app.showLogBtn.addEventListener('click', showLog);
+                                          
+                                                // Search Logic
+                                                app.toggleSearchBtn.addEventListener('click', (e) => {
+                                                  e.stopPropagation(); // Prevent header click from firing
+                                                  app.moduleSearchBox.classList.toggle('hidden');
+                                                  if (!app.moduleSearchBox.classList.contains('hidden')) {
+                                                    app.moduleSearchBox.focus();
+                                                  }
+                                                });
+                                          
+                                                app.moduleSearchBox.addEventListener('input', (e) => {
+                                                  const searchTerm = e.target.value.toLowerCase();
+                                                  const filteredModules = state.allModuleDefinitions.filter(m => 
+                                                    m.name.toLowerCase().includes(searchTerm) || 
+                                                    (m.description && m.description.toLowerCase().includes(searchTerm))
+                                                  );
+                                                  renderModulePalette(filteredModules);
+                                                });
+                                          
+                                                // ... (all existing listeners)
+                                                app.newWorkflowBtn.addEventListener('click', newWorkflow);
+                                                app.reloadModulesBtn.addEventListener('click', loadModuleDefinitionsFromDrive);
+                                                app.reloadModulesBtnMobile.addEventListener('click', loadModuleDefinitionsFromDrive);
+                                                app.moduleFolderIdInput.addEventListener('change', markDirty);
+                                                app.moduleFolderIdInputMobile.addEventListener('change', markDirty);
+                                                app.workflowSelector.addEventListener('change', handleWorkflowSelect);
+                                                app.saveWorkflowBtn.addEventListener('click', async () => {
+                                                      let workflowName = state.currentWorkflowName;
+                                                      if (!workflowName) {
+                                                          workflowName = await showCustomDialog({ title: 'ワークフロー名の入力', message: 'ワークフロー名を入力してください:', type: 'prompt' });
+                                                          if (!workflowName) return;
+                                                      }
+                                                      const workflowData = getWorkflowData();
+                                                      showLoader();
+                                                      google.script.run
+                                                          .withSuccessHandler(response => {
+                                                              state.currentWorkflowName = workflowName;
+                                                              state.isDirty = false;
+                                                              loadWorkflows();
+                                                              setTimeout(() => { app.workflowSelector.value = workflowName; }, 100);
+                                                              hideLoader();
+                                                              log(response, 'success');
+                                                          })
+                                                          .withFailureHandler(showError)
+                                                          .saveWorkflow(workflowName, workflowData);
+                                                  });
+                                                app.deleteWorkflowBtn.addEventListener('click', async () => {
+                                                      if (!state.currentWorkflowName) return;
+                                                      const confirmed = await showCustomDialog({ title: '確認', message: `本当にワークフロー「${state.currentWorkflowName}」を削除しますか？`, type: 'confirm' });
+                                                      if (!confirmed) return;
+                                                      showLoader();
+                                                      google.script.run
+                                                          .withSuccessHandler(response => {
+                                                              hideLoader();
+                                                              log(response, 'success');
+                                                              newWorkflow();
+                                                              loadWorkflows();
+                                                          })
+                                                          .withFailureHandler(showError)
+                                                          .deleteWorkflow(state.currentWorkflowName);
+                                                  });
+                                                app.runBtn.addEventListener('click', () => {
+                                                      if (state.isDirty) { showCustomDialog({ title: 'エラー', message: '変更を保存してから実行してください。', type: 'alert' }); return; }
+                                                      const payload = getWorkflowData();
+                                                      showLoader();
+                                                      log('--- 実行開始 ---', 'system');
+                                                      google.script.run
+                                                          .withSuccessHandler(logs => {
+                                                              logs.forEach(l => log(l.message, l.type));
+                                                              log('--- 実行完了 ---', 'system');
+                                                              hideLoader();
+                                                          })
+                                                          .withFailureHandler(showError)
+                                                          .runWorkflow(payload);
+                                                  });
+                                                app.historyBtn.addEventListener('click', () => {
+                                                      showLoader();
+                                                      google.script.run
+                                                          .withSuccessHandler(url => {
+                                                              hideLoader();
+                                                              if (url) { window.open(url, '_blank'); } else { showError({ message: 'ログシートのURLを取得できませんでした。' }); }
+                                                          })
+                                                          .withFailureHandler(showError)
+                                                          .getExecutionLogUrl();
+                                                  });
+                                                app.settingsBtn.addEventListener('click', openSettingsModal);
+                                                app.settingsCloseBtn.addEventListener('click', closeSettingsModal);
+                                                app.settingsSaveBtn.addEventListener('click', saveSettings);
+                                                app.createInitialModulesBtn.addEventListener('click', handleCreateInitialModules);
+                        
+                                                // Hamburger Menu Logic
+                                                app.hamburgerBtn.addEventListener('click', () => {
+                                                  app.mobileMenu.classList.toggle('hidden');
+                                                });
+                        
+                                                // Click outside to close mobile menu
+                                                document.addEventListener('click', (event) => {
+                                                  if (!app.mobileMenu.contains(event.target) && !app.hamburgerBtn.contains(event.target)) {
+                                                    app.mobileMenu.classList.add('hidden');
+                                                  }
+                                                });
+                        
+                                                app.mobileNewWorkflowBtn.addEventListener('click', () => app.newWorkflowBtn.click());
+                                                app.mobileDeleteWorkflowBtn.addEventListener('click', () => app.deleteWorkflowBtn.click());
+                                                app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
+                                                app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
+                                                app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
+                                                app.mobileShowLogBtn.addEventListener('click', showLog);
+                        
+                                                // Mobile Module Palette Toggle
+                                                if (app.modulePaletteHeader) {
+                                                  app.modulePaletteHeader.addEventListener('click', toggleModulePalette);
+                                                }
+                                              };
+                                          
+                                              // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
+                                              // All other functions remain the same as the previous version.
+                                              // This is a simplified representation to show where the new logic is added.
+                                              // The full content of the file will be written.
+                                              const updateUI = () => {
+                                                app.runBtn.disabled = state.modules.length === 0;
+                                                app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
+                                                app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
+                                                app.moduleFolderIdInput.value = state.currentModuleFolderId;
+                                                app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
+                                                app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
+                                                document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
+                                                renderModules();
+                                              };
+                                          
+                                              const markDirty = () => {
+                                                state.isDirty = true;
+                                                updateUI();
+                                              };
+                                              
+                                              const openSettingsModal = () => {
+                                                app.settingsModuleFolderIdInput.value = state.appSettings.moduleFolderId || '';
+                                                app.darkModeToggle.checked = state.appSettings.darkMode;
+                                                app.settingsModalBackdrop.classList.remove('hidden');
+                                              };
+                                          
+                                              const closeSettingsModal = () => {
+                                                app.settingsModalBackdrop.classList.add('hidden');
+                                              };
+                                          
+                                              const saveSettings = () => {
+                                                const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
+                                                const folderId = _extractIdFromUrl(rawFolderId);
+                                                const settings = {
+                                                  moduleFolderId: folderId,
+                                                  darkMode: app.darkModeToggle.checked,
+                                                };
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler((savedSettings) => {
+                                                    log('設定を保存しました。', 'success');
+                                                    state.appSettings = savedSettings;
+                                                    applySettings(savedSettings);
+                                                    state.currentModuleFolderId = folderId;
+                                                    app.moduleFolderIdInput.value = folderId;
+                                                    app.moduleFolderIdInputMobile.value = folderId;
+                                                    hideLoader();
+                                                    closeSettingsModal();
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .saveSettings(settings);
+                                              };
+                                          
+                                              const handleCreateInitialModules = () => {
+                                                const rawFolderId = app.settingsModuleFolderIdInput.value.trim();
+                                                const folderId = _extractIdFromUrl(rawFolderId);
+                                                if (!folderId) {
+                                                  showError({ message: 'モジュール保管用フォルダIDが入力されていません。' });
+                                                  return;
+                                                }
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler((result) => {
+                                                    log(result, 'success');
+                                                    loadModuleDefinitionsFromDrive(); 
+                                                    hideLoader();
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .createInitialModules(folderId);
+                                              };
+                                              
+                                              const applySettings = (settings) => {
+                                                  if (settings.darkMode) {
+                                                      document.documentElement.classList.add('dark');
+                                                  } else {
+                                                      document.documentElement.classList.remove('dark');
+                                                  }
+                                              };
+                                          
+                                              const renderModules = () => {
+                                                console.log('renderModules triggered. state.modules:', state.modules);
+                                                app.workflowContainer.innerHTML = ''; // Clear the container first
+                                            
+                                                if (state.modules.length === 0) {
+                                                    app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
+                                                        <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
+                                                        <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                                                        <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
+                                                    </div>`;
+                                                    return;
+                                                }
+                                            
+                                                // Recursive function to create the module tree
+                                                const createModuleTree = (modules, parentElement, parentModuleArray) => {
+                                                    modules.forEach((module, index) => {
+                                                        const moduleEl = createModuleElement(module, parentModuleArray);
+                                                        parentElement.appendChild(moduleEl);
+                                            
+                                                        if (module.type === 'container') {
+                                                            const containerContent = moduleEl.querySelector('.module-container-content');
+                                                            if (containerContent) {
+                                                                // Make the container a drop target
+                                                                new Sortable(containerContent, {
+                                                                    group: 'shared',
+                                                                    animation: 150,
+                                                                    onAdd: (evt) => onAddModule(evt, module.modules),
+                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                                                });
+                                            
+                                                                // Recursively render nested modules
+                                                                if (module.modules && module.modules.length > 0) {
+                                                                    createModuleTree(module.modules, containerContent, module.modules);
+                                                                } else {
+                                                                    // Show a guide if the container is empty
+                                                                    containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                };
+                                            
+                                                // Start rendering from the root level
+                                                createModuleTree(state.modules, app.workflowContainer, state.modules);
+                                              };
+                                          
+                                              const createModuleElement = (module, parentModuleArray) => {
+                                                  const moduleEl = document.createElement('div');
+                                                  const isEnabled = module.enabled !== false;
+                                                  const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
+                                                  
+                                                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
+                                                  moduleEl.dataset.id = module.instanceId;
+                                                  moduleEl.dataset.moduleId = module.id;
+                                          
+                                                  let settingsHTML = '';
+                                                  if (moduleDef.settings && moduleDef.settings.length > 0) {
+                                                      settingsHTML += '<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">';
+                                                      moduleDef.settings.forEach(setting => {
+                                                          const currentValue = module.settings[setting.id] || setting.defaultValue || '';
+                                                          settingsHTML += `<div class="setting-field">`;
+                                                          settingsHTML += `<label for="setting-${module.instanceId}-${setting.id}" class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-200">${setting.name}</label>`;
+                                                          
+                                                          switch (setting.type) {
+                                                              case 'text':
+                                                              case 'number':
+                                                                  settingsHTML += `<input type="${setting.type}" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" value="${currentValue}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">`;
+                                                                  break;
+                                                              case 'textarea':
+                                                                  settingsHTML += `<textarea id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
+                                                                  break;
+                                                              case 'select':
+                                                                  const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+                                                                  settingsHTML += `<select id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
+                                                                  break;
+                                                              case 'checkbox':
+                                                                  settingsHTML += `<label class="flex items-center mt-2"><input type="checkbox" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
+                                                                  break;
+                                                          }
+                                                          if (setting.description) {
+                                                              settingsHTML += `<p class="text-xs text-gray-500 mt-1 dark:text-gray-400">${setting.description}</p>`;
+                                                          }
+                                                          settingsHTML += `</div>`;
+                                                      });
+                                                      settingsHTML += '</div>';
+                                                  }
+                        
+                                                  let contentHTML = `
+                                                    <div class="flex items-start gap-3">
+                                                        <i class="fas fa-grip-vertical text-gray-400 mt-1 cursor-grab"></i>
+                                                        <div class="flex-grow">
+                                                            <div class="flex justify-between items-center">
+                                                                <div class="flex items-center gap-3">
+                                                                    <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600 dark:text-gray-400"></i>
+                                                                    <h3 class="font-bold text-gray-800 dark:text-gray-100">${moduleDef.name}</h3>
+                                                                </div>
+                                                                <div class="flex items-center gap-2">
+                                                                    <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
+                                                                        <div class="relative">
+                                                                            <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
+                                                                            <div class="block bg-gray-300 w-10 h-6 rounded-full dark:bg-gray-600"></div>
+                                                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                                                        </div>
+                                                                    </label>
+                                                                    <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
+                                                                    <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
+                                                            ${settingsHTML}
+                                                        `;
+                                          
+                                                  if (module.type === 'container') {
+                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
+                                                  }
+                                          
+                                                  contentHTML += `</div></div>`;
+                                                  moduleEl.innerHTML = contentHTML;
+                                          
+                                                  // --- Attach Event Listeners ---
+                                                  moduleEl.addEventListener('input', (e) => {
+                                                    if (e.target.dataset.settingId) {
+                                                        const settingId = e.target.dataset.settingId;
+                                                        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+                                                        module.settings[settingId] = value;
+                                                        markDirty();
+                                                    }
+                                                  });
+                        
+                                                  moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
+                                                      module.enabled = e.target.checked;
+                                                      markDirty();
+                                                      renderModules(); // Re-render to apply opacity class
+                                                  });
+                                
+                                                  moduleEl.querySelector('[data-action="run"]').addEventListener('click', () => {
+                                                      runSingleModule(module);
+                                                  });
+                                      
+                                                  moduleEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                                                      e.stopPropagation();
+                                                      // Find and remove the module from its parent array
+                                                      const index = parentModuleArray.findIndex(m => m.instanceId === module.instanceId);
+                                                      if (index > -1) {
+                                                          parentModuleArray.splice(index, 1);
+                                                          markDirty();
+                                                          renderModules(); // Re-render to update the UI
+                                                      }
+                                                  });
+                                          
+                                                  return moduleEl;
+                                              };
+                                          
+                                              const renderModulePalette = (modulesToRender = state.allModuleDefinitions) => {
+                                                  app.moduleList.innerHTML = '';
+                                                  if (modulesToRender.length === 0) {
+                                                      app.moduleList.innerHTML = `<p class="text-center text-sm text-red-400 p-4">該当するモジュールが見つかりません。</p>`;
+                                                      return;
+                                                  }
+                                                  const categories = {};
+                                                  modulesToRender.forEach(m => {
+                                                      const cat = m.category || '未分類';
+                                                      if (!categories[cat]) categories[cat] = [];
+                                                      categories[cat].push(m);
+                                                  });
+                        
+                                                  for (const category in categories) {
+                                                      const categoryCard = document.createElement('div');
+                                                      categoryCard.className = 'category-card bg-white dark:bg-gray-800 rounded-lg mb-3 border border-gray-200 dark:border-gray-700';
+                        
+                                                      const categoryHeader = document.createElement('div');
+                                                      categoryHeader.className = 'category-header flex justify-between items-center p-2 cursor-pointer bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600';
+                                                      categoryHeader.innerHTML = `
+                                                          <h4 class="font-bold text-gray-800 dark:text-gray-100">${category}</h4>
+                                                          <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                                                      `;
+                        
+                                                      const modulesContainer = document.createElement('div');
+                                                      modulesContainer.className = 'category-modules p-2 space-y-2'; // Initially visible
+                        
+                                                      categories[category].forEach(m => {
+                                                          const moduleCard = document.createElement('div');
+                                                          moduleCard.className = 'module-card bg-gray-50 dark:bg-gray-700 p-2 rounded-md shadow-md cursor-grab flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-gray-600';
+                                                          moduleCard.dataset.moduleId = m.id;
+                                                          moduleCard.innerHTML = `
+                                                              <i class="fas ${m.icon || 'fa-extension'} text-blue-600 dark:text-blue-400"></i>
+                                                              <span class="text-sm font-medium text-gray-800 dark:text-gray-300">${m.name}</span>
+                                                          `;
+                                                          modulesContainer.appendChild(moduleCard);
+                                                      });
+                        
+                                                      categoryCard.appendChild(categoryHeader);
+                                                      categoryCard.appendChild(modulesContainer);
+                                                      app.moduleList.appendChild(categoryCard);
+                        
+                                                      // Add click listener for accordion
+                                                      categoryHeader.addEventListener('click', () => {
+                                                          modulesContainer.classList.toggle('hidden');
+                                                          categoryHeader.querySelector('i').classList.toggle('rotate-180');
+                                                      });
+                                                  }
+                                              };
+                                          
+                                              const updateWorkflowList = (workflowNames) => {
+                                                  app.workflowSelector.innerHTML = '<option value="">-- 新規ワークフロー --</option>';
+                                                  state.initialWorkflows = workflowNames;
+                                                  workflowNames.forEach(name => {
+                                                      const option = document.createElement('option');
+                                                      option.value = name;
+                                                      option.textContent = name;
+                                                      app.workflowSelector.appendChild(option);
+                                                  });
+                                                  if (state.currentWorkflowName) app.workflowSelector.value = state.currentWorkflowName;
+                                              };
+                                          
+                                              const getWorkflowData = () => {
+                                                // The state is the source of truth, so we just need to clone it.
+                                                // The order is already managed by the onUpdate handlers.
+                                                const clonedModules = JSON.parse(JSON.stringify(state.modules));
+                                                
+                                                console.log('Getting workflow data. Modules being saved:', clonedModules);
+                                            
+                                                return {
+                                                  name: state.currentWorkflowName || '新規ワークフロー',
+                                                  moduleFolderId: state.currentModuleFolderId,
+                                                  modules: clonedModules
+                                                };
+                                              };
+                                            
+                                              // Helper function to find a module by instanceId recursively
+                                              const findModuleByInstanceId = (modules, instanceId) => {
+                                                for (const module of modules) {
+                                                  if (module.instanceId === instanceId) {
+                                                    return module;
+                                                  }
+                                                  if (module.type === 'container' && module.modules) {
+                                                    const found = findModuleByInstanceId(module.modules, instanceId);
+                                                    if (found) {
+                                                      return found;
+                                                    }
+                                                  }
+                                                }
+                                                return null;
+                                              };
+                                              
+                                              const loadModuleDefinitionsFromDrive = async () => {
+                                                  const folderId = app.moduleFolderIdInput.offsetParent ? app.moduleFolderIdInput.value.trim() : app.moduleFolderIdInputMobile.value.trim();
+                                                  if (!folderId) {
+                                                      state.allModuleDefinitions = [];
+                                                      renderModulePalette();
+                                                      return;
+                                                  }
+                                                  showLoader();
+                                                  try {
+                                                      const definitions = await new Promise((resolve, reject) => {
+                                                          google.script.run
+                                                              .withSuccessHandler(resolve)
+                                                              .withFailureHandler(reject)
+                                                              .loadModuleDefinitions(folderId);
+                                                      });
+                                                      state.currentModuleFolderId = folderId;
+                                                      state.allModuleDefinitions = definitions;
+                                                      log(`Driveから ${definitions.length} 個のモジュール定義を読み込みました。`, 'success');
+                                                  } catch (error) {
+                                                      state.allModuleDefinitions = [];
+                                                      showError(error);
+                                                  } finally {
+                                                      renderModulePalette();
+                                                      hideLoader();
+                                                  }
+                                              };
+                                          
+                                              const loadWorkflows = async () => {
+                                                  try {
+                                                      const workflows = await new Promise((resolve, reject) => {
+                                                          google.script.run
+                                                              .withSuccessHandler(resolve)
+                                                              .withFailureHandler(reject)
+                                                              .listWorkflows();
+                                                      });
+                                                      updateWorkflowList(workflows);
+                                                  } catch (error) {
+                                                      showError(error);
+                                                  }
+                                              };
+                                              
+                                              const findAndDeleteModule = (modules, instanceId) => {
+                                                for (let i = 0; i < modules.length; i++) {
+                                                  const module = modules[i];
+                                                  if (module.instanceId === instanceId) {
+                                                    modules.splice(i, 1);
+                                                    return true; // Found and deleted
+                                                  }
+                                                  if (module.type === 'container' && module.modules) {
+                                                    if (findAndDeleteModule(module.modules, instanceId)) {
+                                                      return true; // Found and deleted in a nested container
+                                                    }
+                                                  }
+                                                }
+                                                return false; // Not found in this branch
+                                              };
+                        
+                                              const deleteModule = (instanceId) => {
+                                                  if (findAndDeleteModule(state.modules, instanceId)) {
+                                                      markDirty();
+                                                  }
+                                              };
+                                          
+                                              const newWorkflow = async () => {
+                                                  if (state.isDirty) {
+                                                      const confirmed = await showCustomDialog({ title: '確認', message: '未保存の変更があります。破棄しますか？', type: 'confirm' });
+                                                      if (!confirmed) return;
+                                                  }
+                                                  state.currentWorkflowName = '';
+                                                  state.modules = [];
+                                                  state.isDirty = false;
+                                                  app.workflowSelector.value = '';
+                                                  updateUI();
+                                                  log('新規ワークフローを作成しました。', 'system');
+                                              };
+                                          
+                                              const handleWorkflowSelect = async () => {
+                                                  const workflowName = app.workflowSelector.value;
+                                                  if (state.isDirty) {
+                                                      const confirmed = await showCustomDialog({ title: '確認', message: '未保存の変更があります。破棄しますか？', type: 'confirm' });
+                                                      if (!confirmed) {
+                                                          app.workflowSelector.value = state.currentWorkflowName;
+                                                          return;
+                                                      }
+                                                  }
+                                                  if (workflowName) {
+                                                      showLoader();
+                                                      google.script.run
+                                                          .withSuccessHandler(data => {
+                                                              state.currentWorkflowName = workflowName;
+                                                              state.currentModuleFolderId = data.moduleFolderId || '';
+                                                              state.modules = data.modules || [];
+                                                              state.isDirty = false;
+                                                              loadModuleDefinitionsFromDrive();
+                                                              updateUI();
+                                                              hideLoader();
+                                                              log(`ワークフロー「${workflowName}」を読み込みました。`, 'system');
+                                                          })
+                                                          .withFailureHandler(showError)
+                                                          .loadWorkflow(workflowName);
+                                                  } else {
+                                                      newWorkflow();
+                                                  }
+                                              };
+                                    
+                                              const runSingleModule = (moduleConfig) => {
+                                                  if (state.isDirty) {
+                                                      showCustomDialog({ title: 'エラー', message: '変更を保存してから実行してください。', type: 'alert' });
+                                                      return;
+                                                  }
+                                                  showLoader();
+                                                  log(`--- 単体実行開始: ${moduleConfig.name} ---`, 'system');
+                                                  google.script.run
+                                                      .withSuccessHandler(logs => {
+                                                          logs.forEach(l => log(l.message, l.level)); // LogServiceのlevelをそのまま使う
+                                                          log(`--- 単体実行完了: ${moduleConfig.name} ---`, 'system');
+                                                          hideLoader();
+                                                      })
+                                                      .withFailureHandler(showError)
+                                                      .runSingleModule(state.currentWorkflowName || '新規ワークフロー', moduleConfig, state.currentModuleFolderId);
+                                              };
+                                          
+                                              const hideLog = () => {
+                                                state.logArea.originalHeight = app.logArea.style.height || '16rem';
+                                                app.logArea.classList.add('hidden');
+                                                app.showLogBtn.classList.remove('hidden');
+                                                app.mobileShowLogBtn.classList.remove('hidden');
+                                              };
+                                          
+                                              const showLog = () => {
+                                                app.logArea.classList.remove('hidden');
+                                                app.showLogBtn.classList.add('hidden');
+                                                app.mobileShowLogBtn.classList.add('hidden');
+                                                app.logArea.style.height = state.logArea.originalHeight;
+                                              };
+                                              
+                                              const initResizing = () => {
+                                                let isResizingLog = false;
+                                                let lastY = 0;
+                                          
+                                                const startResizeLog = (e) => {
+                                                  e.preventDefault();
+                                                  isResizingLog = true;
+                                                  lastY = e.clientY || e.touches[0].clientY;
+                                                  document.body.style.cursor = 'ns-resize';
+                                                  document.body.style.userSelect = 'none';
+                                                };
+                                          
+                                                const doResize = (e) => {
+                                                  if (!isResizingLog) return;
+                                                  
+                                                  const clientY = e.clientY !== undefined ? e.clientY : e.touches[0].clientY;
+                                          
+                                                  if (isResizingLog) {
+                                                    const dy = lastY - clientY;
+                                                    lastY = clientY;
+                                                    const currentHeight = app.logArea.offsetHeight;
+                                                    const logHeader = app.logArea.querySelector('.flex.items-center.justify-between');
+                                                    const moduleFooter = document.getElementById('module-source-footer-mobile');
+                                                    let minHeight = logHeader ? logHeader.offsetHeight + 24 : 80; // 24px for padding
+                                    
+                                                    if (moduleFooter && moduleFooter.offsetParent !== null) { // is visible on mobile
+                                                      const headerPaddingAndMargin = 28; // p-3's vertical padding (24px) + header's mb-1 (4px)
+                                                      minHeight = (logHeader ? logHeader.offsetHeight : 0) + headerPaddingAndMargin + moduleFooter.offsetHeight;
+                                                    }
+                                    
+                                                    const newHeight = Math.max(minHeight, currentHeight + dy);
+                                                    app.logArea.style.height = `${newHeight}px`;
+                                                  }
+                                                };
+                                          
+                                                const stopResize = () => {
+                                                  isResizingLog = false;
+                                                  document.body.style.cursor = 'default';
+                                                  document.body.style.userSelect = 'auto';
+                                                };
+                                          
+                                                // Log resize handle
+                                                app.resizeHandle.addEventListener('mousedown', startResizeLog);
+                                                app.resizeHandle.addEventListener('touchstart', startResizeLog, { passive: false });
+                                          
+                                                document.addEventListener('mousemove', doResize);
+                                                document.addEventListener('touchmove', doResize, { passive: false });
+                                          
+                                                document.addEventListener('mouseup', stopResize);
+                                                document.addEventListener('touchend', stopResize);
+                                              };
+                        
+                                              const maximizeModulePalette = () => {
+                                                if (window.innerWidth >= 768) return;
+                                                app.modulePalette.style.height = state.modulePalette.maxHeight;
+                                                app.modulePaletteToggleIcon.classList.remove('rotate-180');
+                                                state.modulePalette.isMinimized = false;
+                                              };
+                        
+                                              const minimizeModulePalette = () => {
+                                                if (window.innerWidth >= 768) return;
+                                                app.modulePalette.style.height = state.modulePalette.minHeight;
+                                                app.modulePaletteToggleIcon.classList.add('rotate-180');
+                                                state.modulePalette.isMinimized = true;
+                                              };
+                        
+                                              const toggleModulePalette = () => {
+                                                if (window.innerWidth >= 768) return;
+                                                if (state.modulePalette.isMinimized) {
+                                                  maximizeModulePalette();
+                                                } else {
+                                                  minimizeModulePalette();
+                                                }
+                                              };
+                                          
+                                              function init() {
+                                                initEventListeners();
+                                                initResizing();
+                                    
+                                                // Set initial heights for mobile view
+                                                if (window.innerWidth < 768) { // md breakpoint
+                                                  minimizeModulePalette();
+                                                }
+                                    
+                                                            google.script.run.withSuccessHandler(data => {
+                                                              state.appSettings = data.settings || {};
+                                                              if (typeof state.appSettings.darkMode === 'undefined') {
+                                                                state.appSettings.darkMode = false;
+                                                              }
+                                                              applySettings(state.appSettings);
+                                                
+                                                              if (data.workflows) {
+                                                                  updateWorkflowList(data.workflows);
+                                                              }
+                                                              if (data.moduleFolderId) {
+                                                                state.currentModuleFolderId = data.moduleFolderId;
+                                                                app.moduleFolderIdInput.value = data.moduleFolderId;
+                                                                app.moduleFolderIdInputMobile.value = data.moduleFolderId;
+                                                                loadModuleDefinitionsFromDrive();
+                                                              }
+                                                              hideLoader();
+                                                            }).withFailureHandler(showError).getInitialData();                      }
+                                          
+                                              init();
+                                            });
+                                          </script>
+                                          
+                                    
+                              
+                        
                   
             
       
