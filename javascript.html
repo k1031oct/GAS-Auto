@@ -897,12 +897,14 @@
                                                   if (workflowName) {
                                                       showLoader();
                                                       google.script.run
-                                                          .withSuccessHandler(data => {
+                                                          .withSuccessHandler(async (data) => {
                                                               state.currentWorkflowName = workflowName;
                                                               state.currentModuleFolderId = data.moduleFolderId || '';
                                                               state.modules = data.modules || [];
                                                               state.isDirty = false;
-                                                              loadModuleDefinitionsFromDrive();
+                                                              // First, ensure module definitions for the workflow's folder are loaded
+                                                              await loadModuleDefinitionsFromDrive();
+                                                              // Then, render the UI
                                                               updateUI();
                                                               hideLoader();
                                                               log(`ワークフロー「${workflowName}」を読み込みました。`, 'system');
