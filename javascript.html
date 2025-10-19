@@ -258,9 +258,16 @@
                                                         type: moduleDef.type,
                                                         settings: {}
                                                     };
-                                                    // If the module is a container, initialize its 'modules' array.
-                                                    if (newModuleData.type === 'container') {
-                                                      newModuleData.modules = [];
+                                                    // If the module is a container, initialize its branch arrays.
+                                                    if (moduleDef.type === 'container') {
+                                                      if (moduleDef.branches && moduleDef.branches.length > 0) {
+                                                        moduleDef.branches.forEach(branch => {
+                                                          newModuleData[branch.id] = [];
+                                                        });
+                                                      } else {
+                                                        // Fallback for older container definitions
+                                                        newModuleData.modules = [];
+                                                      }
                                                     }
                                                     
                                                     // Initialize default settings
@@ -322,8 +329,17 @@
                                               const setCollapseStateRecursive = (modules, isCollapsed) => {
                                                 modules.forEach(module => {
                                                   module.isCollapsed = isCollapsed;
-                                                  if (module.type === 'container' && module.modules) {
-                                                    setCollapseStateRecursive(module.modules, isCollapsed);
+                                                  if (module.type === 'container') {
+                                                    if (module.branches) {
+                                                      module.branches.forEach(branch => {
+                                                        if (module[branch.id]) {
+                                                          setCollapseStateRecursive(module[branch.id], isCollapsed);
+                                                        }
+                                                      });
+                                                    }
+                                                    if (module.modules) {
+                                                      setCollapseStateRecursive(module.modules, isCollapsed);
+                                                    }
                                                   }
                                                 });
                                               };
@@ -363,15 +379,14 @@
                                                 app.groupBtn.addEventListener('click', () => {
                                                   if (state.selectedInstanceIds.length < 2) return;
                         
-                                                  // Define a generic group module on-the-fly
-                                                  const groupModuleDef = {
+                                                  const groupModuleDef = state.allModuleDefinitions.find(m => m.id === 'group_container') || {
                                                     id: 'group_container',
-                                                    name: 'グループ',
+                                                    name: 'グループ化',
                                                     description: '複数のモジュールをまとめるコンテナです。',
                                                     icon: 'fa-object-group',
                                                     type: 'container',
                                                     settings: [
-                                                      { id: 'groupName', name: 'グループ名', type: 'text', defaultValue: '名称未設定グループ' }
+                                                      { id: 'groupTitle', name: 'グループタイトル', type: 'text', defaultValue: '新しいグループ' }
                                                     ]
                                                   };
                         
@@ -385,7 +400,7 @@
                                                     instanceId: `${groupModuleDef.id}_${Date.now()}`,
                                                     name: groupModuleDef.name,
                                                     type: groupModuleDef.type,
-                                                    settings: { groupName: '名称未設定グループ' },
+                                                    settings: { groupTitle: '新しいグループ' },
                                                     modules: [] // This will hold the selected modules
                                                   };
                         
@@ -402,8 +417,15 @@
                                                         extractedModules.unshift(extracted); // Add to start to maintain order
                                                         // Record the position of the *first* selected item found
                                                         insertionPoint = { parentArray: moduleArray, index: i };
-                                                      } else if (module.type === 'container' && module.modules) {
-                                                        findAndExtractSelected(module.modules);
+                                                      } else if (module.type === 'container') {
+                                                        if (module.branches) {
+                                                          module.branches.forEach(branch => {
+                                                            if(module[branch.id]) findAndExtractSelected(module[branch.id]);
+                                                          });
+                                                        }
+                                                        if (module.modules) {
+                                                          findAndExtractSelected(module.modules);
+                                                        }
                                                       }
                                                     }
                                                   };
@@ -428,21 +450,10 @@
                                                   if (state.selectedInstanceIds.length !== 1) return;
                                                   const selectedInstanceId = state.selectedInstanceIds[0];
                         
-                                                  const branchModuleDef = {
-                                                    id: 'condition_branch',
-                                                    name: '条件分岐',
-                                                    description: '条件に応じて実行パスを切り替えます。',
-                                                    icon: 'fa-code-branch',
-                                                    type: 'container', // Special container type
-                                                    settings: [
-                                                      { id: 'operand', name: '対象', type: 'text', placeholder: '例: {{module_1.output}}' },
-                                                      { id: 'operator', name: '比較', type: 'select', options: [ {value: 'eq', label: '次と等しい'}, {value: 'neq', label: '次と等しくない'}, {value: 'gt', label: '次より大きい'} ] },
-                                                      { id: 'value', name: '値', type: 'text', placeholder: '比較する値' }
-                                                    ]
-                                                  };
-                        
-                                                  if (!state.allModuleDefinitions.find(m => m.id === branchModuleDef.id)) {
-                                                    state.allModuleDefinitions.push(branchModuleDef);
+                                                  const branchModuleDef = state.allModuleDefinitions.find(m => m.id === 'condition_branch');
+                                                  if (!branchModuleDef) {
+                                                    console.error('condition_branch module definition not found!');
+                                                    return;
                                                   }
                         
                                                   const newBranchModule = {
@@ -451,9 +462,13 @@
                                                     name: branchModuleDef.name,
                                                     type: branchModuleDef.type,
                                                     settings: {},
-                                                    true_modules: [],
-                                                    false_modules: []
                                                   };
+                                                  // Initialize branch arrays dynamically
+                                                  if (branchModuleDef.branches) {
+                                                    branchModuleDef.branches.forEach(branch => {
+                                                      newBranchModule[branch.id] = [];
+                                                    });
+                                                  }
                         
                                                   let foundModuleInfo = null;
                         
@@ -464,7 +479,14 @@
                                                         foundModuleInfo = { parentArray: moduleArray, index: i };
                                                         return;
                                                       }
-                                                      if (module.type === 'container' && module.modules) {
+                                                      if (module.type === 'container' && module.branches) {
+                                                        module.branches.forEach(branch => {
+                                                          if (module[branch.id]) {
+                                                            findModuleAndGetSiblings(module[branch.id]);
+                                                            if (foundModuleInfo) return;
+                                                          }
+                                                        });
+                                                      } else if (module.type === 'container' && module.modules) {
                                                         findModuleAndGetSiblings(module.modules);
                                                         if (foundModuleInfo) return;
                                                       }
@@ -475,11 +497,12 @@
                         
                                                   if (foundModuleInfo) {
                                                     const { parentArray, index } = foundModuleInfo;
-                                                    // Get all modules after the selected one
                                                     const subsequentModules = parentArray.splice(index + 1);
-                                                    // Put them in the 'true' branch
-                                                    newBranchModule.true_modules = subsequentModules;
-                                                    // Insert the branch module right after the selected module
+                                                    // By default, move subsequent modules to the first defined branch (e.g., 'true_modules')
+                                                    const firstBranchId = branchModuleDef.branches[0]?.id;
+                                                    if (firstBranchId) {
+                                                      newBranchModule[firstBranchId] = subsequentModules;
+                                                    }
                                                     parentArray.splice(index + 1, 0, newBranchModule);
                                                   }
                         
@@ -701,52 +724,41 @@
                                                         parentElement.appendChild(moduleEl);
                                             
                                                         if (module.type === 'container') {
-                                                            if (module.id === 'condition_branch') {
-                                                                const trueContainer = moduleEl.querySelector('.true-branch-dropzone');
-                                                                const falseContainer = moduleEl.querySelector('.false-branch-dropzone');
-                                            
-                                                                // Init Sortable for TRUE branch
-                                                                new Sortable(trueContainer, {
+                                                            const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                            if (moduleDef && moduleDef.branches) {
+                                                              // Dynamic branch logic for containers like 'condition_branch'
+                                                              moduleDef.branches.forEach(branch => {
+                                                                const containerEl = moduleEl.querySelector(`.${branch.id}-dropzone`);
+                                                                if (containerEl) {
+                                                                  new Sortable(containerEl, {
                                                                     group: 'shared', animation: 150, handle: '.handle',
-                                                                    onAdd: (evt) => onAddModule(evt, module.true_modules),
-                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.true_modules)
-                                                                });
+                                                                    onAdd: (evt) => onAddModule(evt, module[branch.id]),
+                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module[branch.id])
+                                                                  });
                                             
-                                                                // Init Sortable for FALSE branch
-                                                                new Sortable(falseContainer, {
-                                                                    group: 'shared', animation: 150, handle: '.handle',
-                                                                    onAdd: (evt) => onAddModule(evt, module.false_modules),
-                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module.false_modules)
-                                                                });
-                                            
-                                                                // Recursively render modules in both branches
-                                                                if (module.true_modules && module.true_modules.length > 0) {
-                                                                    createModuleTree(module.true_modules, trueContainer, module.true_modules);
-                                                                } else {
-                                                                    trueContainer.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                  if (module[branch.id] && module[branch.id].length > 0) {
+                                                                    createModuleTree(module[branch.id], containerEl, module[branch.id]);
+                                                                  } else {
+                                                                    containerEl.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                  }
                                                                 }
-                                                                if (module.false_modules && module.false_modules.length > 0) {
-                                                                    createModuleTree(module.false_modules, falseContainer, module.false_modules);
-                                                                } else {
-                                                                    falseContainer.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                                                }
-                                            
+                                                              });
                                                             } else {
-                                                                // Standard container logic
-                                                                const containerContent = moduleEl.querySelector('.module-container-content');
-                                                                if (containerContent) {
-                                                                    new Sortable(containerContent, {
-                                                                        group: 'shared', animation: 150, handle: '.handle',
-                                                                        onAdd: (evt) => onAddModule(evt, module.modules),
-                                                                        onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
-                                                                    });
+                                                              // Standard container logic for containers like 'group_container'
+                                                              const containerContent = moduleEl.querySelector('.module-container-content');
+                                                              if (containerContent) {
+                                                                new Sortable(containerContent, {
+                                                                  group: 'shared', animation: 150, handle: '.handle',
+                                                                  onAdd: (evt) => onAddModule(evt, module.modules),
+                                                                  onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                                                });
                                             
-                                                                    if (module.modules && module.modules.length > 0) {
-                                                                        createModuleTree(module.modules, containerContent, module.modules);
-                                                                    } else {
-                                                                        containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                                                    }
+                                                                if (module.modules && module.modules.length > 0) {
+                                                                  createModuleTree(module.modules, containerContent, module.modules);
+                                                                } else {
+                                                                  containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
                                                                 }
+                                                              }
                                                             }
                                                         }
                                                     });
@@ -784,8 +796,10 @@
                                                                   settingsHTML += `<textarea id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="${setting.placeholder || ''}">${currentValue}</textarea>`;
                                                                   break;
                                                               case 'select':
-                                                                  const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
-                                                                  settingsHTML += `<select id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
+                                                                  if (Array.isArray(setting.options)) {
+                                                                    const options = setting.options.map(opt => `<option value="${opt.value}" ${currentValue === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('');
+                                                                    settingsHTML += `<select id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white">${options}</select>`;
+                                                                  }
                                                                   break;
                                                               case 'checkbox':
                                                                   settingsHTML += `<label class="flex items-center mt-2"><input type="checkbox" id="setting-${module.instanceId}-${setting.id}" data-setting-id="${setting.id}" ${currentValue ? 'checked' : ''} class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"> <span class="ml-2 text-gray-700 dark:text-gray-300">${setting.label || ''}</span></label>`;
@@ -799,53 +813,61 @@
                                                       settingsHTML += '</div>';
                                                   }
                         
-                                                  let contentHTML = `
-                                                    <div class="flex items-center gap-3">
-                                                        <div class="flex-shrink-0">
-                                                          <i class="fas fa-grip-vertical text-gray-400 cursor-grab handle"></i>
-                                                        </div>
-                                                        <div class="flex-grow">
-                                                            <div class="flex justify-between items-center">
+                                                              let titleDisplay = moduleDef.name;
+                                                              if (module.id === 'group_container' && module.settings.groupTitle) {
+                                                                titleDisplay += `: <span class="font-normal text-gray-600 dark:text-gray-400">${module.settings.groupTitle}</span>`;
+                                                              } else if (module.id === 'condition_branch' && module.settings.condition) {
+                                                                titleDisplay += `: <span class="font-mono text-sm text-blue-600 dark:text-blue-400">${module.settings.condition}</span>`;
+                                                              }
+                        
+                                                              contentHTML = `
                                                                 <div class="flex items-center gap-3">
-                                                                    <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600 dark:text-gray-400"></i>
-                                                                    <h3 class="font-bold text-gray-800 dark:text-gray-100">${moduleDef.name}</h3>
-                                                                </div>
-                                                                <div class="flex items-center gap-2">
-                                                                    <button data-action="collapse" class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" title="${isCollapsed ? '展開' : '折りたたむ'}">
-                                                                      <i class="fas ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} pointer-events-none"></i>
-                                                                    </button>
-                                                                    <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
-                                                                        <div class="relative">
-                                                                            <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
-                                                                            <div class="block bg-gray-300 w-10 h-6 rounded-full dark:bg-gray-600"></div>
-                                                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                                                    <div class="flex-shrink-0">
+                                                                      <i class="fas fa-grip-vertical text-gray-400 cursor-grab handle"></i>
+                                                                    </div>
+                                                                    <div class="flex-grow">
+                                                                        <div class="flex justify-between items-center">
+                                                                            <div class="flex items-center gap-3">
+                                                                                <i class="fas ${moduleDef.icon || 'fa-extension'} text-xl text-gray-600 dark:text-gray-400"></i>
+                                                                                <h3 class="font-bold text-gray-800 dark:text-gray-100">${titleDisplay}</h3>
+                                                                            </div>
+                                                                            <div class="flex items-center gap-2">
+                                                                                <button data-action="collapse" class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" title="${isCollapsed ? '展開' : '折りたたむ'}">
+                                                                                  <i class="fas ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} pointer-events-none"></i>
+                                                                                </button>
+                                                                                <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
+                                                                                    <div class="relative">
+                                                                                        <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
+                                                                                        <div class="block bg-gray-300 w-10 h-6 rounded-full dark:bg-gray-600"></div>
+                                                                                        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                                                                    </div>
+                                                                                </label>
+                                                                                <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
+                                                                                <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
+                                                                            </div>
                                                                         </div>
-                                                                    </label>
-                                                                    <button data-action="run" class="p-2 text-green-500 hover:text-green-700 dark:hover:text-green-400" title="このモジュールのみ実行"><i class="fas fa-play pointer-events-none"></i></button>
-                                                                    <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
-                                                                </div>
-                                                            </div>
-                                                            <div class="module-content-wrapper ${isCollapsed ? 'hidden' : ''}">
-                                                              <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
-                                                              ${settingsHTML}
-                                                            </div>
-                                                        `;
+                                                                        <div class="module-content-wrapper ${isCollapsed ? 'hidden' : ''}">
+                                                                          <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
+                                                                          ${settingsHTML}
+                                                                        </div>
+                                                                    `;
                                           
                                                   if (module.type === 'container') {
-                                                      if (module.id === 'condition_branch') {
-                                                        contentHTML += `
-                                                          <div class="branch-container mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 grid grid-cols-2 gap-4">
-                                                            <div class="branch-true">
-                                                              <h4 class="font-bold text-green-600 dark:text-green-400 text-center mb-2">True</h4>
-                                                              <div class="module-container-content true-branch-dropzone bg-green-50 dark:bg-green-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
+                                                      const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                      if (moduleDef && moduleDef.branches) {
+                                                        // Dynamic branch container for modules like 'condition_branch'
+                                                        contentHTML += `<div class="branch-container mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 grid grid-cols-${moduleDef.branches.length} gap-4">`;
+                                                        moduleDef.branches.forEach(branch => {
+                                                          contentHTML += `
+                                                            <div class="branch-${branch.id}">
+                                                              <h4 class="font-bold text-gray-700 dark:text-gray-300 text-center mb-2">${branch.name}</h4>
+                                                              <div class="module-container-content ${branch.id}-dropzone bg-gray-50 dark:bg-gray-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
                                                             </div>
-                                                            <div class="branch-false">
-                                                              <h4 class="font-bold text-red-600 dark:text-red-400 text-center mb-2">False</h4>
-                                                              <div class="module-container-content false-branch-dropzone bg-red-50 dark:bg-red-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
-                                                            </div>
-                                                          </div>
-                                                        `;
+                                                          `;
+                                                        });
+                                                        contentHTML += `</div>`;
                                                       } else {
+                                                        // Standard container for modules like 'group_container'
                                                         contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
                                                       }
                                                   }
@@ -1013,10 +1035,18 @@
                                                   if (module.instanceId === instanceId) {
                                                     return module;
                                                   }
-                                                  if (module.type === 'container' && module.modules) {
-                                                    const found = findModuleByInstanceId(module.modules, instanceId);
-                                                    if (found) {
-                                                      return found;
+                                                  if (module.type === 'container') {
+                                                    if (module.branches) {
+                                                      for (const branch of module.branches) {
+                                                        if (module[branch.id]) {
+                                                          const found = findModuleByInstanceId(module[branch.id], instanceId);
+                                                          if (found) return found;
+                                                        }
+                                                      }
+                                                    }
+                                                    if (module.modules) {
+                                                      const found = findModuleByInstanceId(module.modules, instanceId);
+                                                      if (found) return found;
                                                     }
                                                   }
                                                 }
@@ -1071,9 +1101,18 @@
                                                     modules.splice(i, 1);
                                                     return true; // Found and deleted
                                                   }
-                                                  if (module.type === 'container' && module.modules) {
-                                                    if (findAndDeleteModule(module.modules, instanceId)) {
-                                                      return true; // Found and deleted in a nested container
+                                                  if (module.type === 'container') {
+                                                    if (module.branches) {
+                                                      for (const branch of module.branches) {
+                                                        if (module[branch.id] && findAndDeleteModule(module[branch.id], instanceId)) {
+                                                          return true;
+                                                        }
+                                                      }
+                                                    }
+                                                    if (module.modules) {
+                                                      if (findAndDeleteModule(module.modules, instanceId)) {
+                                                        return true; // Found and deleted in a nested container
+                                                      }
                                                     }
                                                   }
                                                 }
@@ -1107,7 +1146,14 @@
                                                 }
                                                 modules.forEach(module => {
                                                   if (module.type === 'container') {
-                                                    module.modules = sanitizeModules(module.modules);
+                                                    if (module.branches) {
+                                                      module.branches.forEach(branch => {
+                                                        module[branch.id] = sanitizeModules(module[branch.id]);
+                                                      });
+                                                    }
+                                                    if (module.modules) {
+                                                      module.modules = sanitizeModules(module.modules);
+                                                    }
                                                   }
                                                 });
                                                 return modules;
