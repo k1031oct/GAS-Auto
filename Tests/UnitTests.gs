@@ -279,6 +279,7 @@ GasT.describe('ArchiveService', function() {
       }
     },
     getDateCreated: () => dateCreated || new Date(),
+    getLastUpdated: () => dateCreated || new Date(),
     setTrashed: function(trashed) {
       if (trashed) {
         trashedFiles.push(this.getId());
@@ -296,6 +297,14 @@ GasT.describe('ArchiveService', function() {
     getName: function() { return this.name; },
     getFiles: function() {
       const folderFiles = createdFiles.filter(f => f.parentId === this.id);
+      let index = 0;
+      return {
+        hasNext: () => index < folderFiles.length,
+        next: () => folderFiles[index++]
+      };
+    },
+    getFilesByName: function(fileName) {
+      const folderFiles = createdFiles.filter(f => f.parentId === this.id && f.name === fileName);
       let index = 0;
       return {
         hasNext: () => index < folderFiles.length,
@@ -348,7 +357,7 @@ GasT.describe('ArchiveService', function() {
       Files: {
         insert: function(resource, blob, options) {
           const newFile = { id: `converted_${Date.now()}`, name: resource.title };
-          createdFiles.push(createMockFile(newFile.id, newFile.name));
+          createdFiles.push(createMockFile(newFile.id, newFile.name, new Date()));
           return newFile;
         }
       }
@@ -400,7 +409,7 @@ GasT.describe('ArchiveService', function() {
   });
 
   GasT.it('processAndArchiveFile should archive a new file correctly', function() {
-    const excelFile = createMockFile('excel1', 'Report-2023-10-25.xlsx');
+    const excelFile = createMockFile('excel1', 'Report-2023-10-25.xlsx', new Date());
     createdFiles.push(excelFile);
 
     processAndArchiveFile(excelFile, 'MyArchive');
@@ -415,16 +424,18 @@ GasT.describe('ArchiveService', function() {
 
   GasT.it('processAndArchiveFile should replace an older file', function() {
     const archiveName = 'MyArchive';
-    const date = new Date(2023, 9, 15);
-    
+    const oldDate = new Date(2023, 9, 15);
+    const newDate = new Date(2023, 9, 20);
+    const reportName = 'Monthly-Report-2023-10';
+
     // 1. Create an "existing" file in the archive
-    const existingFile = createMockFile('existing1', 'Old-Report-2023-10-15.xlsx', date);
-    const monthFolder = getOrCreateArchiveFolder(archiveName, date);
+    const monthFolder = getOrCreateArchiveFolder(archiveName, newDate); // Folder for the new file
+    const existingFile = createMockFile('existing1', reportName, oldDate);
     existingFile.parentId = monthFolder.getId();
     createdFiles.push(existingFile);
 
-    // 2. Process a newer file
-    const newExcelFile = createMockFile('excelNew', 'New-Report-2023-10-20.xlsx');
+    // 2. Process a newer file with the same base name
+    const newExcelFile = createMockFile('excelNew', `${reportName}.xlsx`, newDate);
     createdFiles.push(newExcelFile);
     processAndArchiveFile(newExcelFile, archiveName);
 
@@ -437,16 +448,18 @@ GasT.describe('ArchiveService', function() {
 
   GasT.it('processAndArchiveFile should discard a new file if its older', function() {
     const archiveName = 'MyArchive';
-    const date = new Date(2023, 9, 25);
-    
+    const oldDate = new Date(2023, 9, 10);
+    const newDate = new Date(2023, 9, 25);
+    const reportName = 'Monthly-Report-2023-10';
+
     // 1. Create an "existing" file in the archive
-    const existingFile = createMockFile('existing2', 'Newer-Report-2023-10-25.xlsx', date);
-    const monthFolder = getOrCreateArchiveFolder(archiveName, date);
+    const monthFolder = getOrCreateArchiveFolder(archiveName, oldDate); // Folder for the old file
+    const existingFile = createMockFile('existing2', reportName, newDate);
     existingFile.parentId = monthFolder.getId();
     createdFiles.push(existingFile);
 
-    // 2. Process an older file
-    const oldExcelFile = createMockFile('excelOld', 'Older-Report-2023-10-10.xlsx');
+    // 2. Process an older file with the same base name
+    const oldExcelFile = createMockFile('excelOld', `${reportName}.xlsx`, oldDate);
     createdFiles.push(oldExcelFile);
     processAndArchiveFile(oldExcelFile, archiveName);
 
