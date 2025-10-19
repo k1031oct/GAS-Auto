@@ -22,7 +22,6 @@ jobs:
       prompt: ${{ github.event.comment.body }}
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      # ai-code-generator.ymlにPATを渡す
       GH_PAT: ${{ secrets.GH_PAT }}
 
   dispatch-on-label:
@@ -37,6 +36,45 @@ jobs:
       prompt: ${{ github.event.issue.body }}
     secrets:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      # ai-code-generator.ymlにPATを渡す
       GH_PAT: ${{ secrets.GH_PAT }}
 
+  dispatch-on-new-module:
+    if: |
+      github.event.sender.type != 'Bot' && 
+      (contains(github.event.comment.body, '@gemini-cli /new_module') || contains(github.event.comment.body, '@github-actions /new_module'))
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    uses: ./.github/workflows/ai-code-generator.yml
+    with:
+      issue_number: ${{ github.event.issue.number }}
+      prompt: |
+        ## モジュール生成タスク
+        
+        あなたは、このリポジトリの「Automater」に新しい機能モジュールを追加するエキスパートです。
+        
+        **あなたのタスク:**
+        ユーザーの要望（以下に記載）を分析し、それを実現するための「モジュールJSONファイル」と「GASハンドラ関数」の両方を生成・追加してください。
+        
+        **実行手順:**
+        1.  **分析**: ユーザーの要望から、必要な機能、引数（設定項目）、カテゴリ（"Google Sheets", "Gmail"など）を特定します。
+        2.  **GASハンドラ生成**: 要望された機能を実現するGoogle Apps Scriptの関数を作成します。
+            -   この関数は、適切な `*Service.gs` ファイル（例: `SheetService.gs`, `DriveService.gs`）の末尾に追加してください。
+            -   関数は `settings` オブジェクトを引数として受け取ります (例: `SheetService.exportSheetAsPdf = function(settings) { ... }`)。
+        3.  **JSON定義生成**: `ModuleService.gs` の `createInitialModules` 関数にあるスキーマを参考に、新しいモジュール定義JSONファイルを作成します。
+            -   `id` は (例: `sheets_export_pdf`) のように命名します。
+            -   `handler` には、ステップ2で作成した関数名（例: `SheetService.exportSheetAsPdf`）を指定します。
+            -   `settings` 配列には、ユーザーがUIで設定する必要がある項目（例: `spreadsheetUrl`, `sheetName`）を定義します。
+        4.  **ファイル配置**:
+            -   GASハンドラ関数は、既存の `.gs` ファイルに追加します。
+            -   JSON定義ファイルは、リポジトリのルートに（例: `sheets_export_pdf.json`）として新規作成してください。
+        
+        **ユーザーの要望:**
+        ${{ github.event.comment.body }}
+        
+        ---
+        あなたはGEMINI.mdのルールに厳格に従う必要があります。すべてのファイル修正が完了したら、必ず `All tasks are complete.` という決まったフレーズで応答を終了してください。
+    secrets:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GH_PAT: ${{ secrets.GH_PAT }}
