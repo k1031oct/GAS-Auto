@@ -977,7 +977,28 @@
                                                                 titleDisplay += `: <span class="font-mono text-sm text-blue-600 dark:text-blue-400">${module.settings.condition}</span>`;
                                                               }
                         
-                                                              contentHTML = `
+                                                              let containerHTML = '';
+                                                              if (module.type === 'container') {
+                                                                  const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                                  if (moduleDef && moduleDef.branches) {
+                                                                    // Dynamic branch container for modules like 'condition_branch'
+                                                                    containerHTML += `<div class="branch-container mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 grid grid-cols-${moduleDef.branches.length} gap-4">`;
+                                                                    moduleDef.branches.forEach(branch => {
+                                                                      containerHTML += `
+                                                                        <div class="branch-${branch.id}">
+                                                                          <h4 class="font-bold text-gray-700 dark:text-gray-300 text-center mb-2">${branch.name}</h4>
+                                                                          <div class="module-container-content ${branch.id}-dropzone bg-gray-50 dark:bg-gray-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
+                                                                        </div>
+                                                                      `;
+                                                                    });
+                                                                    containerHTML += `</div>`;
+                                                                  } else {
+                                                                    // Standard container for modules like 'group_container'
+                                                                    containerHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
+                                                                  }
+                                                              }
+                        
+                                                              const contentHTML = `
                                                                 <div class="flex items-center gap-3">
                                                                     <div class="flex-shrink-0">
                                                                       <i class="fas fa-grip-vertical text-gray-400 cursor-grab handle"></i>
@@ -1006,30 +1027,10 @@
                                                                         <div class="module-content-wrapper ${isCollapsed ? 'hidden' : ''}">
                                                                           <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
                                                                           ${settingsHTML}
+                                                                          ${containerHTML}
                                                                         </div>
-                                                                    `;
-                                          
-                                                  if (module.type === 'container') {
-                                                      const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
-                                                      if (moduleDef && moduleDef.branches) {
-                                                        // Dynamic branch container for modules like 'condition_branch'
-                                                        contentHTML += `<div class="branch-container mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 grid grid-cols-${moduleDef.branches.length} gap-4">`;
-                                                        moduleDef.branches.forEach(branch => {
-                                                          contentHTML += `
-                                                            <div class="branch-${branch.id}">
-                                                              <h4 class="font-bold text-gray-700 dark:text-gray-300 text-center mb-2">${branch.name}</h4>
-                                                              <div class="module-container-content ${branch.id}-dropzone bg-gray-50 dark:bg-gray-900/20 p-2 rounded-lg min-h-[60px] border-2 border-dashed border-gray-300 dark:border-gray-600 space-y-2"></div>
-                                                            </div>
-                                                          `;
-                                                        });
-                                                        contentHTML += `</div>`;
-                                                      } else {
-                                                        // Standard container for modules like 'group_container'
-                                                        contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
-                                                      }
-                                                  }
-                                          
-                                                  contentHTML += `</div></div>`;
+                                                                    </div>
+                                                                </div>`;
                                                   moduleEl.innerHTML = contentHTML;
                                           
                                                   // --- Attach Event Listeners ---
