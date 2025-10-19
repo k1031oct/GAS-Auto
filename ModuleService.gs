@@ -21,9 +21,11 @@ var ModuleService = {
    * @returns {Array<object>} ロードされたモジュール定義の配列
    */
   loadModuleDefinitions: function (folderId) {
+    const defaultModules = this._getDefaultModules();
+
     if (!folderId) {
-      Logger.log("モジュールフォルダIDが未指定です。カスタムモジュールはロードされません。");
-      return [];
+      Logger.log("モジュールフォルダIDが未指定です。デフォルトモジュールのみをロードします。");
+      return defaultModules;
     }
 
     const cache = CacheService.getScriptCache();
@@ -38,44 +40,49 @@ var ModuleService = {
     // ユーザープロパティにフォルダIDを保存
     PropertiesService.getUserProperties().setProperty(this._DEFAULT_MODULE_FOLDER_KEY, folderId);
 
-    const loadedModules = [];
-    let folder;
-    
+    let customModules = [];
     try {
-      folder = DriveApp.getFolderById(folderId);
+      const folder = DriveApp.getFolderById(folderId);
+      const jsonFiles = folder.getFilesByType("application/json");
+      
+      while (jsonFiles.hasNext()) {
+        const file = jsonFiles.next();
+        try {
+          const content = file.getBlob().getDataAsString();
+          const moduleDef = JSON.parse(content);
+          
+          if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
+            customModules.push(moduleDef);
+          } else {
+            Logger.log(`警告: ファイル「${file.getName()}」は有効なモジュールJSON形式ではありません。`);
+          }
+        } catch (e) {
+          Logger.log(`JSONファイル「${file.getName()}」の解析に失敗しました: ${e.message}`);
+        }
+      }
     } catch (e) {
       Logger.log(`指定されたフォルダID「${folderId}」が見つからないか、アクセスできません。エラー: ${e.message}`);
-      return [];
+      // フォルダにアクセスできなくても、デフォルトモジュールは返す
     }
+    
+    // デフォルトモジュールとカスタムモジュールをマージ（カスタムが優先）
+    const finalModules = defaultModules.map(defaultModule => {
+      const customOverride = customModules.find(customModule => customModule.id === defaultModule.id);
+      return customOverride || defaultModule;
+    });
 
-    const jsonFiles = folder.getFilesByType("application/json");
-    
-    while (jsonFiles.hasNext()) {
-      const file = jsonFiles.next();
-      try {
-        const content = file.getBlob().getDataAsString();
-        const moduleDef = JSON.parse(content);
-        
-        // 必須フィールドのチェック（最低限のバリデーション）
-        if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
-          // 既存のデフォルトモジュールIDと衝突しないかチェック
-          if (loadedModules.findIndex(m => m.id === moduleDef.id) === -1) {
-            loadedModules.push(moduleDef);
-          } else {
-             Logger.log(`警告: モジュールID「${moduleDef.id}」は既に存在するためスキップされました。`);
-          }
-        } else {
-          Logger.log(`警告: ファイル「${file.getName()}」は有効なモジュールJSON形式ではありません。`);
-        }
-      } catch (e) {
-        Logger.log(`JSONファイル「${file.getName()}」の解析に失敗しました: ${e.message}`);
+    // デフォルトにない完全なカスタムモジュールを追加
+    customModules.forEach(customModule => {
+      if (!finalModules.some(m => m.id === customModule.id)) {
+        finalModules.push(customModule);
       }
-    }
-    
+    });
+
     // データをキャッシュに保存（有効期限10分）
-    cache.put(cacheKey, JSON.stringify(loadedModules), 600); 
-    Logger.log(`Driveから ${loadedModules.length} 個のカスタムモジュールをロードし、キャッシュに保存しました。`);
-    return loadedModules;
+    cache.put(cacheKey, JSON.stringify(finalModules), 600); 
+    Logger.log(`Driveから ${customModules.length} 個のカスタムモジュールをロードし、合計 ${finalModules.length} 個のモジュールをキャッシュに保存しました。`);
+    
+    return finalModules;
   },
   
   /**
@@ -103,7 +110,40 @@ var ModuleService = {
       throw new Error('フォルダIDが指定されていません。処理を中断しました。');
     }
 
-    const defaultModules = [
+    const defaultModules = this._getDefaultModules();
+
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      let createdCount = 0;
+      
+      defaultModules.forEach(module => {
+        const fileName = `${module.id}.json`;
+        const files = folder.getFilesByName(fileName);
+        
+        // 同じ名前のファイルが存在しない場合のみ作成
+        if (!files.hasNext()) {
+          folder.createFile(fileName, JSON.stringify(module, null, 2), "application/json");
+          createdCount++;
+        }
+      });
+
+      if (createdCount > 0) {
+        return `${createdCount}個の初期モジュールを生成しました。`;
+      } else {
+        return '初期モジュールは既に存在するため、生成をスキップしました。';
+      }
+    } catch (e) {
+      Logger.log(`初期モジュールの生成に失敗しました: ${e.message}`);
+      throw new Error(`初期モジュールの生成に失敗しました: ${e.message}`);
+    }
+  },
+
+  /**
+   * デフォルトで組み込まれているモジュール定義のリストを返す
+   * @private
+   */
+  _getDefaultModules: function() {
+    return [
       {
         "id": "drive_move_file",
         "name": "ドライブファイルを移動",
@@ -235,30 +275,5 @@ var ModuleService = {
         ]
       }
     ];
-
-    try {
-      const folder = DriveApp.getFolderById(folderId);
-      let createdCount = 0;
-      
-      defaultModules.forEach(module => {
-        const fileName = `${module.id}.json`;
-        const files = folder.getFilesByName(fileName);
-        
-        // 同じ名前のファイルが存在しない場合のみ作成
-        if (!files.hasNext()) {
-          folder.createFile(fileName, JSON.stringify(module, null, 2), "application/json");
-          createdCount++;
-        }
-      });
-
-      if (createdCount > 0) {
-        return `${createdCount}個の初期モジュールを生成しました。`;
-      } else {
-        return '初期モジュールは既に存在するため、生成をスキップしました。';
-      }
-    } catch (e) {
-      Logger.log(`初期モジュールの生成に失敗しました: ${e.message}`);
-      throw new Error(`初期モジュールの生成に失敗しました: ${e.message}`);
-    }
   }
 };
