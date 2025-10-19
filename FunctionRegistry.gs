@@ -4,7 +4,7 @@
  * This follows an interpreter pattern, where function handlers are registered
  * with a string key and can be invoked dynamically.
  */
-const FunctionRegistry = {
+var FunctionRegistry = {
   _registry: {},
 
   /**
