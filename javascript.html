@@ -7,6 +7,7 @@
       workflowSelector: document.getElementById('workflow-selector'),
       newWorkflowBtn: document.getElementById('new-workflow-btn'),
       saveWorkflowBtn: document.getElementById('save-workflow-btn'),
+      mobileSaveWorkflowBtn: document.getElementById('mobile-save-workflow-btn'),
       deleteWorkflowBtn: document.getElementById('delete-workflow-btn'),
       runBtn: document.getElementById('run-btn'),
       historyBtn: document.getElementById('history-btn'),
@@ -286,6 +287,27 @@
                                                   targetModuleArray.splice(evt.newIndex, 0, movedItem);
                                                   markDirty();
                                               };
+
+                                              const saveWorkflow = async () => {
+                                                  let workflowName = state.currentWorkflowName;
+                                                  if (!workflowName) {
+                                                      workflowName = await showCustomDialog({ title: 'ワークフロー名の入力', message: 'ワークフロー名を入力してください:', type: 'prompt' });
+                                                      if (!workflowName) return;
+                                                  }
+                                                  const workflowData = getWorkflowData();
+                                                  showLoader();
+                                                  google.script.run
+                                                      .withSuccessHandler(response => {
+                                                          state.currentWorkflowName = workflowName;
+                                                          state.isDirty = false;
+                                                          loadWorkflows();
+                                                          setTimeout(() => { app.workflowSelector.value = workflowName; }, 100);
+                                                          hideLoader();
+                                                          log(response, 'success');
+                                                      })
+                                                      .withFailureHandler(showError)
+                                                      .saveWorkflow(workflowName, workflowData);
+                                              };
                         
                                               // --- initEventListeners ---
                                               const initEventListeners = () => {
@@ -334,26 +356,8 @@
                                                 app.moduleFolderIdInput.addEventListener('change', markDirty);
                                                 app.moduleFolderIdInputMobile.addEventListener('change', markDirty);
                                                 app.workflowSelector.addEventListener('change', handleWorkflowSelect);
-                                                app.saveWorkflowBtn.addEventListener('click', async () => {
-                                                      let workflowName = state.currentWorkflowName;
-                                                      if (!workflowName) {
-                                                          workflowName = await showCustomDialog({ title: 'ワークフロー名の入力', message: 'ワークフロー名を入力してください:', type: 'prompt' });
-                                                          if (!workflowName) return;
-                                                      }
-                                                      const workflowData = getWorkflowData();
-                                                      showLoader();
-                                                      google.script.run
-                                                          .withSuccessHandler(response => {
-                                                              state.currentWorkflowName = workflowName;
-                                                              state.isDirty = false;
-                                                              loadWorkflows();
-                                                              setTimeout(() => { app.workflowSelector.value = workflowName; }, 100);
-                                                              hideLoader();
-                                                              log(response, 'success');
-                                                          })
-                                                          .withFailureHandler(showError)
-                                                          .saveWorkflow(workflowName, workflowData);
-                                                  });
+                                                app.saveWorkflowBtn.addEventListener('click', saveWorkflow);
+                                                app.mobileSaveWorkflowBtn.addEventListener('click', saveWorkflow);
                                                 app.deleteWorkflowBtn.addEventListener('click', async () => {
                                                       if (!state.currentWorkflowName) return;
                                                       const confirmed = await showCustomDialog({ title: '確認', message: `本当にワークフロー「${state.currentWorkflowName}」を削除しますか？`, type: 'confirm' });
