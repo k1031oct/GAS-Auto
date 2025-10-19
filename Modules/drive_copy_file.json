@@ -1,7 +1,7 @@
 {
   "id": "drive_copy_file",
   "name": "ファイルをコピー",
-  "icon": "file_copy",
+  "icon": "fa-copy",
   "category": "Google Drive",
   "description": "ファイルをコピーします。新しいファイル名は直接入力するか、スプレッドシートのセルから取得できます。",
   "returnsValue": true,

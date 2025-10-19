@@ -1,7 +1,7 @@
 {
   "id": "gmail_send_email",
   "name": "Gmailを送信する",
-  "icon": "send",
+  "icon": "fa-paper-plane",
   "category": "Gmail",
   "description": "Gmailでメールを送信します。CC, BCC, 添付ファイルも指定可能です。",
   "settings": [
