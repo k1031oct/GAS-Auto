@@ -295,6 +295,7 @@
                                                     }
                         
                                                     markDirty();
+                                                    setTimeout(drawConnectors, 50);
                                                 }
                                               };
                         
@@ -303,6 +304,7 @@
                                                   const movedItem = targetModuleArray.splice(evt.oldIndex, 1)[0];
                                                   targetModuleArray.splice(evt.newIndex, 0, movedItem);
                                                   markDirty();
+                                                  setTimeout(drawConnectors, 50);
                                               };
 
                                               const saveWorkflow = async () => {
@@ -318,7 +320,10 @@
                                                           state.currentWorkflowName = workflowName;
                                                           state.isDirty = false;
                                                           loadWorkflows();
-                                                          setTimeout(() => { app.workflowSelector.value = workflowName; }, 100);
+                                                          setTimeout(() => {
+                                                            app.workflowSelector.value = workflowName;
+                                                            drawConnectors();
+                                                          }, 100);
                                                           hideLoader();
                                                           log(response, 'success');
                                                       })
@@ -705,6 +710,150 @@
                                                   }
                                               };
                                           
+                                              const debounce = (func, delay) => {
+                                                let timeout;
+                                                return (...args) => {
+                                                  clearTimeout(timeout);
+                                                  timeout = setTimeout(() => func.apply(this, args), delay);
+                                                };
+                                              };
+                                          
+                                              const drawConnectors = () => {
+                                                const svg = document.getElementById('connector-svg');
+                                                const container = app.workflowContainer;
+                                                if (!svg || !container) return;
+                                            
+                                                svg.innerHTML = ''; // Clear existing connectors
+                                            
+                                                const containerRect = container.getBoundingClientRect();
+                                            
+                                                const getModuleEndpoints = (moduleEl) => {
+                                                  if (!moduleEl) return null;
+                                                  const rect = moduleEl.getBoundingClientRect();
+                                                  return {
+                                                    top: { x: rect.left + rect.width / 2 - containerRect.left, y: rect.top - containerRect.top },
+                                                    bottom: { x: rect.left + rect.width / 2 - containerRect.left, y: rect.bottom - containerRect.top },
+                                                  };
+                                                };
+                                            
+                                                const createPath = (d, isBranch = false) => {
+                                                  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                                                  path.setAttribute('d', d);
+                                                  path.setAttribute('stroke', isBranch ? '#F59E0B' : '#9CA3AF'); // amber-500 for branch, gray-400 for normal
+                                                  path.setAttribute('stroke-width', '2');
+                                                  path.setAttribute('fill', 'none');
+                                                  if (isBranch) {
+                                                    path.setAttribute('stroke-dasharray', '4 4');
+                                                  }
+                                                  return path;
+                                                };
+                                            
+                                                const createBranchIcon = (x, y, module) => {
+                                                  const iconGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                                                  iconGroup.style.cursor = 'pointer';
+                                            
+                                                  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                                                  circle.setAttribute('cx', x);
+                                                  circle.setAttribute('cy', y);
+                                                  circle.setAttribute('r', '12');
+                                                  circle.setAttribute('fill', '#F59E0B'); // amber-500
+                                            
+                                                  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                                                  text.setAttribute('x', x);
+                                                  text.setAttribute('y', y + 1);
+                                                  text.setAttribute('fill', 'white');
+                                                  text.setAttribute('font-size', '14');
+                                                  text.setAttribute('text-anchor', 'middle');
+                                                  text.setAttribute('dominant-baseline', 'middle');
+                                                  text.setAttribute('font-family', 'FontAwesome');
+                                                  text.innerHTML = '&#xf126;'; // fa-code-branch
+                                            
+                                                  iconGroup.appendChild(circle);
+                                                  iconGroup.appendChild(text);
+                                            
+                                                  iconGroup.addEventListener('click', (e) => {
+                                                    e.stopPropagation();
+                                                    console.log('Branch icon clicked for module:', module.instanceId);
+                                                    // Here you would open a modal for setting the condition
+                                                    showCustomDialog({
+                                                      title: '条件設定',
+                                                      message: `モジュール「${module.name}」の分岐条件を入力してください:`,
+                                                      type: 'prompt',
+                                                      defaultValue: module.settings.condition || ''
+                                                    }).then(condition => {
+                                                      if (condition !== null) {
+                                                        module.settings.condition = condition;
+                                                        markDirty();
+                                                        renderModules(); // Re-render to show new condition text
+                                                      }
+                                                    });
+                                                  });
+                                            
+                                                  return iconGroup;
+                                                };
+                                            
+                                                const drawNested = (modules) => {
+                                                  for (let i = 0; i < modules.length - 1; i++) {
+                                                    const currentModule = modules[i];
+                                                    const nextModule = modules[i + 1];
+                                                    const currentEl = container.querySelector(`[data-id="${currentModule.instanceId}"]`);
+                                                    const nextEl = container.querySelector(`[data-id="${nextModule.instanceId}"]`);
+                                            
+                                                    if (currentEl && nextEl) {
+                                                      const start = getModuleEndpoints(currentEl).bottom;
+                                                      const end = getModuleEndpoints(nextEl).top;
+                                                      const d = `M ${start.x} ${start.y} C ${start.x} ${start.y + 30}, ${end.x} ${end.y - 30}, ${end.x} ${end.y}`;
+                                                      svg.appendChild(createPath(d));
+                                                    }
+                                                  }
+                                            
+                                                  modules.forEach(module => {
+                                                    if (module.type === 'container') {
+                                                      const containerEl = container.querySelector(`[data-id="${module.instanceId}"]`);
+                                                      if (!containerEl) return;
+                                            
+                                                      const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                      if (moduleDef && moduleDef.branches) {
+                                                        // Branching logic
+                                                        const startPoint = getModuleEndpoints(containerEl).bottom;
+                                                        const branchContainer = containerEl.querySelector('.branch-container');
+                                                        if (!branchContainer) return;
+                                            
+                                                        const branchRect = branchContainer.getBoundingClientRect();
+                                                        const midY = startPoint.y + 40;
+                                            
+                                                        // Draw main vertical line down
+                                                        const mainLineDown = `M ${startPoint.x} ${startPoint.y} L ${startPoint.x} ${midY}`;
+                                                        svg.appendChild(createPath(mainLineDown, true));
+                                            
+                                                        // Add branch icon
+                                                        const icon = createBranchIcon(startPoint.x, midY, module);
+                                                        svg.appendChild(icon);
+                                            
+                                                        moduleDef.branches.forEach(branch => {
+                                                          const branchModules = module[branch.id] || [];
+                                                          if (branchModules.length > 0) {
+                                                            const firstModuleInBranch = container.querySelector(`[data-id="${branchModules[0].instanceId}"]`);
+                                                            if (firstModuleInBranch) {
+                                                              const endPoint = getModuleEndpoints(firstModuleInBranch).top;
+                                                              // Draw horizontal and vertical lines to the branch
+                                                              const d = `M ${startPoint.x} ${midY} L ${endPoint.x} ${midY} L ${endPoint.x} ${endPoint.y}`;
+                                                              svg.appendChild(createPath(d, true));
+                                                            }
+                                                          }
+                                                          drawNested(branchModules);
+                                                        });
+                                                      } else if (module.modules) {
+                                                        // Standard container logic
+                                                        drawNested(module.modules);
+                                                      }
+                                                    }
+                                                  });
+                                                };
+                                            
+                                                drawNested(state.modules);
+                                              };
+
                                               const renderModules = () => {
                                                 app.workflowContainer.innerHTML = ''; // Clear the container first
                                             
@@ -766,6 +915,9 @@
                                             
                                                 // Start rendering from the root level
                                                 createModuleTree(state.modules, app.workflowContainer, state.modules);
+                                                
+                                                // Use a timeout to ensure the DOM has been updated before drawing connectors
+                                                setTimeout(drawConnectors, 50);
                                               };
                                           
                                               const createModuleElement = (module, parentModuleArray) => {
@@ -925,7 +1077,7 @@
                                                       if (index > -1) {
                                                           parentModuleArray.splice(index, 1);
                                                           markDirty();
-                                                          renderModules(); // Re-render to update the UI
+                                                          renderModules(); // Re-render to update the UI and connectors
                                                       }
                                                   });
                                           
@@ -1122,6 +1274,7 @@
                                               const deleteModule = (instanceId) => {
                                                   if (findAndDeleteModule(state.modules, instanceId)) {
                                                       markDirty();
+                                                      renderModules(); // This will also call drawConnectors
                                                   }
                                               };
                                           
@@ -1137,6 +1290,7 @@
                                                   state.isDirty = false;
                                                   app.workflowSelector.value = '';
                                                   updateUI();
+                                                  drawConnectors(); // Clear connectors
                                                   log('新規ワークフローを作成しました。', 'system');
                                               };
 
@@ -1185,6 +1339,7 @@
                                                               await loadModuleDefinitionsFromDrive();
                                                               // Then, render the UI
                                                               updateUI();
+                                                              setTimeout(drawConnectors, 100); // Redraw connectors after UI update
                                                               hideLoader();
                                                               log(`ワークフロー「${workflowName}」を読み込みました。`, 'system');
                                                           })
@@ -1305,6 +1460,9 @@
                                               };
                                           
                                               function init() {
+                                                const debouncedDrawConnectors = debounce(drawConnectors, 100);
+                                                window.addEventListener('resize', debouncedDrawConnectors);
+
                                                 initEventListeners();
                                                 initResizing();
                                     
