@@ -5,6 +5,8 @@
     const app = {
       // ... (existing elements)
       workflowSelector: document.getElementById('workflow-selector'),
+      collapseAllBtn: document.getElementById('collapse-all-btn'),
+      expandAllBtn: document.getElementById('expand-all-btn'),
       newWorkflowBtn: document.getElementById('new-workflow-btn'),
       saveWorkflowBtn: document.getElementById('save-workflow-btn'),
       deleteWorkflowBtn: document.getElementById('delete-workflow-btn'),
@@ -299,6 +301,15 @@
                                                       preventOnFilter: false
                                                   });
                                                   console.log('Sortable for workflowContainer initialized.');
+
+                                                app.collapseAllBtn.addEventListener('click', () => {
+                                                  state.modules.forEach(m => m.isCollapsed = true);
+                                                  renderModules();
+                                                });
+                                                app.expandAllBtn.addEventListener('click', () => {
+                                                  state.modules.forEach(m => m.isCollapsed = false);
+                                                  renderModules();
+                                                });
                                           
                                                 // Trigger Modal Listeners
                                                 app.triggerBtn.addEventListener('click', openTriggerModal);
@@ -551,15 +562,16 @@
                                               const createModuleElement = (module, parentModuleArray) => {
                                                   const moduleEl = document.createElement('div');
                                                   const isEnabled = module.enabled !== false;
+                                                  const isCollapsed = module.isCollapsed === true;
                                                   const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id) || { name: '不明なモジュール', icon: 'fa-question-circle', settings: [] };
                                                   
-                                                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700`;
+                                                  moduleEl.className = `bg-white p-3 rounded-lg shadow border border-gray-200 ${!isEnabled ? 'opacity-60' : ''} dark:bg-gray-800 dark:border-gray-700 max-w-3xl mx-auto`;
                                                   moduleEl.dataset.id = module.instanceId;
                                                   moduleEl.dataset.moduleId = module.id;
                                           
                                                   let settingsHTML = '';
                                                   if (moduleDef.settings && moduleDef.settings.length > 0) {
-                                                      settingsHTML += '<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">';
+                                                      settingsHTML += `<div class="module-settings-grid grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700" ${isCollapsed ? 'style="display:none;"' : ''}>`;
                                                       moduleDef.settings.forEach(setting => {
                                                           const currentValue = module.settings[setting.id] || setting.defaultValue || '';
                                                           settingsHTML += `<div class="setting-field">`;
@@ -599,6 +611,9 @@
                                                                     <h3 class="font-bold text-gray-800 dark:text-gray-100">${moduleDef.name}</h3>
                                                                 </div>
                                                                 <div class="flex items-center gap-2">
+                                                                    <button data-action="collapse" class="p-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-400" title="${isCollapsed ? '展開' : '折りたたむ'}">
+                                                                      <i class="fas ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} pointer-events-none"></i>
+                                                                    </button>
                                                                     <label class="flex items-center cursor-pointer" title="${isEnabled ? '無効化' : '有効化'}">
                                                                         <div class="relative">
                                                                             <input type="checkbox" data-action="toggle" class="sr-only module-toggle-checkbox" ${isEnabled ? 'checked' : ''}>
@@ -610,12 +625,12 @@
                                                                     <button data-action="delete" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400" title="削除"><i class="fas fa-trash pointer-events-none"></i></button>
                                                                 </div>
                                                             </div>
-                                                            <div class="mt-1 text-sm text-gray-500 dark:text-gray-400">${moduleDef.description || ''}</div>
+                                                            <div class="module-description mt-1 text-sm text-gray-500 dark:text-gray-400" ${isCollapsed ? 'style="display:none;"' : ''}>${moduleDef.description || ''}</div>
                                                             ${settingsHTML}
                                                         `;
                                           
                                                   if (module.type === 'container') {
-                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]"></div>`;
+                                                      contentHTML += `<div class="module-container-content mt-3 pt-3 border-t border-dashed border-gray-300 dark:border-gray-600 space-y-2 min-h-[50px]" ${isCollapsed ? 'style="display:none;"' : ''}></div>`;
                                                   }
                                           
                                                   contentHTML += `</div></div>`;
@@ -631,6 +646,11 @@
                                                     }
                                                   });
                         
+                                                  moduleEl.querySelector('[data-action="collapse"]').addEventListener('click', () => {
+                                                    module.isCollapsed = !module.isCollapsed;
+                                                    renderModules();
+                                                  });
+
                                                   moduleEl.querySelector('[data-action="toggle"]').addEventListener('change', (e) => {
                                                       module.enabled = e.target.checked;
                                                       markDirty();
