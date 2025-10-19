@@ -268,6 +268,8 @@ var WorkflowService = {
       const executionTime = (endTime.getTime() - startTime.getTime()) / 1000;
       LogService.endLog(logContext.runId, logContext.summaryRow, status, executionTime);
     }
+    // Return the logs for this run to the client
+    return LogService.getDetailLogsByRunId(logContext.runId);
   },
 
   /**
