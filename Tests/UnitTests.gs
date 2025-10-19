@@ -49,47 +49,106 @@ GasT.describe('WorkflowService', function() {
 
 GasT.describe('ModuleService', function() {
 
-  GasT.it('should create a module', function() {
-    var mockPropertiesService = {
-      getScriptProperties: function() {
-        return {
-          setProperty: function(key, value) {
-            // Do nothing
-          }
-        };
+  var FOLDER_ID = 'test-folder-id';
+  var mockDriveApp, mockCacheService, originalDriveApp, originalCacheService;
+  var mockCache;
+
+  // モックファイルデータ
+  var mockFiles = [
+    { name: 'module1.json', content: '{"id":"m1","name":"Module 1","settings":[]}' },
+    { name: 'module2.json', content: '{"id":"m2","name":"Module 2","settings":[]}' }
+  ];
+
+  GasT.beforeEach(function() {
+    // DriveAppのモック
+    var fileIterator = {
+      files: mockFiles.slice(), // コピーを渡す
+      hasNext: function() { return this.files.length > 0; },
+      next: function() { return {
+        getBlob: () => ({
+          getDataAsString: () => this.files.shift().content
+        }),
+        getName: () => 'mockName.json'
+      }; }
+    };
+
+    mockDriveApp = {
+      getFolderById: function(folderId) {
+        if (folderId === FOLDER_ID) {
+          return {
+            getFilesByType: function(mimeType) {
+              if (mimeType === "application/json") {
+                return fileIterator;
+              }
+            }
+          };
+        }
+        return null;
       }
     };
 
-    var originalPropertiesService = mock(this, 'PropertiesService', mockPropertiesService);
-
-    var result = ModuleService.createModule('test module', 'test description');
-
-    GasT.assert(result, 'test module', 'createModule should return the module name');
-
-    this['PropertiesService'] = originalPropertiesService;
+    // CacheServiceのモック
+    var cacheStore = {};
+    mockCache = {
+      get: function(key) { return cacheStore[key] || null; },
+      put: function(key, value, timeout) { cacheStore[key] = value; },
+      store: cacheStore // テスト用に内部ストアを公開
+    };
+    mockCacheService = {
+      getScriptCache: function() { return mockCache; }
+    };
+    
+    // グローバルオブジェクトをモックに差し替え
+    originalDriveApp = mock(this, 'DriveApp', mockDriveApp);
+    originalCacheService = mock(this, 'CacheService', mockCacheService);
+    
+    // PropertiesServiceの基本的なモックも用意
+    mock(PropertiesService, 'getUserProperties', {
+      getProperty: function() { return FOLDER_ID; },
+      setProperty: function() {} // Do nothing
+    });
   });
 
-  GasT.it('should update a module', function() {
-    var mockPropertiesService = {
-      getScriptProperties: function() {
-        return {
-          setProperty: function(key, value) {
-            // Do nothing
-          },
-          getProperty: function(key) {
-            return '{"name":"test module","description":"old description"}';
-          }
-        };
-      }
+  GasT.afterEach(function() {
+    // モックを元に戻す
+    this['DriveApp'] = originalDriveApp;
+    this['CacheService'] = originalCacheService;
+  });
+
+  GasT.it('should load modules from Drive and set cache when cache is empty', function() {
+    // 実行
+    var modules = ModuleService.loadModuleDefinitions(FOLDER_ID);
+
+    // 検証
+    GasT.assert(modules.length, 2, 'should load two modules from Drive');
+    GasT.assert(modules[0].id, 'm1', 'first module ID should be m1');
+    GasT.assert(modules[1].name, 'Module 2', 'second module name should be "Module 2"');
+
+    // キャッシュが正しく設定されたか検証
+    var cached = mockCache.get('modules_cache_' + FOLDER_ID);
+    GasT.assert(cached !== null, true, 'modules should be cached');
+    GasT.assert(JSON.parse(cached).length, 2, 'cached data should contain two modules');
+  });
+
+  GasT.it('should load modules from cache when cache is available', function() {
+    // 事前にキャッシュを設定
+    var cachedModules = [{id: 'cached_m1', name: 'Cached Module 1', settings:[]}];
+    mockCache.put('modules_cache_' + FOLDER_ID, JSON.stringify(cachedModules));
+
+    // DriveApp.getFolderByIdが呼ばれないことを確認するためのスパイ
+    var driveSpy = { called: false };
+    mockDriveApp.getFolderById = function() {
+      driveSpy.called = true;
+      return null; // 本来のモックは呼ばれないはず
     };
+    
+    // 実行
+    var modules = ModuleService.loadModuleDefinitions(FOLDER_ID);
 
-    var originalPropertiesService = mock(this, 'PropertiesService', mockPropertiesService);
-
-    var result = ModuleService.updateModule('test module', 'new description');
-
-    GasT.assert(result.description, 'new description', 'updateModule should return the updated module');
-
-    this['PropertiesService'] = originalPropertiesService;
+    // 検証
+    GasT.assert(driveSpy.called, false, 'DriveApp.getFolderById should not be called when cache is hit');
+    GasT.assert(modules.length, 1, 'should load one module from cache');
+    GasT.assert(modules[0].id, 'cached_m1', 'should return the cached module');
   });
 });
 
