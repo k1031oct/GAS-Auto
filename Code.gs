@@ -262,13 +262,11 @@ function executeWorkflowByTrigger(e) {
 //================================================================
 
 /**
- * Excel自動アーカイブ設定ウィザードのUIを表示する
+ * Excel自動アーカイブ設定ウィザードのHTMLコンテンツを取得する
+ * @returns {string} HTMLコンテンツ
  */
-function showArchiveWizard() {
-  const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate()
-      .setWidth(600)
-      .setHeight(500);
-  SpreadsheetApp.getUi().showModalDialog(html, 'Excel自動アーカイブ設定');
+function getArchiveWizardHtml() {
+  return HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
 }
 
 /**
