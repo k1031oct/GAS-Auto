@@ -59,6 +59,11 @@
     .dark .module-toggle-checkbox:checked + .block {
         background-color: #3730A3; /* indigo-800 */
     }
+    /* Style for selected modules */
+    .module-selected {
+      border-color: #3B82F6 !important; /* blue-500 */
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+    }
   </style>
 </head>
 
@@ -129,7 +134,15 @@
               </div>
             </div>
             <!-- Floating Action Buttons -->
-            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 space-y-2">
+            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 space-y-2" id="floating-buttons">
+              <div id="selection-actions" class="space-y-2 hidden">
+                <button id="group-btn" title="グループ化" class="w-12 h-12 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                    <i class="fas fa-object-group text-xl"></i>
+                </button>
+                <button id="branch-btn" title="条件分岐" class="w-12 h-12 rounded-full bg-green-500 text-white shadow-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+                    <i class="fas fa-code-branch text-xl"></i>
+                </button>
+              </div>
               <button id="expand-all-btn" title="すべて展開" class="w-12 h-12 rounded-full bg-white shadow-lg hover:bg-gray-100 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 flex items-center justify-center">
                 <i class="fas fa-expand-alt text-xl"></i>
               </button>
