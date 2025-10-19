@@ -89,7 +89,6 @@
                                                 modulePalette: {
                                                   isMinimized: true,
                                                   minHeight: '60px', // Header height
-                                                  maxHeight: '40vh',
                                                 }
                                               };
                                           
@@ -959,7 +958,10 @@
                         
                                               const maximizeModulePalette = () => {
                                                 if (window.innerWidth >= 768) return;
-                                                app.modulePalette.style.height = state.modulePalette.maxHeight;
+                                                const mainElement = document.querySelector('main');
+                                                if (mainElement) {
+                                                  app.modulePalette.style.height = `${mainElement.offsetHeight}px`;
+                                                }
                                                 app.modulePaletteToggleIcon.classList.remove('rotate-180');
                                                 state.modulePalette.isMinimized = false;
                                               };
