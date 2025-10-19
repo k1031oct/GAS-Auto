@@ -289,27 +289,6 @@
                         
                                               // --- initEventListeners ---
                                               const initEventListeners = () => {
-                                                  // Init SortableJS for module palette (drag source)
-                                                  new Sortable(app.moduleList, {
-                                                      group: { name: 'shared', pull: 'clone', put: false },
-                                                      animation: 150,
-                                                      sort: false, // Do not sort items in the palette
-                                                      draggable: '.module-card', // Only module cards are draggable
-                                                      delay: 100, // 100msの長押しでドラッグ開始
-                                                      delayOnTouchOnly: true, // タッチデバイスのみ遅延を有効化
-                                                      onStart: () => {
-                                                        if (window.innerWidth < 768) {
-                                                          minimizeModulePalette();
-                                                        }
-                                                      },
-                                                      onEnd: () => {
-                                                        if (window.innerWidth < 768) {
-                                                          setTimeout(maximizeModulePalette, 100);
-                                                        }
-                                                      }
-                                                  });
-                                                  console.log('Sortable for moduleList initialized.');
-                                          
                                                   // Init SortableJS for workflow container (drop target)
                                                   const logSortable = new Sortable(app.workflowContainer, {
                                                       group: 'shared',
@@ -722,6 +701,26 @@
                                                       categoryHeader.addEventListener('click', () => {
                                                           modulesContainer.classList.toggle('hidden');
                                                           categoryHeader.querySelector('i').classList.toggle('rotate-180');
+                                                      });
+                        
+                                                      // Init SortableJS for each category's module container
+                                                      new Sortable(modulesContainer, {
+                                                          group: { name: 'shared', pull: 'clone', put: false },
+                                                          animation: 150,
+                                                          sort: false,
+                                                          draggable: '.module-card',
+                                                          delay: 100,
+                                                          delayOnTouchOnly: true,
+                                                          onStart: () => {
+                                                              if (window.innerWidth < 768) {
+                                                                  minimizeModulePalette();
+                                                              }
+                                                          },
+                                                          onEnd: () => {
+                                                              if (window.innerWidth < 768) {
+                                                                  setTimeout(maximizeModulePalette, 100);
+                                                              }
+                                                          }
                                                       });
                                                   }
                                               };
