@@ -64,6 +64,7 @@
                         triggerType: document.getElementById('trigger-type'),
                         triggerTimeOptions: document.getElementById('trigger-time-options'),
                         triggerHour: document.getElementById('trigger-hour'),
+                        archiveBtn: document.getElementById('archive-btn'), // Added for new feature
 
                         // Hamburger Menu
                         hamburgerBtn: document.getElementById('hamburger-btn'),
@@ -73,6 +74,7 @@
                         mobileSettingsBtn: document.getElementById('mobile-settings-btn'),
                         mobileTriggerBtn: document.getElementById('mobile-trigger-btn'),
                         mobileHistoryBtn: document.getElementById('mobile-history-btn'),
+                        mobileArchiveBtn: document.getElementById('mobile-archive-btn'), // Added for new feature
                                                 modulePaletteHeader: document.getElementById('module-palette-header'),
                                                 modulePaletteToggleIcon: document.getElementById('module-palette-toggle-icon'),
                                                 mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
@@ -102,7 +104,7 @@
                                               // ... (existing helper functions: _extractIdFromUrl, showCustomDialog, log, showError, showLoader, hideLoader)
                                               const _extractIdFromUrl = (url) => {
                                                   if (!url) return null;
-                                                  const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0-9-_]{20,})/;
+                                                  const regex1 = /(?:\/d\/|\/folders\/|id=)([a-zA-Z0--9-_]{20,})/;
                                                   const match1 = url.match(regex1);
                                                   if (match1 && match1[1]) {
                                                       return match1[1];
@@ -167,6 +169,15 @@
                                               
                                               const showLoader = () => app.loader.classList.remove('hidden');
                                               const hideLoader = () => app.loader.classList.add('hidden');
+
+                                              // --- Archive Wizard Logic ---
+                                              const openArchiveWizard = () => {
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(() => hideLoader())
+                                                  .withFailureHandler(showError)
+                                                  .showArchiveWizard();
+                                              };
                                           
                                               // --- Trigger Modal Logic ---
                                               const openTriggerModal = () => {
@@ -539,6 +550,9 @@
                                                 app.triggerCloseBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
+
+                                                // Archive Wizard Listener
+                                                app.archiveBtn.addEventListener('click', openArchiveWizard);
                                           
                                                 app.hideLogBtn.addEventListener('click', hideLog);
                                                 app.showLogBtn.addEventListener('click', showLog);
@@ -631,6 +645,7 @@
                                                 app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
                                                 app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
                                                 app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
+                                                app.mobileArchiveBtn.addEventListener('click', () => app.archiveBtn.click());
                                                 app.mobileShowLogBtn.addEventListener('click', showLog);
                         
                                                 // Mobile Module Palette Toggle

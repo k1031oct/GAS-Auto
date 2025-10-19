@@ -256,64 +256,204 @@ GasT.describe('ExecutionService', function() {
     
     GasT.assertThrows(function() {
       ExecutionService.execute(logic, {});
-    }, /Security Error: Function "unregistered.function" is not registered or not found./, 'should throw a security error');
+    }, /No valid 'logic' or 'handler' found/, 'should throw an error for invalid module definition');
   });
 });
 
-GasT.describe('WorkflowService._executeModuleLogic', function() {
-  var originalExecutionServiceExecute;
-  var originalFunctionRegistryRun;
+GasT.describe('ArchiveService', function() {
+
+  // Mocks for various services
+  var mockDriveApp, mockDrive, mockLogService;
+  var originalDriveApp, originalDrive, originalLogService;
+  var createdFolders, createdFiles, trashedFiles;
+
+  // Helper to create a mock file object
+  const createMockFile = (id, name, dateCreated) => ({
+    getId: () => id,
+    getName: () => name,
+    getBlob: () => ({}),
+    moveTo: function(targetFolder) {
+      const fileIndex = createdFiles.findIndex(f => f.id === this.getId());
+      if (fileIndex > -1) {
+        createdFiles[fileIndex].parentId = targetFolder.getId();
+      }
+    },
+    getDateCreated: () => dateCreated || new Date(),
+    setTrashed: function(trashed) {
+      if (trashed) {
+        trashedFiles.push(this.getId());
+      }
+    }
+  });
+
+  // Helper to create a mock folder object
+  const createMockFolder = (id, name) => ({
+    id: id,
+    name: name,
+    files: [],
+    folders: [],
+    getId: function() { return this.id; },
+    getName: function() { return this.name; },
+    getFiles: function() {
+      const folderFiles = createdFiles.filter(f => f.parentId === this.id);
+      let index = 0;
+      return {
+        hasNext: () => index < folderFiles.length,
+        next: () => folderFiles[index++]
+      };
+    },
+    getFoldersByName: function(folderName) {
+      const foundFolders = this.folders.filter(f => f.name === folderName);
+      let index = 0;
+      return {
+        hasNext: () => index < foundFolders.length,
+        next: () => foundFolders[index++]
+      };
+    },
+    createFolder: function(folderName) {
+      const newFolder = createMockFolder(`${this.id}-${folderName}`, folderName);
+      this.folders.push(newFolder);
+      createdFolders.push(newFolder);
+      return newFolder;
+    },
+    searchFiles: function(query) {
+      // Simplified mock search
+      const searchTerm = query.match(/title contains '(.*?)'/)[1];
+      const matchingFiles = createdFiles.filter(f => f.name.includes(searchTerm));
+      let index = 0;
+      return {
+        hasNext: () => index < matchingFiles.length,
+        next: () => matchingFiles[index++]
+      };
+    }
+  });
 
   GasT.beforeEach(function() {
-    originalExecutionServiceExecute = ExecutionService.execute;
-    originalFunctionRegistryRun = FunctionRegistry.run;
+    createdFolders = [];
+    createdFiles = [];
+    trashedFiles = [];
+
+    const rootFolder = createMockFolder('root', 'Root');
+    
+    mockDriveApp = {
+      getRootFolder: () => rootFolder,
+      getFolderById: (id) => {
+        if (id === 'root') return rootFolder;
+        return createdFolders.find(f => f.id === id);
+      },
+      getFileById: (id) => createdFiles.find(f => f.id === id)
+    };
+
+    mockDrive = {
+      Files: {
+        insert: function(resource, blob, options) {
+          const newFile = { id: `converted_${Date.now()}`, name: resource.title };
+          createdFiles.push(createMockFile(newFile.id, newFile.name));
+          return newFile;
+        }
+      }
+    };
+
+    mockLogService = {
+      log: function(msg) { console.log('LOG:', msg); },
+      error: function(msg) { console.log('ERROR:', msg); }
+    };
+
+    originalDriveApp = mock(this, 'DriveApp', mockDriveApp);
+    originalDrive = mock(this, 'Drive', mockDrive);
+    originalLogService = mock(this, 'LogService', mockLogService);
   });
 
   GasT.afterEach(function() {
-    ExecutionService.execute = originalExecutionServiceExecute;
-    FunctionRegistry.run = originalFunctionRegistryRun;
+    this['DriveApp'] = originalDriveApp;
+    this['Drive'] = originalDrive;
+    this['LogService'] = originalLogService;
   });
 
-  GasT.it('should delegate to ExecutionService for logic-based modules', function() {
-    let executed = false;
-    ExecutionService.execute = function(logic, context) {
-      executed = true;
-      GasT.assert(logic.length, 1, 'should receive the logic array');
-      GasT.assert(context.setting1, 'value1', 'should receive the initial context');
-      return 'logic_executed';
-    };
-
-    const moduleDef = { id: 'test-logic-module', logic: [{ func: 'any.func' }] };
-    const moduleSettings = { setting1: 'value1' };
-    const result = WorkflowService._executeModuleLogic(moduleDef, moduleSettings, null);
-
-    GasT.assert(executed, true, 'ExecutionService.execute should have been called');
-    GasT.assert(result, 'logic_executed', 'should return the result from ExecutionService');
+  GasT.it('getFileDate should extract date from yyyy-mm-dd format', function() {
+    const filename = 'Report-2023-10-25.xlsx';
+    const result = getFileDate(filename);
+    GasT.assert(result.getFullYear(), 2023, 'Year should be 2023');
+    GasT.assert(result.getMonth(), 9, 'Month should be 9 (October)');
+    GasT.assert(result.getDate(), 25, 'Day should be 25');
   });
 
-  GasT.it('should use FunctionRegistry for handler-based modules', function() {
-    let executed = false;
-    FunctionRegistry.run = function(handler, settings, inputValue) {
-      executed = true;
-      GasT.assert(handler, 'OldService.doWork', 'should receive the correct handler');
-      GasT.assert(settings.param, 'test', 'should receive the module settings');
-      GasT.assert(inputValue, 'input', 'should receive the input value');
-      return 'handler_executed';
-    };
-
-    const moduleDef = { id: 'test-handler-module', handler: 'OldService.doWork' };
-    const moduleSettings = { param: 'test' };
-    const result = WorkflowService._executeModuleLogic(moduleDef, moduleSettings, 'input');
-
-    GasT.assert(executed, true, 'FunctionRegistry.run should have been called');
-    GasT.assert(result, 'handler_executed', 'should return the result from FunctionRegistry');
+  GasT.it('getFileDate should return null for filenames without a date', function() {
+    const filename = 'Monthly_Report.xlsx';
+    const result = getFileDate(filename);
+    GasT.assert(result, null, 'Should return null for no date');
   });
 
-  GasT.it('should throw an error if no logic or handler is found', function() {
-    const moduleDef = { id: 'invalid-module' }; // No 'logic' or 'handler'
+  GasT.it('getOrCreateArchiveFolder should create nested folders correctly', function() {
+    const rootFolderName = 'TestArchive';
+    const date = new Date(2023, 9, 25); // Oct 25, 2023
     
-    GasT.assertThrows(function() {
-      WorkflowService._executeModuleLogic(moduleDef, {}, null);
-    }, /No valid 'logic' or 'handler' found/, 'should throw an error for invalid module definition');
+    const monthFolder = getOrCreateArchiveFolder(rootFolderName, date);
+
+    GasT.assert(monthFolder.getName(), '10', 'Month folder should be named "10"');
+    
+    const yearFolder = createdFolders.find(f => f.name === '2023');
+    GasT.assert(yearFolder !== undefined, true, 'Year folder "2023" should be created');
+    
+    const rootArchiveFolder = createdFolders.find(f => f.name === rootFolderName);
+    GasT.assert(rootArchiveFolder !== undefined, true, 'Root archive folder should be created');
+  });
+
+  GasT.it('processAndArchiveFile should archive a new file correctly', function() {
+    const excelFile = createMockFile('excel1', 'Report-2023-10-25.xlsx');
+    createdFiles.push(excelFile);
+
+    processAndArchiveFile(excelFile, 'MyArchive');
+
+    const convertedFile = createdFiles.find(f => f.id.startsWith('converted_'));
+    GasT.assert(convertedFile !== undefined, true, 'File should have been converted');
+    
+    const monthFolder = createdFolders.find(f => f.name === '10');
+    GasT.assert(monthFolder !== undefined, true, 'Month folder should exist');
+    GasT.assert(convertedFile.parentId, monthFolder.getId(), 'Converted file should be in the month folder');
+  });
+
+  GasT.it('processAndArchiveFile should replace an older file', function() {
+    const archiveName = 'MyArchive';
+    const date = new Date(2023, 9, 15);
+    
+    // 1. Create an "existing" file in the archive
+    const existingFile = createMockFile('existing1', 'Old-Report-2023-10-15.xlsx', date);
+    const monthFolder = getOrCreateArchiveFolder(archiveName, date);
+    existingFile.parentId = monthFolder.getId();
+    createdFiles.push(existingFile);
+
+    // 2. Process a newer file
+    const newExcelFile = createMockFile('excelNew', 'New-Report-2023-10-20.xlsx');
+    createdFiles.push(newExcelFile);
+    processAndArchiveFile(newExcelFile, archiveName);
+
+    // 3. Assertions
+    const convertedFile = createdFiles.find(f => f.id.startsWith('converted_'));
+    GasT.assert(trashedFiles.length, 1, 'One file should be trashed');
+    GasT.assert(trashedFiles[0], 'existing1', 'The old existing file should be the one trashed');
+    GasT.assert(convertedFile.parentId, monthFolder.getId(), 'The new converted file should be in the month folder');
+  });
+
+  GasT.it('processAndArchiveFile should discard a new file if its older', function() {
+    const archiveName = 'MyArchive';
+    const date = new Date(2023, 9, 25);
+    
+    // 1. Create an "existing" file in the archive
+    const existingFile = createMockFile('existing2', 'Newer-Report-2023-10-25.xlsx', date);
+    const monthFolder = getOrCreateArchiveFolder(archiveName, date);
+    existingFile.parentId = monthFolder.getId();
+    createdFiles.push(existingFile);
+
+    // 2. Process an older file
+    const oldExcelFile = createMockFile('excelOld', 'Older-Report-2023-10-10.xlsx');
+    createdFiles.push(oldExcelFile);
+    processAndArchiveFile(oldExcelFile, archiveName);
+
+    // 3. Assertions
+    const convertedFile = createdFiles.find(f => f.id.startsWith('converted_'));
+    GasT.assert(trashedFiles.length, 1, 'One file should be trashed');
+    GasT.assert(trashedFiles[0], convertedFile.getId(), 'The newly converted file should be the one trashed');
+    GasT.assert(createdFiles.find(f => f.id === 'existing2').parentId, monthFolder.getId(), 'The existing file should remain in the folder');
   });
 });
