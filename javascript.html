@@ -636,7 +636,10 @@
                                               // This is a simplified representation to show where the new logic is added.
                                               // The full content of the file will be written.
                                               const updateUI = () => {
-                                                app.runBtn.disabled = state.modules.length === 0;
+                                                const hasModules = state.modules.length > 0;
+                                                app.runBtn.disabled = !hasModules;
+                                                document.getElementById('floating-buttons').classList.toggle('hidden', !hasModules);
+
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.moduleFolderIdInput.value = state.currentModuleFolderId;
