@@ -884,6 +884,18 @@
                                                   updateUI();
                                                   log('新規ワークフローを作成しました。', 'system');
                                               };
+
+                                              const sanitizeModules = (modules) => {
+                                                if (!modules) {
+                                                  return [];
+                                                }
+                                                modules.forEach(module => {
+                                                  if (module.type === 'container') {
+                                                    module.modules = sanitizeModules(module.modules);
+                                                  }
+                                                });
+                                                return modules;
+                                              };
                                           
                                               const handleWorkflowSelect = async () => {
                                                   const workflowName = app.workflowSelector.value;
@@ -900,7 +912,8 @@
                                                           .withSuccessHandler(async (data) => {
                                                               state.currentWorkflowName = workflowName;
                                                               state.currentModuleFolderId = data.moduleFolderId || '';
-                                                              state.modules = data.modules || [];
+                                                              // Sanitize loaded modules to ensure containers have a 'modules' array
+                                                              state.modules = sanitizeModules(data.modules);
                                                               state.isDirty = false;
                                                               // First, ensure module definitions for the workflow's folder are loaded
                                                               await loadModuleDefinitionsFromDrive();
