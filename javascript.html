@@ -287,9 +287,8 @@
                           new Sortable(app.moduleList, {
                               group: { name: 'shared', pull: 'clone', put: false },
                               animation: 150,
-                              sort: false,
-                              filter: 'h3',
-                              preventOnFilter: false,
+                              sort: false, // Do not sort items in the palette
+                              draggable: '.module-card', // Only module cards are draggable
                               delay: 300, // 300msの長押しでドラッグ開始
                               delayOnTouchOnly: true // タッチデバイスのみ遅延を有効化
                           });
@@ -667,18 +666,41 @@
                               if (!categories[cat]) categories[cat] = [];
                               categories[cat].push(m);
                           });
+
                           for (const category in categories) {
-                              const catDiv = document.createElement('div');
-                              catDiv.className = 'module-category mb-2 border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700';
-                              catDiv.innerHTML = `<h3 class="font-bold p-2 bg-gray-100 text-gray-700 cursor-pointer dark:bg-gray-700 dark:text-gray-200">${category}</h3>`;
+                              const categoryCard = document.createElement('div');
+                              categoryCard.className = 'category-card bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-3';
+
+                              const categoryHeader = document.createElement('div');
+                              categoryHeader.className = 'category-header flex justify-between items-center p-2 cursor-pointer border-b border-gray-200 dark:border-gray-700';
+                              categoryHeader.innerHTML = `
+                                  <h4 class="font-bold text-gray-700 dark:text-gray-200">${category}</h4>
+                                  <i class="fas fa-chevron-down transform transition-transform duration-200"></i>
+                              `;
+
+                              const modulesContainer = document.createElement('div');
+                              modulesContainer.className = 'category-modules p-2 space-y-2'; // Initially visible
+
                               categories[category].forEach(m => {
-                                  const itemDiv = document.createElement('div');
-                                  itemDiv.className = 'module-item p-2 border-t border-gray-100 cursor-grab flex items-center gap-2 hover:bg-blue-50 dark:border-gray-700 dark:hover:bg-gray-600';
-                                  itemDiv.dataset.moduleId = m.id;
-                                  itemDiv.innerHTML = `<i class="fas ${m.icon || 'fa-extension'} text-blue-600 dark:text-blue-400"></i><span class="text-sm dark:text-gray-300">${m.name}</span>`;
-                                  catDiv.appendChild(itemDiv);
+                                  const moduleCard = document.createElement('div');
+                                  moduleCard.className = 'module-card bg-gray-50 dark:bg-gray-700 p-2 rounded-md shadow-md cursor-grab flex items-center gap-2 hover:bg-blue-50 dark:hover:bg-gray-600';
+                                  moduleCard.dataset.moduleId = m.id;
+                                  moduleCard.innerHTML = `
+                                      <i class="fas ${m.icon || 'fa-extension'} text-blue-600 dark:text-blue-400"></i>
+                                      <span class="text-sm font-medium text-gray-800 dark:text-gray-300">${m.name}</span>
+                                  `;
+                                  modulesContainer.appendChild(moduleCard);
                               });
-                              app.moduleList.appendChild(catDiv);
+
+                              categoryCard.appendChild(categoryHeader);
+                              categoryCard.appendChild(modulesContainer);
+                              app.moduleList.appendChild(categoryCard);
+
+                              // Add click listener for accordion
+                              categoryHeader.addEventListener('click', () => {
+                                  modulesContainer.classList.toggle('hidden');
+                                  categoryHeader.querySelector('i').classList.toggle('rotate-180');
+                              });
                           }
                       };
                   
