@@ -1,0 +1,51 @@
+{
+  "id": "docs_create_file",
+  "name": "Googleドキュメントを作成",
+  "description": "指定されたフォルダに新しいGoogleドキュメントを作成します。",
+  "category": "Google Docs",
+  "icon": "fa-file-word",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "folderUrl",
+      "name": "作成先フォルダURL",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "fileName",
+      "name": "ドキュメント名",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "content",
+      "name": "初期コンテンツ",
+      "type": "textarea",
+      "required": false
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_folder_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{folderUrl}}" },
+      "resultTo": "folderId"
+    },
+    {
+      "step_id": "get_folder",
+      "func": "core.driveGetFolderById",
+      "args": { "folderId": "{{outputs.folderId}}" },
+      "resultTo": "folderObj"
+    },
+    {
+      "step_id": "create_doc",
+      "func": "core.docsCreateFile",
+      "args": {
+        "folder": "{{outputs.folderObj}}",
+        "name": "{{fileName}}",
+        "content": "{{content}}"
+      }
+    }
+  ]
+}

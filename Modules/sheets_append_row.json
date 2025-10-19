@@ -1,0 +1,58 @@
+{
+  "id": "sheets_append_row",
+  "name": "スプレッドシートに行を追加",
+  "description": "指定されたシートの末尾に新しい行を追加します。",
+  "category": "Google Sheets",
+  "icon": "fa-file-excel",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "spreadsheetUrl",
+      "name": "スプレッドシートURL",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "sheetName",
+      "name": "シート名（任意）",
+      "type": "text",
+      "required": false,
+      "description": "無指定の場合はアクティブなシートが対象になります。"
+    },
+    {
+      "id": "rowData",
+      "name": "追加する行データ（カンマ区切り）",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_spreadsheet_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{spreadsheetUrl}}" },
+      "resultTo": "spreadsheetId"
+    },
+    {
+      "step_id": "open_spreadsheet",
+      "func": "core.sheetsOpenById",
+      "args": { "spreadsheetId": "{{outputs.spreadsheetId}}" },
+      "resultTo": "spreadsheetObj"
+    },
+    {
+      "step_id": "prepare_row_data",
+      "func": "core.splitString",
+      "args": { "text": "{{rowData}}", "delimiter": "," },
+      "resultTo": "rowDataArray"
+    },
+    {
+      "step_id": "append_row",
+      "func": "core.sheetsAppendRow",
+      "args": {
+        "spreadsheet": "{{outputs.spreadsheetObj}}",
+        "sheetName": "{{sheetName}}",
+        "rowData": "{{outputs.rowDataArray}}"
+      }
+    }
+  ]
+}

@@ -68,6 +68,10 @@ var FunctionRegistry = {
  * This ensures that all module handlers are available for dynamic invocation.
  */
 function _initializeRegistry() {
+  // Register new core services for the logic-based engine
+  FunctionRegistry.registerService('core', CoreService);
+
+  // Register legacy services for backward compatibility
   FunctionRegistry.registerService('DriveService', DriveService);
   FunctionRegistry.registerService('SheetService', SheetService);
   FunctionRegistry.registerService('GmailService', GmailService);

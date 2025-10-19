@@ -1,0 +1,63 @@
+{
+  "id": "drive_copy_file",
+  "name": "ドライブファイルをコピー",
+  "description": "指定されたファイルをGoogle Driveの別の場所にコピーします。",
+  "category": "Google Drive",
+  "icon": "fa-copy",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "sourceFileUrl",
+      "name": "コピー元ファイルURL",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "destinationFolderUrl",
+      "name": "コピー先フォルダURL",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "newFileName",
+      "name": "新しいファイル名（任意）",
+      "type": "text",
+      "required": false
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_source_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{sourceFileUrl}}" },
+      "resultTo": "sourceFileId"
+    },
+    {
+      "step_id": "extract_dest_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{destinationFolderUrl}}" },
+      "resultTo": "destFolderId"
+    },
+    {
+      "step_id": "get_file",
+      "func": "core.driveGetFileById",
+      "args": { "fileId": "{{outputs.sourceFileId}}" },
+      "resultTo": "fileToCopy"
+    },
+    {
+      "step_id": "get_folder",
+      "func": "core.driveGetFolderById",
+      "args": { "folderId": "{{outputs.destFolderId}}" },
+      "resultTo": "destinationFolder"
+    },
+    {
+      "step_id": "copy_file",
+      "func": "core.driveCopyFile",
+      "args": {
+        "file": "{{outputs.fileToCopy}}",
+        "folder": "{{outputs.destinationFolder}}",
+        "newFileName": "{{newFileName}}"
+      }
+    }
+  ]
+}

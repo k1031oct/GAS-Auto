@@ -1,0 +1,39 @@
+{
+  "id": "gmail_send_email",
+  "name": "Gmailでメールを送信",
+  "description": "指定された宛先にメールを送信します。",
+  "category": "Gmail",
+  "icon": "fa-envelope",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "recipient",
+      "name": "宛先メールアドレス",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "subject",
+      "name": "件名",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "body",
+      "name": "本文",
+      "type": "textarea",
+      "required": true
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "send_email",
+      "func": "core.gmailSendEmail",
+      "args": {
+        "recipient": "{{recipient}}",
+        "subject": "{{subject}}",
+        "body": "{{body}}"
+      }
+    }
+  ]
+}

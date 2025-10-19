@@ -1,0 +1,56 @@
+{
+  "id": "drive_move_file_logic",
+  "name": "（ロジック版）ドライブファイルを移動",
+  "description": "IDで指定されたファイルをGoogle Driveの別のフォルダに移動します。ロジックはJSON内に直接記述されます。",
+  "category": "Google Drive",
+  "icon": "fa-project-diagram",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "sourceFileId",
+      "name": "移動元ファイルID",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "destinationFolderId",
+      "name": "移動先フォルダID",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "step1_get_file",
+      "func": "DriveService.getFileById",
+      "args": {
+        "fileId": "{{sourceFileId}}"
+      },
+      "resultTo": "fileToMove"
+    },
+    {
+      "step_id": "step2_get_folder",
+      "func": "DriveService.getFolderById",
+      "args": {
+        "folderId": "{{destinationFolderId}}"
+      },
+      "resultTo": "destinationFolder"
+    },
+    {
+      "step_id": "step3_move_file",
+      "func": "DriveService.moveFile",
+      "args": {
+        "file": "{{outputs.fileToMove}}",
+        "folder": "{{outputs.destinationFolder}}"
+      },
+      "resultTo": "finalStatus"
+    },
+    {
+      "step_id": "step4_log_status",
+      "func": "LogService.addLog",
+      "args": {
+        "message": "{{outputs.finalStatus}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "calendar_create_event",
+  "name": "カレンダーに予定を作成",
+  "description": "Googleカレンダーに新しい予定を作成します。",
+  "category": "Google Calendar",
+  "icon": "fa-calendar-alt",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "calendarId",
+      "name": "カレンダーID（任意）",
+      "type": "text",
+      "required": false,
+      "defaultValue": "primary",
+      "description": "無指定の場合はデフォルトのカレンダー（通常はご自身のメインカレンダー）が使用されます。"
+    },
+    {
+      "id": "title",
+      "name": "予定のタイトル",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "startTime",
+      "name": "開始時刻 (例: 2023/10/28 10:00)",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "endTime",
+      "name": "終了時刻 (例: 2023/10/28 11:00)",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "create_event",
+      "func": "core.calendarCreateEvent",
+      "args": {
+        "calendarId": "{{calendarId}}",
+        "title": "{{title}}",
+        "startTime": "{{startTime}}",
+        "endTime": "{{endTime}}"
+      }
+    }
+  ]
+}

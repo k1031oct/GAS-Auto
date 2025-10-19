@@ -271,25 +271,30 @@ var WorkflowService = {
   },
 
   /**
-   * モジュールIDに基づいて実際の処理を実行する
+   * モジュール定義に基づいて実際の処理を実行する
    * @private
-   * @param {string} moduleId - 実行するモジュールのID
-   * @param {object} configs - モジュールの設定
-   * @param {*} inputValue - 前のモジュールからの入力値
+   * @param {object} moduleDef - モジュールの定義オブジェクト (JSON)
+   * @param {object} moduleSettings - ユーザーがUIで設定した値
+   * @param {*} inputValue - 前のモジュールからの入力値 (後方互換性のために維持)
    * @returns {*} モジュールの処理結果
    */
-  _executeModuleLogic: function (moduleDef, configs, inputValue) {
-    if (!moduleDef || !moduleDef.handler) {
-      throw new Error(`モジュール定義またはハンドラが不正です: ${moduleDef.id}`);
+  _executeModuleLogic: function (moduleDef, moduleSettings, inputValue) {
+    // 新アーキテクチャ: 'logic' キーが存在する場合、インタープリタで実行
+    if (moduleDef.logic && Array.isArray(moduleDef.logic)) {
+      return ExecutionService.execute(moduleDef.logic, moduleSettings);
     }
 
-    // FunctionRegistryを使用してハンドラを実行
-    try {
-      return FunctionRegistry.run(moduleDef.handler, configs, inputValue);
-    } catch (e) {
-      // エラーメッセージに詳細を追加して再スロー
-      throw new Error(`ハンドラ「${moduleDef.handler}」の実行中にエラーが発生しました: ${e.message}`);
+    // 従来アーキテクチャ: 'handler' キーが存在する場合、FunctionRegistry経由で実行
+    if (moduleDef.handler) {
+      try {
+        return FunctionRegistry.run(moduleDef.handler, moduleSettings, inputValue);
+      } catch (e) {
+        throw new Error(`Handler '${moduleDef.handler}' execution failed: ${e.message}`);
+      }
     }
+
+    // 実行可能なロジックが見つからない場合
+    throw new Error(`No valid 'logic' or 'handler' found in module definition for ID: ${moduleDef.id}`);
   },
 
   /**

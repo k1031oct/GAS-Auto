@@ -1,0 +1,46 @@
+{
+  "id": "drive_move_file",
+  "name": "ドライブファイルを移動",
+  "description": "指定されたファイルをGoogle Driveの別のフォルダに移動します。",
+  "category": "Google Drive",
+  "icon": "fa-folder-open",
+  "type": "unit",
+  "settings": [
+    { "id": "sourceFileUrl", "name": "移動元ファイルURL", "type": "text", "required": true },
+    { "id": "destinationFolderUrl", "name": "移動先フォルダURL", "type": "text", "required": true }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_source_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{sourceFileUrl}}" },
+      "resultTo": "sourceFileId"
+    },
+    {
+      "step_id": "extract_dest_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{destinationFolderUrl}}" },
+      "resultTo": "destFolderId"
+    },
+    {
+      "step_id": "get_file",
+      "func": "core.driveGetFileById",
+      "args": { "fileId": "{{outputs.sourceFileId}}" },
+      "resultTo": "fileToMove"
+    },
+    {
+      "step_id": "get_folder",
+      "func": "core.driveGetFolderById",
+      "args": { "folderId": "{{outputs.destFolderId}}" },
+      "resultTo": "destinationFolder"
+    },
+    {
+      "step_id": "move_file",
+      "func": "core.driveMoveFile",
+      "args": {
+        "file": "{{outputs.fileToMove}}",
+        "folder": "{{outputs.destinationFolder}}"
+      }
+    }
+  ]
+}

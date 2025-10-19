@@ -1,0 +1,59 @@
+{
+  "id": "sheets_update_cell",
+  "name": "スプレッドシートのセルを更新",
+  "description": "指定されたスプレッドシートのセルに値を書き込みます。",
+  "category": "Google Sheets",
+  "icon": "fa-file-excel",
+  "type": "unit",
+  "settings": [
+    {
+      "id": "spreadsheetUrl",
+      "name": "スプレッドシートURL",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "sheetName",
+      "name": "シート名（任意）",
+      "type": "text",
+      "required": false,
+      "description": "無指定の場合はアクティブなシートが対象になります。"
+    },
+    {
+      "id": "cell",
+      "name": "セル（例: A1）",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "value",
+      "name": "書き込む値",
+      "type": "text",
+      "required": true
+    }
+  ],
+  "logic": [
+    {
+      "step_id": "extract_spreadsheet_id",
+      "func": "core.extractIdFromUrl",
+      "args": { "url": "{{spreadsheetUrl}}" },
+      "resultTo": "spreadsheetId"
+    },
+    {
+      "step_id": "open_spreadsheet",
+      "func": "core.sheetsOpenById",
+      "args": { "spreadsheetId": "{{outputs.spreadsheetId}}" },
+      "resultTo": "spreadsheetObj"
+    },
+    {
+      "step_id": "update_cell",
+      "func": "core.sheetsUpdateCell",
+      "args": {
+        "spreadsheet": "{{outputs.spreadsheetObj}}",
+        "sheetName": "{{sheetName}}",
+        "cell": "{{cell}}",
+        "value": "{{value}}"
+      }
+    }
+  ]
+}
