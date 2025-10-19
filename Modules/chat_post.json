@@ -1,7 +1,7 @@
 {
   "id": "chat_post",
   "name": "Chatにメッセージ投稿",
-  "icon": "chat",
+  "icon": "fa-comments",
   "category": "Google Chat",
   "description": "指定されたWebhook URLを使用して、Google Chatにメッセージを投稿します。",
   "settings": [

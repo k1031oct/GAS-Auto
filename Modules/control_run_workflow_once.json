@@ -1,7 +1,7 @@
 {
   "id": "control_run_workflow_once",
   "name": "指定日時にワークフローを実行",
-  "icon": "update",
+  "icon": "fa-clock",
   "category": "ワークフロー制御",
   "description": "指定した日時に、選択したワークフローを1回だけ実行するトリガーを作成します。",
   "settings": [

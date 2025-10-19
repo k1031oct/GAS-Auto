@@ -1,7 +1,7 @@
 {
   "id": "sheets_insert_cols",
   "name": "列を挿入",
-  "icon": "view_column",
+  "icon": "fa-arrows-alt-h",
   "category": "Google Sheets",
   "description": "指定した位置に列を挿入します。",
   "settings": [

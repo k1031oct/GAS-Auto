@@ -1,7 +1,7 @@
 {
   "id": "drive_delete_files_by_type",
   "name": "指定タイプのファイルを削除",
-  "icon": "delete_forever",
+  "icon": "fa-trash-alt",
   "category": "Google Drive",
   "description": "指定したフォルダ内にある、特定のMIMEタイプのファイルをすべてゴミ箱に移動します。",
   "settings": [

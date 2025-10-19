@@ -1,7 +1,7 @@
 {
   "id": "sheets_to_excel",
   "name": "Excel形式で出力",
-  "icon": "file_download",
+  "icon": "fa-file-excel",
   "category": "Google Sheets",
   "description": "スプレッドシートをExcel形式(.xlsx)で出力し、指定したフォルダに保存します。",
   "returnsValue": true,

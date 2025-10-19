@@ -1,7 +1,7 @@
 {
   "id": "sheets_insert_image",
   "name": "セルに画像を挿入",
-  "icon": "image",
+  "icon": "fa-image",
   "category": "Google Sheets",
   "description": "Google Drive上の画像ファイルを指定したセルに挿入します。",
   "settings": [

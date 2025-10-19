@@ -1,7 +1,7 @@
 {
   "id": "sheets_unhide_rows",
   "name": "行を再表示",
-  "icon": "visibility",
+  "icon": "fa-eye",
   "category": "Google Sheets",
   "description": "指定した範囲の非表示になっている行を再表示します。",
   "settings": [

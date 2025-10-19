@@ -1,7 +1,7 @@
 {
   "id": "sheets_hide_rows_by_value",
   "name": "条件で行を非表示",
-  "icon": "visibility_off",
+  "icon": "fa-eye-slash",
   "category": "Google Sheets",
   "description": "指定した列の値が特定の値と一致する行を非表示にします。",
   "settings": [

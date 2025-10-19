@@ -1,7 +1,7 @@
 {
   "id": "drive_list_files_to_sheet",
   "name": "ファイル一覧を出力",
-  "icon": "list_alt",
+  "icon": "fa-list-alt",
   "category": "Google Drive",
   "description": "指定されたフォルダ内のファイルとサブフォルダの一覧を指定のスプレッドシートに書き出します。",
   "settings": [

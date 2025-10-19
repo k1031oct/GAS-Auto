@@ -1,7 +1,7 @@
 {
   "id": "sheets_to_pdf",
   "name": "PDFとして出力",
-  "icon": "picture_as_pdf",
+  "icon": "fa-file-pdf",
   "category": "Google Sheets",
   "description": "スプレッドシートの特定のシートをPDFとして出力し、指定したフォルダに保存します。",
   "returnsValue": true,

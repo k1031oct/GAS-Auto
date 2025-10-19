@@ -1,7 +1,7 @@
 {
   "id": "slides_refresh_charts",
   "name": "スライドのグラフを更新",
-  "icon": "refresh",
+  "icon": "fa-sync-alt",
   "category": "Google Slides",
   "description": "指定されたGoogleスライド内の、スプレッドシートにリンクされたすべてのグラフを更新します。",
   "settings": [

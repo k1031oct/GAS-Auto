@@ -1,7 +1,7 @@
 {
   "id": "drive_create_folder",
   "name": "フォルダを新規作成",
-  "icon": "create_new_folder",
+  "icon": "fa-folder-plus",
   "category": "Google Drive",
   "description": "Google Driveに新しいフォルダを作成します。",
   "returnsValue": true,

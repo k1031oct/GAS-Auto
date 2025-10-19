@@ -1,7 +1,7 @@
 {
   "id": "gmail_create_draft",
   "name": "Gmailの下書きを作成",
-  "icon": "drafts",
+  "icon": "fa-file-alt",
   "category": "Gmail",
   "description": "Gmailの下書きを作成します。添付ファイルも指定可能です。",
   "settings": [

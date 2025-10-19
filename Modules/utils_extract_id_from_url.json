@@ -1,7 +1,7 @@
 {
   "id": "utils_extract_id_from_url",
   "name": "URLからIDを抽出しセルに書き込み",
-  "icon": "vpn_key",
+  "icon": "fa-key",
   "category": "ユーティリティ",
   "description": "URLからIDを抽出し、指定したスプレッドシートのセルに書き込みます。",
   "returnsValue": true,

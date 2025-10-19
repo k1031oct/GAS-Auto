@@ -1,7 +1,7 @@
 {
   "id": "gmail_fetch_attachments",
   "name": "Gmailの添付ファイルを取得",
-  "icon": "attach_file",
+  "icon": "fa-paperclip",
   "category": "Gmail",
   "description": "Gmailを検索し、条件に一致したメールから添付ファイルを指定したフォルダに保存します。",
   "settings": [

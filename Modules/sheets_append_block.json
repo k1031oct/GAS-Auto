@@ -1,7 +1,7 @@
 {
   "id": "sheets_append_block",
   "name": "最終行に追記",
-  "icon": "dataset",
+  "icon": "fa-table",
   "category": "Google Sheets",
   "description": "前のモジュールの結果や指定範囲のデータブロックを、基準列の最終行を元に追記します。",
   "settings": [

@@ -1,7 +1,7 @@
 {
   "id": "calendar_get_holidays_to_sheet",
   "name": "祝日リストを取得",
-  "icon": "event",
+  "icon": "fa-calendar-check",
   "category": "Google Calendar",
   "description": "指定された期間の日本の祝日を取得し、スプレッドシートに書き出します。",
   "settings": [

@@ -1,7 +1,7 @@
 {
   "id": "date_manipulation",
   "name": "日付・時刻を操作",
-  "icon": "date_range",
+  "icon": "fa-calendar-alt",
   "category": "ユーティリティ",
   "description": "基準日に対して様々な日付計算を行い、結果を返します。日本の祝日カレンダーに対応しています。",
   "returnsValue": true,

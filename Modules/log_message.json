@@ -1,7 +1,7 @@
 {
   "id": "log_message",
   "name": "ログを出力",
-  "icon": "speaker_notes",
+  "icon": "fa-comment-alt",
   "category": "ユーティリティ",
   "description": "指定したメッセージを実行ログに出力します。",
   "settings": [

@@ -1,7 +1,7 @@
 {
   "id": "sheets_clear_values",
   "name": "セルの値を削除",
-  "icon": "clear_all",
+  "icon": "fa-eraser",
   "category": "Google Sheets",
   "description": "指定された範囲のセルの値を削除します。",
   "settings": [

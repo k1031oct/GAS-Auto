@@ -1,7 +1,7 @@
 {
   "id": "sheets_get_monthly_data",
   "name": "月次フォルダからデータ取得",
-  "icon": "calendar_month",
+  "icon": "fa-calendar-alt",
   "category": "Google Sheets",
   "description": "ルートフォルダ内の「年フォルダ」>「月フォルダ」から、その月で最終更新されたスプレッドシートのデータを取得し貼り付けます。",
   "returnsValue": true,

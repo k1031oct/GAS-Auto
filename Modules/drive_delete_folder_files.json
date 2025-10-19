@@ -1,7 +1,7 @@
 {
   "id": "drive_delete_folder_files",
   "name": "フォルダ内ファイルを全て削除",
-  "icon": "folder_delete",
+  "icon": "fa-folder-minus",
   "category": "Google Drive",
   "description": "指定したフォルダ内にある、すべてのファイルをゴミ箱に移動します。",
   "settings": [

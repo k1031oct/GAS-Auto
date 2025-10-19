@@ -1,7 +1,7 @@
 {
   "id": "sheets_import_csv",
   "name": "CSVをインポート",
-  "icon": "file_upload",
+  "icon": "fa-file-csv",
   "category": "Google Sheets",
   "description": "指定したフォルダにあるCSVファイルをシートにインポートします。フォルダ内に複数CSVがある場合、最初の1つが対象になります。",
   "settings": [

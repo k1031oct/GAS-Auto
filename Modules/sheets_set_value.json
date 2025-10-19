@@ -1,7 +1,7 @@
 {
   "id": "sheets_set_value",
   "name": "セルに値を設定",
-  "icon": "edit_square",
+  "icon": "fa-edit",
   "category": "Google Sheets",
   "description": "指定されたセルに値または数式を設定します。",
   "settings": [

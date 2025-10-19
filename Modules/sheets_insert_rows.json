@@ -1,7 +1,7 @@
 {
   "id": "sheets_insert_rows",
   "name": "行を挿入",
-  "icon": "table_rows",
+  "icon": "fa-arrows-alt-v",
   "category": "Google Sheets",
   "description": "指定した位置に行を挿入します。",
   "settings": [

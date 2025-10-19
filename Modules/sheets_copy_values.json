@@ -1,7 +1,7 @@
 {
   "id": "sheets_copy_values",
   "name": "範囲コピーペースト",
-  "icon": "content_copy",
+  "icon": "fa-copy",
   "category": "Google Sheets",
   "description": "指定したスプレッドシートの範囲を、値・書式を選択して別のセルにコピーします。",
   "settings": [

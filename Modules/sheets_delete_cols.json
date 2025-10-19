@@ -1,7 +1,7 @@
 {
   "id": "sheets_delete_cols",
   "name": "列を削除",
-  "icon": "delete_sweep",
+  "icon": "fa-trash-alt",
   "category": "Google Sheets",
   "description": "指定した範囲の列を削除します。",
   "settings": [
