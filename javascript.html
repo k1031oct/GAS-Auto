@@ -77,6 +77,7 @@
                                                 modulePaletteHeader: document.getElementById('module-palette-header'),
                                                 modulePaletteToggleIcon: document.getElementById('module-palette-toggle-icon'),
                                                 mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
+                        floatingButtons: document.getElementById('floating-buttons'),
                                               };
                                           
                                               // --- State Management ---
@@ -648,8 +649,10 @@
                                                 const hasModules = state.modules.length > 0;
                                                 console.log(`  Has modules: ${hasModules}`);
                                                 app.runBtn.disabled = !hasModules;
-                                                app.expandAllBtn.classList.toggle('hidden', !hasModules);
-                                                app.collapseAllBtn.classList.toggle('hidden', !hasModules);
+                                                // For debugging: ensure these are always visible
+                                                app.floatingButtons.classList.remove('hidden');
+                                                app.expandAllBtn.classList.remove('hidden');
+                                                app.collapseAllBtn.classList.remove('hidden');
                                                 console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
