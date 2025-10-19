@@ -289,7 +289,7 @@
                               animation: 150,
                               sort: false, // Do not sort items in the palette
                               draggable: '.module-card', // Only module cards are draggable
-                              delay: 100, // 100msの長押しでドラッグ開始
+                              delay: 0, // 100msの長押しでドラッグ開始
                               delayOnTouchOnly: true // タッチデバイスのみ遅延を有効化
                           });
                           console.log('Sortable for moduleList initialized.');
@@ -669,7 +669,7 @@
 
                           for (const category in categories) {
                               const categoryCard = document.createElement('div');
-                              categoryCard.className = 'category-card bg-white dark:bg-gray-800 rounded-lg shadow-lg mb-3';
+                              categoryCard.className = 'category-card bg-white dark:bg-gray-800 rounded-lg mb-3';
 
                               const categoryHeader = document.createElement('div');
                               categoryHeader.className = 'category-header flex justify-between items-center p-2 cursor-pointer bg-gray-100 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600';
