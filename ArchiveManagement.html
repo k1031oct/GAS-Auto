@@ -34,6 +34,8 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      google.script.run.LogService.info('ArchiveManagement.html: DOMContentLoaded event fired.', 'ArchiveFeature');
+
       const configList = document.getElementById('config-list');
       const addBtn = document.getElementById('add-new-config-btn');
       const wizardBackdrop = document.getElementById('wizard-backdrop');
