@@ -124,6 +124,24 @@ var LogService = {
     delete this._workflowNames[runId]; // Clean up
   },
 
+  /**
+   * Writes a general informational log message without a runId.
+   * @param {string} message The log message.
+   * @param {string} [moduleName='System'] The name of the module logging the message.
+   */
+  info: function(message, moduleName = 'System') {
+    this.writeDetailLog('N/A', 'N/A', moduleName, '', '情報', message);
+  },
+
+  /**
+   * Writes a general error log message without a runId.
+   * @param {string} message The error message.
+   * @param {string} [moduleName='System'] The name of the module logging the message.
+   */
+  error: function(message, moduleName = 'System') {
+    this.writeDetailLog('N/A', 'N/A', moduleName, '', '失敗', message);
+  },
+
   getSummaryLogs: function (limit) {
     const ss = this._getLogSpreadsheet();
     const summarySheet = ss.getSheetByName(this._SUMMARY_SHEET_NAME);
