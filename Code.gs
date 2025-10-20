@@ -362,7 +362,7 @@ function saveArchiveConfig(moduleDefinition) {
     modules: [moduleDefinition]
   };
   try {
-    TriggerService.deleteTriggerForModule(workflowName);
+    TriggerService.deleteTriggerByWorkflowName(workflowName);
     const result = WorkflowService.saveWorkflow(workflowName, workflowData);
     LogService.info(`saveArchiveConfig: WorkflowService.saveWorkflow result: ${result}`, 'ArchiveFeature');
     TriggerService.createTriggerForModule(moduleDefinition);

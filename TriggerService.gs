@@ -155,5 +155,31 @@ var TriggerService = {
         Logger.log(`Could not delete trigger ${triggerUid} (may already be gone): ${e.message}`);
       }
     }
+  },
+
+  deleteTriggerByWorkflowName: function(workflowName) {
+    const allTriggers = ScriptApp.getProjectTriggers();
+    const userProperties = PropertiesService.getUserProperties();
+    let deleted = false;
+
+    allTriggers.forEach(trigger => {
+      const triggerUid = trigger.getUniqueId();
+      const configStr = userProperties.getProperty('module_config_' + triggerUid);
+      if (configStr) {
+        try {
+          const config = JSON.parse(configStr);
+          if (config.name === workflowName) {
+            ScriptApp.deleteTrigger(trigger);
+            userProperties.deleteProperty('module_config_' + triggerUid);
+            deleted = true;
+            Logger.log(`Deleted trigger ${triggerUid} for workflow ${workflowName}.`);
+          }
+        } catch (e) {
+          // Ignore configs that can't be parsed
+        }
+      }
+    });
+
+    return deleted;
   }
 };
