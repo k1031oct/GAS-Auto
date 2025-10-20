@@ -257,6 +257,39 @@ function executeWorkflowByTrigger(e) {
   }
 }
 
+/**
+ * Executes a single module based on a trigger event.
+ * @param {GoogleAppsScript.Events.TimeDriven} e The trigger event object.
+ */
+function executeModuleByTrigger(e) {
+  const triggerUid = e.triggerUid;
+  const properties = PropertiesService.getUserProperties();
+  const moduleConfigStr = properties.getProperty(`module_config_${triggerUid}`);
+
+  if (!moduleConfigStr) {
+    Logger.log(`Module trigger error: Could not find config for trigger ID "${triggerUid}".`);
+    return;
+  }
+
+  try {
+    const moduleConfig = JSON.parse(moduleConfigStr);
+    const handlerName = moduleConfig.handler;
+    const settings = moduleConfig.settings.reduce((acc, setting) => {
+      acc[setting.id] = setting.value;
+      return acc;
+    }, {});
+
+    if (typeof this[handlerName] === 'function') {
+      this[handlerName](settings);
+      Logger.log(`Successfully executed module handler "${handlerName}" via trigger.`);
+    } else {
+      Logger.log(`Module trigger error: Handler function "${handlerName}" not found.`);
+    }
+  } catch (error) {
+    Logger.log(`Module trigger error: Failed to execute module for trigger ID "${triggerUid}". Error: ${error.toString()}`);
+  }
+}
+
 //================================================================
 // 6. 新機能：Excel自動アーカイブ
 //================================================================
@@ -265,9 +298,16 @@ function executeWorkflowByTrigger(e) {
  * Excel自動アーカイブ設定ウィザードのHTMLコンテンツを取得する
  * @returns {string} HTMLコンテンツ
  */
-function getArchiveWizardHtml() {
-  return HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
+function showArchiveWizard() {
+  const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
+  return { title: 'Excel自動アーカイブ設定', html: html };
 }
+
+function showArchiveManagement() {
+  const html = HtmlService.createTemplateFromFile('ArchiveManagement').evaluate().getContent();
+  return { title: '自動保管設定の管理', html: html };
+}
+
 
 /**
  * Google Picker APIを使用してフォルダ選択ダイアログを作成・表示する
@@ -295,37 +335,71 @@ function createPicker() {
 /**
  * 新しいモジュール定義をJSONファイルとして保存する
  * @param {object} moduleDefinition - 保存するモジュールの定義オブジェクト
- * @param {string} moduleName - ファイル名 (拡張子なし)
  */
-function saveNewModule(moduleDefinition, moduleName) {
-  const folderId = ModuleService._getDefaultModuleFolderId();
-  if (!folderId) {
-    throw new Error('モジュールフォルダが設定されていません。先に「設定」からフォルダIDを登録してください。');
-  }
+function saveArchiveConfig(moduleDefinition) {
+  const configs = getArchiveConfigs();
   
-  try {
-    const folder = DriveApp.getFolderById(folderId);
-    const fileName = `${moduleName}.json`;
-    
-    // 既存のファイルを検索
-    const files = folder.getFilesByName(fileName);
-    if (files.hasNext()) {
-      // 存在する場合は上書きする
-      const file = files.next();
-      file.setContent(JSON.stringify(moduleDefinition, null, 2));
-      Logger.log(`モジュール「${fileName}」を更新しました。`);
-    } else {
-      // 存在しない場合は新規作成
-      folder.createFile(fileName, JSON.stringify(moduleDefinition, null, 2), 'application/json');
-      Logger.log(`新しいモジュール「${fileName}」を作成しました。`);
-    }
-    
-    // キャッシュをクリア
-    const cache = CacheService.getScriptCache();
-    cache.remove(`modules_cache_${folderId}`);
+  // Check if a config with the same ID already exists to update it
+  const existingIndex = configs.findIndex(c => c.id === moduleDefinition.id);
 
+  if (existingIndex > -1) {
+    // Update existing config
+    configs[existingIndex] = moduleDefinition;
+  } else {
+    // Add new config
+    configs.push(moduleDefinition);
+  }
+
+  try {
+    PropertiesService.getUserProperties().setProperty('archiveConfigs', JSON.stringify(configs));
+    // Also, set up the trigger for this specific module
+    TriggerService.createTriggerForModule(moduleDefinition);
+    Logger.log(`Saved archive configurations.`);
+    return configs;
   } catch (e) {
-    Logger.log(`モジュールの保存に失敗しました: ${e.message}`);
-    throw new Error(`モジュールの保存に失敗しました: ${e.message}`);
+    Logger.log(`Failed to save archive configurations: ${e.message}`);
+    throw new Error(`Failed to save archive configurations: ${e.message}`);
+  }
+}
+
+/**
+ * Retrieves all archive configurations from PropertiesService.
+ * @returns {Array<object>} An array of configuration objects.
+ */
+function getArchiveConfigs() {
+  try {
+    const configsJson = PropertiesService.getUserProperties().getProperty('archiveConfigs');
+    return configsJson ? JSON.parse(configsJson) : [];
+  } catch (e) {
+    Logger.log(`Failed to retrieve archive configurations: ${e.message}`);
+    return [];
+  }
+}
+
+/**
+ * Deletes an archive configuration by its ID.
+ * @param {string} configId The ID of the configuration to delete.
+ * @returns {Array<object>} The remaining configuration objects.
+ */
+function deleteArchiveConfig(configId) {
+  let configs = getArchiveConfigs();
+  const configToDelete = configs.find(c => c.id === configId);
+  
+  if (!configToDelete) {
+    throw new Error(`Configuration with ID ${configId} not found.`);
+  }
+
+  // Delete the associated trigger first
+  TriggerService.deleteTriggerForModule(configToDelete);
+
+  const remainingConfigs = configs.filter(c => c.id !== configId);
+
+  try {
+    PropertiesService.getUserProperties().setProperty('archiveConfigs', JSON.stringify(remainingConfigs));
+    Logger.log(`Deleted archive configuration with ID: ${configId}`);
+    return remainingConfigs;
+  } catch (e) {
+    Logger.log(`Failed to delete archive configuration: ${e.message}`);
+    throw new Error(`Failed to delete archive configuration: ${e.message}`);
   }
 }
