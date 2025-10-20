@@ -1,0 +1,67 @@
+name: 📝 Summarize PR Description
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  summarize:
+    if: |
+      github.event.issue.pull_request &&
+      github.event.sender.type != 'Bot' &&
+      contains(github.event.comment.body, '@gemini-cli, please summarize')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: 'Generate Summary and Post Comment'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const commentBody = context.payload.comment.body;
+            const marker = 'please summarize the following pull request based on the instructions below.';
+            const promptIndex = commentBody.indexOf(marker);
+            if (promptIndex === -1) {
+              console.log('Marker not found in comment.');
+              return;
+            }
+            const prompt = commentBody.substring(promptIndex + marker.length).trim();
+
+            // Gemini APIを呼び出す
+            const apiKey = '${{ secrets.GEMINI_API_KEY }}';
+            if (!apiKey) {
+              core.setFailed('GEMINI_API_KEY is not set.');
+              return;
+            }
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+            
+            try {
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: prompt }] }]
+                })
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Gemini API request failed with status ${response.status}: ${errorText}`);
+              }
+
+              const result = await response.json();
+              const summary = result.candidates[0].content.parts[0].text;
+
+              // PRにコメントを投稿
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `### 修正概要 (AIによる要約)\n\n${summary}`
+              });
+            } catch (error) {
+              core.setFailed(`An error occurred: ${error.message}`);
+            }
