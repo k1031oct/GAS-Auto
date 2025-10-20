@@ -101,5 +101,59 @@ var TriggerService = {
     } else {
       throw new Error(`トリガー (ID: ${triggerUid}) が見つかりませんでした。`);
     }
+  },
+
+  /**
+   * Creates a trigger for a standalone module configuration.
+   * @param {object} moduleConfig The module configuration object.
+   */
+  createTriggerForModule: function(moduleConfig) {
+    if (!moduleConfig || !moduleConfig.trigger || !moduleConfig.handler) {
+      throw new Error('Invalid module configuration for trigger creation.');
+    }
+    
+    // If a trigger already exists for this module, delete the old one first.
+    if (moduleConfig.triggerUid) {
+      this.deleteTrigger(moduleConfig.triggerUid);
+    }
+
+    const triggerOptions = moduleConfig.trigger;
+    let triggerBuilder = ScriptApp.newTrigger('executeModuleByTrigger').timeBased();
+
+    switch (triggerOptions.frequency) {
+      case 'daily':
+        triggerBuilder.atHour(triggerOptions.hour || 2).everyDays(1);
+        break;
+      // Add other frequencies like 'weekly', 'hourly' if needed
+      default:
+        // Default to daily at 2am
+        triggerBuilder.atHour(2).everyDays(1);
+        break;
+    }
+
+    const trigger = triggerBuilder.build();
+    moduleConfig.triggerUid = trigger.getUniqueId(); // Store the new trigger ID
+
+    PropertiesService.getUserProperties().setProperty('module_config_' + trigger.getUniqueId(), JSON.stringify(moduleConfig));
+    Logger.log(`Created trigger ${moduleConfig.triggerUid} for module ${moduleConfig.name}.`);
+  },
+
+  /**
+   * Deletes the trigger associated with a module configuration.
+   * @param {object} moduleConfig The module configuration object.
+   */
+  deleteTriggerForModule: function(moduleConfig) {
+    const triggerUid = moduleConfig.triggerUid;
+    if (triggerUid) {
+      try {
+        this.deleteTrigger(triggerUid);
+        // The main deleteTrigger also removes the property, but we might have a different property key.
+        PropertiesService.getUserProperties().deleteProperty('module_config_' + triggerUid);
+        Logger.log(`Deleted trigger ${triggerUid} for module ${moduleConfig.name}.`);
+      } catch (e) {
+        // Ignore if trigger is already deleted
+        Logger.log(`Could not delete trigger ${triggerUid} (may already be gone): ${e.message}`);
+      }
+    }
   }
 };

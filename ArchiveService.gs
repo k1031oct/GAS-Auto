@@ -14,15 +14,19 @@
  * @returns {void}
  */
 function archiveExcelFilesHandler(settings) {
-  const { sourceFolderId, searchTerm, archiveFolderName } = settings;
+  const { sourceFolder, searchTerm, archiveFolderName } = settings;
 
-  if (!sourceFolderId || !searchTerm || !archiveFolderName) {
+  if (!sourceFolder || !searchTerm || !archiveFolderName) {
     LogService.error('ArchiveService: Missing required settings.');
     return;
   }
 
   try {
-    const sourceFolder = DriveApp.getFolderById(sourceFolderId);
+    const sourceFolder = getFolderFromIdOrUrl(sourceFolder);
+    if (!sourceFolder) {
+      LogService.error(`ArchiveService: Could not find folder with ID or URL: ${sourceFolder}`);
+      return;
+    }
     const excelFiles = searchExcelFiles(sourceFolder, searchTerm);
 
     excelFiles.forEach(file => {
@@ -173,4 +177,34 @@ function getFileDate(filename) {
     }
   }
   return null;
+}
+
+/**
+ * Retrieves a Google Drive folder from either a folder ID or a folder URL.
+ *
+ * @param {string} idOrUrl The folder ID or URL.
+ * @returns {GoogleAppsScript.Drive.Folder|null} The folder object or null if not found.
+ */
+function getFolderFromIdOrUrl(idOrUrl) {
+  if (!idOrUrl) return null;
+
+  let folderId = idOrUrl;
+  
+  // Check if it's a URL and extract the ID
+  if (idOrUrl.startsWith('http')) {
+    const match = idOrUrl.match(/folders\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      folderId = match[1];
+    } else {
+      LogService.error(`ArchiveService: Invalid Google Drive folder URL: ${idOrUrl}`);
+      return null;
+    }
+  }
+  
+  try {
+    return DriveApp.getFolderById(folderId);
+  } catch (e) {
+    LogService.error(`ArchiveService: Could not access folder with ID: ${folderId}. Error: ${e.toString()}`);
+    return null;
+  }
 }

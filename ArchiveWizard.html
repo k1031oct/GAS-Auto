@@ -40,11 +40,8 @@
       <div class="step-title">Step 1: Select Source Folder and Search Term</div>
       <p>Specify the folder to search for Excel files and the keyword to identify them.</p>
       <div class="input-field">
-        <a id="pick-folder-btn" class="waves-effect waves-light btn folder-picker-btn">
-          <i class="material-icons left">folder_open</i> Select Source Folder
-        </a>
-        <span id="picked-folder-name">No folder selected</span>
-        <input type="hidden" id="sourceFolderId">
+        <input id="sourceFolder" type="text" class="validate">
+        <label for="sourceFolder">Source Folder ID or URL</label>
       </div>
       <div class="input-field">
         <input id="searchTerm" type="text" class="validate">
@@ -102,33 +99,9 @@
         progressBar.style.width = (currentStep / steps.length * 100) + '%';
       }
 
-      function getPicker() {
-        return new Promise((resolve, reject) => {
-          google.script.run
-            .withSuccessHandler(picker => resolve(picker))
-            .withFailureHandler(reject)
-            .createPicker();
-        });
-      }
-
-      document.getElementById('pick-folder-btn').addEventListener('click', async () => {
-        try {
-          const picker = await getPicker();
-          picker.setCallback(data => {
-            if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-              const folder = data[google.picker.Response.DOCUMENTS][0];
-              document.getElementById('sourceFolderId').value = folder.id;
-              document.getElementById('picked-folder-name').textContent = folder.name;
-            }
-          }).build().setVisible(true);
-        } catch (err) {
-          M.toast({ html: 'Could not open folder picker: ' + err });
-        }
-      });
-
       document.getElementById('next-step-1').addEventListener('click', () => {
-        if (!document.getElementById('sourceFolderId').value || !document.getElementById('searchTerm').value) {
-          M.toast({ html: 'Please select a folder and enter a search term.' });
+        if (!document.getElementById('sourceFolder').value || !document.getElementById('searchTerm').value) {
+          M.toast({ html: 'Please enter a folder ID/URL and a search term.' });
           return;
         }
         currentStep = 2;
@@ -145,7 +118,7 @@
           M.toast({ html: 'Please enter an archive folder name.' });
           return;
         }
-        document.getElementById('review-sourceFolder').textContent = document.getElementById('picked-folder-name').textContent;
+        document.getElementById('review-sourceFolder').textContent = document.getElementById('sourceFolder').value;
         document.getElementById('review-searchTerm').textContent = document.getElementById('searchTerm').value;
         document.getElementById('review-archiveFolderName').textContent = document.getElementById('archiveFolderName').value;
         currentStep = 3;
@@ -162,7 +135,7 @@
         preloader.classList.add('active');
 
         const settings = {
-          sourceFolderId: document.getElementById('sourceFolderId').value,
+          sourceFolder: document.getElementById('sourceFolder').value,
           searchTerm: document.getElementById('searchTerm').value,
           archiveFolderName: document.getElementById('archiveFolderName').value
         };
@@ -180,7 +153,7 @@
             hour: 2
           },
           settings: [
-            { id: 'sourceFolderId', name: 'Source Folder ID', type: 'string', value: settings.sourceFolderId },
+            { id: 'sourceFolder', name: 'Source Folder ID or URL', type: 'string', value: settings.sourceFolder },
             { id: 'searchTerm', name: 'Search Term', type: 'string', value: settings.searchTerm },
             { id: 'archiveFolderName', name: 'Archive Folder Name', type: 'string', value: settings.archiveFolderName }
           ]
@@ -189,14 +162,15 @@
         google.script.run
           .withSuccessHandler(() => {
             preloader.classList.remove('active');
-            M.toast({ html: 'Module created successfully! The page will now reload.' });
-            setTimeout(() => google.script.host.close(), 2000);
+            M.toast({ html: 'Archive configuration saved successfully!' });
+            // The main script will handle closing this and reopening the management modal.
+            google.script.host.close();
           })
           .withFailureHandler((err) => {
             preloader.classList.remove('active');
             M.toast({ html: 'Error: ' + err });
           })
-          .saveNewModule(moduleDefinition, moduleName);
+          .saveArchiveConfig(moduleDefinition);
       });
 
       updateWizard();

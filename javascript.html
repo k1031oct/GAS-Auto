@@ -68,6 +68,10 @@
                         archiveWizardBackdrop: document.getElementById('archive-wizard-backdrop'),
                         archiveWizardContent: document.getElementById('archive-wizard-content'),
                         archiveWizardCloseBtn: document.getElementById('archive-wizard-close-btn'),
+                        archiveManagementBackdrop: document.getElementById('archive-management-backdrop'),
+                        archiveManagementModal: document.getElementById('archive-management-modal'),
+                        archiveManagementContent: document.getElementById('archive-management-content'),
+                        archiveManagementCloseBtn: document.getElementById('archive-management-close-btn'),
 
                         // Hamburger Menu
                         hamburgerBtn: document.getElementById('hamburger-btn'),
@@ -173,24 +177,45 @@
                                               const showLoader = () => app.loader.classList.remove('hidden');
                                               const hideLoader = () => app.loader.classList.add('hidden');
 
+                                              // --- Archive Management Logic ---
+                                              const openArchiveManagement = () => {
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(response => {
+                                                    hideLoader();
+                                                    app.archiveManagementContent.innerHTML = response.html;
+                                                    app.archiveManagementBackdrop.classList.remove('hidden');
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .showArchiveManagement();
+                                              };
+
+                                              const closeArchiveManagement = () => {
+                                                app.archiveManagementBackdrop.classList.add('hidden');
+                                                app.archiveManagementContent.innerHTML = '';
+                                              };
+
                                               // --- Archive Wizard Logic ---
                                               const openArchiveWizard = () => {
                                                 showLoader();
                                                 google.script.run
-                                                  .withSuccessHandler((html) => {
+                                                  .withSuccessHandler((response) => {
                                                     hideLoader();
-                                                    app.archiveWizardContent.innerHTML = html;
+                                                    // First, close the management modal if it's open
+                                                    closeArchiveManagement();
+                                                    // Then, show the wizard
+                                                    app.archiveWizardContent.innerHTML = response.html;
                                                     app.archiveWizardBackdrop.classList.remove('hidden');
-                                                    // After injecting the HTML, attach event listeners for elements inside the wizard
-                                                    // Example: document.getElementById('some-button-in-wizard').addEventListener('click', ...);
                                                   })
                                                   .withFailureHandler(showError)
-                                                  .getArchiveWizardHtml();
+                                                  .showArchiveWizard();
                                               };
 
                                               const closeArchiveWizard = () => {
                                                 app.archiveWizardBackdrop.classList.add('hidden');
                                                 app.archiveWizardContent.innerHTML = ''; // Clear content
+                                                // Re-open the management modal after closing the wizard
+                                                openArchiveManagement();
                                               };
                                           
                                               // --- Trigger Modal Logic ---
@@ -565,9 +590,10 @@
                                                 app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
 
-                                                // Archive Wizard Listener
-                                                app.archiveBtn.addEventListener('click', openArchiveWizard);
+                                                // Archive Listeners
+                                                app.archiveBtn.addEventListener('click', openArchiveManagement);
                                                 app.archiveWizardCloseBtn.addEventListener('click', closeArchiveWizard);
+                                                app.archiveManagementCloseBtn.addEventListener('click', closeArchiveManagement);
 
                                           
                                                 app.hideLogBtn.addEventListener('click', hideLog);
