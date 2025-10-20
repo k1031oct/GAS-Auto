@@ -296,16 +296,29 @@ function executeModuleByTrigger(e) {
 
 /**
  * Excel自動アーカイブ設定ウィザードのHTMLコンテンツを取得する
- * @returns {string} HTMLコンテンツ
+ * @returns {object} HTMLコンテンツとタイトル
  */
 function showArchiveWizard() {
-  const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
-  return { title: 'Excel自動アーカイブ設定', html: html };
+  LogService.log('showArchiveWizard called.');
+  try {
+    const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
+    LogService.log(`Returning HTML for wizard (length: ${html.length})`);
+    return { title: 'Excel自動アーカイブ設定', html: html };
+  } catch (e) {
+    LogService.error(`Error in showArchiveWizard: ${e.toString()}`);
+    throw e;
+  }
 }
 
 function showArchiveManagement() {
-  const html = HtmlService.createTemplateFromFile('ArchiveManagement').evaluate().getContent();
-  return { title: '自動保管設定の管理', html: html };
+  LogService.log('showArchiveManagement called.');
+  try {
+    const html = HtmlService.createTemplateFromFile('ArchiveManagement').evaluate().getContent();
+    return { title: '自動保管設定の管理', html: html };
+  } catch (e) {
+    LogService.error(`Error in showArchiveManagement: ${e.toString()}`);
+    throw e;
+  }
 }
 
 
@@ -314,6 +327,7 @@ function showArchiveManagement() {
  * @returns {object} Picker Builder
  */
 function createPicker() {
+  // ... (This function seems fine, no logs needed for now)
   const apiKey = PropertiesService.getScriptProperties().getProperty('GCP_API_KEY');
   if (!apiKey) {
     throw new Error('GCP API Key is not set. Please ask the administrator to set the "GCP_API_KEY" in the script properties.');
@@ -337,69 +351,76 @@ function createPicker() {
  * @param {object} moduleDefinition - 保存するモジュールの定義オブジェクト
  */
 function saveArchiveConfig(moduleDefinition) {
-  const configs = getArchiveConfigs();
-  
-  // Check if a config with the same ID already exists to update it
-  const existingIndex = configs.findIndex(c => c.id === moduleDefinition.id);
-
-  if (existingIndex > -1) {
-    // Update existing config
-    configs[existingIndex] = moduleDefinition;
-  } else {
-    // Add new config
-    configs.push(moduleDefinition);
+  LogService.log(`saveArchiveConfig called with: ${JSON.stringify(moduleDefinition)}`);
+  if (!moduleDefinition || !moduleDefinition.name) {
+    throw new Error('Invalid module definition or name is missing.');
   }
-
+  const workflowName = moduleDefinition.name;
+  const workflowData = {
+    name: workflowName,
+    moduleFolderId: '', 
+    modules: [moduleDefinition]
+  };
   try {
-    PropertiesService.getUserProperties().setProperty('archiveConfigs', JSON.stringify(configs));
-    // Also, set up the trigger for this specific module
+    TriggerService.deleteTriggerForModule(workflowName);
+    const result = WorkflowService.saveWorkflow(workflowName, workflowData);
+    LogService.log(`WorkflowService.saveWorkflow result: ${result}`);
     TriggerService.createTriggerForModule(moduleDefinition);
-    Logger.log(`Saved archive configurations.`);
-    return configs;
+    return result;
   } catch (e) {
-    Logger.log(`Failed to save archive configurations: ${e.message}`);
-    throw new Error(`Failed to save archive configurations: ${e.message}`);
+    LogService.error(`Failed to save archive config as workflow: ${e.toString()}`);
+    throw new Error(`Failed to save workflow: ${e.message}`);
   }
 }
 
 /**
- * Retrieves all archive configurations from PropertiesService.
- * @returns {Array<object>} An array of configuration objects.
+ * Retrieves all archive configurations by listing and loading workflows.
+ * @returns {Array<object>} An array of configuration objects, including the workflow name.
  */
 function getArchiveConfigs() {
+  LogService.log('getArchiveConfigs called.');
   try {
-    const configsJson = PropertiesService.getUserProperties().getProperty('archiveConfigs');
-    return configsJson ? JSON.parse(configsJson) : [];
+    const allWorkflows = WorkflowService.listWorkflows();
+    const archiveWorkflowNames = allWorkflows.filter(name => name.startsWith('AutoArchive:'));
+    LogService.log(`Found archive workflows: ${JSON.stringify(archiveWorkflowNames)}`);
+    
+    const configs = archiveWorkflowNames.map(name => {
+      const workflowData = WorkflowService.loadWorkflow(name);
+      if (workflowData && workflowData.modules && workflowData.modules.length > 0) {
+        return {
+          workflowName: name,
+          module: workflowData.modules[0] 
+        };
+      }
+      return null;
+    }).filter(Boolean);
+    
+    LogService.log(`Returning configs: ${JSON.stringify(configs)}`);
+    return configs;
   } catch (e) {
-    Logger.log(`Failed to retrieve archive configurations: ${e.message}`);
-    return [];
+    LogService.error(`Error in getArchiveConfigs: ${e.toString()}`);
+    return []; // Return empty array on error to prevent UI freeze
   }
 }
 
 /**
- * Deletes an archive configuration by its ID.
- * @param {string} configId The ID of the configuration to delete.
- * @returns {Array<object>} The remaining configuration objects.
+ * Deletes an archive configuration workflow and its associated trigger.
+ * @param {string} workflowName The name of the workflow to delete.
+ * @returns {string} The result from the delete operation.
  */
-function deleteArchiveConfig(configId) {
-  let configs = getArchiveConfigs();
-  const configToDelete = configs.find(c => c.id === configId);
-  
-  if (!configToDelete) {
-    throw new Error(`Configuration with ID ${configId} not found.`);
+function deleteArchiveConfig(workflowName) {
+  LogService.log(`deleteArchiveConfig called for: ${workflowName}`);
+  if (!workflowName) {
+    throw new Error('Workflow name is required to delete the configuration.');
   }
 
-  // Delete the associated trigger first
-  TriggerService.deleteTriggerForModule(configToDelete);
-
-  const remainingConfigs = configs.filter(c => c.id !== configId);
-
-  try {
-    PropertiesService.getUserProperties().setProperty('archiveConfigs', JSON.stringify(remainingConfigs));
-    Logger.log(`Deleted archive configuration with ID: ${configId}`);
-    return remainingConfigs;
-  } catch (e) {
-    Logger.log(`Failed to delete archive configuration: ${e.message}`);
-    throw new Error(`Failed to delete archive configuration: ${e.message}`);
+  const workflowData = WorkflowService.loadWorkflow(workflowName);
+  if (workflowData && workflowData.modules && workflowData.modules.length > 0) {
+    const moduleConfig = workflowData.modules[0];
+    TriggerService.deleteTriggerForModule(moduleConfig);
+  } else {
+    LogService.log(`Could not find workflow data for "${workflowName}" to delete its trigger, proceeding with workflow deletion.`);
   }
+
+  return WorkflowService.deleteWorkflow(workflowName);
 }

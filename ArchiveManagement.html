@@ -6,38 +6,68 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 p-4">
+
+  <!-- Config List -->
   <div id="config-list" class="space-y-2">
-    <!-- Config items will be injected here -->
     <p class="text-gray-500">Loading configurations...</p>
   </div>
 
+  <!-- Add New Button -->
   <div class="mt-4">
     <button id="add-new-config-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">
       <i class="fas fa-plus mr-2"></i> 新しい自動保管を追加
     </button>
   </div>
 
+  <!-- Wizard Modal -->
+  <div id="wizard-backdrop" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
+    <div id="wizard-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[90vh]">
+      <header id="wizard-header" class="p-4 border-b flex justify-between items-center flex-shrink-0">
+        <h2 id="wizard-title" class="text-xl font-bold"></h2>
+        <button id="wizard-close-btn" class="p-2 rounded-full hover:bg-gray-200"><i class="fas fa-times"></i></button>
+      </header>
+      <main id="wizard-content" class="p-6 flex-grow overflow-y-auto">
+        <!-- Wizard HTML will be injected here -->
+      </main>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const configList = document.getElementById('config-list');
       const addBtn = document.getElementById('add-new-config-btn');
+      const wizardBackdrop = document.getElementById('wizard-backdrop');
+      const wizardModal = document.getElementById('wizard-modal');
+      const wizardTitle = document.getElementById('wizard-title');
+      const wizardContent = document.getElementById('wizard-content');
+      const wizardCloseBtn = document.getElementById('wizard-close-btn');
 
-      // Function to render configurations
+      function refreshConfigs() {
+        configList.innerHTML = '<p class="text-gray-500">Loading configurations...</p>';
+        google.script.run
+          .withSuccessHandler(renderConfigs)
+          .withFailureHandler(err => {
+            configList.innerHTML = `<p class="text-red-500">Error loading configurations: ${err}</p>`;
+          })
+          .getArchiveConfigs();
+      }
+
       function renderConfigs(configs) {
         configList.innerHTML = '';
         if (configs && configs.length > 0) {
           configs.forEach(config => {
             const configElement = document.createElement('div');
             configElement.className = 'bg-white p-3 rounded-lg shadow-sm flex justify-between items-center';
-            configElement.innerHTML = `
+            const searchTerm = config.module.settings.find(s => s.id === 'searchTerm').value;
+            configElement.innerHTML = "
               <div>
-                <p class="font-semibold text-gray-800">${config.name}</p>
-                <p class="text-sm text-gray-500">Search: "${config.settings.find(s => s.id === 'searchTerm').value}"</p>
+                <p class=\"font-semibold text-gray-800\">${config.module.name}</p>
+                <p class=\"text-sm text-gray-500\">Search: \"${searchTerm}\"</p>
               </div>
-              <button data-id="${config.id}" class="delete-btn text-red-500 hover:text-red-700 transition-colors">
-                <i class="fas fa-trash"></i>
+              <button data-workflow-name=\"${config.workflowName}\" class=\"delete-btn text-red-500 hover:text-red-700 transition-colors\">
+                <i class=\"fas fa-trash\"></i>
               </button>
-            `;
+            ";
             configList.appendChild(configElement);
           });
         } else {
@@ -45,35 +75,64 @@
         }
       }
 
-      // Fetch and render configs on load
-      google.script.run
-        .withSuccessHandler(renderConfigs)
-        .withFailureHandler(err => {
-          configList.innerHTML = `<p class="text-red-500">Error loading configurations: ${err}</p>`;
-        })
-        .getArchiveConfigs();
+      function showWizard(response) {
+        wizardTitle.textContent = response.title;
+        wizardContent.innerHTML = response.html;
+        wizardBackdrop.classList.remove('hidden');
+        // Re-attach event listeners for the new content inside the wizard
+        // This is crucial because the script from ArchiveWizard.html is now in the DOM
+        const scripts = wizardContent.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+          eval(scripts[i].innerHTML);
+        }
+      }
+
+      function hideWizard() {
+        wizardBackdrop.classList.add('hidden');
+        wizardContent.innerHTML = '';
+        refreshConfigs(); // Refresh the list after closing the wizard
+      }
+
+      // Initial load
+      refreshConfigs();
 
       // Handle Add New
       addBtn.addEventListener('click', () => {
-        google.script.run.showArchiveWizard();
+        google.script.run
+          .withSuccessHandler(showWizard)
+          .showArchiveWizard();
       });
+
+      // Handle Wizard Close
+      wizardCloseBtn.addEventListener('click', hideWizard);
+      wizardBackdrop.addEventListener('click', (e) => {
+        if (e.target === wizardBackdrop) {
+          hideWizard();
+        }
+      });
+      // The wizard itself will call google.script.host.close() which we can listen for.
+      // However, a more robust way is to handle it within this modal's context.
+      // We will override the default close behavior.
+      window.closeModalAndRefresh = hideWizard;
 
       // Handle Delete
       configList.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.delete-btn');
         if (deleteBtn) {
-          const configId = deleteBtn.dataset.id;
-          if (confirm('Are you sure you want to delete this configuration?')) {
+          const workflowName = deleteBtn.dataset.workflowName;
+          if (confirm(`Are you sure you want to delete the configuration: ${workflowName}?`)) {
             google.script.run
-              .withSuccessHandler((remainingConfigs) => {
-                renderConfigs(remainingConfigs);
-                // Maybe show a success toast in the main UI later
-              })
+              .withSuccessHandler(renderConfigs)
               .withFailureHandler(err => alert('Error deleting configuration: ' + err))
-              .deleteArchiveConfig(configId);
+              .deleteArchiveConfig(workflowName);
           }
         }
       });
+
+      // Override google.script.host.close for the wizard
+      google.script.host.close = () => {
+        hideWizard();
+      };
     });
   </script>
 </body>

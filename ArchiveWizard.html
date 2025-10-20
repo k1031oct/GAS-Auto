@@ -2,106 +2,98 @@
 <html>
 <head>
   <base target="_top">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     .wizard-step { display: none; }
     .wizard-step.active { display: block; }
-    .progress-container { margin-top: 20px; margin-bottom: 20px; }
-    .step-title { font-weight: bold; margin-bottom: 15px; }
-    .preloader-wrapper {
-      display: none;
-      margin: 20px auto;
-    }
-    .preloader-wrapper.active {
-      display: block;
-    }
-    .folder-picker-btn {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #picked-folder-name {
-      margin-left: 10px;
-      font-style: italic;
-    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="progress-container">
-      <div class="progress">
-        <div class="determinate" style="width: 33%"></div>
-      </div>
+<body class="bg-gray-100 p-4">
+
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <!-- Progress Bar -->
+    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+      <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 33%"></div>
     </div>
 
+    <!-- Step 1 -->
     <div id="wizard-step-1" class="wizard-step active">
-      <div class="step-title">Step 1: Select Source Folder and Search Term</div>
-      <p>Specify the folder to search for Excel files and the keyword to identify them.</p>
-      <div class="input-field">
-        <input id="sourceFolder" type="text" class="validate">
-        <label for="sourceFolder">Source Folder ID or URL</label>
+      <h2 class="text-xl font-bold mb-2">Step 1: Select Source Folder and Search Term</h2>
+      <p class="text-gray-600 mb-4">Specify the folder to search for Excel files and the keyword to identify them.</p>
+      <div class="mb-4">
+        <label for="sourceFolder" class="block text-gray-700 text-sm font-bold mb-2">Source Folder ID or URL</label>
+        <input id="sourceFolder" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <div class="input-field">
-        <input id="searchTerm" type="text" class="validate">
-        <label for="searchTerm">Search Term (in filename)</label>
+      <div class="mb-4">
+        <label for="searchTerm" class="block text-gray-700 text-sm font-bold mb-2">Search Term (in filename)</label>
+        <input id="searchTerm" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <button class="btn waves-effect waves-light right" id="next-step-1">Next <i class="material-icons right">arrow_forward</i></button>
+      <div class="flex justify-end">
+        <button id="next-step-1" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+          Next <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
     </div>
 
+    <!-- Step 2 -->
     <div id="wizard-step-2" class="wizard-step">
-      <div class="step-title">Step 2: Define Archive Folder</div>
-      <p>Enter the name for the main folder where your archives will be stored. This folder will be created in your Google Drive's root directory if it doesn't exist.</p>
-      <div class="input-field">
-        <input id="archiveFolderName" type="text" class="validate">
-        <label for="archiveFolderName">Archive Root Folder Name</label>
+      <h2 class="text-xl font-bold mb-2">Step 2: Define Archive Folder</h2>
+      <p class="text-gray-600 mb-4">Enter the name for the main folder where your archives will be stored. This folder will be created in your Google Drive's root directory if it doesn't exist.</p>
+      <div class="mb-4">
+        <label for="archiveFolderName" class="block text-gray-700 text-sm font-bold mb-2">Archive Root Folder Name</label>
+        <input id="archiveFolderName" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
       </div>
-      <button class="btn-flat waves-effect waves-light" id="prev-step-2">Back</button>
-      <button class="btn waves-effect waves-light right" id="next-step-2">Next <i class="material-icons right">arrow_forward</i></button>
+      <div class="flex justify-between">
+        <button id="prev-step-2" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg">
+          <i class="fas fa-arrow-left mr-2"></i> Back
+        </button>
+        <button id="next-step-2" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+          Next <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
     </div>
 
+    <!-- Step 3 -->
     <div id="wizard-step-3" class="wizard-step">
-      <div class="step-title">Step 3: Review and Save</div>
-      <p>Please review the settings below. A new module will be created to run this archiving task automatically every day.</p>
-      <ul>
-        <li><strong>Source Folder:</strong> <span id="review-sourceFolder"></span></li>
-        <li><strong>Search Term:</strong> <span id="review-searchTerm"></span></li>
-        <li><strong>Archive Folder Name:</strong> <span id="review-archiveFolderName"></span></li>
-      </ul>
-      <div class="preloader-wrapper small">
-        <div class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
-          </div>
-        </div>
+      <h2 class="text-xl font-bold mb-2">Step 3: Review and Save</h2>
+      <p class="text-gray-600 mb-4">Please review the settings below. A new module will be created to run this archiving task automatically every day.</p>
+      <div class="bg-gray-50 p-4 rounded-lg border">
+        <ul class="list-disc list-inside space-y-2">
+          <li><strong>Source Folder:</strong> <span id="review-sourceFolder" class="font-mono bg-gray-200 px-2 py-1 rounded"></span></li>
+          <li><strong>Search Term:</strong> <span id="review-searchTerm" class="font-mono bg-gray-200 px-2 py-1 rounded"></span></li>
+          <li><strong>Archive Folder Name:</strong> <span id="review-archiveFolderName" class="font-mono bg-gray-200 px-2 py-1 rounded"></span></li>
+        </ul>
       </div>
-      <button class="btn-flat waves-effect waves-light" id="prev-step-3">Back</button>
-      <button class="btn waves-effect waves-light right" id="save-settings">Save & Create Module <i class="material-icons right">save</i></button>
+      <div class="mt-6 flex justify-between items-center">
+        <button id="prev-step-3" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg">
+          <i class="fas fa-arrow-left mr-2"></i> Back
+        </button>
+        <button id="save-settings" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+          <span id="save-btn-text">Save & Create Module</span>
+          <i id="save-spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+        </button>
+      </div>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       let currentStep = 1;
       const steps = document.querySelectorAll('.wizard-step');
-      const progressBar = document.querySelector('.determinate');
+      const progressBar = document.getElementById('progress-bar');
 
       function updateWizard() {
         steps.forEach((step, index) => {
           step.classList.toggle('active', index + 1 === currentStep);
         });
-        progressBar.style.width = (currentStep / steps.length * 100) + '%';
+        const progressPercentage = (currentStep - 1) / (steps.length - 1) * 66.66 + 33.33;
+        progressBar.style.width = `${progressPercentage}%`;
       }
 
       document.getElementById('next-step-1').addEventListener('click', () => {
         if (!document.getElementById('sourceFolder').value || !document.getElementById('searchTerm').value) {
-          M.toast({ html: 'Please enter a folder ID/URL and a search term.' });
+          alert('Please enter a folder ID/URL and a search term.');
           return;
         }
         currentStep = 2;
@@ -115,7 +107,7 @@
 
       document.getElementById('next-step-2').addEventListener('click', () => {
         if (!document.getElementById('archiveFolderName').value) {
-          M.toast({ html: 'Please enter an archive folder name.' });
+          alert('Please enter an archive folder name.');
           return;
         }
         document.getElementById('review-sourceFolder').textContent = document.getElementById('sourceFolder').value;
@@ -131,8 +123,13 @@
       });
 
       document.getElementById('save-settings').addEventListener('click', () => {
-        const preloader = document.querySelector('.preloader-wrapper');
-        preloader.classList.add('active');
+        const saveButton = document.getElementById('save-settings');
+        const buttonText = document.getElementById('save-btn-text');
+        const spinner = document.getElementById('save-spinner');
+        
+        saveButton.disabled = true;
+        buttonText.textContent = 'Saving...';
+        spinner.classList.remove('hidden');
 
         const settings = {
           sourceFolder: document.getElementById('sourceFolder').value,
@@ -140,11 +137,9 @@
           archiveFolderName: document.getElementById('archiveFolderName').value
         };
 
-        const moduleName = `AutoArchive_${settings.archiveFolderName.replace(/\s/g, '_')}`;
-        
         const moduleDefinition = {
           id: `module_${Date.now()}`,
-          name: `Excel Archiver: ${settings.archiveFolderName}`,
+          name: `AutoArchive: ${settings.archiveFolderName}`,
           description: `Automatically archives Excel files matching '${settings.searchTerm}' from a specific folder.`,
           handler: 'archiveExcelFilesHandler',
           trigger: {
@@ -161,14 +156,14 @@
 
         google.script.run
           .withSuccessHandler(() => {
-            preloader.classList.remove('active');
-            M.toast({ html: 'Archive configuration saved successfully!' });
-            // The main script will handle closing this and reopening the management modal.
+            alert('Archive configuration saved successfully!');
             google.script.host.close();
           })
           .withFailureHandler((err) => {
-            preloader.classList.remove('active');
-            M.toast({ html: 'Error: ' + err });
+            saveButton.disabled = false;
+            buttonText.textContent = 'Save & Create Module';
+            spinner.classList.add('hidden');
+            alert('Error: ' + err);
           })
           .saveArchiveConfig(moduleDefinition);
       });
