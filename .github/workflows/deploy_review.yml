@@ -64,6 +64,42 @@ jobs:
           echo "Deploying to Review Script ID: ${{ secrets.GAS_SCRIPT_ID }}"
           clasp deploy --deploymentId ${{ secrets.GAS_DEV_DEPLOYMENT_ID }} --description "Review Deployment for PR #${{ github.event.pull_request.number }}"
 
+      - name: Generate Summary
+        id: generate_summary
+        if: success() && github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const prBody = context.payload.pull_request.body;
+            const labels = context.payload.pull_request.labels.map(label => label.name);
+
+            let prompt = '';
+            if (labels.includes('機能追加')) {
+              prompt = `
+                以下のPull Requestのタイトルと本文を元に、追加された機能の概要と、UI上での操作開始位置について、日本語で簡潔に説明してください。
+
+                **タイトル:** ${prTitle}
+
+                **本文:**
+                ${prBody}
+              `;
+            } else if (labels.includes('不具合修正')) {
+              prompt = `
+                以下のPull Requestのタイトルと本文を元に、不具合の要因と修正概要について、日本語で簡潔に説明してください。
+
+                **タイトル:** ${prTitle}
+
+                **本文:**
+                ${prBody}
+              `;
+            }
+            
+            if (prompt) {
+              core.setOutput('summary_prompt', prompt);
+            }
+
       - name: Post Review URL as PR Comment
         if: success() && github.event_name == 'pull_request'
         uses: actions/github-script@v6
@@ -72,23 +108,14 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
             const deployUrl = `https://script.google.com/macros/s/${{ secrets.GAS_DEV_DEPLOYMENT_ID }}/exec`;
-            const prBody = context.payload.pull_request.body;
-            const labels = context.payload.pull_request.labels.map(label => label.name);
+            const summaryPrompt = `${{ steps.generate_summary.outputs.summary_prompt }}`;
 
             let summary;
-            if (labels.includes('機能追加')) {
+            if (summaryPrompt) {
               summary = `
-                #### 修正概要（機能追加）
-                \`\`\`
-                ${prBody}
-                \`\`\`
-              `;
-            } else if (labels.includes('不具合修正')) {
-              summary = `
-                #### 修正概要（不具合修正）
-                \`\`\`
-                ${prBody}
-                \`\`\`
+                #### 修正概要
+                @gemini-clm
+                ${summaryPrompt}
               `;
             } else {
               // Get the diff of the PR
