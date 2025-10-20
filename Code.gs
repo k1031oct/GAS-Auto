@@ -299,24 +299,24 @@ function executeModuleByTrigger(e) {
  * @returns {object} HTMLコンテンツとタイトル
  */
 function showArchiveWizard() {
-  LogService.info('showArchiveWizard called.', 'ArchiveFeature');
+  LogService.info('showArchiveWizard: Called', 'ArchiveFeature');
   try {
     const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
-    LogService.info(`Returning HTML for wizard (length: ${html.length})`, 'ArchiveFeature');
+    LogService.info(`showArchiveWizard: Returning HTML for wizard (length: ${html.length})`, 'ArchiveFeature');
     return { title: 'Excel自動アーカイブ設定', html: html };
   } catch (e) {
-    LogService.error(`Error in showArchiveWizard: ${e.toString()}`, 'ArchiveFeature');
+    LogService.error(`showArchiveWizard: Error: ${e.toString()}`, 'ArchiveFeature');
     throw e;
   }
 }
 
 function showArchiveManagement() {
-  LogService.info('showArchiveManagement called.', 'ArchiveFeature');
+  LogService.info('showArchiveManagement: Called', 'ArchiveFeature');
   try {
     const html = HtmlService.createTemplateFromFile('ArchiveManagement').evaluate().getContent();
     return { title: '自動保管設定の管理', html: html };
   } catch (e) {
-    LogService.error(`Error in showArchiveManagement: ${e.toString()}`, 'ArchiveFeature');
+    LogService.error(`showArchiveManagement: Error: ${e.toString()}`, 'ArchiveFeature');
     throw e;
   }
 }
@@ -351,7 +351,7 @@ function createPicker() {
  * @param {object} moduleDefinition - 保存するモジュールの定義オブジェクト
  */
 function saveArchiveConfig(moduleDefinition) {
-  LogService.info(`saveArchiveConfig called with: ${JSON.stringify(moduleDefinition)}`, 'ArchiveFeature');
+  LogService.info(`saveArchiveConfig: Called with: ${JSON.stringify(moduleDefinition)}`, 'ArchiveFeature');
   if (!moduleDefinition || !moduleDefinition.name) {
     throw new Error('Invalid module definition or name is missing.');
   }
@@ -364,11 +364,11 @@ function saveArchiveConfig(moduleDefinition) {
   try {
     TriggerService.deleteTriggerForModule(workflowName);
     const result = WorkflowService.saveWorkflow(workflowName, workflowData);
-    LogService.info(`WorkflowService.saveWorkflow result: ${result}`, 'ArchiveFeature');
+    LogService.info(`saveArchiveConfig: WorkflowService.saveWorkflow result: ${result}`, 'ArchiveFeature');
     TriggerService.createTriggerForModule(moduleDefinition);
     return result;
   } catch (e) {
-    LogService.error(`Failed to save archive config as workflow: ${e.toString()}`, 'ArchiveFeature');
+    LogService.error(`saveArchiveConfig: Error: ${e.toString()}`, 'ArchiveFeature');
     throw new Error(`Failed to save workflow: ${e.message}`);
   }
 }
@@ -378,11 +378,11 @@ function saveArchiveConfig(moduleDefinition) {
  * @returns {Array<object>} An array of configuration objects, including the workflow name.
  */
 function getArchiveConfigs() {
-  LogService.info('getArchiveConfigs called.', 'ArchiveFeature');
+  LogService.info('getArchiveConfigs: Called', 'ArchiveFeature');
   try {
     const allWorkflows = WorkflowService.listWorkflows();
     const archiveWorkflowNames = allWorkflows.filter(name => name.startsWith('AutoArchive:'));
-    LogService.info(`Found archive workflows: ${JSON.stringify(archiveWorkflowNames)}`, 'ArchiveFeature');
+    LogService.info(`getArchiveConfigs: Found archive workflows: ${JSON.stringify(archiveWorkflowNames)}`, 'ArchiveFeature');
     
     const configs = archiveWorkflowNames.map(name => {
       const workflowData = WorkflowService.loadWorkflow(name);
@@ -395,10 +395,10 @@ function getArchiveConfigs() {
       return null;
     }).filter(Boolean);
     
-    LogService.info(`Returning configs: ${JSON.stringify(configs)}`, 'ArchiveFeature');
+    LogService.info(`getArchiveConfigs: Returning configs: ${JSON.stringify(configs)}`, 'ArchiveFeature');
     return configs;
   } catch (e) {
-    LogService.error(`Error in getArchiveConfigs: ${e.toString()}`, 'ArchiveFeature');
+    LogService.error(`getArchiveConfigs: Error: ${e.toString()}`, 'ArchiveFeature');
     return []; // Return empty array on error to prevent UI freeze
   }
 }
@@ -409,7 +409,7 @@ function getArchiveConfigs() {
  * @returns {string} The result from the delete operation.
  */
 function deleteArchiveConfig(workflowName) {
-  LogService.info(`deleteArchiveConfig called for: ${workflowName}`, 'ArchiveFeature');
+  LogService.info(`deleteArchiveConfig: Called for: ${workflowName}`, 'ArchiveFeature');
   if (!workflowName) {
     throw new Error('Workflow name is required to delete the configuration.');
   }
@@ -419,7 +419,7 @@ function deleteArchiveConfig(workflowName) {
     const moduleConfig = workflowData.modules[0];
     TriggerService.deleteTriggerForModule(moduleConfig);
   } else {
-    LogService.info(`Could not find workflow data for "${workflowName}" to delete its trigger, proceeding with workflow deletion.`, 'ArchiveFeature');
+    LogService.info(`deleteArchiveConfig: Could not find workflow data for "${workflowName}" to delete its trigger.`, 'ArchiveFeature');
   }
 
   return WorkflowService.deleteWorkflow(workflowName);
