@@ -279,11 +279,11 @@ function executeModuleByTrigger(e) {
       return acc;
     }, {});
 
-    if (typeof this[handlerName] === 'function') {
-      this[handlerName](settings);
+    try {
+      FunctionRegistry.run(handlerName, settings);
       Logger.log(`Successfully executed module handler "${handlerName}" via trigger.`);
-    } else {
-      Logger.log(`Module trigger error: Handler function "${handlerName}" not found.`);
+    } catch (e) {
+      Logger.log(`Module trigger error: Handler function "${handlerName}" not found or failed to execute. Error: ${e.toString()}`);
     }
   } catch (error) {
     Logger.log(`Module trigger error: Failed to execute module for trigger ID "${triggerUid}". Error: ${error.toString()}`);

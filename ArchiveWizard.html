@@ -141,7 +141,7 @@
           id: `module_${Date.now()}`,
           name: `AutoArchive: ${settings.archiveFolderName}`,
           description: `Automatically archives Excel files matching '${settings.searchTerm}' from a specific folder.`,
-          handler: 'archiveExcelFilesHandler',
+          handler: 'ArchiveService.archiveExcelFilesHandler',
           trigger: {
             type: 'time-based',
             frequency: 'daily',
