@@ -1251,15 +1251,42 @@
                                           
                                               const getWorkflowData = () => {
                                                 // The state is the source of truth, so we just need to clone it.
-                                                // The order is already managed by the onUpdate handlers.
                                                 const clonedModules = JSON.parse(JSON.stringify(state.modules));
+
+                                                // Recursively filter out modules with unknown definitions
+                                                const filterUnknownModules = (modules) => {
+                                                  if (!Array.isArray(modules)) return [];
+                                                  return modules.filter(module => {
+                                                    const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                    if (!moduleDef) {
+                                                      console.warn(`Saving workflow: Unknown module ID "${module.id}" found. It will be removed from the saved data.`);
+                                                      log(`不明なモジュールID "${module.id}" が見つかりました。保存データから除外されます。`, 'system');
+                                                      return false; // Exclude this module
+                                                    }
+                                                    if (module.type === 'container') {
+                                                      if (module.branches) {
+                                                        module.branches.forEach(branch => {
+                                                          if (module[branch.id]) {
+                                                            module[branch.id] = filterUnknownModules(module[branch.id]);
+                                                          }
+                                                        });
+                                                      }
+                                                      if (module.modules) {
+                                                        module.modules = filterUnknownModules(module.modules);
+                                                      }
+                                                    }
+                                                    return true; // Keep this module
+                                                  });
+                                                };
+
+                                                const sanitizedModules = filterUnknownModules(clonedModules);
                                                 
-                                                console.log('Getting workflow data. Modules being saved:', clonedModules);
+                                                console.log('Getting workflow data. Modules being saved:', sanitizedModules);
                                             
                                                 return {
                                                   name: state.currentWorkflowName || '新規ワークフロー',
                                                   moduleFolderId: state.currentModuleFolderId,
-                                                  modules: clonedModules
+                                                  modules: sanitizedModules
                                                 };
                                               };
                                             
