@@ -295,18 +295,17 @@ function executeModuleByTrigger(e) {
 //================================================================
 
 /**
- * Excel自動アーカイブ設定ウィザードのHTMLコンテンツを取得する
+ * Excel自動アーカイブ設定のHTMLコンテンツを取得する
  * @returns {object} HTMLコンテンツとタイトル
  */
-function showArchiveWizard() {
-  LogService.info('showArchiveWizard: Called from client.', 'ArchiveFeature');
-  LogService.info('showArchiveWizard: Called', 'ArchiveFeature');
+function showArchiveSettings() {
+  LogService.info('showArchiveSettings: Called from client.', 'ArchiveFeature');
   try {
-    const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
-    LogService.info(`showArchiveWizard: Returning HTML for wizard (length: ${html.length})`, 'ArchiveFeature');
+    const html = HtmlService.createTemplateFromFile('ArchiveSettings').evaluate().getContent();
+    LogService.info(`showArchiveSettings: Returning HTML for settings (length: ${html.length})`, 'ArchiveFeature');
     return { title: 'Excel自動アーカイブ設定', html: html };
   } catch (e) {
-    LogService.error(`showArchiveWizard: Error: ${e.toString()}`, 'ArchiveFeature');
+    LogService.error(`showArchiveSettings: Error: ${e.toString()}`, 'ArchiveFeature');
     throw e;
   }
 }
