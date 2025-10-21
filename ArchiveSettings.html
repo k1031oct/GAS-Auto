@@ -9,20 +9,20 @@
 
   <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
     <div class="mb-4">
-      <label for="sourceFolder" class="block text-gray-700 text-sm font-bold mb-2">Source Folder ID or URL</label>
+      <label for="sourceFolder" class="block text-gray-700 text-sm font-bold mb-2">ソースフォルダIDまたはURL</label>
       <input id="sourceFolder" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
     </div>
     <div class="mb-4">
-      <label for="searchTerm" class="block text-gray-700 text-sm font-bold mb-2">Search Term (in filename)</label>
+      <label for="searchTerm" class="block text-gray-700 text-sm font-bold mb-2">検索語句 (ファイル名)</label>
       <input id="searchTerm" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
     </div>
     <div class="mb-4">
-      <label for="archiveFolderName" class="block text-gray-700 text-sm font-bold mb-2">Archive Root Folder Name</label>
+      <label for="archiveFolderName" class="block text-gray-700 text-sm font-bold mb-2">アーカイブ先ルートフォルダ名</label>
       <input id="archiveFolderName" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
     </div>
     <div class="flex justify-end">
       <button id="save-settings" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex items-center">
-        <span id="save-btn-text">Save & Create Module</span>
+        <span id="save-btn-text">保存してモジュールを作成</span>
         <i id="save-spinner" class="fas fa-spinner fa-spin ml-2 hidden"></i>
       </button>
     </div>
@@ -36,7 +36,7 @@
         const spinner = document.getElementById('save-spinner');
         
         saveButton.disabled = true;
-        buttonText.textContent = 'Saving...';
+        buttonText.textContent = '保存中...';
         spinner.classList.remove('hidden');
 
         const settings = {
@@ -48,7 +48,7 @@
         const moduleDefinition = {
           id: `module_${Date.now()}`,
           name: `AutoArchive: ${settings.archiveFolderName}`,
-          description: `Automatically archives Excel files matching '${settings.searchTerm}' from a specific folder.`,
+          description: `特定のフォルダから'${settings.searchTerm}'に一致するExcelファイルを自動的にアーカイブします。`,
           handler: 'ArchiveService.archiveExcelFilesHandler',
           trigger: {
             type: 'time-based',
@@ -56,22 +56,22 @@
             hour: 2
           },
           settings: [
-            { id: 'sourceFolder', name: 'Source Folder ID or URL', type: 'string', value: settings.sourceFolder },
-            { id: 'searchTerm', name: 'Search Term', type: 'string', value: settings.searchTerm },
-            { id: 'archiveFolderName', name: 'Archive Folder Name', type: 'string', value: settings.archiveFolderName }
+            { id: 'sourceFolder', name: 'ソースフォルダIDまたはURL', type: 'string', value: settings.sourceFolder },
+            { id: 'searchTerm', name: '検索語句', type: 'string', value: settings.searchTerm },
+            { id: 'archiveFolderName', name: 'アーカイブ先フォルダ名', type: 'string', value: settings.archiveFolderName }
           ]
         };
 
         google.script.run
           .withSuccessHandler(() => {
-            alert('Archive configuration saved successfully!');
+            alert('自動保管設定が正常に保存されました！');
             google.script.host.close();
           })
           .withFailureHandler((err) => {
             saveButton.disabled = false;
             buttonText.textContent = 'Save & Create Module';
             spinner.classList.add('hidden');
-            alert('Error: ' + err);
+            alert('エラー: ' + err);
           })
           .saveArchiveConfig(moduleDefinition);
       });

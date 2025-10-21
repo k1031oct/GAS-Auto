@@ -9,7 +9,7 @@
 
   <!-- Config List -->
   <div id="config-list" class="space-y-2">
-    <p class="text-gray-500">Loading configurations...</p>
+    <p class="text-gray-500">設定を読み込み中...</p>
   </div>
 
   <!-- Add New Button -->
@@ -48,7 +48,7 @@
       google.script.run
         .withSuccessHandler(renderConfigs)
         .withFailureHandler(err => {
-          configList.innerHTML = `<p class="text-red-500">Error loading configurations: ${err}</p>`;
+          configList.innerHTML = `<p class="text-red-500">設定の読み込み中にエラーが発生しました: ${err}</p>`;
         })
         .getArchiveConfigs();
     }
@@ -63,7 +63,7 @@
           configElement.innerHTML = `
             <div>
               <p class="font-semibold text-gray-800">${config.module.name}</p>
-              <p class="text-sm text-gray-500">Search: \"${searchTerm}\"</p>
+              <p class="text-sm text-gray-500">検索条件: \"${searchTerm}\"</p>
             </div>
             <button data-workflow-name="${config.workflowName}" class="delete-btn text-red-500 hover:text-red-700 transition-colors">
               <i class="fas fa-trash"></i>
@@ -72,7 +72,7 @@
           configList.appendChild(configElement);
         });
       } else {
-        configList.innerHTML = '<p class="text-center text-gray-500">No archive configurations found.</p>';
+        configList.innerHTML = '<p class="text-center text-gray-500">自動保管設定は見つかりませんでした。</p>';
       }
     }
 
@@ -124,10 +124,10 @@
       const deleteBtn = e.target.closest('.delete-btn');
       if (deleteBtn) {
         const workflowName = deleteBtn.dataset.workflowName;
-        if (confirm(`Are you sure you want to delete the configuration: ${workflowName}?`)) {
+        if (confirm(`設定「${workflowName}」を本当に削除しますか？`)) {
           google.script.run
             .withSuccessHandler(renderConfigs)
-            .withFailureHandler(err => alert('Error deleting configuration: ' + err))
+            .withFailureHandler(err => alert('設定の削除中にエラーが発生しました: ' + err))
             .deleteArchiveConfig(workflowName);
         }
       }
