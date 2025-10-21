@@ -311,6 +311,7 @@ function showArchiveSettings() {
 }
 
 function showArchiveManagement() {
+  Logger.log('showArchiveManagement: LogService is ' + (typeof LogService === 'undefined' ? 'undefined' : 'defined'));
   LogService.info('showArchiveManagement: Called', 'ArchiveFeature');
   try {
     const html = HtmlService.createTemplateFromFile('ArchiveManagement').evaluate().getContent();
