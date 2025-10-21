@@ -193,16 +193,7 @@
               </div>        <div id="module-list" class="p-2 md:p-3 space-y-2 md:space-y-3 flex-grow overflow-y-auto h-64 md:h-auto select-none">
           <p class="text-center text-sm text-gray-400 p-4">Google Driveからモジュールを読み込み中...</p>
         </div>
-        <!-- Module Source Folder Settings (Desktop) -->
-        <div id="module-source-footer" class="p-3 border-t border-gray-200 flex-shrink-0 bg-gray-50 hidden md:block dark:bg-gray-800 dark:border-gray-700">
-          <label for="module-folder-id" class="text-xs font-bold text-gray-600 block mb-1 dark:text-gray-400">
-            使用中のモジュールフォルダ
-          </label>
-          <div class="flex items-center gap-2">
-            <input type="text" id="module-folder-id" placeholder="Google Drive Folder ID" class="w-full p-2 text-xs border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <button id="reload-modules-btn" title="モジュールを再読み込み" class="p-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors flex-shrink-0 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200"><i class="fas fa-sync-alt"></i></button>
-          </div>
-        </div>
+
       </aside>
     </main>
 
@@ -215,13 +206,13 @@
         <div class="flex items-center justify-between mb-1">
           <h3 class="font-mono text-md font-bold text-gray-200">実行ログ</h3>
           <div class="flex items-center gap-2">
-            <div id="module-source-footer-mobile" class="md:hidden flex items-center gap-1">
-              <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-400 whitespace-nowrap">
-                モジュール:
+            <div class="flex items-center gap-1">
+              <label for="module-folder-id" class="text-xs text-gray-400" title="使用中のモジュールフォルダ">
+                <i class="fas fa-folder"></i>
               </label>
               <div class="flex items-center gap-1">
-                <input type="text" id="module-folder-id-mobile" placeholder="Folder ID" class="w-24 p-1 text-xs border border-gray-600 rounded bg-gray-700 text-white">
-                <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-1 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors flex-shrink-0"><i class="fas fa-sync-alt text-xs"></i></button>
+                <input type="text" id="module-folder-id" placeholder="Folder ID" class="w-24 p-1 text-xs border border-gray-600 rounded bg-gray-700 text-white">
+                <button id="reload-modules-btn" title="モジュールを再読み込み" class="p-1 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors flex-shrink-0"><i class="fas fa-sync-alt text-xs"></i></button>
               </div>
             </div>
             <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
