@@ -1463,7 +1463,11 @@
                                                   log(`--- 単体実行開始: ${moduleConfig.name} ---`, 'system');
                                                   google.script.run
                                                       .withSuccessHandler(logs => {
-                                                          logs.forEach(l => log(l.message, l.level)); // LogServiceのlevelをそのまま使う
+                                                          console.log('Received logs from server:', logs);
+                                                          logs.forEach(l => {
+                                                              console.log('Processing log entry:', l);
+                                                              log(l.message, l.level);
+                                                          });
                                                           log(`--- 単体実行完了: ${moduleConfig.name} ---`, 'system');
                                                           hideLoader();
                                                       })
