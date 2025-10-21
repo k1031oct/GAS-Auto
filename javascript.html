@@ -18,8 +18,6 @@
       loader: document.getElementById('loader'),
       moduleFolderIdInput: document.getElementById('module-folder-id'),
       reloadModulesBtn: document.getElementById('reload-modules-btn'),
-      moduleFolderIdInputMobile: document.getElementById('module-folder-id-mobile'),
-      reloadModulesBtnMobile: document.getElementById('reload-modules-btn-mobile'),
       workflowContainer: document.getElementById('workflow-container'),
       modulePalette: document.getElementById('module-palette'),
       moduleList: document.getElementById('module-list'),
@@ -625,9 +623,7 @@
                                                 // ... (all existing listeners)
                                                 app.newWorkflowBtn.addEventListener('click', newWorkflow);
                                                 app.reloadModulesBtn.addEventListener('click', loadModuleDefinitionsFromDrive);
-                                                app.reloadModulesBtnMobile.addEventListener('click', loadModuleDefinitionsFromDrive);
                                                 app.moduleFolderIdInput.addEventListener('change', markDirty);
-                                                app.moduleFolderIdInputMobile.addEventListener('change', markDirty);
                                                 app.workflowSelector.addEventListener('change', handleWorkflowSelect);
                                                 app.saveWorkflowBtn.addEventListener('click', saveWorkflow);
                                                 app.mobileSaveWorkflowBtn.addEventListener('click', saveWorkflow);
@@ -717,7 +713,6 @@
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.moduleFolderIdInput.value = state.currentModuleFolderId;
-                                                app.moduleFolderIdInputMobile.value = state.currentModuleFolderId;
                                                 app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
                                                 document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
                                                 renderModules();
@@ -1315,7 +1310,7 @@
                                               };
                                               
                                               const loadModuleDefinitionsFromDrive = async () => {
-                                                  const folderId = app.moduleFolderIdInput.offsetParent ? app.moduleFolderIdInput.value.trim() : app.moduleFolderIdInputMobile.value.trim();
+                                                  const folderId = app.moduleFolderIdInput.value.trim();
                                                   if (!folderId) {
                                                       state.allModuleDefinitions = [];
                                                       renderModulePalette();
