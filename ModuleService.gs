@@ -50,7 +50,7 @@ var ModuleService = {
       do {
         const response = Drive.Files.list({
           q: query,
-          fields: 'nextPageToken, id, name',
+          fields: 'nextPageToken, files(id, name)',
           pageToken: pageToken
         });
         Logger.log(`Drive APIレスポンス - ファイル数: ${response.files ? response.files.length : 0}, nextPageToken: ${response.nextPageToken}`); // デバッグログ
