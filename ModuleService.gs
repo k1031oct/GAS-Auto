@@ -42,24 +42,38 @@ var ModuleService = {
 
     let customModules = [];
     try {
-      const folder = DriveApp.getFolderById(folderId);
-      const jsonFiles = folder.getFilesByType("application/json");
-      
-      while (jsonFiles.hasNext()) {
-        const file = jsonFiles.next();
-        try {
-          const content = file.getBlob().getDataAsString();
-          const moduleDef = JSON.parse(content);
-          
-          if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
-            customModules.push(moduleDef);
-          } else {
-            Logger.log(`警告: ファイル「${file.getName()}」は有効なモジュールJSON形式ではありません。`);
+      // DriveApp の代わりに Advanced Drive Service を使用して効率的にファイルを取得
+      const query = `'${folderId}' in parents and mimeType='application/json' and trashed=false`;
+      let pageToken = null;
+      do {
+        const response = Drive.Files.list({
+          q: query,
+          fields: 'nextPageToken, files(id, name)',
+          pageToken: pageToken
+        });
+        response.files.forEach(file => {
+          try {
+            // ファイルのコンテンツを直接取得
+            const content = UrlFetchApp.fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+              headers: {
+                Authorization: `Bearer ${ScriptApp.getOAuthToken()}`
+              },
+              muteHttpExceptions: true
+            }).getContentText();
+            const moduleDef = JSON.parse(content);
+            
+            if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
+              customModules.push(moduleDef);
+            } else {
+              Logger.log(`警告: ファイル「${file.name}」は有効なモジュールJSON形式ではありません。`);
+            }
+          } catch (e) {
+            Logger.log(`JSONファイル「${file.name}」の解析に失敗しました: ${e.message}`);
           }
-        } catch (e) {
-          Logger.log(`JSONファイル「${file.getName()}」の解析に失敗しました: ${e.message}`);
-        }
-      }
+        });
+        pageToken = response.nextPageToken;
+      } while (pageToken);
+
     } catch (e) {
       Logger.log(`指定されたフォルダID「${folderId}」が見つからないか、アクセスできません。エラー: ${e.message}`);
       // フォルダにアクセスできなくても、デフォルトモジュールは返す
