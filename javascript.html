@@ -1428,50 +1428,50 @@
                                               };
                                               
                                               const initResizing = () => {
-                                                let isResizingLog = false;
-                                                let lastY = 0;
-                                          
-                                                const startResizeLog = (e) => {
-                                                  e.preventDefault();
-                                                  isResizingLog = true;
-                                                  lastY = e.clientY || e.touches[0].clientY;
-                                                  document.body.style.cursor = 'ns-resize';
-                                                  document.body.style.userSelect = 'none';
+                                                const handle = app.resizeHandle;
+                                                const target = app.logArea;
+                                            
+                                                const startResize = (e) => {
+                                                    e.preventDefault();
+                                                    let lastY = e.clientY || e.touches[0].clientY;
+                                            
+                                                    const doResize = (moveEvent) => {
+                                                        const clientY = moveEvent.clientY !== undefined ? moveEvent.clientY : moveEvent.touches[0].clientY;
+                                                        const dy = lastY - clientY;
+                                                        lastY = clientY;
+                                                        const currentHeight = target.offsetHeight;
+                                                        
+                                                        const logHeader = target.querySelector('.p-3 > .flex');
+                                                        const preContent = target.querySelector('#log-content');
+                                                        const minHeight = (logHeader ? logHeader.offsetHeight : 40) + (preContent ? 16 : 0) + 20;
+                                            
+                                                        const newHeight = Math.max(minHeight, currentHeight + dy);
+                                                        target.style.height = `${newHeight}px`;
+                                            
+                                                        if (window.innerWidth < 768) {
+                                                            app.modulePalette.style.bottom = `${newHeight}px`;
+                                                        }
+                                                    };
+                                            
+                                                    const stopResize = () => {
+                                                        document.removeEventListener('mousemove', doResize);
+                                                        document.removeEventListener('touchmove', doResize);
+                                                        document.removeEventListener('mouseup', stopResize);
+                                                        document.removeEventListener('touchend', stopResize);
+                                                        document.body.style.cursor = 'default';
+                                                        document.body.style.userSelect = 'auto';
+                                                    };
+                                            
+                                                    document.addEventListener('mousemove', doResize);
+                                                    document.addEventListener('touchmove', doResize, { passive: false });
+                                                    document.addEventListener('mouseup', stopResize);
+                                                    document.addEventListener('touchend', stopResize);
+                                                    document.body.style.cursor = 'ns-resize';
+                                                    document.body.style.userSelect = 'none';
                                                 };
-                                          
-                                                const doResize = (e) => {
-                                                  if (!isResizingLog) return;
-                                                  
-                                                  const clientY = e.clientY !== undefined ? e.clientY : e.touches[0].clientY;
-                                          
-                                                  if (isResizingLog) {
-                                                    const dy = lastY - clientY;
-                                                    lastY = clientY;
-                                                    const currentHeight = app.logArea.offsetHeight;
-                                                    const logHeader = app.logArea.querySelector('.flex.items-center.justify-between');
-                                                    const headerPaddingAndMargin = 28; // p-3's vertical padding (24px) + header's mb-1 (4px)
-                                                    const minHeight = (logHeader ? logHeader.offsetHeight : 0) + headerPaddingAndMargin;
-                                    
-                                                    const newHeight = Math.max(minHeight, currentHeight + dy);
-                                                    app.logArea.style.height = `${newHeight}px`;
-                                                  }
-                                                };
-                                          
-                                                const stopResize = () => {
-                                                  isResizingLog = false;
-                                                  document.body.style.cursor = 'default';
-                                                  document.body.style.userSelect = 'auto';
-                                                };
-                                          
-                                                // Log resize handle
-                                                app.resizeHandle.addEventListener('mousedown', startResizeLog);
-                                                app.resizeHandle.addEventListener('touchstart', startResizeLog, { passive: false });
-                                          
-                                                document.addEventListener('mousemove', doResize);
-                                                document.addEventListener('touchmove', doResize, { passive: false });
-                                          
-                                                document.addEventListener('mouseup', stopResize);
-                                                document.addEventListener('touchend', stopResize);
+                                            
+                                                handle.addEventListener('mousedown', startResize);
+                                                handle.addEventListener('touchstart', startResize, { passive: false });
                                               };
                         
                                               const maximizeModulePalette = () => {
