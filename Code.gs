@@ -299,6 +299,7 @@ function executeModuleByTrigger(e) {
  * @returns {object} HTMLコンテンツとタイトル
  */
 function showArchiveWizard() {
+  LogService.info('showArchiveWizard: Called from client.', 'ArchiveFeature');
   LogService.info('showArchiveWizard: Called', 'ArchiveFeature');
   try {
     const html = HtmlService.createTemplateFromFile('ArchiveWizard').evaluate().getContent();
