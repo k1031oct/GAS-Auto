@@ -33,109 +33,107 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      google.script.run.LogService.info('ArchiveManagement: DOMContentLoaded event fired.', 'ArchiveFeature');
+    google.script.run.LogService.info('ArchiveManagement: Script loaded.', 'ArchiveFeature');
 
-      const configList = document.getElementById('config-list');
-      const addBtn = document.getElementById('add-new-config-btn');
-      const wizardBackdrop = document.getElementById('wizard-backdrop');
-      const wizardModal = document.getElementById('wizard-modal');
-      const wizardTitle = document.getElementById('wizard-title');
-      const wizardContent = document.getElementById('wizard-content');
-      const wizardCloseBtn = document.getElementById('wizard-close-btn');
+    const configList = document.getElementById('config-list');
+    const addBtn = document.getElementById('add-new-config-btn');
+    const wizardBackdrop = document.getElementById('wizard-backdrop');
+    const wizardModal = document.getElementById('wizard-modal');
+    const wizardTitle = document.getElementById('wizard-title');
+    const wizardContent = document.getElementById('wizard-content');
+    const wizardCloseBtn = document.getElementById('wizard-close-btn');
 
-      function refreshConfigs() {
-        configList.innerHTML = '<p class="text-gray-500">Loading configurations...</p>';
-        google.script.run
-          .withSuccessHandler(renderConfigs)
-          .withFailureHandler(err => {
-            configList.innerHTML = `<p class="text-red-500">Error loading configurations: ${err}</p>`;
-          })
-          .getArchiveConfigs();
+    function refreshConfigs() {
+      configList.innerHTML = '<p class="text-gray-500">Loading configurations...</p>';
+      google.script.run
+        .withSuccessHandler(renderConfigs)
+        .withFailureHandler(err => {
+          configList.innerHTML = `<p class="text-red-500">Error loading configurations: ${err}</p>`;
+        })
+        .getArchiveConfigs();
+    }
+
+    function renderConfigs(configs) {
+      configList.innerHTML = '';
+      if (configs && configs.length > 0) {
+        configs.forEach(config => {
+          const configElement = document.createElement('div');
+          configElement.className = 'bg-white p-3 rounded-lg shadow-sm flex justify-between items-center';
+          const searchTerm = config.module.settings.find(s => s.id === 'searchTerm').value;
+          configElement.innerHTML = `
+            <div>
+              <p class="font-semibold text-gray-800">${config.module.name}</p>
+              <p class="text-sm text-gray-500">Search: \"${searchTerm}\"</p>
+            </div>
+            <button data-workflow-name="${config.workflowName}" class="delete-btn text-red-500 hover:text-red-700 transition-colors">
+              <i class="fas fa-trash"></i>
+            </button>
+          `;
+          configList.appendChild(configElement);
+        });
+      } else {
+        configList.innerHTML = '<p class="text-center text-gray-500">No archive configurations found.</p>';
       }
+    }
 
-      function renderConfigs(configs) {
-        configList.innerHTML = '';
-        if (configs && configs.length > 0) {
-          configs.forEach(config => {
-            const configElement = document.createElement('div');
-            configElement.className = 'bg-white p-3 rounded-lg shadow-sm flex justify-between items-center';
-            const searchTerm = config.module.settings.find(s => s.id === 'searchTerm').value;
-            configElement.innerHTML = "
-              <div>
-                <p class=\"font-semibold text-gray-800\">${config.module.name}</p>
-                <p class=\"text-sm text-gray-500\">Search: \"${searchTerm}\"</p>
-              </div>
-              <button data-workflow-name=\"${config.workflowName}\" class=\"delete-btn text-red-500 hover:text-red-700 transition-colors\">
-                <i class=\"fas fa-trash\"></i>
-              </button>
-            ";
-            configList.appendChild(configElement);
-          });
-        } else {
-          configList.innerHTML = '<p class="text-center text-gray-500">No archive configurations found.</p>';
-        }
+    function showWizard(response) {
+      wizardTitle.textContent = response.title;
+      wizardContent.innerHTML = response.html;
+      wizardBackdrop.classList.remove('hidden');
+      // Re-attach event listeners for the new content inside the wizard
+      // This is crucial because the script from ArchiveWizard.html is now in the DOM
+      const scripts = wizardContent.getElementsByTagName('script');
+      for (let i = 0; i < scripts.length; i++) {
+        eval(scripts[i].innerHTML);
       }
+    }
 
-      function showWizard(response) {
-        wizardTitle.textContent = response.title;
-        wizardContent.innerHTML = response.html;
-        wizardBackdrop.classList.remove('hidden');
-        // Re-attach event listeners for the new content inside the wizard
-        // This is crucial because the script from ArchiveWizard.html is now in the DOM
-        const scripts = wizardContent.getElementsByTagName('script');
-        for (let i = 0; i < scripts.length; i++) {
-          eval(scripts[i].innerHTML);
-        }
-      }
+    function hideWizard() {
+      wizardBackdrop.classList.add('hidden');
+      wizardContent.innerHTML = '';
+      refreshConfigs(); // Refresh the list after closing the wizard
+    }
 
-      function hideWizard() {
-        wizardBackdrop.classList.add('hidden');
-        wizardContent.innerHTML = '';
-        refreshConfigs(); // Refresh the list after closing the wizard
-      }
+    // Initial load
+    refreshConfigs();
 
-      // Initial load
-      refreshConfigs();
-
-      // Handle Add New
-      addBtn.addEventListener('click', () => {
-        google.script.run
-          .withSuccessHandler(showWizard)
-          .showArchiveWizard();
-      });
-
-      // Handle Wizard Close
-      wizardCloseBtn.addEventListener('click', hideWizard);
-      wizardBackdrop.addEventListener('click', (e) => {
-        if (e.target === wizardBackdrop) {
-          hideWizard();
-        }
-      });
-      // The wizard itself will call google.script.host.close() which we can listen for.
-      // However, a more robust way is to handle it within this modal's context.
-      // We will override the default close behavior.
-      window.closeModalAndRefresh = hideWizard;
-
-      // Handle Delete
-      configList.addEventListener('click', (e) => {
-        const deleteBtn = e.target.closest('.delete-btn');
-        if (deleteBtn) {
-          const workflowName = deleteBtn.dataset.workflowName;
-          if (confirm(`Are you sure you want to delete the configuration: ${workflowName}?`)) {
-            google.script.run
-              .withSuccessHandler(renderConfigs)
-              .withFailureHandler(err => alert('Error deleting configuration: ' + err))
-              .deleteArchiveConfig(workflowName);
-          }
-        }
-      });
-
-      // Override google.script.host.close for the wizard
-      google.script.host.close = () => {
-        hideWizard();
-      };
+    // Handle Add New
+    addBtn.addEventListener('click', () => {
+      google.script.run
+        .withSuccessHandler(showWizard)
+        .showArchiveWizard();
     });
+
+    // Handle Wizard Close
+    wizardCloseBtn.addEventListener('click', hideWizard);
+    wizardBackdrop.addEventListener('click', (e) => {
+      if (e.target === wizardBackdrop) {
+        hideWizard();
+      }
+    });
+    // The wizard itself will call google.script.host.close() which we can listen for.
+    // However, a more robust way is to handle it within this modal's context.
+    // We will override the default close behavior.
+    window.closeModalAndRefresh = hideWizard;
+
+    // Handle Delete
+    configList.addEventListener('click', (e) => {
+      const deleteBtn = e.target.closest('.delete-btn');
+      if (deleteBtn) {
+        const workflowName = deleteBtn.dataset.workflowName;
+        if (confirm(`Are you sure you want to delete the configuration: ${workflowName}?`)) {
+          google.script.run
+            .withSuccessHandler(renderConfigs)
+            .withFailureHandler(err => alert('Error deleting configuration: ' + err))
+            .deleteArchiveConfig(workflowName);
+        }
+      }
+    });
+
+    // Override google.script.host.close for the wizard
+    google.script.host.close = () => {
+      hideWizard();
+    };
   </script>
 </body>
 </html>
