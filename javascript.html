@@ -1519,6 +1519,8 @@
                                                 if (window.innerWidth >= 768) return;
                                                 const mainElement = document.querySelector('main');
                                                 if (mainElement) {
+                                                  // Ensure palette is inside main content area for proper layout
+                                                  mainElement.appendChild(app.modulePalette);
                                                   app.modulePalette.style.height = `${mainElement.offsetHeight}px`;
                                                 }
                                                 app.modulePaletteToggleIcon.classList.remove('rotate-180');
@@ -1527,6 +1529,8 @@
                         
                                               const minimizeModulePalette = () => {
                                                 if (window.innerWidth >= 768) return;
+                                                // Move the palette to be before the log area, outside of main
+                                                app.logArea.before(app.modulePalette);
                                                 app.modulePalette.style.height = state.modulePalette.minHeight;
                                                 app.modulePaletteToggleIcon.classList.add('rotate-180');
                                                 state.modulePalette.isMinimized = true;
@@ -1543,7 +1547,26 @@
                                           
                                               function init() {
                                                 const debouncedDrawConnectors = debounce(drawConnectors, 100);
-                                                window.addEventListener('resize', debouncedDrawConnectors);
+                                                
+                                                const handleResize = () => {
+                                                  const mainElement = document.querySelector('main');
+                                                  if (window.innerWidth >= 768) {
+                                                    // Desktop view: ensure palette is inside main and reset styles
+                                                    if (mainElement && app.modulePalette.parentElement !== mainElement) {
+                                                      mainElement.appendChild(app.modulePalette);
+                                                      app.modulePalette.style.height = ''; // Let CSS handle the height
+                                                    }
+                                                  } else {
+                                                    // Mobile view: re-apply the correct state
+                                                    if (state.modulePalette.isMinimized) {
+                                                      minimizeModulePalette();
+                                                    } else {
+                                                      maximizeModulePalette();
+                                                    }
+                                                  }
+                                                  debouncedDrawConnectors();
+                                                };
+                                                window.addEventListener('resize', debounce(handleResize, 100));
 
                                                 initEventListeners();
                                                 initResizing();
