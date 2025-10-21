@@ -214,19 +214,20 @@
       <div class="p-3 flex flex-col flex-grow overflow-hidden">
         <div class="flex items-center justify-between mb-1">
           <h3 class="font-mono text-md font-bold text-gray-200">実行ログ</h3>
-          <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+          <div class="flex items-center gap-2">
+            <div id="module-source-footer-mobile" class="md:hidden flex items-center gap-1">
+              <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-400 whitespace-nowrap">
+                モジュール:
+              </label>
+              <div class="flex items-center gap-1">
+                <input type="text" id="module-folder-id-mobile" placeholder="Folder ID" class="w-24 p-1 text-xs border border-gray-600 rounded bg-gray-700 text-white">
+                <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-1 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors flex-shrink-0"><i class="fas fa-sync-alt text-xs"></i></button>
+              </div>
+            </div>
+            <button id="hide-log-btn" title="非表示" class="p-1 text-gray-400 hover:text-white transition-colors"><i class="fas fa-times"></i></button>
+          </div>
         </div>
         <pre id="log-content" class="h-full w-full bg-gray-900 text-xs overflow-y-auto p-2 rounded-lg font-mono flex-grow text-gray-300 scrollbar scrollbar-thumb-gray-600 scrollbar-track-gray-800"></pre>
-      </div>
-      <!-- Module Source Folder Settings (Mobile) -->
-      <div id="module-source-footer-mobile" class="p-3 border-t border-gray-700 bg-gray-800 md:hidden flex-shrink-0">
-        <label for="module-folder-id-mobile" class="text-xs font-bold text-gray-400 block mb-1">
-          使用中のモジュールフォルダ
-        </label>
-        <div class="flex items-center gap-2">
-          <input type="text" id="module-folder-id-mobile" placeholder="Google Drive Folder ID" class="w-full p-2 text-xs border border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white">
-          <button id="reload-modules-btn-mobile" title="モジュールを再読み込み" class="p-2 bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors flex-shrink-0"><i class="fas fa-sync-alt"></i></button>
-        </div>
       </div>
     </footer>
   </div>
