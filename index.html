@@ -63,6 +63,29 @@
       border-color: #3B82F6 !important; /* blue-500 */
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
     }
+
+    @media (max-width: 767px) {
+      main {
+        position: relative;
+      }
+      #module-palette {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 90%;
+        max-height: calc(100% - 60px);
+        transform: translateY(calc(100% - 60px));
+        transition: transform 0.3s ease-in-out;
+        z-index: 25;
+      }
+      #module-palette.is-open {
+        transform: translateY(0);
+      }
+      #main-area .overflow-y-auto {
+        padding-bottom: 70px;
+      }
+    }
   </style>
 </head>
 

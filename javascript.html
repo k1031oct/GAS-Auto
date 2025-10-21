@@ -1517,17 +1517,14 @@
                         
                                               const maximizeModulePalette = () => {
                                                 if (window.innerWidth >= 768) return;
-                                                const mainElement = document.querySelector('main');
-                                                if (mainElement) {
-                                                  app.modulePalette.style.height = `${mainElement.offsetHeight}px`;
-                                                }
+                                                app.modulePalette.classList.add('is-open');
                                                 app.modulePaletteToggleIcon.classList.remove('rotate-180');
                                                 state.modulePalette.isMinimized = false;
                                               };
                         
                                               const minimizeModulePalette = () => {
                                                 if (window.innerWidth >= 768) return;
-                                                app.modulePalette.style.height = state.modulePalette.minHeight;
+                                                app.modulePalette.classList.remove('is-open');
                                                 app.modulePaletteToggleIcon.classList.add('rotate-180');
                                                 state.modulePalette.isMinimized = true;
                                               };
