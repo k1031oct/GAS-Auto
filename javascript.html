@@ -185,6 +185,11 @@
                                                     hideLoader();
                                                     app.archiveManagementContent.innerHTML = response.html;
                                                     app.archiveManagementBackdrop.classList.remove('hidden');
+                                                    // Execute scripts in the injected HTML
+                                                    const scripts = app.archiveManagementContent.getElementsByTagName('script');
+                                                    for (let i = 0; i < scripts.length; i++) {
+                                                      eval(scripts[i].innerHTML);
+                                                    }
                                                   })
                                                   .withFailureHandler(showError)
                                                   .showArchiveManagement();
