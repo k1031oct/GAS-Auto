@@ -63,6 +63,28 @@
       border-color: #3B82F6 !important; /* blue-500 */
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
     }
+
+    /* Module Palette Animation for Mobile */
+    @media (max-width: 767px) {
+      #module-palette {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 80vh;
+        transform: translateY(calc(100% - 60px)); /* 60px is approx header height */
+        transition: transform 0.3s ease-in-out;
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+      }
+      #module-palette.is-open {
+        transform: translateY(0);
+      }
+      #module-list {
+        height: 100%;
+      }
+    }
   </style>
 </head>
 
