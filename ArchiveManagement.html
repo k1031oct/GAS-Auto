@@ -33,7 +33,7 @@
   </div>
 
   <script>
-    google.script.run.LogService.info('ArchiveManagement: Script loaded.', 'ArchiveFeature');
+    google.script.run.logInfo('ArchiveManagement: Script loaded.', 'ArchiveFeature');
 
     const configList = document.getElementById('config-list');
     const addBtn = document.getElementById('add-new-config-btn');
@@ -101,7 +101,7 @@
 
     // Handle Add New
     addBtn.addEventListener('click', () => {
-      google.script.run.LogService.info('ArchiveManagement: Add New button clicked.', 'ArchiveFeature');
+      google.script.run.logInfo('ArchiveManagement: Add New button clicked.', 'ArchiveFeature');
       google.script.run
         .withSuccessHandler(showWizard)
         .showArchiveSettings();

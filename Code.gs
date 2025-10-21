@@ -145,6 +145,10 @@ function getExecutionLogUrl() {
   return LogService.getLogSheetUrl();
 }
 
+function logInfo(message, moduleName) {
+  LogService.info(message, moduleName);
+}
+
 /**
  * 指定されたフォルダIDに初期モジュールを生成する
  * @param {string} folderId
