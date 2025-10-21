@@ -44,41 +44,51 @@ var ModuleService = {
     try {
       // DriveApp の代わりに Advanced Drive Service を使用して効率的にファイルを取得
       const query = `'${folderId}' in parents and mimeType='application/json' and trashed=false`;
+      Logger.log(`Drive APIクエリ: ${query}`); // デバッグログ
       let pageToken = null;
+      let fileCount = 0; // デバッグ用ファイルカウント
       do {
         const response = Drive.Files.list({
           q: query,
           fields: 'nextPageToken, files(id, name)',
           pageToken: pageToken
         });
-        response.files.forEach(file => {
-          try {
-            // ファイルのコンテンツを直接取得
-            const content = UrlFetchApp.fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
-              headers: {
-                Authorization: `Bearer ${ScriptApp.getOAuthToken()}`
-              },
-              muteHttpExceptions: true
-            }).getContentText();
-            const moduleDef = JSON.parse(content);
-            
-            if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
-              customModules.push(moduleDef);
-            } else {
-              Logger.log(`警告: ファイル「${file.name}」は有効なモジュールJSON形式ではありません。`);
+        Logger.log(`Drive APIレスポンス - ファイル数: ${response.files ? response.files.length : 0}, nextPageToken: ${response.nextPageToken}`); // デバッグログ
+
+        if (response.files) {
+          response.files.forEach(file => {
+            fileCount++; // ファイルカウント
+            try {
+              const content = UrlFetchApp.fetch(`https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`, {
+                headers: {
+                  Authorization: `Bearer ${ScriptApp.getOAuthToken()}`
+                },
+                muteHttpExceptions: true
+              }).getContentText();
+              const moduleDef = JSON.parse(content);
+              
+              if (moduleDef && moduleDef.id && moduleDef.name && moduleDef.settings) {
+                customModules.push(moduleDef);
+                Logger.log(`  カスタムモジュール追加: ${moduleDef.id} (${file.name})`); // デバッグログ
+              } else {
+                Logger.log(`警告: ファイル「${file.name}」は有効なモジュールJSON形式ではありません。`);
+              }
+            } catch (e) {
+              Logger.log(`JSONファイル「${file.name}」の解析に失敗しました: ${e.message}`);
             }
-          } catch (e) {
-            Logger.log(`JSONファイル「${file.name}」の解析に失敗しました: ${e.message}`);
-          }
-        });
+          });
+        }
         pageToken = response.nextPageToken;
       } while (pageToken);
+      Logger.log(`Driveから取得したJSONファイル総数: ${fileCount}`); // デバッグログ
 
     } catch (e) {
       Logger.log(`指定されたフォルダID「${folderId}」が見つからないか、アクセスできません。エラー: ${e.message}`);
       // フォルダにアクセスできなくても、デフォルトモジュールは返す
     }
     
+    Logger.log(`カスタムモジュール (解析成功): ${customModules.length} 個`); // デバッグログ
+
     // デフォルトモジュールとカスタムモジュールをマージ（カスタムが優先）
     const finalModules = defaultModules.map(defaultModule => {
       const customOverride = customModules.find(customModule => customModule.id === defaultModule.id);
@@ -91,6 +101,7 @@ var ModuleService = {
         finalModules.push(customModule);
       }
     });
+    Logger.log(`最終的なモジュール数 (マージ後): ${finalModules.length} 個`); // デバッグログ
 
     // データをキャッシュに保存（有効期限10分）
     cache.put(cacheKey, JSON.stringify(finalModules), 600); 
