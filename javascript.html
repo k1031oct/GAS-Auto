@@ -62,14 +62,6 @@
                         triggerType: document.getElementById('trigger-type'),
                         triggerTimeOptions: document.getElementById('trigger-time-options'),
                         triggerHour: document.getElementById('trigger-hour'),
-                        archiveBtn: document.getElementById('archive-btn'), // Added for new feature
-                        archiveWizardBackdrop: document.getElementById('archive-wizard-backdrop'),
-                        archiveWizardContent: document.getElementById('archive-wizard-content'),
-                        archiveWizardCloseBtn: document.getElementById('archive-wizard-close-btn'),
-                        archiveManagementBackdrop: document.getElementById('archive-management-backdrop'),
-                        archiveManagementModal: document.getElementById('archive-management-modal'),
-                        archiveManagementContent: document.getElementById('archive-management-content'),
-                        archiveManagementCloseBtn: document.getElementById('archive-management-close-btn'),
 
                         // Hamburger Menu
                         hamburgerBtn: document.getElementById('hamburger-btn'),
@@ -79,7 +71,6 @@
                         mobileSettingsBtn: document.getElementById('mobile-settings-btn'),
                         mobileTriggerBtn: document.getElementById('mobile-trigger-btn'),
                         mobileHistoryBtn: document.getElementById('mobile-history-btn'),
-                        mobileArchiveBtn: document.getElementById('mobile-archive-btn'), // Added for new feature
                                                 modulePaletteHeader: document.getElementById('module-palette-header'),
                                                 modulePaletteToggleIcon: document.getElementById('module-palette-toggle-icon'),
                                                 mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
@@ -175,52 +166,6 @@
                                               const showLoader = () => app.loader.classList.remove('hidden');
                                               const hideLoader = () => app.loader.classList.add('hidden');
 
-                                              // --- Archive Management Logic ---
-                                              const openArchiveManagement = () => {
-                                                showLoader();
-                                                google.script.run
-                                                  .withSuccessHandler(response => {
-                                                    hideLoader();
-                                                    app.archiveManagementContent.innerHTML = response.html;
-                                                    app.archiveManagementBackdrop.classList.remove('hidden');
-                                                    // Execute scripts in the injected HTML
-                                                    const scripts = app.archiveManagementContent.getElementsByTagName('script');
-                                                    for (let i = 0; i < scripts.length; i++) {
-                                                      eval(scripts[i].innerHTML);
-                                                    }
-                                                  })
-                                                  .withFailureHandler(showError)
-                                                  .showArchiveManagement();
-                                              };
-
-                                              const closeArchiveManagement = () => {
-                                                app.archiveManagementBackdrop.classList.add('hidden');
-                                                app.archiveManagementContent.innerHTML = '';
-                                              };
-
-                                              // --- Archive Wizard Logic ---
-                                              const openArchiveWizard = () => {
-                                                showLoader();
-                                                google.script.run
-                                                  .withSuccessHandler((response) => {
-                                                    hideLoader();
-                                                    // First, close the management modal if it's open
-                                                    closeArchiveManagement();
-                                                    // Then, show the wizard
-                                                    app.archiveWizardContent.innerHTML = response.html;
-                                                    app.archiveWizardBackdrop.classList.remove('hidden');
-                                                  })
-                                                  .withFailureHandler(showError)
-                                                  .showArchiveWizard();
-                                              };
-
-                                              const closeArchiveWizard = () => {
-                                                app.archiveWizardBackdrop.classList.add('hidden');
-                                                app.archiveWizardContent.innerHTML = ''; // Clear content
-                                                // Re-open the management modal after closing the wizard
-                                                openArchiveManagement();
-                                              };
-                                          
                                               // --- Trigger Modal Logic ---
                                               const openTriggerModal = () => {
                                                 if (!state.currentWorkflowName) {
@@ -593,11 +538,6 @@
                                                 app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
 
-                                                // Archive Listeners
-                                                app.archiveBtn.addEventListener('click', openArchiveManagement);
-                                                app.archiveWizardCloseBtn.addEventListener('click', closeArchiveWizard);
-                                                app.archiveManagementCloseBtn.addEventListener('click', closeArchiveManagement);
-
                                           
                                                 app.hideLogBtn.addEventListener('click', hideLog);
                                                 app.showLogBtn.addEventListener('click', showLog);
@@ -688,8 +628,6 @@
                                                 app.mobileSettingsBtn.addEventListener('click', () => app.settingsBtn.click());
                                                 app.mobileTriggerBtn.addEventListener('click', () => app.triggerBtn.click());
                                                 app.mobileHistoryBtn.addEventListener('click', () => app.historyBtn.click());
-                                                app.mobileArchiveBtn.addEventListener('click', () => app.archiveBtn.click());
-                                                app.mobileShowLogBtn.addEventListener('click', showLog);
                         
                                                 // Mobile Module Palette Toggle
                                                 if (app.modulePaletteHeader) {

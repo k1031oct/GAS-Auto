@@ -1,0 +1,35 @@
+{
+  "id": "file_convert",
+  "name": "ファイル変換",
+  "description": "ファイル形式を変換します。（例: ExcelからGoogleスプレッドシートへ）",
+  "category": "ファイル操作",
+  "icon": "fa-exchange-alt",
+  "handler": "FileOperationService.convertFiles",
+  "settings": [
+    {
+      "id": "actionType",
+      "name": "変換の種類",
+      "type": "select",
+      "options": [
+        { "value": "excel_to_sheet", "label": "Excel → Googleスプレッドシート" },
+        { "value": "csv_to_sheet", "label": "CSV → Googleスプレッドシート" }
+      ],
+      "defaultValue": "excel_to_sheet",
+      "description": "実行する変換の種類を選択します。"
+    },
+    {
+      "id": "outputFolderId",
+      "name": "出力先フォルダIDまたはURL",
+      "type": "text",
+      "placeholder": "Google DriveのフォルダIDまたはURL",
+      "description": "変換後のファイルが保存されるフォルダを指定します。（Excel変換時のみ）"
+    },
+    {
+      "id": "templateSheetId",
+      "name": "テンプレートシートIDまたはURL",
+      "type": "text",
+      "placeholder": "GoogleスプレッドシートのIDまたはURL",
+      "description": "CSVを読み込む対象のGoogleスプレッドシートを指定します。（CSV変換時のみ）"
+    }
+  ]
+}

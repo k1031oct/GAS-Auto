@@ -77,7 +77,6 @@ function _initializeRegistry() {
   FunctionRegistry.registerService('GmailService', GmailService);
   FunctionRegistry.registerService('CalendarService', CalendarService);
   FunctionRegistry.registerService('DocsService', DocsService);
-  FunctionRegistry.registerService('ArchiveService', ArchiveService);
   // Add other services here as they are created.
 }
 

@@ -1,0 +1,35 @@
+{
+  "id": "file_archive",
+  "name": "ファイルアーカイブ",
+  "description": "ファイルをアーカイブフォルダに整理・保管します。",
+  "category": "ファイル操作",
+  "icon": "fa-archive",
+  "handler": "FileOperationService.archiveFiles",
+  "settings": [
+    {
+      "id": "archiveRootFolderId",
+      "name": "アーカイブ先ルートフォルダIDまたはURL",
+      "type": "text",
+      "placeholder": "Google DriveのフォルダIDまたはURL",
+      "description": "アーカイブされたファイルが保存されるルートフォルダを指定します。"
+    },
+    {
+      "id": "archiveFormat",
+      "name": "アーカイブ形式",
+      "type": "select",
+      "options": [
+        { "value": "YYYY/MM", "label": "年/月 (例: 2023/01)" },
+        { "value": "YYYY", "label": "年 (例: 2023)" }
+      ],
+      "defaultValue": "YYYY/MM",
+      "description": "アーカイブフォルダの階層構造を選択します。"
+    },
+    {
+      "id": "renameKeyword",
+      "name": "リネームキーワード",
+      "type": "text",
+      "placeholder": "例: 月次報告",
+      "description": "アーカイブ時のファイル名に付与するキーワードを指定します。（例: 【キーワード】YYYYMMDD）"
+    }
+  ]
+}

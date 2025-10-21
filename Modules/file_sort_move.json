@@ -1,0 +1,50 @@
+{
+  "id": "file_sort_move",
+  "name": "ファイル絞り込み・移動",
+  "description": "指定された条件に基づいてファイルを絞り込み、指定のフォルダへ移動します。",
+  "category": "ファイル操作",
+  "icon": "fa-arrows-alt",
+  "handler": "FileOperationService.sortFiles",
+  "settings": [
+    {
+      "id": "filterFileType",
+      "name": "ファイルの種類",
+      "type": "select",
+      "options": [
+        { "value": "any", "label": "すべて" },
+        { "value": "excel", "label": "Excel" },
+        { "value": "csv", "label": "CSV" },
+        { "value": "pdf", "label": "PDF" }
+      ],
+      "defaultValue": "any",
+      "description": "処理対象とするファイルの種類を選択します。"
+    },
+    {
+      "id": "filterKeyword",
+      "name": "検索キーワード",
+      "type": "text",
+      "placeholder": "例: 報告書",
+      "description": "ファイル名に含まれるキーワードで絞り込みます。"
+    },
+    {
+      "id": "filterCondition",
+      "name": "キーワードの条件",
+      "type": "select",
+      "options": [
+        { "value": "contains", "label": "含む" },
+        { "value": "not_contains", "label": "含まない" },
+        { "value": "starts_with", "label": "で始まる" },
+        { "value": "ends_with", "label": "で終わる" }
+      ],
+      "defaultValue": "contains",
+      "description": "検索キーワードの適用条件を選択します。"
+    },
+    {
+      "id": "destFolderId",
+      "name": "移動先フォルダIDまたはURL",
+      "type": "text",
+      "placeholder": "Google DriveのフォルダIDまたはURL",
+      "description": "絞り込まれたファイルの移動先フォルダを指定します。"
+    }
+  ]
+}
