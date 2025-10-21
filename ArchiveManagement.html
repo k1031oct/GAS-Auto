@@ -80,11 +80,13 @@
       wizardTitle.textContent = response.title;
       wizardContent.innerHTML = response.html;
       wizardBackdrop.classList.remove('hidden');
-      // Re-attach event listeners for the new content inside the wizard
-      // This is crucial because the script from ArchiveWizard.html is now in the DOM
+
+      // Execute the script from the loaded HTML
       const scripts = wizardContent.getElementsByTagName('script');
       for (let i = 0; i < scripts.length; i++) {
-        eval(scripts[i].innerHTML);
+        const script = document.createElement('script');
+        script.text = scripts[i].innerText;
+        scripts[i].parentNode.replaceChild(script, scripts[i]);
       }
     }
 

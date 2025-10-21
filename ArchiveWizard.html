@@ -78,7 +78,7 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
       let currentStep = 1;
       const steps = document.querySelectorAll('.wizard-step');
       const progressBar = document.getElementById('progress-bar');
@@ -169,7 +169,7 @@
       });
 
       updateWizard();
-    });
+    })();
   </script>
 </body>
 </html>
