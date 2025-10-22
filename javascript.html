@@ -1417,9 +1417,9 @@
                                                 state.logArea.originalHeight = app.logArea.style.height || getComputedStyle(app.logArea).height;
                                                 app.logArea.classList.add('hidden');
                                                 app.showLogBtn.classList.remove('hidden');
-                                                app.mobileShowLogBtn.classList.remove('hidden');
                                                 if (window.innerWidth < 768) {
                                                     updateMainAreaPadding();
+                                                    updateModulePalettePosition();
                                                 }
                                               };
                                           
@@ -1430,6 +1430,7 @@
                                                 app.logArea.style.height = state.logArea.originalHeight;
                                                 if (window.innerWidth < 768) {
                                                     updateMainAreaPadding();
+                                                    updateModulePalettePosition();
                                                 }
                                               };
                                               
@@ -1456,6 +1457,7 @@
                                             
                                                         if (window.innerWidth < 768) {
                                                             updateMainAreaPadding();
+                                                            updateModulePalettePosition();
                                                         }
                                                     };
                                             
@@ -1501,6 +1503,7 @@
                                                 } else {
                                                   minimizeModulePalette();
                                                 }
+                                                updateModulePalettePosition();
                                               };
                                           
                                               const updateMainAreaPadding = () => {
@@ -1514,7 +1517,25 @@
                                                     logHeight = app.logArea.offsetHeight;
                                                 }
                                             
-                                                mainAreaContent.style.paddingBottom = `${logHeight + 48}px`; // 48px for the visible module palette header
+                                                mainAreaContent.style.paddingBottom = `${logHeight}px`;
+                                              };
+                                          
+                                              const updateModulePalettePosition = () => {
+                                                if (window.innerWidth >= 768) return; // Only for mobile
+                                            
+                                                let logHeight = 0;
+                                                if (!app.logArea.classList.contains('hidden')) {
+                                                    logHeight = app.logArea.offsetHeight;
+                                                }
+                                            
+                                                const paletteHeaderHeight = 48; // Estimated height of the module palette header
+                                            
+                                                if (app.modulePalette.classList.contains('is-open')) {
+                                                    app.modulePalette.style.transform = 'translateY(0)'; // Fully open
+                                                } else {
+                                                    // Closed state: header visible, positioned above log or at bottom
+                                                    app.modulePalette.style.transform = `translateY(calc(100% - ${paletteHeaderHeight}px - ${logHeight}px))`;
+                                                }
                                               };
                                           
                                               function init() {
@@ -1528,6 +1549,7 @@
                                                 if (window.innerWidth < 768) { // md breakpoint
                                                   minimizeModulePalette();
                                                   updateMainAreaPadding();
+                                                  updateModulePalettePosition();
                                                 }
                                                 state.logArea.originalHeight = getComputedStyle(app.logArea).height;
                                     
