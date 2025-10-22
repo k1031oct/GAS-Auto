@@ -1419,7 +1419,7 @@
                                                 app.showLogBtn.classList.remove('hidden');
                                                 app.mobileShowLogBtn.classList.remove('hidden');
                                                 if (window.innerWidth < 768) {
-                                                    document.documentElement.style.setProperty('--log-area-height', '0px');
+                                                    updateMainAreaPadding();
                                                 }
                                               };
                                           
@@ -1429,7 +1429,7 @@
                                                 app.mobileShowLogBtn.classList.add('hidden');
                                                 app.logArea.style.height = state.logArea.originalHeight;
                                                 if (window.innerWidth < 768) {
-                                                    document.documentElement.style.setProperty('--log-area-height', getComputedStyle(app.logArea).height);
+                                                    updateMainAreaPadding();
                                                 }
                                               };
                                               
@@ -1455,7 +1455,7 @@
                                                         target.style.height = `${newHeight}px`;
                                             
                                                         if (window.innerWidth < 768) {
-                                                            document.documentElement.style.setProperty('--log-area-height', `${newHeight}px`);
+                                                            updateMainAreaPadding();
                                                         }
                                                     };
                                             
@@ -1503,6 +1503,20 @@
                                                 }
                                               };
                                           
+                                              const updateMainAreaPadding = () => {
+                                                if (window.innerWidth >= 768) return; // Only for mobile
+                                            
+                                                const mainAreaContent = document.querySelector('#main-area .overflow-y-auto');
+                                                if (!mainAreaContent) return;
+                                            
+                                                let logHeight = 0;
+                                                if (!app.logArea.classList.contains('hidden')) {
+                                                    logHeight = app.logArea.offsetHeight;
+                                                }
+                                            
+                                                mainAreaContent.style.paddingBottom = `${logHeight}px`;
+                                              };
+                                          
                                               function init() {
                                                 const debouncedDrawConnectors = debounce(drawConnectors, 100);
                                                 window.addEventListener('resize', debouncedDrawConnectors);
@@ -1513,11 +1527,7 @@
                                                 // Set initial heights for mobile view
                                                 if (window.innerWidth < 768) { // md breakpoint
                                                   minimizeModulePalette();
-                                                  if (!app.logArea.classList.contains('hidden')) {
-                                                      document.documentElement.style.setProperty('--log-area-height', getComputedStyle(app.logArea).height);
-                                                  } else {
-                                                      document.documentElement.style.setProperty('--log-area-height', '0px');
-                                                  }
+                                                  updateMainAreaPadding();
                                                 }
                                                 state.logArea.originalHeight = getComputedStyle(app.logArea).height;
                                     
