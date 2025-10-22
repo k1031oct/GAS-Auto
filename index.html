@@ -74,15 +74,15 @@
         left: 0;
         right: 0;
         height: 100%;
-        transform: translateY(calc(100% - 60px));
-        transition: transform 0.3s ease-in-out;
+        transform: translateY(calc(100% - 48px));
+        transition: transform 0.3s ease-in-out, bottom 0.3s ease-in-out;
         z-index: 25;
       }
       #module-palette.is-open {
         transform: translateY(0);
       }
       #main-area .overflow-y-auto {
-        padding-bottom: 70px;
+        padding-bottom: 60px;
       }
     }
   </style>
@@ -196,7 +196,7 @@
     </main>
 
     <!-- Footer (Log Area) -->
-    <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-48 md:h-64 flex flex-col shadow-2xl">
+    <footer id="log-area" class="bg-gray-800 text-white flex-shrink-0 h-20 flex flex-col shadow-2xl">
       <div id="resize-handle" class="w-full h-4 flex items-center justify-center cursor-ns-resize hover:bg-gray-600 transition-colors shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         ···
       </div>

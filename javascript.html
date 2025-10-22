@@ -1414,10 +1414,13 @@
                                               };
                                           
                                               const hideLog = () => {
-                                                state.logArea.originalHeight = app.logArea.style.height || '16rem';
+                                                state.logArea.originalHeight = app.logArea.style.height || getComputedStyle(app.logArea).height;
                                                 app.logArea.classList.add('hidden');
                                                 app.showLogBtn.classList.remove('hidden');
                                                 app.mobileShowLogBtn.classList.remove('hidden');
+                                                if (window.innerWidth < 768) {
+                                                    app.modulePalette.style.bottom = '0';
+                                                }
                                               };
                                           
                                               const showLog = () => {
@@ -1425,6 +1428,9 @@
                                                 app.showLogBtn.classList.add('hidden');
                                                 app.mobileShowLogBtn.classList.add('hidden');
                                                 app.logArea.style.height = state.logArea.originalHeight;
+                                                if (window.innerWidth < 768) {
+                                                    app.modulePalette.style.bottom = getComputedStyle(app.logArea).height;
+                                                }
                                               };
                                               
                                               const initResizing = () => {
@@ -1507,7 +1513,11 @@
                                                 // Set initial heights for mobile view
                                                 if (window.innerWidth < 768) { // md breakpoint
                                                   minimizeModulePalette();
+                                                  if (!app.logArea.classList.contains('hidden')) {
+                                                      app.modulePalette.style.bottom = getComputedStyle(app.logArea).height;
+                                                  }
                                                 }
+                                                state.logArea.originalHeight = getComputedStyle(app.logArea).height;
                                     
                                                             google.script.run.withSuccessHandler(data => {
                                                               console.log('Initial data loaded.', data);
