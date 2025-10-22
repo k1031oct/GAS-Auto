@@ -1419,7 +1419,7 @@
                                                 app.showLogBtn.classList.remove('hidden');
                                                 app.mobileShowLogBtn.classList.remove('hidden');
                                                 if (window.innerWidth < 768) {
-                                                    app.modulePalette.style.bottom = '0';
+                                                    document.documentElement.style.setProperty('--log-area-height', '0px');
                                                 }
                                               };
                                           
@@ -1429,7 +1429,7 @@
                                                 app.mobileShowLogBtn.classList.add('hidden');
                                                 app.logArea.style.height = state.logArea.originalHeight;
                                                 if (window.innerWidth < 768) {
-                                                    app.modulePalette.style.bottom = getComputedStyle(app.logArea).height;
+                                                    document.documentElement.style.setProperty('--log-area-height', getComputedStyle(app.logArea).height);
                                                 }
                                               };
                                               
@@ -1455,7 +1455,7 @@
                                                         target.style.height = `${newHeight}px`;
                                             
                                                         if (window.innerWidth < 768) {
-                                                            app.modulePalette.style.bottom = `${newHeight}px`;
+                                                            document.documentElement.style.setProperty('--log-area-height', `${newHeight}px`);
                                                         }
                                                     };
                                             
@@ -1514,7 +1514,9 @@
                                                 if (window.innerWidth < 768) { // md breakpoint
                                                   minimizeModulePalette();
                                                   if (!app.logArea.classList.contains('hidden')) {
-                                                      app.modulePalette.style.bottom = getComputedStyle(app.logArea).height;
+                                                      document.documentElement.style.setProperty('--log-area-height', getComputedStyle(app.logArea).height);
+                                                  } else {
+                                                      document.documentElement.style.setProperty('--log-area-height', '0px');
                                                   }
                                                 }
                                                 state.logArea.originalHeight = getComputedStyle(app.logArea).height;
