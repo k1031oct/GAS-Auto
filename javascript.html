@@ -690,15 +690,12 @@
                                                 app.runBtn.disabled = !hasModules;
                                                 app.expandAllBtn.classList.toggle('hidden', !hasModules);
                                                 app.collapseAllBtn.classList.toggle('hidden', !hasModules);
-                                                console.log(`  Expand All button hidden: ${app.expandAllBtn.classList.contains('hidden')}, Collapse All button hidden: ${app.collapseAllBtn.classList.contains('hidden')}`);
 
                                                 app.deleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.mobileDeleteWorkflowBtn.disabled = !state.currentWorkflowName;
                                                 app.moduleFolderIdInput.value = state.currentModuleFolderId;
                                                 app.dirtyIndicator.classList.toggle('hidden', !state.isDirty);
                                                 document.title = (state.currentWorkflowName || '新規ワークフロー') + (state.isDirty ? ' *' : '');
-                                                renderModules();
-                                                renderModules();
                                                 renderModules();
                                               };
                                           
