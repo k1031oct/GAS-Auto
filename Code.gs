@@ -77,6 +77,7 @@ function _findModuleRecursive(modules, condition) {
 //================================================================
 
 function getInitialData() {
+  getTemplateFolderUrl(); // Ensure template folder exists on startup
   const workflows = WorkflowService.listWorkflows();
   const settings = getSettings();
   return { workflows: workflows, moduleFolderId: settings.moduleFolderId, settings: settings };
