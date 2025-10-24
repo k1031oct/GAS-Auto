@@ -1507,36 +1507,33 @@
                                               };
                                           
                                               const updateMainAreaPadding = () => {
-                                                if (window.innerWidth >= 768) return; // Only for mobile
-                                            
                                                 const mainAreaContent = document.querySelector('#main-area .overflow-y-auto');
                                                 if (!mainAreaContent) return;
                                             
-                                                let logHeight = 0;
-                                                if (!app.logArea.classList.contains('hidden')) {
-                                                    logHeight = app.logArea.offsetHeight;
+                                                if (window.innerWidth < 768) {
+                                                  const paletteHeaderHeight = app.modulePaletteHeader.offsetHeight;
+                                                  const bottomPadding = state.modulePalette.isMinimized ? paletteHeaderHeight : app.modulePalette.offsetHeight;
+                                                  mainAreaContent.style.paddingBottom = `${bottomPadding}px`;
+                                                } else {
+                                                  mainAreaContent.style.paddingBottom = '';
                                                 }
-                                            
-                                                mainAreaContent.style.paddingBottom = `${logHeight}px`;
                                               };
                                           
                                               const updateModulePalettePosition = () => {
-                                                if (window.innerWidth >= 768) return; // Only for mobile
-                                            
-                                                let logHeight = 0;
-                                                if (!app.logArea.classList.contains('hidden')) {
-                                                    logHeight = app.logArea.offsetHeight;
+                                                if (window.innerWidth >= 768) {
+                                                  app.modulePalette.style.transform = '';
+                                                  app.modulePalette.style.bottom = '';
+                                                  return;
                                                 }
                                             
                                                 const paletteHeaderHeight = app.modulePaletteHeader.offsetHeight;
                                             
                                                 if (app.modulePalette.classList.contains('is-open')) {
-                                                    app.modulePalette.style.bottom = '0';
-                                                    app.modulePalette.style.transform = 'translateY(0)'; // Fully open
+                                                  app.modulePalette.style.transform = 'translateY(0)';
+                                                  app.modulePalette.style.bottom = '0';
                                                 } else {
-                                                    // Closed state: header visible, positioned above log or at bottom
-                                                    app.modulePalette.style.bottom = `${logHeight}px`;
-                                                    app.modulePalette.style.transform = `translateY(calc(100% - ${paletteHeaderHeight}px))`;
+                                                  app.modulePalette.style.transform = `translateY(calc(100% - ${paletteHeaderHeight}px))`;
+                                                  app.modulePalette.style.bottom = '0';
                                                 }
                                               };
                                           
