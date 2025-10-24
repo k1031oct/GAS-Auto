@@ -51,20 +51,27 @@ var TriggerService = {
     let triggerBuilder = ScriptApp.newTrigger('executeWorkflowByTrigger').timeBased();
 
     switch (options.type) {
-      case 'every_minutes':
-        triggerBuilder.everyMinutes(options.interval || 5);
-        break;
       case 'every_hours':
-        triggerBuilder.everyHours(options.interval || 1);
+        const interval = [1, 3, 6].includes(options.interval) ? options.interval : 1;
+        triggerBuilder.everyHours(interval);
         break;
       case 'daily':
         triggerBuilder.atHour(options.hour || 9).everyDays(1);
         break;
       case 'weekly':
-        triggerBuilder.onWeekDay(options.weekday || ScriptApp.WeekDay.MONDAY).atHour(options.hour || 9);
+        if (!options.weekday || !ScriptApp.WeekDay[options.weekday]) {
+          throw new Error('無効な曜日が指定されました。');
+        }
+        triggerBuilder.onWeekDay(ScriptApp.WeekDay[options.weekday]).atHour(options.hour || 9);
+        break;
+      case 'monthly':
+        if (!options.day || options.day < 1 || options.day > 31) {
+            throw new Error('無効な日付が指定されました。');
+        }
+        triggerBuilder.onMonthDay(options.day).atHour(options.hour || 9);
         break;
       default:
-        throw new Error(`Unsupported trigger type: ${options.type}`);
+        throw new Error(`サポートされていないトリガー種別です: ${options.type}`);
     }
 
     const trigger = triggerBuilder.build();

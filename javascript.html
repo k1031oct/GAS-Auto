@@ -167,6 +167,39 @@
                                               const hideLoader = () => app.loader.classList.add('hidden');
 
                                               // --- Trigger Modal Logic ---
+                                              const updateTriggerOptionsUI = () => {
+                                                const type = app.triggerType.value;
+                                                const options = {
+                                                  hourly: document.getElementById('trigger-options-hourly'),
+                                                  weekly: document.getElementById('trigger-options-weekly'),
+                                                  monthly: document.getElementById('trigger-options-monthly'),
+                                                  time: document.getElementById('trigger-options-time'),
+                                                };
+
+                                                // Hide all options first
+                                                for (const key in options) {
+                                                  options[key].classList.add('hidden');
+                                                }
+
+                                                // Show options based on type
+                                                switch (type) {
+                                                  case 'daily':
+                                                    options.time.classList.remove('hidden');
+                                                    break;
+                                                  case 'weekly':
+                                                    options.weekly.classList.remove('hidden');
+                                                    options.time.classList.remove('hidden');
+                                                    break;
+                                                  case 'monthly':
+                                                    options.monthly.classList.remove('hidden');
+                                                    options.time.classList.remove('hidden');
+                                                    break;
+                                                  case 'every_hours':
+                                                    options.hourly.classList.remove('hidden');
+                                                    break;
+                                                }
+                                              };
+
                                               const openTriggerModal = () => {
                                                 if (!state.currentWorkflowName) {
                                                   showCustomDialog({ title: 'エラー', message: 'トリガーを設定する前に、ワークフローを保存してください。', type: 'alert' });
@@ -177,6 +210,7 @@
                                                   .withSuccessHandler(triggers => {
                                                     hideLoader();
                                                     renderTriggers(triggers);
+                                                    updateTriggerOptionsUI(); // Set initial UI state
                                                     app.triggerModalBackdrop.classList.remove('hidden');
                                                   })
                                                   .withFailureHandler(showError)
@@ -226,11 +260,30 @@
                                               };
                                           
                                               const handleCreateTrigger = () => {
-                                                const options = {
-                                                  type: app.triggerType.value,
-                                                  hour: parseInt(app.triggerHour.value, 10),
-                                                  // Add more options for other types here
-                                                };
+                                                const type = app.triggerType.value;
+                                                const options = { type };
+
+                                                switch (type) {
+                                                  case 'daily':
+                                                    options.hour = parseInt(document.getElementById('trigger-hour').value, 10);
+                                                    break;
+                                                  case 'weekly':
+                                                    const selectedDay = document.querySelector('#weekday-selector input[name="weekday"]:checked');
+                                                    if (!selectedDay) {
+                                                      showError({ message: '曜日を選択してください。' });
+                                                      return;
+                                                    }
+                                                    options.weekday = selectedDay.value;
+                                                    options.hour = parseInt(document.getElementById('trigger-hour').value, 10);
+                                                    break;
+                                                  case 'monthly':
+                                                    options.day = parseInt(document.getElementById('trigger-month-day').value, 10);
+                                                    options.hour = parseInt(document.getElementById('trigger-hour').value, 10);
+                                                    break;
+                                                  case 'every_hours':
+                                                    options.interval = parseInt(document.getElementById('trigger-hour-interval').value, 10);
+                                                    break;
+                                                }
                                           
                                                 showLoader();
                                                 google.script.run
@@ -537,6 +590,7 @@
                                                 app.triggerCloseBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCancelBtn.addEventListener('click', closeTriggerModal);
                                                 app.triggerCreateBtn.addEventListener('click', handleCreateTrigger);
+                                                app.triggerType.addEventListener('change', updateTriggerOptionsUI);
 
                                           
                                                 app.hideLogBtn.addEventListener('click', hideLog);
