@@ -194,16 +194,43 @@ function getWorkflowFolderUrl(workflowName) {
  * Gets the URL of the template folder, creating it if it doesn't exist.
  * @returns {string} The URL of the template folder.
  */
-function getTemplateFolderUrl() {
-  const templateFolderName = 'GAS-Auto Templates';
-  let folder;
-  const folders = DriveApp.getRootFolder().getFoldersByName(templateFolderName);
-  if (folders.hasNext()) {
-    folder = folders.next();
+/**
+ * Gets the template folder, creating it if it doesn't exist within the AppData folder.
+ * @private
+ * @returns {GoogleAppsScript.Drive.Folder} The template folder.
+ */
+function _getTemplateFolder() {
+  const APP_DATA_FOLDER_NAME = 'GAS_Workflow_Automator_AppData';
+  const TEMPLATE_FOLDER_NAME = 'Template';
+
+  // Get or create the main AppData folder
+  let appDataFolder;
+  const appDataFolders = DriveApp.getFoldersByName(APP_DATA_FOLDER_NAME);
+  if (appDataFolders.hasNext()) {
+    appDataFolder = appDataFolders.next();
   } else {
-    folder = DriveApp.getRootFolder().createFolder(templateFolderName);
+    appDataFolder = DriveApp.getRootFolder().createFolder(APP_DATA_FOLDER_NAME);
   }
-  return folder.getUrl();
+
+  // Get or create the Template folder inside AppData
+  let templateFolder;
+  const templateFolders = appDataFolder.getFoldersByName(TEMPLATE_FOLDER_NAME);
+  if (templateFolders.hasNext()) {
+    templateFolder = templateFolders.next();
+  } else {
+    templateFolder = appDataFolder.createFolder(TEMPLATE_FOLDER_NAME);
+  }
+  return templateFolder;
+}
+
+
+/**
+ * Gets the URL of the template folder, creating it if it doesn't exist.
+ * @returns {string} The URL of the template folder.
+ */
+function getTemplateFolderUrl() {
+  const templateFolder = _getTemplateFolder();
+  return templateFolder.getUrl();
 }
 
 /**
@@ -212,12 +239,10 @@ function getTemplateFolderUrl() {
  * @returns {Array<{id: string, name: string}>} A list of templates.
  */
 function getTemplates(fileType) {
-  const templateFolderName = 'GAS-Auto Templates';
-  const folders = DriveApp.getRootFolder().getFoldersByName(templateFolderName);
-  if (!folders.hasNext()) {
-    return [];
+  const templateFolder = _getTemplateFolder();
+  if (!templateFolder) {
+      return [];
   }
-  const templateFolder = folders.next();
   const templates = [];
   const files = templateFolder.getFiles();
   while (files.hasNext()) {
