@@ -1577,6 +1577,7 @@
                                                 app.modulePalette.classList.add('is-open');
                                                 app.modulePaletteToggleIcon.classList.remove('rotate-180');
                                                 state.modulePalette.isMinimized = false;
+                                                updateModulePalettePosition();
                                               };
                         
                                               const minimizeModulePalette = () => {
@@ -1584,6 +1585,7 @@
                                                 app.modulePalette.classList.remove('is-open');
                                                 app.modulePaletteToggleIcon.classList.add('rotate-180');
                                                 state.modulePalette.isMinimized = true;
+                                                updateModulePalettePosition();
                                               };
                         
                                               const toggleModulePalette = () => {
