@@ -106,6 +106,19 @@
           <button id="settings-btn" title="設定" class="p-1.5 md:p-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow-md transition-colors"><i class="fas fa-cog"></i></button>
           <button id="trigger-btn" title="定期実行/トリガーを設定" class="p-1.5 md:p-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 shadow-md transition-colors"><i class="fas fa-clock"></i></button>
           <button id="history-btn" title="実行履歴シートを開く" class="p-1.5 md:p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md transition-colors"><i class="fas fa-history"></i></button>
+          
+          <!-- Related Files Dropdown -->
+          <div class="relative inline-block text-left">
+            <button id="related-files-btn" title="関連ファイル" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-folder-open"></i></button>
+            <div id="related-files-menu" class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+              <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                <a href="#" id="open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
+                <a href="#" id="add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+              </div>
+            </div>
+          </div>
+
+          <button id="template-btn" title="テンプレートフォルダを開く" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-file-alt"></i></button>
         </div>
         
         <button id="mobile-save-workflow-btn" title="保存" class="md:hidden text-sm p-2 rounded-full bg-green-500 text-white hover:bg-green-600 shadow-md transition-colors"><i class="fas fa-save"></i></button>
@@ -124,6 +137,14 @@
         <button id="mobile-history-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-history w-6 text-center mr-2"></i>実行履歴</button>
         <button id="mobile-delete-workflow-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700" disabled><i class="fas fa-trash w-6 text-center mr-2"></i>削除</button>
         <button id="mobile-settings-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-cog w-6 text-center mr-2"></i>設定</button>
+        <div class="relative">
+          <button id="mobile-related-files-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-folder-open w-6 text-center mr-2"></i>関連ファイル</button>
+          <div id="mobile-related-files-menu" class="hidden mt-2 w-full bg-gray-50 dark:bg-gray-700 rounded-md shadow-lg">
+            <a href="#" id="mobile-open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
+            <a href="#" id="mobile-add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+          </div>
+        </div>
+        <button id="mobile-template-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-file-alt w-6 text-center mr-2"></i>テンプレート</button>
         <button id="mobile-show-log-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hidden"><i class="fas fa-comment-dots w-6 text-center mr-2"></i>実行ログを表示</button>
       </div>
     </header>
