@@ -789,14 +789,11 @@
                                             
                                                 svg.innerHTML = ''; // Clear existing connectors
                                             
-                                                const containerRect = container.getBoundingClientRect();
-                                            
                                                 const getModuleEndpoints = (moduleEl) => {
                                                   if (!moduleEl) return null;
-                                                  const rect = moduleEl.getBoundingClientRect();
                                                   return {
-                                                    top: { x: rect.left + rect.width / 2 - containerRect.left, y: rect.top - containerRect.top },
-                                                    bottom: { x: rect.left + rect.width / 2 - containerRect.left, y: rect.bottom - containerRect.top },
+                                                    top: { x: moduleEl.offsetLeft + moduleEl.offsetWidth / 2, y: moduleEl.offsetTop },
+                                                    bottom: { x: moduleEl.offsetLeft + moduleEl.offsetWidth / 2, y: moduleEl.offsetTop + moduleEl.offsetHeight },
                                                   };
                                                 };
                                             
