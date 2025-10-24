@@ -392,6 +392,48 @@
     </div>
   </div>
 
+  <!-- Add File Modal -->
+  <div id="add-file-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-2 md:p-4">
+    <div id="add-file-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] dark:bg-gray-800">
+      <header class="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0 dark:border-gray-700">
+        <h2 class="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">ファイルを追加</h2>
+        <button id="add-file-close-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600"><i class="fas fa-times text-gray-600 dark:text-gray-300"></i></button>
+      </header>
+      <main class="p-4 md:p-6 flex-grow overflow-y-auto">
+        <div class="space-y-4">
+          <div>
+            <label for="file-type-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">種類</label>
+            <select id="file-type-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="document">文書を追加</option>
+              <option value="sheet">表を追加</option>
+            </select>
+          </div>
+          <div>
+            <label for="creation-type-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">作成方法</label>
+            <select id="creation-type-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="new">新規作成</option>
+              <option value="template">テンプレートから作成</option>
+            </select>
+          </div>
+          <div id="template-select-container" class="hidden">
+            <label for="template-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">テンプレート</label>
+            <select id="template-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <!-- Template options will be loaded here -->
+            </select>
+          </div>
+          <div>
+            <label for="file-name-input" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">ファイル名</label>
+            <input type="text" id="file-name-input" placeholder="ファイル名を入力" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+        </div>
+      </main>
+      <footer class="p-4 bg-gray-50 border-t flex justify-end gap-3 flex-shrink-0 rounded-b-xl dark:bg-gray-800 dark:border-gray-700">
+        <button id="add-file-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">キャンセル</button>
+        <button id="add-file-create-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">作成</button>
+      </footer>
+    </div>
+  </div>
+
   <!-- Loader Overlay -->
   <div id="loader" class="fixed inset-0 bg-white bg-opacity-70 hidden flex items-center justify-center z-[60] dark:bg-gray-900 dark:bg-opacity-70">
     <div class="text-center"><i class="fas fa-sync fa-spin text-4xl text-blue-600"></i>
