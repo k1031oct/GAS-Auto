@@ -297,8 +297,7 @@
                                               
                                               const onAddModule = (evt, targetModuleArray) => {
                                                 console.log('onAddModule called.');
-                                                const item = evt.item; // The cloned element from the palette
-                                                const draggedModuleId = item.dataset.moduleId;
+                                                const draggedModuleId = evt.item.dataset.moduleId;
                                                 const moduleDef = state.allModuleDefinitions.find(m => m.id === draggedModuleId);
                         
                                                 if (moduleDef) {
@@ -334,21 +333,12 @@
                                                     // 2. Add the new data to the state array at the correct position
                                                     targetModuleArray.splice(evt.newIndex, 0, newModuleData);
                         
-                                                    // 3. Create the real, properly-styled module element
-                                                    const moduleEl = createModuleElement(newModuleData, targetModuleArray);
-                        
-                                                    // 4. Replace the cloned palette item with the real module element
-                                                    item.replaceWith(moduleEl);
-                                                    
-                                                    // If this was the first module in the main container, remove the placeholder text
-                                                    if (state.modules.length === 1 && targetModuleArray === state.modules) {
-                                                        const placeholder = app.workflowContainer.querySelector('.workflow-guide');
-                                                        if(placeholder) placeholder.remove();
-                                                    }
-                        
+                                                    // 3. Remove the original cloned item, as renderModules will redraw everything.
+                                                    evt.item.remove();
+
+                                                    // 4. Mark dirty and re-render, which will call drawConnectors
                                                     markDirty();
                                                     console.log('  Module added. Current state.modules.length:', state.modules.length);
-                                                    setTimeout(drawConnectors, 50);
                                                 }
                                               };
                         
@@ -783,7 +773,6 @@
                                               };
                                           
                                               const drawConnectors = () => {
-                                                log('drawConnectors function called.', 'system'); // DEBUG
                                                 const svg = document.getElementById('connector-svg');
                                                 const container = app.workflowContainer;
                                                 if (!svg || !container) return;
@@ -801,8 +790,8 @@
                                                 const createPath = (d, isBranch = false) => {
                                                   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                                                   path.setAttribute('d', d);
-                                                  path.setAttribute('stroke', '#FF0000'); // DEBUG: Bright red
-                                                  path.setAttribute('stroke-width', '3'); // DEBUG: Thicker
+                                                  path.setAttribute('stroke', isBranch ? '#F59E0B' : '#9CA3AF'); // amber-500 for branch, gray-400 for normal
+                                                  path.setAttribute('stroke-width', '2');
                                                   path.setAttribute('fill', 'none');
                                                   if (isBranch) {
                                                     path.setAttribute('stroke-dasharray', '4 4');
@@ -862,7 +851,6 @@
                                                     if (currentEl && nextEl) {
                                                       const start = getModuleEndpoints(currentEl).bottom;
                                                       const end = getModuleEndpoints(nextEl).top;
-                                                      log(`Drawing line from (${start.x}, ${start.y}) to (${end.x}, ${end.y})`, 'system'); // DEBUG
                                                       const d = `M ${start.x} ${start.y} C ${start.x} ${start.y + 30}, ${end.x} ${end.y - 30}, ${end.x} ${end.y}`;
                                                       svg.appendChild(createPath(d));
                                                     }
