@@ -124,6 +124,16 @@ var LogService = {
     delete this._workflowNames[runId]; // Clean up
   },
 
+  logSkippedExecution: function (workflowName, type) {
+    const ss = this._getLogSpreadsheet();
+    const summarySheet = ss.getSheetByName(this._SUMMARY_SHEET_NAME);
+    const startTime = new Date();
+    const runId = `skip-${startTime.getTime()}`;
+    const status = 'スキップ';
+    const message = '他のプロセスが実行中のため、この実行はスキップされました。';
+    summarySheet.appendRow([runId, startTime, workflowName, type, status, 0, message]);
+  },
+
   /**
    * Writes a general informational log message without a runId.
    * @param {string} message The log message.
