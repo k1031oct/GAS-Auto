@@ -1308,7 +1308,28 @@
                                                       renderModulePalette();
                                                       return;
                                                   }
-                                                  showLoader();
+
+                                                  const cacheKey = `modules_cache_${folderId}`;
+                                                  const cachedData = localStorage.getItem(cacheKey);
+                                                  let hasRenderedFromCache = false;
+
+                                                  if (cachedData) {
+                                                      try {
+                                                          const parsedData = JSON.parse(cachedData);
+                                                          state.allModuleDefinitions = parsedData;
+                                                          renderModulePalette();
+                                                          log('ローカルキャッシュからモジュールを読み込みました。', 'system');
+                                                          hasRenderedFromCache = true;
+                                                      } catch (e) {
+                                                          console.error("Failed to parse cached modules", e);
+                                                          localStorage.removeItem(cacheKey); // Clear corrupted cache
+                                                      }
+                                                  }
+
+                                                  if (!hasRenderedFromCache) {
+                                                      showLoader();
+                                                  }
+
                                                   try {
                                                       const definitions = await new Promise((resolve, reject) => {
                                                           google.script.run
@@ -1316,14 +1337,29 @@
                                                               .withFailureHandler(reject)
                                                               .loadModuleDefinitions(folderId);
                                                       });
+
                                                       state.currentModuleFolderId = folderId;
-                                                      state.allModuleDefinitions = definitions;
-                                                      log(`Driveから ${definitions.length} 個のモジュール定義を読み込みました。`, 'success');
+                                                      
+                                                      // Only re-render if the data has changed
+                                                      if (!cachedData || JSON.stringify(definitions) !== cachedData) {
+                                                          state.allModuleDefinitions = definitions;
+                                                          localStorage.setItem(cacheKey, JSON.stringify(definitions));
+                                                          renderModulePalette();
+                                                          log(`サーバーから ${definitions.length} 個の最新モジュール定義を読み込みました。`, 'success');
+                                                      } else if (hasRenderedFromCache) {
+                                                          log('モジュールは最新の状態です。', 'system');
+                                                      }
+
                                                   } catch (error) {
-                                                      state.allModuleDefinitions = [];
-                                                      showError(error);
+                                                      // If the server call fails, we rely on the cache if it was loaded
+                                                      if (!hasRenderedFromCache) {
+                                                          state.allModuleDefinitions = [];
+                                                          renderModulePalette(); // Clear palette if server call fails and no cache
+                                                          showError(error);
+                                                      } else {
+                                                          log('サーバーからのモジュール取得に失敗しました。キャッシュを引き続き使用します。', 'error');
+                                                      }
                                                   } finally {
-                                                      renderModulePalette();
                                                       hideLoader();
                                                   }
                                               };

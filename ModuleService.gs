@@ -103,8 +103,8 @@ var ModuleService = {
     });
     Logger.log(`最終的なモジュール数 (マージ後): ${finalModules.length} 個`); // デバッグログ
 
-    // データをキャッシュに保存（有効期限10分）
-    cache.put(cacheKey, JSON.stringify(finalModules), 600); 
+    // データをキャッシュに保存（有効期限1時間）
+    cache.put(cacheKey, JSON.stringify(finalModules), 3600); 
     Logger.log(`Driveから ${customModules.length} 個のカスタムモジュールをロードし、合計 ${finalModules.length} 個のモジュールをキャッシュに保存しました。`);
     
     return finalModules;
