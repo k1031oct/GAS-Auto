@@ -1531,10 +1531,12 @@
                                                 const paletteHeaderHeight = app.modulePaletteHeader.offsetHeight;
                                             
                                                 if (app.modulePalette.classList.contains('is-open')) {
+                                                    app.modulePalette.style.bottom = '0';
                                                     app.modulePalette.style.transform = 'translateY(0)'; // Fully open
                                                 } else {
                                                     // Closed state: header visible, positioned above log or at bottom
-                                                    app.modulePalette.style.transform = `translateY(calc(100% - ${paletteHeaderHeight}px - ${logHeight}px))`;
+                                                    app.modulePalette.style.bottom = `${logHeight}px`;
+                                                    app.modulePalette.style.transform = `translateY(calc(100% - ${paletteHeaderHeight}px))`;
                                                 }
                                               };
                                           
