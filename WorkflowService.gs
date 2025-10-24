@@ -78,6 +78,22 @@ var WorkflowService = {
     return Array.from(workflowNames).sort();
   },
 
+  /**
+   * Gets the URL of the folder for a given workflow.
+   * @param {string} workflowName - The name of the workflow.
+   * @returns {string} The URL of the workflow folder or null if not found.
+   */
+  getWorkflowFolderUrl: function(workflowName) {
+    if (!workflowName) return null;
+    try {
+      const workflowFolder = this._getWorkflowFolder(workflowName);
+      return workflowFolder.getUrl();
+    } catch (e) {
+      Logger.log(`Error getting workflow folder URL for "${workflowName}": ${e.message}`);
+      return null;
+    }
+  },
+
 
   /**
    * 指定されたワークフローの定義(JSON)を読み込む。
