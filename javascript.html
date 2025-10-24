@@ -783,6 +783,7 @@
                                               };
                                           
                                               const drawConnectors = () => {
+                                                log('drawConnectors function called.', 'system'); // DEBUG
                                                 const svg = document.getElementById('connector-svg');
                                                 const container = app.workflowContainer;
                                                 if (!svg || !container) return;
@@ -800,8 +801,8 @@
                                                 const createPath = (d, isBranch = false) => {
                                                   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                                                   path.setAttribute('d', d);
-                                                  path.setAttribute('stroke', isBranch ? '#F59E0B' : '#9CA3AF'); // amber-500 for branch, gray-400 for normal
-                                                  path.setAttribute('stroke-width', '2');
+                                                  path.setAttribute('stroke', '#FF0000'); // DEBUG: Bright red
+                                                  path.setAttribute('stroke-width', '3'); // DEBUG: Thicker
                                                   path.setAttribute('fill', 'none');
                                                   if (isBranch) {
                                                     path.setAttribute('stroke-dasharray', '4 4');
@@ -834,8 +835,6 @@
                                             
                                                   iconGroup.addEventListener('click', (e) => {
                                                     e.stopPropagation();
-                                                    console.log('Branch icon clicked for module:', module.instanceId);
-                                                    // Here you would open a modal for setting the condition
                                                     showCustomDialog({
                                                       title: '条件設定',
                                                       message: `モジュール「${module.name}」の分岐条件を入力してください:`,
@@ -863,6 +862,7 @@
                                                     if (currentEl && nextEl) {
                                                       const start = getModuleEndpoints(currentEl).bottom;
                                                       const end = getModuleEndpoints(nextEl).top;
+                                                      log(`Drawing line from (${start.x}, ${start.y}) to (${end.x}, ${end.y})`, 'system'); // DEBUG
                                                       const d = `M ${start.x} ${start.y} C ${start.x} ${start.y + 30}, ${end.x} ${end.y - 30}, ${end.x} ${end.y}`;
                                                       svg.appendChild(createPath(d));
                                                     }
@@ -880,7 +880,6 @@
                                                         const branchContainer = containerEl.querySelector('.branch-container');
                                                         if (!branchContainer) return;
                                             
-                                                        const branchRect = branchContainer.getBoundingClientRect();
                                                         const midY = startPoint.y + 40;
                                             
                                                         // Draw main vertical line down
@@ -897,7 +896,6 @@
                                                             const firstModuleInBranch = container.querySelector(`[data-id="${branchModules[0].instanceId}"]`);
                                                             if (firstModuleInBranch) {
                                                               const endPoint = getModuleEndpoints(firstModuleInBranch).top;
-                                                              // Draw horizontal and vertical lines to the branch
                                                               const d = `M ${startPoint.x} ${midY} L ${endPoint.x} ${midY} L ${endPoint.x} ${endPoint.y}`;
                                                               svg.appendChild(createPath(d, true));
                                                             }
