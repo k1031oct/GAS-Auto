@@ -791,8 +791,8 @@
                                                 const createPath = (d, isBranch = false) => {
                                                   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                                                   path.setAttribute('d', d);
-                                                  path.setAttribute('stroke', '#FF0000'); // DEBUG: Bright red
-                                                  path.setAttribute('stroke-width', '3'); // DEBUG: Thicker
+                                                  path.setAttribute('stroke', isBranch ? '#F59E0B' : '#9CA3AF'); // amber-500 for branch, gray-400 for normal
+                                                  path.setAttribute('stroke-width', '2');
                                                   path.setAttribute('fill', 'none');
                                                   if (isBranch) {
                                                     path.setAttribute('stroke-dasharray', '4 4');
@@ -903,74 +903,67 @@
                                               };
 
                                               const renderModules = () => {
-                                                log('renderModules called', 'system'); // DEBUG
-                                                try {
-                                                    app.workflowContainer.innerHTML = ''; // Clear the container first
-                                                
-                                                    if (state.modules.length === 0) {
-                                                        app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
-                                                            <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
-                                                            <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
-                                                            <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
-                                                        </div>`;
-                                                        return;
-                                                    }
-                                                
-                                                    // Recursive function to create the module tree
-                                                    const createModuleTree = (modules, parentElement, parentModuleArray) => {
-                                                        modules.forEach((module, index) => {
-                                                            const moduleEl = createModuleElement(module, parentModuleArray);
-                                                            parentElement.appendChild(moduleEl);
-                                                
-                                                            if (module.type === 'container') {
-                                                                const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
-                                                                if (moduleDef && moduleDef.branches) {
-                                                                  // Dynamic branch logic for containers like 'condition_branch'
-                                                                  moduleDef.branches.forEach(branch => {
-                                                                    const containerEl = moduleEl.querySelector(`.${branch.id}-dropzone`);
-                                                                    if (containerEl) {
-                                                                      new Sortable(containerEl, {
-                                                                        group: 'shared', animation: 150, handle: '.handle',
-                                                                        onAdd: (evt) => onAddModule(evt, module[branch.id]),
-                                                                        onUpdate: (evt) => onUpdateModuleOrder(evt, module[branch.id])
-                                                                      });
-                                                
-                                                                      if (module[branch.id] && module[branch.id].length > 0) {
-                                                                        createModuleTree(module[branch.id], containerEl, module[branch.id]);
-                                                                      } else {
-                                                                        containerEl.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                                                      }
-                                                                    }
+                                                app.workflowContainer.innerHTML = ''; // Clear the container first
+                                            
+                                                if (state.modules.length === 0) {
+                                                    app.workflowContainer.innerHTML = `<div class="text-center text-gray-500 p-4 md:p-8 workflow-guide">
+                                                        <i class="fas fa-arrow-up text-3xl md:text-4xl mb-3 text-gray-300"></i>
+                                                        <p class="text-sm md:text-base">下部のライブラリからモジュールをドラッグ＆ドロップしてください。</p>
+                                                        <p class="text-xs md:text-sm mt-2">（ファイル整理機能は、モジュール「ドライブ操作」などに統合されています）</p>
+                                                    </div>`;
+                                                    return;
+                                                }
+                                            
+                                                // Recursive function to create the module tree
+                                                const createModuleTree = (modules, parentElement, parentModuleArray) => {
+                                                    modules.forEach((module, index) => {
+                                                        const moduleEl = createModuleElement(module, parentModuleArray);
+                                                        parentElement.appendChild(moduleEl);
+                                            
+                                                        if (module.type === 'container') {
+                                                            const moduleDef = state.allModuleDefinitions.find(d => d.id === module.id);
+                                                            if (moduleDef && moduleDef.branches) {
+                                                              // Dynamic branch logic for containers like 'condition_branch'
+                                                              moduleDef.branches.forEach(branch => {
+                                                                const containerEl = moduleEl.querySelector(`.${branch.id}-dropzone`);
+                                                                if (containerEl) {
+                                                                  new Sortable(containerEl, {
+                                                                    group: 'shared', animation: 150, handle: '.handle',
+                                                                    onAdd: (evt) => onAddModule(evt, module[branch.id]),
+                                                                    onUpdate: (evt) => onUpdateModuleOrder(evt, module[branch.id])
                                                                   });
-                                                                } else {
-                                                                  // Standard container logic for containers like 'group_container'
-                                                                  const containerContent = moduleEl.querySelector('.module-container-content');
-                                                                  if (containerContent) {
-                                                                    new Sortable(containerContent, {
-                                                                      group: 'shared', animation: 150, handle: '.handle',
-                                                                      onAdd: (evt) => onAddModule(evt, module.modules),
-                                                                      onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
-                                                                    });
-                                                
-                                                                    if (module.modules && module.modules.length > 0) {
-                                                                      createModuleTree(module.modules, containerContent, module.modules);
-                                                                    } else {
-                                                                      containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
-                                                                    }
+                                            
+                                                                  if (module[branch.id] && module[branch.id].length > 0) {
+                                                                    createModuleTree(module[branch.id], containerEl, module[branch.id]);
+                                                                  } else {
+                                                                    containerEl.innerHTML = `<div class="text-center text-xs text-gray-400 p-2 workflow-guide">ここにモジュールをドラッグ</div>`;
                                                                   }
                                                                 }
+                                                              });
+                                                            } else {
+                                                              // Standard container logic for containers like 'group_container'
+                                                              const containerContent = moduleEl.querySelector('.module-container-content');
+                                                              if (containerContent) {
+                                                                new Sortable(containerContent, {
+                                                                  group: 'shared', animation: 150, handle: '.handle',
+                                                                  onAdd: (evt) => onAddModule(evt, module.modules),
+                                                                  onUpdate: (evt) => onUpdateModuleOrder(evt, module.modules)
+                                                                });
+                                            
+                                                                if (module.modules && module.modules.length > 0) {
+                                                                  createModuleTree(module.modules, containerContent, module.modules);
+                                                                } else {
+                                                                  containerContent.innerHTML = `<div class="text-center text-xs text-gray-400 p-4 workflow-guide">ここにモジュールをドラッグ</div>`;
+                                                                }
+                                                              }
                                                             }
-                                                        });
-                                                    };
+                                                        }
+                                                    });
+                                                };
+                                            
+                                                // Start rendering from the root level
+                                                createModuleTree(state.modules, app.workflowContainer, state.modules);
                                                 
-                                                    // Start rendering from the root level
-                                                    createModuleTree(state.modules, app.workflowContainer, state.modules);
-                                                } catch (e) {
-                                                    log(`Error during renderModules: ${e.message}`, 'error');
-                                                    console.error(e);
-                                                }
-                                                
-                                                log('Scheduling drawConnectors', 'system'); // DEBUG
                                                 // Use a timeout to ensure the DOM has been updated before drawing connectors
                                                 setTimeout(drawConnectors, 50);
                                               };
