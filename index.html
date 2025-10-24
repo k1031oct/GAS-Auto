@@ -296,21 +296,52 @@
         </div>
         <div class="border-t pt-6 dark:border-gray-700">
           <h3 class="font-bold text-gray-700 mb-4 dark:text-gray-200">新しいトリガーを作成</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-4">
+            <!-- Trigger Type -->
             <div>
               <label for="trigger-type" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">種類</label>
               <select id="trigger-type" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                 <option value="daily">毎日</option>
                 <option value="weekly">毎週</option>
+                <option value="monthly">毎月</option>
                 <option value="every_hours">時間ごと</option>
-                <option value="every_minutes">分ごと</option>
               </select>
             </div>
-            <div id="trigger-time-options">
-              <div>
-                <label for="trigger-hour" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">時刻</label>
-                <input type="number" id="trigger-hour" min="0" max="23" value="9" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+            <!-- Hourly Options -->
+            <div id="trigger-options-hourly" class="hidden">
+              <label for="trigger-hour-interval" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">間隔</label>
+              <select id="trigger-hour-interval" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                <option value="1">1時間ごと</option>
+                <option value="3">3時間ごと</option>
+                <option value="6">6時間ごと</option>
+              </select>
+            </div>
+
+            <!-- Weekly Options -->
+            <div id="trigger-options-weekly" class="hidden">
+              <label class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">曜日</label>
+              <div id="weekday-selector" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-1 text-sm">
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="SUNDAY" class="text-blue-600 focus:ring-blue-500"> 日</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="MONDAY" class="text-blue-600 focus:ring-blue-500"> 月</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="TUESDAY" class="text-blue-600 focus:ring-blue-500"> 火</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="WEDNESDAY" class="text-blue-600 focus:ring-blue-500"> 水</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="THURSDAY" class="text-blue-600 focus:ring-blue-500"> 木</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="FRIDAY" class="text-blue-600 focus:ring-blue-500"> 金</label>
+                <label class="flex items-center gap-2 p-2 rounded-lg border dark:border-gray-600"><input type="radio" name="weekday" value="SATURDAY" class="text-blue-600 focus:ring-blue-500"> 土</label>
               </div>
+            </div>
+
+            <!-- Monthly Options -->
+            <div id="trigger-options-monthly" class="hidden">
+              <label for="trigger-month-day" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">日付</label>
+              <input type="number" id="trigger-month-day" min="1" max="31" value="1" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+
+            <!-- Time Options (for daily, weekly, monthly) -->
+            <div id="trigger-options-time">
+              <label for="trigger-hour" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">時刻（時）</label>
+              <input type="number" id="trigger-hour" min="0" max="23" value="9" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
             </div>
           </div>
         </div>
