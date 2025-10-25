@@ -127,14 +127,6 @@ jobs:
               issue_number: prNumber,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `
-                ### ${title}<br>AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
-
-<a href="${deployUrl}" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Review%20App-Open-blue?style=for-the-badge&logo=google-apps-script" alt="Open Review App"></a>
-
-${summarySection}
-
-レビュー後、問題がなければPRをマージしてください。
-              `
+              body: 'Deployment successful.'
             });
 
