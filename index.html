@@ -129,6 +129,29 @@
             </div>
           </div>
 
+          <!-- Bookmarks Dropdown -->
+          <div class="relative inline-block text-left">
+            <button id="bookmarks-btn" title="ブックマーク" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-star"></i></button>
+            <div id="bookmarks-menu" class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+              <div class="p-2">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                  <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                    <button id="workflow-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400">ワークフロー</button>
+                    <button id="global-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">共通</button>
+                  </nav>
+                </div>
+                <div id="workflow-bookmarks-content" class="py-2">
+                  <div id="workflow-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                  <button id="add-workflow-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"><i class="fas fa-plus mr-1"></i>ワークフローに追加</button>
+                </div>
+                <div id="global-bookmarks-content" class="hidden py-2">
+                  <div id="global-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                  <button id="add-global-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"><i class="fas fa-plus mr-1"></i>共通に追加</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <button id="template-btn" title="テンプレートフォルダを開く" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-file-alt"></i></button>
           <button id="settings-btn" title="設定" class="p-1.5 md:p-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow-md transition-colors"><i class="fas fa-cog"></i></button>
         </div>
@@ -165,6 +188,25 @@
                 <!-- File list will be injected here -->
               </div>
             </div>
+          </div>
+        </div>
+        <div class="relative">
+          <button id="mobile-bookmarks-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-star w-6 text-center mr-2"></i>ブックマーク</button>
+          <div id="mobile-bookmarks-menu" class="hidden mt-2 w-full bg-gray-50 dark:bg-gray-700 rounded-md shadow-lg p-2">
+              <div class="border-b border-gray-200 dark:border-gray-600">
+                <nav class="-mb-px flex space-x-2" aria-label="Tabs">
+                  <button id="mobile-workflow-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400">ワークフロー</button>
+                  <button id="mobile-global-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-xs border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">共通</button>
+                </nav>
+              </div>
+              <div id="mobile-workflow-bookmarks-content" class="py-2">
+                <div id="mobile-workflow-bookmarks-list" class="max-h-48 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                <button id="mobile-add-workflow-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"><i class="fas fa-plus mr-1"></i>ワークフローに追加</button>
+              </div>
+              <div id="mobile-global-bookmarks-content" class="hidden py-2">
+                <div id="mobile-global-bookmarks-list" class="max-h-48 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                <button id="mobile-add-global-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"><i class="fas fa-plus mr-1"></i>共通に追加</button>
+              </div>
           </div>
         </div>
         <button id="mobile-template-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-file-alt w-6 text-center mr-2"></i>テンプレート</button>
@@ -454,6 +496,36 @@
       <footer class="p-4 bg-gray-50 border-t flex justify-end gap-3 flex-shrink-0 rounded-b-xl dark:bg-gray-800 dark:border-gray-700">
         <button id="add-file-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">キャンセル</button>
         <button id="add-file-create-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">作成</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Bookmark Modal -->
+  <div id="bookmark-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-2 md:p-4">
+    <div id="bookmark-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] dark:bg-gray-800">
+      <header class="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0 dark:border-gray-700">
+        <h2 id="bookmark-modal-title" class="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">ブックマークを追加</h2>
+        <button id="bookmark-close-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600"><i class="fas fa-times text-gray-600 dark:text-gray-300"></i></button>
+      </header>
+      <main class="p-4 md:p-6 flex-grow overflow-y-auto">
+        <div class="space-y-4">
+          <div>
+            <label for="bookmark-name-input" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">名前 <span class="text-red-500">*</span></label>
+            <input type="text" id="bookmark-name-input" placeholder="例: 案件管理シート" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+          </div>
+          <div>
+            <label for="bookmark-url-input" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">URL <span class="text-red-500">*</span></label>
+            <input type="url" id="bookmark-url-input" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
+          </div>
+          <div>
+            <label for="bookmark-description-input" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">説明</label>
+            <textarea id="bookmark-description-input" rows="3" placeholder="このブックマークについてのメモ" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+          </div>
+        </div>
+      </main>
+      <footer class="p-4 bg-gray-50 border-t flex justify-end gap-3 flex-shrink-0 rounded-b-xl dark:bg-gray-800 dark:border-gray-700">
+        <button id="bookmark-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">キャンセル</button>
+        <button id="save-bookmark-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">保存</button>
       </footer>
     </div>
   </div>
