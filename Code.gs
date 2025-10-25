@@ -275,6 +275,15 @@ function getTemplateFolderUrl() {
 }
 
 /**
+ * Exports the specification of a workflow to a Google Doc.
+ * @param {object} workflowData The workflow data object.
+ * @returns {{message: string, url: string}} The result of the operation.
+ */
+function exportWorkflowSpecification(workflowData) {
+  return DocsService.exportWorkflowSpecification(workflowData);
+}
+
+/**
  * Gets a list of available templates for the given file type.
  * @param {string} fileType The type of file ('document' or 'sheet').
  * @returns {Array<{id: string, name: string}>} A list of templates.
