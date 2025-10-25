@@ -75,6 +75,28 @@
                                                 modulePaletteToggleIcon: document.getElementById('module-palette-toggle-icon'),
                                                 mobileShowLogBtn: document.getElementById('mobile-show-log-btn'),
                         floatingButtons: document.getElementById('floating-buttons'),
+
+                        // New Feature Elements
+                        relatedFilesBtn: document.getElementById('related-files-btn'),
+                        relatedFilesMenu: document.getElementById('related-files-menu'),
+                        openFolderBtn: document.getElementById('open-folder-btn'),
+                        addFileBtn: document.getElementById('add-file-btn'),
+                        templateBtn: document.getElementById('template-btn'),
+                        mobileRelatedFilesBtn: document.getElementById('mobile-related-files-btn'),
+                        mobileRelatedFilesMenu: document.getElementById('mobile-related-files-menu'),
+                        mobileOpenFolderBtn: document.getElementById('mobile-open-folder-btn'),
+                        mobileAddFileBtn: document.getElementById('mobile-add-file-btn'),
+                        mobileTemplateBtn: document.getElementById('mobile-template-btn'),
+                        addFileModalBackdrop: document.getElementById('add-file-modal-backdrop'),
+                        addFileModal: document.getElementById('add-file-modal'),
+                        addFileCloseBtn: document.getElementById('add-file-close-btn'),
+                        addFileCancelBtn: document.getElementById('add-file-cancel-btn'),
+                        addFileCreateBtn: document.getElementById('add-file-create-btn'),
+                        fileTypeSelect: document.getElementById('file-type-select'),
+                        creationTypeSelect: document.getElementById('creation-type-select'),
+                        templateSelectContainer: document.getElementById('template-select-container'),
+                        templateSelect: document.getElementById('template-select'),
+                        fileNameInput: document.getElementById('file-name-input'),
                                               };
                                           
                                               // --- State Management ---
@@ -257,6 +279,107 @@
                                                   })
                                                   .withFailureHandler(showError)
                                                   .deleteTrigger(uid);
+                                              };
+
+                                              // --- New Feature Functions ---
+                                              const openWorkflowFolder = () => {
+                                                if (!state.currentWorkflowName) {
+                                                  showCustomDialog({ title: 'エラー', message: 'フォルダを開くには、まずワークフローを保存または選択してください。', type: 'alert' });
+                                                  return;
+                                                }
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(url => {
+                                                    hideLoader();
+                                                    if (url) {
+                                                      window.open(url, '_blank');
+                                                    } else {
+                                                      showError({ message: 'フォルダのURLを取得できませんでした。' });
+                                                    }
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .getWorkflowFolderUrl(state.currentWorkflowName);
+                                              };
+
+                                              const openTemplateFolder = () => {
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(url => {
+                                                    hideLoader();
+                                                    if (url) {
+                                                      window.open(url, '_blank');
+                                                    } else {
+                                                      showError({ message: 'テンプレートフォルダのURLを取得できませんでした。' });
+                                                    }
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .getTemplateFolderUrl();
+                                              };
+
+                                              const openAddFileDialog = () => {
+                                                if (!state.currentWorkflowName) {
+                                                  showCustomDialog({ title: 'エラー', message: 'ファイルを追加するには、まずワークフローを保存または選択してください。', type: 'alert' });
+                                                  return;
+                                                }
+                                                app.addFileModalBackdrop.classList.remove('hidden');
+                                                app.templateSelectContainer.classList.add('hidden');
+                                                app.creationTypeSelect.value = 'new';
+                                                app.fileTypeSelect.value = 'document';
+                                                app.fileNameInput.value = '';
+                                              };
+
+                                              const closeAddFileDialog = () => {
+                                                app.addFileModalBackdrop.classList.add('hidden');
+                                              };
+
+                                              const loadTemplates = () => {
+                                                const fileType = app.fileTypeSelect.value; // 'document' or 'sheet'
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(templates => {
+                                                    hideLoader();
+                                                    app.templateSelect.innerHTML = '';
+                                                    if (templates.length === 0) {
+                                                      app.templateSelect.innerHTML = '<option value="">利用可能なテンプレートはありません</option>';
+                                                      return;
+                                                    }
+                                                    templates.forEach(template => {
+                                                      const option = document.createElement('option');
+                                                      option.value = template.id;
+                                                      option.textContent = template.name;
+                                                      app.templateSelect.appendChild(option);
+                                                    });
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .getTemplates(fileType);
+                                              };
+
+                                              const handleCreateFile = () => {
+                                                const options = {
+                                                  workflowName: state.currentWorkflowName,
+                                                  fileName: app.fileNameInput.value.trim(),
+                                                  fileType: app.fileTypeSelect.value,
+                                                  creationType: app.creationTypeSelect.value,
+                                                  templateId: app.creationTypeSelect.value === 'template' ? app.templateSelect.value : null,
+                                                };
+
+                                                if (!options.fileName) {
+                                                  showError({ message: 'ファイル名を入力してください。' });
+                                                  return;
+                                                }
+
+                                                showLoader();
+                                                google.script.run
+                                                  .withSuccessHandler(response => {
+                                                    hideLoader();
+                                                    log(response.message, 'success');
+                                                    if(response.url) {
+                                                        window.open(response.url, '_blank');
+                                                    }
+                                                    closeAddFileDialog();
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .createFileInWorkflowFolder(options);
                                               };
                                           
                                               const handleCreateTrigger = () => {
@@ -677,6 +800,43 @@
                                                 if (app.modulePaletteHeader) {
                                                   app.modulePaletteHeader.addEventListener('click', toggleModulePalette);
                                                 }
+
+                                                // New Feature Listeners
+                                                app.relatedFilesBtn.addEventListener('click', () => app.relatedFilesMenu.classList.toggle('hidden'));
+                                                app.mobileRelatedFilesBtn.addEventListener('click', () => app.mobileRelatedFilesMenu.classList.toggle('hidden'));
+
+                                                app.openFolderBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openWorkflowFolder();
+                                                });
+                                                app.mobileOpenFolderBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openWorkflowFolder();
+                                                });
+
+                                                app.addFileBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openAddFileDialog();
+                                                });
+                                                app.mobileAddFileBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openAddFileDialog();
+                                                });
+
+                                                app.templateBtn.addEventListener('click', openTemplateFolder);
+                                                app.mobileTemplateBtn.addEventListener('click', openTemplateFolder);
+
+                                                app.addFileCloseBtn.addEventListener('click', closeAddFileDialog);
+                                                app.addFileCancelBtn.addEventListener('click', closeAddFileDialog);
+                                                app.addFileCreateBtn.addEventListener('click', handleCreateFile);
+
+                                                app.creationTypeSelect.addEventListener('change', () => {
+                                                  const isTemplate = app.creationTypeSelect.value === 'template';
+                                                  app.templateSelectContainer.classList.toggle('hidden', !isTemplate);
+                                                  if (isTemplate) {
+                                                    loadTemplates();
+                                                  }
+                                                });
                                               };
                                           
                                               // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)

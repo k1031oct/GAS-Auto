@@ -470,3 +470,105 @@ GasT.describe('ArchiveService', function() {
     GasT.assert(createdFiles.find(f => f.id === 'existing2').parentId, monthFolder.getId(), 'The existing file should remain in the folder');
   });
 });
+
+GasT.describe('New Features: Related Files and Templates', function() {
+
+  var mockDriveApp, originalDriveApp;
+  var mockWorkflowService, originalWorkflowService;
+
+  GasT.beforeEach(function() {
+    mockDriveApp = {
+      getRootFolder: function() {
+        return {
+          getFoldersByName: function(name) {
+            return {
+              hasNext: function() { return false; },
+              next: function() { return null; }
+            };
+          },
+          createFolder: function(name) {
+            return {
+              getUrl: function() { return 'http://mock.url/' + name; },
+              getFiles: function() {
+                return {
+                  hasNext: function() { return false; },
+                  next: function() { return null; }
+                }
+              }
+            };
+          }
+        };
+      },
+      getFolderById: function(id) {
+        return {
+          getUrl: function() { return 'http://mock.url/folder/' + id; }
+        };
+      },
+      getFileById: function(id) {
+        return {
+          makeCopy: function(name, folder) {
+            return {
+              getUrl: function() { return 'http://mock.url/file/' + name; }
+            };
+          }
+        };
+      }
+    };
+
+    mockWorkflowService = {
+      getWorkflowFolderUrl: function(workflowName) {
+        return 'http://mock.url/workflow/' + workflowName;
+      }
+    };
+
+    originalDriveApp = mock(this, 'DriveApp', mockDriveApp);
+    originalWorkflowService = mock(this, 'WorkflowService', mockWorkflowService);
+  });
+
+  GasT.afterEach(function() {
+    this['DriveApp'] = originalDriveApp;
+    this['WorkflowService'] = originalWorkflowService;
+  });
+
+  GasT.it('should return a mock URL for the workflow folder', function() {
+    var url = getWorkflowFolderUrl('MyWorkflow');
+    GasT.assert(url, 'http://mock.url/workflow/MyWorkflow', 'getWorkflowFolderUrl should return a mock URL.');
+  });
+
+  GasT.it('should create and return a template folder URL', function() {
+    var url = getTemplateFolderUrl();
+    GasT.assert(url, 'http://mock.url/GAS-Auto Templates', 'getTemplateFolderUrl should create and return a URL.');
+  });
+
+  GasT.it('should return an empty array of templates if the folder does not exist', function() {
+    var templates = getTemplates('document');
+    GasT.assert(templates.length, 0, 'getTemplates should return an empty array.');
+  });
+
+  GasT.it('should create a file in the workflow folder', function() {
+    var options = {
+      workflowName: 'MyWorkflow',
+      fileName: 'MyTestFile',
+      fileType: 'document',
+      creationType: 'new',
+      templateId: null
+    };
+
+    var mockDocumentApp = {
+      create: function(name) {
+        return {
+          getId: function() { return 'mock-doc-id'; },
+          getUrl: function() { return 'http://mock.url/doc/' + name; }
+        };
+      }
+    };
+    var originalDocumentApp = mock(this, 'DocumentApp', mockDocumentApp);
+
+    var result = createFileInWorkflowFolder(options);
+
+    GasT.assert(result.message, 'ファイル「MyTestFile」を作成しました。', 'createFileInWorkflowFolder should return a success message.');
+    GasT.assert(result.url.includes('MyTestFile'), true, 'The returned URL should contain the file name.');
+
+    this['DocumentApp'] = originalDocumentApp;
+  });
+});

@@ -103,9 +103,22 @@
           <button id="new-workflow-btn" title="新規作成" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-plus"></i></button>
           <button id="save-workflow-btn" title="保存" class="p-1.5 md:p-2 rounded-full bg-green-500 text-white hover:bg-green-600 shadow-md transition-colors"><i class="fas fa-save"></i></button>
           <button id="delete-workflow-btn" title="削除" class="p-1.5 md:p-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-md transition-colors disabled:bg-gray-300" disabled><i class="fas fa-trash"></i></button>
-          <button id="settings-btn" title="設定" class="p-1.5 md:p-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow-md transition-colors"><i class="fas fa-cog"></i></button>
           <button id="trigger-btn" title="定期実行/トリガーを設定" class="p-1.5 md:p-2 rounded-full bg-yellow-500 text-white hover:bg-yellow-600 shadow-md transition-colors"><i class="fas fa-clock"></i></button>
           <button id="history-btn" title="実行履歴シートを開く" class="p-1.5 md:p-2 rounded-full bg-purple-500 text-white hover:bg-purple-600 shadow-md transition-colors"><i class="fas fa-history"></i></button>
+          
+          <!-- Related Files Dropdown -->
+          <div class="relative inline-block text-left">
+            <button id="related-files-btn" title="関連ファイル" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-folder-open"></i></button>
+            <div id="related-files-menu" class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+              <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                <a href="#" id="open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
+                <a href="#" id="add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+              </div>
+            </div>
+          </div>
+
+          <button id="template-btn" title="テンプレートフォルダを開く" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-file-alt"></i></button>
+          <button id="settings-btn" title="設定" class="p-1.5 md:p-2 rounded-full bg-gray-500 text-white hover:bg-gray-600 shadow-md transition-colors"><i class="fas fa-cog"></i></button>
         </div>
         
         <button id="mobile-save-workflow-btn" title="保存" class="md:hidden text-sm p-2 rounded-full bg-green-500 text-white hover:bg-green-600 shadow-md transition-colors"><i class="fas fa-save"></i></button>
@@ -123,8 +136,16 @@
         <button id="mobile-trigger-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-clock w-6 text-center mr-2"></i>予約実行</button>
         <button id="mobile-history-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-history w-6 text-center mr-2"></i>実行履歴</button>
         <button id="mobile-delete-workflow-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700" disabled><i class="fas fa-trash w-6 text-center mr-2"></i>削除</button>
-        <button id="mobile-settings-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-cog w-6 text-center mr-2"></i>設定</button>
+        <div class="relative">
+          <button id="mobile-related-files-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-folder-open w-6 text-center mr-2"></i>関連ファイル</button>
+          <div id="mobile-related-files-menu" class="hidden mt-2 w-full bg-gray-50 dark:bg-gray-700 rounded-md shadow-lg">
+            <a href="#" id="mobile-open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
+            <a href="#" id="mobile-add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+          </div>
+        </div>
+        <button id="mobile-template-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-file-alt w-6 text-center mr-2"></i>テンプレート</button>
         <button id="mobile-show-log-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 hidden"><i class="fas fa-comment-dots w-6 text-center mr-2"></i>実行ログを表示</button>
+        <button id="mobile-settings-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-cog w-6 text-center mr-2"></i>設定</button>
       </div>
     </header>
 
@@ -368,6 +389,48 @@
         <button id="custom-dialog-cancel" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">キャンセル</button>
         <button id="custom-dialog-ok" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">OK</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Add File Modal -->
+  <div id="add-file-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-2 md:p-4">
+    <div id="add-file-modal" class="bg-white rounded-xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh] dark:bg-gray-800">
+      <header class="p-3 md:p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0 dark:border-gray-700">
+        <h2 class="text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100">ファイルを追加</h2>
+        <button id="add-file-close-btn" class="p-2 rounded-full hover:bg-gray-200 transition-colors dark:hover:bg-gray-600"><i class="fas fa-times text-gray-600 dark:text-gray-300"></i></button>
+      </header>
+      <main class="p-4 md:p-6 flex-grow overflow-y-auto">
+        <div class="space-y-4">
+          <div>
+            <label for="file-type-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">種類</label>
+            <select id="file-type-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="document">文書を追加</option>
+              <option value="sheet">表を追加</option>
+            </select>
+          </div>
+          <div>
+            <label for="creation-type-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">作成方法</label>
+            <select id="creation-type-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <option value="new">新規作成</option>
+              <option value="template">テンプレートから作成</option>
+            </select>
+          </div>
+          <div id="template-select-container" class="hidden">
+            <label for="template-select" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">テンプレート</label>
+            <select id="template-select" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              <!-- Template options will be loaded here -->
+            </select>
+          </div>
+          <div>
+            <label for="file-name-input" class="text-sm font-medium text-gray-700 block mb-1 dark:text-gray-300">ファイル名</label>
+            <input type="text" id="file-name-input" placeholder="ファイル名を入力" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+        </div>
+      </main>
+      <footer class="p-4 bg-gray-50 border-t flex justify-end gap-3 flex-shrink-0 rounded-b-xl dark:bg-gray-800 dark:border-gray-700">
+        <button id="add-file-cancel-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500">キャンセル</button>
+        <button id="add-file-create-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">作成</button>
+      </footer>
     </div>
   </div>
 

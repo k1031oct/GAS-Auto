@@ -77,6 +77,7 @@ function _findModuleRecursive(modules, condition) {
 //================================================================
 
 function getInitialData() {
+  getTemplateFolderUrl(); // Ensure template folder exists on startup
   const workflows = WorkflowService.listWorkflows();
   const settings = getSettings();
   return { workflows: workflows, moduleFolderId: settings.moduleFolderId, settings: settings };
@@ -174,6 +175,128 @@ function createTimeBasedTrigger(workflowName, options) {
 
 function deleteTrigger(triggerUid) {
   return TriggerService.deleteTrigger(triggerUid);
+}
+
+//================================================================
+// 6. New Feature Functions (Related Files / Templates)
+//================================================================
+
+/**
+ * Gets the URL of the folder containing the specified workflow.
+ * @param {string} workflowName The name of the workflow.
+ * @returns {string} The URL of the folder.
+ */
+function getWorkflowFolderUrl(workflowName) {
+  return WorkflowService.getWorkflowFolderUrl(workflowName);
+}
+
+/**
+ * Gets the URL of the template folder, creating it if it doesn't exist.
+ * @returns {string} The URL of the template folder.
+ */
+/**
+ * Gets the template folder, creating it if it doesn't exist within the AppData folder.
+ * @private
+ * @returns {GoogleAppsScript.Drive.Folder} The template folder.
+ */
+function _getTemplateFolder() {
+  const APP_DATA_FOLDER_NAME = 'GAS_Workflow_Automator_AppData';
+  const TEMPLATE_FOLDER_NAME = 'Template';
+
+  // Get or create the main AppData folder
+  let appDataFolder;
+  const appDataFolders = DriveApp.getFoldersByName(APP_DATA_FOLDER_NAME);
+  if (appDataFolders.hasNext()) {
+    appDataFolder = appDataFolders.next();
+  } else {
+    appDataFolder = DriveApp.getRootFolder().createFolder(APP_DATA_FOLDER_NAME);
+  }
+
+  // Get or create the Template folder inside AppData
+  let templateFolder;
+  const templateFolders = appDataFolder.getFoldersByName(TEMPLATE_FOLDER_NAME);
+  if (templateFolders.hasNext()) {
+    templateFolder = templateFolders.next();
+  } else {
+    templateFolder = appDataFolder.createFolder(TEMPLATE_FOLDER_NAME);
+  }
+  return templateFolder;
+}
+
+
+/**
+ * Gets the URL of the template folder, creating it if it doesn't exist.
+ * @returns {string} The URL of the template folder.
+ */
+function getTemplateFolderUrl() {
+  const templateFolder = _getTemplateFolder();
+  return templateFolder.getUrl();
+}
+
+/**
+ * Gets a list of available templates for the given file type.
+ * @param {string} fileType The type of file ('document' or 'sheet').
+ * @returns {Array<{id: string, name: string}>} A list of templates.
+ */
+function getTemplates(fileType) {
+  const templateFolder = _getTemplateFolder();
+  if (!templateFolder) {
+      return [];
+  }
+  const templates = [];
+  const files = templateFolder.getFiles();
+  while (files.hasNext()) {
+    const file = files.next();
+    const mimeType = file.getMimeType();
+    if (fileType === 'document' && mimeType === MimeType.GOOGLE_DOCS) {
+      templates.push({ id: file.getId(), name: file.getName() });
+    } else if (fileType === 'sheet' && mimeType === MimeType.GOOGLE_SHEETS) {
+      templates.push({ id: file.getId(), name: file.getName() });
+    }
+  }
+  return templates;
+}
+
+/**
+ * Creates a new file (document or spreadsheet) in the workflow's folder.
+ * @param {object} options The options for creating the file.
+ * @returns {{message: string, url: string}} The result of the operation.
+ */
+function createFileInWorkflowFolder(options) {
+  const { workflowName, fileName, fileType, creationType, templateId } = options;
+
+  if (!workflowName) {
+    throw new Error('ワークフローが指定されていません。');
+  }
+
+  const workflowFolderUrl = WorkflowService.getWorkflowFolderUrl(workflowName);
+  if (!workflowFolderUrl) {
+    throw new Error('ワークフローのフォルダが見つかりません。');
+  }
+  const workflowFolder = DriveApp.getFolderById(_extractIdFromUrl(workflowFolderUrl));
+
+  let newFile;
+
+  if (creationType === 'template') {
+    if (!templateId) {
+      throw new Error('テンプレートが選択されていません。');
+    }
+    const templateFile = DriveApp.getFileById(templateId);
+    newFile = templateFile.makeCopy(fileName, workflowFolder);
+  } else {
+    if (fileType === 'document') {
+      newFile = DocumentApp.create(fileName);
+      DriveApp.getFileById(newFile.getId()).moveTo(workflowFolder);
+    } else if (fileType === 'sheet') {
+      newFile = SpreadsheetApp.create(fileName);
+      DriveApp.getFileById(newFile.getId()).moveTo(workflowFolder);
+    }
+  }
+
+  return {
+    message: `ファイル「${fileName}」を作成しました。`,
+    url: newFile.getUrl(),
+  };
 }
 
 //================================================================
