@@ -99,6 +99,36 @@
                         fileNameInput: document.getElementById('file-name-input'),
                         refreshFolderFilesBtn: document.getElementById('refresh-folder-files-btn'),
                         mobileRefreshFolderFilesBtn: document.getElementById('mobile-refresh-folder-files-btn'),
+
+                        // Bookmark Elements
+                        bookmarksBtn: document.getElementById('bookmarks-btn'),
+                        bookmarksMenu: document.getElementById('bookmarks-menu'),
+                        workflowBookmarksTab: document.getElementById('workflow-bookmarks-tab'),
+                        globalBookmarksTab: document.getElementById('global-bookmarks-tab'),
+                        workflowBookmarksContent: document.getElementById('workflow-bookmarks-content'),
+                        globalBookmarksContent: document.getElementById('global-bookmarks-content'),
+                        workflowBookmarksList: document.getElementById('workflow-bookmarks-list'),
+                        globalBookmarksList: document.getElementById('global-bookmarks-list'),
+                        addWorkflowBookmarkBtn: document.getElementById('add-workflow-bookmark-btn'),
+                        addGlobalBookmarkBtn: document.getElementById('add-global-bookmark-btn'),
+                        mobileBookmarksBtn: document.getElementById('mobile-bookmarks-btn'),
+                        mobileBookmarksMenu: document.getElementById('mobile-bookmarks-menu'),
+                        mobileWorkflowBookmarksTab: document.getElementById('mobile-workflow-bookmarks-tab'),
+                        mobileGlobalBookmarksTab: document.getElementById('mobile-global-bookmarks-tab'),
+                        mobileWorkflowBookmarksContent: document.getElementById('mobile-workflow-bookmarks-content'),
+                        mobileGlobalBookmarksContent: document.getElementById('mobile-global-bookmarks-content'),
+                        mobileWorkflowBookmarksList: document.getElementById('mobile-workflow-bookmarks-list'),
+                        mobileGlobalBookmarksList: document.getElementById('mobile-global-bookmarks-list'),
+                        mobileAddWorkflowBookmarkBtn: document.getElementById('mobile-add-workflow-bookmark-btn'),
+                        mobileAddGlobalBookmarkBtn: document.getElementById('mobile-add-global-bookmark-btn'),
+                        bookmarkModalBackdrop: document.getElementById('bookmark-modal-backdrop'),
+                        bookmarkModalTitle: document.getElementById('bookmark-modal-title'),
+                        bookmarkCloseBtn: document.getElementById('bookmark-close-btn'),
+                        bookmarkCancelBtn: document.getElementById('bookmark-cancel-btn'),
+                        saveBookmarkBtn: document.getElementById('save-bookmark-btn'),
+                        bookmarkNameInput: document.getElementById('bookmark-name-input'),
+                        bookmarkUrlInput: document.getElementById('bookmark-url-input'),
+                        bookmarkDescriptionInput: document.getElementById('bookmark-description-input'),
                                               };
                                           
                                               // --- State Management ---
@@ -118,6 +148,11 @@
                                                 modulePalette: {
                                                   isMinimized: true,
                                                   minHeight: '60px', // Header height
+                                                },
+                                                bookmarks: {
+                                                  isMenuOpen: false,
+                                                  currentTab: 'workflow', // 'workflow' or 'global'
+                                                  editingBookmark: null, // { type, id, name, url, description }
                                                 }
                                               };
                                           
@@ -281,6 +316,192 @@
                                                   })
                                                   .withFailureHandler(showError)
                                                   .deleteTrigger(uid);
+                                              };
+
+                                              // --- Bookmark Functions ---
+                                              const toggleBookmarksMenu = () => {
+                                                state.bookmarks.isMenuOpen ? closeBookmarksMenu() : openBookmarksMenu();
+                                              };
+
+                                              const openBookmarksMenu = () => {
+                                                state.bookmarks.isMenuOpen = true;
+                                                app.bookmarksMenu.classList.remove('hidden');
+                                                // Default to workflow tab, but only if a workflow is selected
+                                                if (state.currentWorkflowName) {
+                                                  switchBookmarkTab('workflow');
+                                                } else {
+                                                  switchBookmarkTab('global');
+                                                }
+                                              };
+
+                                              const closeBookmarksMenu = () => {
+                                                state.bookmarks.isMenuOpen = false;
+                                                app.bookmarksMenu.classList.add('hidden');
+                                                app.mobileBookmarksMenu.classList.add('hidden');
+                                              };
+
+                                              const switchBookmarkTab = (tab) => { // tab: 'workflow' or 'global'
+                                                state.bookmarks.currentTab = tab;
+                                                const isWorkflow = tab === 'workflow';
+
+                                                // Handle disabled state for workflow tab
+                                                const workflowTabElements = [app.workflowBookmarksTab, app.mobileWorkflowBookmarksTab];
+                                                if (!state.currentWorkflowName) {
+                                                  workflowTabElements.forEach(el => {
+                                                    el.disabled = true;
+                                                    el.classList.add('opacity-50', 'cursor-not-allowed');
+                                                  });
+                                                } else {
+                                                   workflowTabElements.forEach(el => {
+                                                    el.disabled = false;
+                                                    el.classList.remove('opacity-50', 'cursor-not-allowed');
+                                                  });
+                                                }
+
+                                                // Tab UI
+                                                [app.workflowBookmarksTab, app.mobileWorkflowBookmarksTab].forEach(el => {
+                                                  el.classList.toggle('border-blue-500', isWorkflow);
+                                                  el.classList.toggle('text-blue-600', isWorkflow);
+                                                  el.classList.toggle('dark:border-blue-400', isWorkflow);
+                                                  el.classList.toggle('dark:text-blue-400', isWorkflow);
+                                                  el.classList.toggle('border-transparent', !isWorkflow);
+                                                });
+                                                [app.globalBookmarksTab, app.mobileGlobalBookmarksTab].forEach(el => {
+                                                  el.classList.toggle('border-blue-500', !isWorkflow);
+                                                  el.classList.toggle('text-blue-600', !isWorkflow);
+                                                  el.classList.toggle('dark:border-blue-400', !isWorkflow);
+                                                  el.classList.toggle('dark:text-blue-400', !isWorkflow);
+                                                  el.classList.toggle('border-transparent', isWorkflow);
+                                                });
+
+                                                // Content UI
+                                                [app.workflowBookmarksContent, app.mobileWorkflowBookmarksContent].forEach(el => el.classList.toggle('hidden', !isWorkflow));
+                                                [app.globalBookmarksContent, app.mobileGlobalBookmarksContent].forEach(el => el.classList.toggle('hidden', isWorkflow));
+
+                                                // Fetch data
+                                                if (isWorkflow && state.currentWorkflowName) {
+                                                  fetchWorkflowBookmarks();
+                                                } else {
+                                                  fetchGlobalBookmarks();
+                                                }
+                                              };
+
+                                              const renderBookmarks = (bookmarks, type) => { // type: 'workflow' or 'global'
+                                                const listContainers = type === 'workflow'
+                                                  ? [app.workflowBookmarksList, app.mobileWorkflowBookmarksList]
+                                                  : [app.globalBookmarksList, app.mobileGlobalBookmarksList];
+
+                                                listContainers.forEach(container => {
+                                                  container.innerHTML = '';
+                                                  if (!bookmarks || bookmarks.length === 0) {
+                                                    container.innerHTML = `<p class="text-xs text-gray-400 p-2">ブックマークはありません。</p>`;
+                                                    return;
+                                                  }
+                                                  const ul = document.createElement('ul');
+                                                  ul.className = 'space-y-1';
+                                                  bookmarks.forEach(bm => {
+                                                    const li = document.createElement('li');
+                                                    li.className = 'group flex items-center justify-between p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700';
+                                                    li.innerHTML = `
+                                                      <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="truncate flex-grow" title="${bm.description || bm.name}">
+                                                        <p class="font-semibold text-gray-800 dark:text-gray-200">${bm.name}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">${bm.url}</p>
+                                                      </a>
+                                                      <div class="flex-shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button data-action="edit-bookmark" data-type="${type}" data-id="${bm.id}" class="p-1 text-gray-500 hover:text-blue-500" title="編集"><i class="fas fa-pencil-alt text-xs"></i></button>
+                                                        <button data-action="delete-bookmark" data-type="${type}" data-id="${bm.id}" class="p-1 text-gray-500 hover:text-red-500" title="削除"><i class="fas fa-trash-alt text-xs"></i></button>
+                                                      </div>
+                                                    `;
+                                                    ul.appendChild(li);
+                                                  });
+                                                  container.appendChild(ul);
+                                                });
+                                              };
+
+                                              const fetchWorkflowBookmarks = () => {
+                                                if (!state.currentWorkflowName) {
+                                                  renderBookmarks([], 'workflow');
+                                                  return;
+                                                }
+                                                google.script.run
+                                                  .withSuccessHandler(bookmarks => renderBookmarks(bookmarks, 'workflow'))
+                                                  .withFailureHandler(showError)
+                                                  .getBookmarksForWorkflow(state.currentWorkflowName);
+                                              };
+
+                                              const fetchGlobalBookmarks = () => {
+                                                google.script.run
+                                                  .withSuccessHandler(bookmarks => renderBookmarks(bookmarks, 'global'))
+                                                  .withFailureHandler(showError)
+                                                  .getGlobalBookmarks();
+                                              };
+
+                                              const openBookmarkModal = (type, bookmark = null) => {
+                                                state.bookmarks.editingBookmark = { type, id: bookmark?.id };
+                                                app.bookmarkModalTitle.textContent = bookmark ? 'ブックマークを編集' : 'ブックマークを追加';
+                                                app.bookmarkNameInput.value = bookmark?.name || '';
+                                                app.bookmarkUrlInput.value = bookmark?.url || '';
+                                                app.bookmarkDescriptionInput.value = bookmark?.description || '';
+                                                app.bookmarkModalBackdrop.classList.remove('hidden');
+                                              };
+
+                                              const closeBookmarkModal = () => {
+                                                app.bookmarkModalBackdrop.classList.add('hidden');
+                                                state.bookmarks.editingBookmark = null;
+                                              };
+
+                                              const handleSaveBookmark = () => {
+                                                const { type, id } = state.bookmarks.editingBookmark;
+                                                const bookmarkData = {
+                                                  name: app.bookmarkNameInput.value.trim(),
+                                                  url: app.bookmarkUrlInput.value.trim(),
+                                                  description: app.bookmarkDescriptionInput.value.trim(),
+                                                };
+
+                                                if (!bookmarkData.name || !bookmarkData.url) {
+                                                  showError({ message: '名前とURLは必須です。' });
+                                                  return;
+                                                }
+
+                                                showLoader();
+                                                let serverFunction;
+                                                let args;
+
+                                                if (id) { // Update
+                                                  serverFunction = type === 'workflow' ? 'updateBookmarkInWorkflow' : 'updateGlobalBookmark';
+                                                  args = type === 'workflow' ? [state.currentWorkflowName, id, bookmarkData] : [id, bookmarkData];
+                                                } else { // Add
+                                                  serverFunction = type === 'workflow' ? 'addBookmarkToWorkflow' : 'addGlobalBookmark';
+                                                  args = type === 'workflow' ? [state.currentWorkflowName, bookmarkData] : [bookmarkData];
+                                                }
+
+                                                google.script.run
+                                                  .withSuccessHandler((updatedBookmarks) => {
+                                                    hideLoader();
+                                                    renderBookmarks(updatedBookmarks, type);
+                                                    closeBookmarkModal();
+                                                    log('ブックマークを保存しました。', 'success');
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  [serverFunction](...args);
+                                              };
+
+                                              const handleDeleteBookmark = async (type, id) => {
+                                                const confirmed = await showCustomDialog({ title: '確認', message: 'このブックマークを本当に削除しますか？', type: 'confirm' });
+                                                if (!confirmed) return;
+
+                                                showLoader();
+                                                const serverFunction = type === 'workflow' ? 'deleteBookmarkFromWorkflow' : 'deleteGlobalBookmark';
+                                                const args = type === 'workflow' ? [state.currentWorkflowName, id] : [id];
+
+                                                google.script.run
+                                                  .withSuccessHandler((updatedBookmarks) => {
+                                                    hideLoader();
+                                                    renderBookmarks(updatedBookmarks, type);
+                                                    log('ブックマークを削除しました。', 'success');
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  [serverFunction](...args);
                                               };
 
                                               // --- New Feature Functions ---
@@ -929,6 +1150,81 @@
 
                                                 app.refreshFolderFilesBtn.addEventListener('click', fetchAndDisplayWorkflowFiles);
                                                 app.mobileRefreshFolderFilesBtn.addEventListener('click', fetchAndDisplayWorkflowFiles);
+
+                                                // --- Bookmark Event Listeners ---
+                                                app.bookmarksBtn.addEventListener('click', (e) => {
+                                                  e.stopPropagation();
+                                                  toggleBookmarksMenu();
+                                                });
+                                                app.mobileBookmarksBtn.addEventListener('click', (e) => {
+                                                  e.stopPropagation();
+                                                  app.mobileBookmarksMenu.classList.toggle('hidden');
+                                                  // Load initial data if opening
+                                                  if (!app.mobileBookmarksMenu.classList.contains('hidden')) {
+                                                    if (state.currentWorkflowName) {
+                                                      switchBookmarkTab('workflow');
+                                                    } else {
+                                                      switchBookmarkTab('global');
+                                                    }
+                                                  }
+                                                });
+
+                                                // Close menu when clicking outside
+                                                document.addEventListener('click', (e) => {
+                                                  if (state.bookmarks.isMenuOpen && !app.bookmarksMenu.contains(e.target) && !app.bookmarksBtn.contains(e.target)) {
+                                                    closeBookmarksMenu();
+                                                  }
+                                                });
+
+                                                // Tab switching
+                                                [app.workflowBookmarksTab, app.mobileWorkflowBookmarksTab].forEach(btn => btn.addEventListener('click', () => switchBookmarkTab('workflow')));
+                                                [app.globalBookmarksTab, app.mobileGlobalBookmarksTab].forEach(btn => btn.addEventListener('click', () => switchBookmarkTab('global')));
+
+                                                // Open "Add Bookmark" modal
+                                                [app.addWorkflowBookmarkBtn, app.mobileAddWorkflowBookmarkBtn].forEach(btn => btn.addEventListener('click', () => openBookmarkModal('workflow')));
+                                                [app.addGlobalBookmarkBtn, app.mobileAddGlobalBookmarkBtn].forEach(btn => btn.addEventListener('click', () => openBookmarkModal('global')));
+                                                
+                                                // Modal buttons
+                                                app.saveBookmarkBtn.addEventListener('click', handleSaveBookmark);
+                                                app.bookmarkCloseBtn.addEventListener('click', closeBookmarkModal);
+                                                app.bookmarkCancelBtn.addEventListener('click', closeBookmarkModal);
+
+                                                // Delegated events for edit/delete
+                                                const bookmarkListsContainer = [app.bookmarksMenu, app.mobileBookmarksMenu];
+                                                bookmarkListsContainer.forEach(container => {
+                                                  container.addEventListener('click', (e) => {
+                                                    const target = e.target.closest('button');
+                                                    if (!target) return;
+
+                                                    const { action, type, id } = target.dataset;
+
+                                                    if (action === 'delete-bookmark') {
+                                                      handleDeleteBookmark(type, id);
+                                                    } else if (action === 'edit-bookmark') {
+                                                      // Find the bookmark data to pre-fill the modal
+                                                      const listContainer = type === 'workflow' ? app.workflowBookmarksList : app.globalBookmarksList;
+                                                      // This is a simplification. A better approach would be to fetch the bookmark data from state.
+                                                      // For now, we'll just open the modal and the user has to re-enter data, or we can fetch it.
+                                                      // Let's fetch it for a better UX.
+                                                      showLoader();
+                                                      const fetchFunction = type === 'workflow' ? 'getBookmarksForWorkflow' : 'getGlobalBookmarks';
+                                                      const fetchArgs = type === 'workflow' ? [state.currentWorkflowName] : [];
+                                                      
+                                                      google.script.run
+                                                        .withSuccessHandler(bookmarks => {
+                                                          hideLoader();
+                                                          const bookmarkToEdit = bookmarks.find(b => b.id === id);
+                                                          if (bookmarkToEdit) {
+                                                            openBookmarkModal(type, bookmarkToEdit);
+                                                          } else {
+                                                            showError({ message: '編集するブックマークが見つかりませんでした。' });
+                                                          }
+                                                        })
+                                                        .withFailureHandler(showError)
+                                                        [fetchFunction](...fetchArgs);
+                                                    }
+                                                  });
+                                                });
                                               };
                                           
                                               // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
