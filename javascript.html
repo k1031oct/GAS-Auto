@@ -97,6 +97,8 @@
                         templateSelectContainer: document.getElementById('template-select-container'),
                         templateSelect: document.getElementById('template-select'),
                         fileNameInput: document.getElementById('file-name-input'),
+                        refreshFolderFilesBtn: document.getElementById('refresh-folder-files-btn'),
+                        mobileRefreshFolderFilesBtn: document.getElementById('mobile-refresh-folder-files-btn'),
                                               };
                                           
                                               // --- State Management ---
@@ -377,10 +379,97 @@
                                                         window.open(response.url, '_blank');
                                                     }
                                                     closeAddFileDialog();
+                                                    fetchAndDisplayWorkflowFiles(); // Refresh file list after adding a new file
                                                   })
                                                   .withFailureHandler(showError)
                                                   .createFileInWorkflowFolder(options);
                                               };
+
+                                              const copyToClipboard = (text) => {
+                                                navigator.clipboard.writeText(text).then(() => {
+                                                  log(`ID「${text}」をクリップボードにコピーしました。`, 'success');
+                                                }).catch(err => {
+                                                  showError({ message: 'クリップボードへのコピーに失敗しました: ' + err });
+                                                });
+                                              };
+
+                                              const displayWorkflowFolderFiles = (files) => {
+                                                const listContainers = [
+                                                  document.getElementById('workflow-folder-files-list'),
+                                                  document.getElementById('mobile-workflow-folder-files-list')
+                                                ];
+
+                                                listContainers.forEach(container => {
+                                                  if (!container) return;
+                                                  container.innerHTML = ''; // Clear previous content
+
+                                                  if (!files || files.length === 0) {
+                                                    container.innerHTML = '<p class="text-xs text-gray-500 dark:text-gray-400 p-2">ファイルはありません</p>';
+                                                    return;
+                                                  }
+
+                                                  const fileList = document.createElement('ul');
+                                                  fileList.className = 'space-y-1';
+
+                                                  files.forEach(file => {
+                                                    const li = document.createElement('li');
+                                                    li.className = 'flex items-center justify-between text-sm p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700';
+                                                    li.innerHTML = `
+                                                      <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="truncate flex-grow" title="${file.name}">
+                                                        <i class="far fa-file-alt mr-2 text-gray-500"></i>
+                                                        ${file.name}
+                                                      </a>
+                                                      <button class="copy-file-id-btn p-1 text-gray-400 hover:text-blue-500" data-id="${file.id}" title="ファイルIDをコピー">
+                                                        <i class="far fa-copy text-xs"></i>
+                                                      </button>
+                                                    `;
+                                                    fileList.appendChild(li);
+                                                  });
+
+                                                  container.appendChild(fileList);
+                                                });
+
+                                                // Add event listeners to the new copy buttons
+                                                document.querySelectorAll('.copy-file-id-btn').forEach(btn => {
+                                                  btn.addEventListener('click', (e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    copyToClipboard(e.currentTarget.dataset.id);
+                                                  });
+                                                });
+                                              };
+
+                                              const fetchAndDisplayWorkflowFiles = () => {
+                                                const listContainers = [
+                                                  document.getElementById('workflow-folder-files-list'),
+                                                  document.getElementById('mobile-workflow-folder-files-list')
+                                                ];
+
+                                                if (state.currentWorkflowName) {
+                                                  // Show loading state
+                                                  listContainers.forEach(container => {
+                                                    if (container) {
+                                                      container.innerHTML = '<p class="text-xs text-gray-500 dark:text-gray-400 p-2"><i class="fas fa-spinner fa-spin mr-2"></i>読み込み中...</p>';
+                                                    }
+                                                  });
+
+                                                  google.script.run
+                                                    .withSuccessHandler(displayWorkflowFolderFiles)
+                                                    .withFailureHandler(error => {
+                                                      listContainers.forEach(container => {
+                                                        if (container) {
+                                                          container.innerHTML = '<p class="text-xs text-red-500 p-2">ファイルの読み込みに失敗しました。</p>';
+                                                        }
+                                                      });
+                                                      showError(error);
+                                                    })
+                                                    .getFilesInWorkflowFolder(state.currentWorkflowName);
+                                                } else {
+                                                  // No workflow selected, clear the list
+                                                  displayWorkflowFolderFiles([]);
+                                                }
+                                              };
+
                                           
                                               const handleCreateTrigger = () => {
                                                 const type = app.triggerType.value;
@@ -837,6 +926,9 @@
                                                     loadTemplates();
                                                   }
                                                 });
+
+                                                app.refreshFolderFilesBtn.addEventListener('click', fetchAndDisplayWorkflowFiles);
+                                                app.mobileRefreshFolderFilesBtn.addEventListener('click', fetchAndDisplayWorkflowFiles);
                                               };
                                           
                                               // ... (rest of the functions: handleWorkflowSelect, newWorkflow, deleteModule, loadWorkflows, etc.)
@@ -1565,6 +1657,7 @@
                                                   app.workflowSelector.value = '';
                                                   updateUI();
                                                   drawConnectors(); // Clear connectors
+                                                  fetchAndDisplayWorkflowFiles(); // Clear the file list
                                                   log('新規ワークフローを作成しました。', 'system');
                                               };
 
@@ -1613,6 +1706,7 @@
                                                               await loadModuleDefinitionsFromDrive();
                                                               // Then, render the UI
                                                               updateUI();
+                                                              fetchAndDisplayWorkflowFiles(); // Fetch files for the selected workflow
                                                               setTimeout(drawConnectors, 100); // Redraw connectors after UI update
                                                               hideLoader();
                                                               log(`ワークフロー「${workflowName}」を読み込みました。`, 'system');

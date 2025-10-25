@@ -109,10 +109,22 @@
           <!-- Related Files Dropdown -->
           <div class="relative inline-block text-left">
             <button id="related-files-btn" title="関連ファイル" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-folder-open"></i></button>
-            <div id="related-files-menu" class="hidden origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+            <div id="related-files-menu" class="hidden origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
               <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                 <a href="#" id="open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
                 <a href="#" id="add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+                <hr class="my-1 dark:border-gray-600">
+                <div class="px-4 py-2">
+                  <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">フォルダ内のファイル</h4>
+                    <button id="refresh-folder-files-btn" title="更新" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                      <i class="fas fa-sync-alt text-xs text-gray-500 dark:text-gray-400"></i>
+                    </button>
+                  </div>
+                  <div id="workflow-folder-files-list" class="mt-2 max-h-48 overflow-y-auto scrollbar">
+                    <!-- File list will be injected here -->
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -138,9 +150,21 @@
         <button id="mobile-delete-workflow-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700" disabled><i class="fas fa-trash w-6 text-center mr-2"></i>削除</button>
         <div class="relative">
           <button id="mobile-related-files-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-folder-open w-6 text-center mr-2"></i>関連ファイル</button>
-          <div id="mobile-related-files-menu" class="hidden mt-2 w-full bg-gray-50 dark:bg-gray-700 rounded-md shadow-lg">
-            <a href="#" id="mobile-open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
-            <a href="#" id="mobile-add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+          <div id="mobile-related-files-menu" class="hidden mt-2 w-full bg-gray-50 dark:bg-gray-700 rounded-md shadow-lg p-2">
+            <a href="#" id="mobile-open-folder-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 rounded-md"><i class="fas fa-folder-open w-6 text-center mr-2"></i>フォルダを開く</a>
+            <a href="#" id="mobile-add-file-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 rounded-md"><i class="fas fa-plus w-6 text-center mr-2"></i>ファイルを追加</a>
+            <hr class="my-1 dark:border-gray-600">
+            <div class="px-2 py-2">
+              <div class="flex justify-between items-center">
+                <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">フォルダ内のファイル</h4>
+                <button id="mobile-refresh-folder-files-btn" title="更新" class="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+                  <i class="fas fa-sync-alt text-xs text-gray-500 dark:text-gray-400"></i>
+                </button>
+              </div>
+              <div id="mobile-workflow-folder-files-list" class="mt-2 max-h-48 overflow-y-auto scrollbar">
+                <!-- File list will be injected here -->
+              </div>
+            </div>
           </div>
         </div>
         <button id="mobile-template-btn" class="w-full text-left p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"><i class="fas fa-file-alt w-6 text-center mr-2"></i>テンプレート</button>
