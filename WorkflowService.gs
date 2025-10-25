@@ -48,6 +48,18 @@ var WorkflowService = {
     return workflowsRootFolder.createFolder(workflowName);
   },
 
+  /**
+   * Gets the folder object for a given workflow.
+   * @param {string} workflowName - The name of the workflow.
+   * @returns {GoogleAppsScript.Drive.Folder} The folder object or throws an error if not found.
+   */
+  getWorkflowFolder: function(workflowName) {
+    if (!workflowName) {
+      throw new Error('Workflow name must be provided.');
+    }
+    return this._getWorkflowFolder(workflowName);
+  },
+
 
   /**
    * 保存されている全ワークフローのリストを取得する。

@@ -87,6 +87,8 @@
                         mobileOpenFolderBtn: document.getElementById('mobile-open-folder-btn'),
                         mobileAddFileBtn: document.getElementById('mobile-add-file-btn'),
                         mobileTemplateBtn: document.getElementById('mobile-template-btn'),
+                        exportSpecBtn: document.getElementById('export-spec-btn'),
+                        mobileExportSpecBtn: document.getElementById('mobile-export-spec-btn'),
                         addFileModalBackdrop: document.getElementById('add-file-modal-backdrop'),
                         addFileModal: document.getElementById('add-file-modal'),
                         addFileCloseBtn: document.getElementById('add-file-close-btn'),
@@ -691,6 +693,27 @@
                                                 }
                                               };
 
+                                              const handleExportSpecification = () => {
+                                                if (!state.currentWorkflowName) {
+                                                  showCustomDialog({ title: 'エラー', message: '仕様書を書き出すには、まずワークフローを保存または選択してください。', type: 'alert' });
+                                                  return;
+                                                }
+
+                                                showLoader();
+                                                const workflowData = getWorkflowData();
+
+                                                google.script.run
+                                                  .withSuccessHandler(response => {
+                                                    hideLoader();
+                                                    log(response.message, 'success');
+                                                    if (response.url) {
+                                                      window.open(response.url, '_blank');
+                                                    }
+                                                  })
+                                                  .withFailureHandler(showError)
+                                                  .exportWorkflowSpecification(workflowData);
+                                              };
+
                                           
                                               const handleCreateTrigger = () => {
                                                 const type = app.triggerType.value;
@@ -1135,6 +1158,9 @@
 
                                                 app.templateBtn.addEventListener('click', openTemplateFolder);
                                                 app.mobileTemplateBtn.addEventListener('click', openTemplateFolder);
+
+                                                app.exportSpecBtn.addEventListener('click', handleExportSpecification);
+                                                app.mobileExportSpecBtn.addEventListener('click', handleExportSpecification);
 
                                                 app.addFileCloseBtn.addEventListener('click', closeAddFileDialog);
                                                 app.addFileCancelBtn.addEventListener('click', closeAddFileDialog);
