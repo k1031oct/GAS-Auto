@@ -3,12 +3,12 @@
 [DEBUG] [MemoryDiscovery] Searching for GEMINI.md starting from CWD: /home/runner/work/GAS-Auto/GAS-Auto
 [DEBUG] [MemoryDiscovery] Determined project root: /home/runner/work/GAS-Auto/GAS-Auto
 [DEBUG] [BfsFileSearch] Scanning [1/200]: batch of 1
-[DEBUG] [BfsFileSearch] Scanning [6/200]: batch of 5
-[DEBUG] [BfsFileSearch] Scanning [13/200]: batch of 7
-[DEBUG] [BfsFileSearch] Scanning [19/200]: batch of 6
-[DEBUG] [BfsFileSearch] Scanning [22/200]: batch of 3
-[DEBUG] [BfsFileSearch] Scanning [24/200]: batch of 2
-[DEBUG] [BfsFileSearch] Scanning [25/200]: batch of 1
+[DEBUG] [BfsFileSearch] Scanning [7/200]: batch of 6
+[DEBUG] [BfsFileSearch] Scanning [14/200]: batch of 7
+[DEBUG] [BfsFileSearch] Scanning [20/200]: batch of 6
+[DEBUG] [BfsFileSearch] Scanning [23/200]: batch of 3
+[DEBUG] [BfsFileSearch] Scanning [25/200]: batch of 2
+[DEBUG] [BfsFileSearch] Scanning [26/200]: batch of 1
 [DEBUG] [MemoryDiscovery] Final ordered GEMINI.md paths to read: ["/home/runner/work/GAS-Auto/GAS-Auto/GEMINI.md"]
 [DEBUG] [MemoryDiscovery] Successfully read and processed imports: /home/runner/work/GAS-Auto/GAS-Auto/GEMINI.md (Length: 2266)
 [DEBUG] [MemoryDiscovery] Combined instructions length: 2336
@@ -38,8 +38,9 @@ AIエージェントは、以下の条件を満たした Issue のみを自動�
 ターゲットファイル:...
 [AgentRegistry] Initialized with 0 agents.
 Flushing log events to Clearcut.
-Session ID: 98116dbb-787d-4f2c-9b01-9d94e884239e
-[GrepTool] Total result limit: 20000
+Session ID: 9dcfa586-1c70-4a04-b1b1-31e2c43ae259
+Flushing log events to Clearcut.
+ClearcutLogger: Flush already in progress, marking pending flush.
 [DEBUG] [IDEClient] Failed to read IDE connection directory: Error: ENOENT: no such file or directory, scandir '/tmp/gemini/ide'
     at async Object.readdir (node:internal/fs/promises:952:18)
     at async IdeClient.getConnectionConfigFromFile (file:///usr/local/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/ide/ide-client.js:441:25)
@@ -51,3 +52,7 @@ Session ID: 98116dbb-787d-4f2c-9b01-9d94e884239e
   syscall: 'scandir',
   path: '/tmp/gemini/ide'
 }
+ClearcutLogger: Flush already in progress, marking pending flush.
+ClearcutLogger: Flush already in progress, marking pending flush.
+ClearcutLogger: Flush already in progress, marking pending flush.
+Flushing log events to Clearcut.
