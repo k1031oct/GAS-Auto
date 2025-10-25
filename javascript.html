@@ -2192,8 +2192,12 @@
                                               };
                                           
                                               function init() {
-                                                const debouncedDrawConnectors = debounce(drawConnectors, 100);
-                                                window.addEventListener('resize', debouncedDrawConnectors);
+                                                const debouncedResizeHandler = debounce(() => {
+                                                  updateModulePalettePosition();
+                                                  updateMainAreaPadding();
+                                                  drawConnectors();
+                                                }, 100);
+                                                window.addEventListener('resize', debouncedResizeHandler);
 
                                                 initEventListeners();
                                                 initResizing();
