@@ -805,11 +805,23 @@
                                                 app.relatedFilesBtn.addEventListener('click', () => app.relatedFilesMenu.classList.toggle('hidden'));
                                                 app.mobileRelatedFilesBtn.addEventListener('click', () => app.mobileRelatedFilesMenu.classList.toggle('hidden'));
 
-                                                app.openFolderBtn.addEventListener('click', openWorkflowFolder);
-                                                app.mobileOpenFolderBtn.addEventListener('click', openWorkflowFolder);
+                                                app.openFolderBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openWorkflowFolder();
+                                                });
+                                                app.mobileOpenFolderBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openWorkflowFolder();
+                                                });
 
-                                                app.addFileBtn.addEventListener('click', openAddFileDialog);
-                                                app.mobileAddFileBtn.addEventListener('click', openAddFileDialog);
+                                                app.addFileBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openAddFileDialog();
+                                                });
+                                                app.mobileAddFileBtn.addEventListener('click', (e) => {
+                                                  e.preventDefault();
+                                                  openAddFileDialog();
+                                                });
 
                                                 app.templateBtn.addEventListener('click', openTemplateFolder);
                                                 app.mobileTemplateBtn.addEventListener('click', openTemplateFolder);

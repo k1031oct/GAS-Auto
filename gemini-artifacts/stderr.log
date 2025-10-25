@@ -1,0 +1,53 @@
+[DEBUG] CLI: Delegating hierarchical memory load to server for CWD: /home/runner/work/GAS-Auto/GAS-Auto (memoryImportFormat: tree)
+[DEBUG] [MemoryDiscovery] Loading server hierarchical memory for CWD: /home/runner/work/GAS-Auto/GAS-Auto (importFormat: tree)
+[DEBUG] [MemoryDiscovery] Searching for GEMINI.md starting from CWD: /home/runner/work/GAS-Auto/GAS-Auto
+[DEBUG] [MemoryDiscovery] Determined project root: /home/runner/work/GAS-Auto/GAS-Auto
+[DEBUG] [BfsFileSearch] Scanning [1/200]: batch of 1
+[DEBUG] [BfsFileSearch] Scanning [6/200]: batch of 5
+[DEBUG] [BfsFileSearch] Scanning [13/200]: batch of 7
+[DEBUG] [BfsFileSearch] Scanning [19/200]: batch of 6
+[DEBUG] [BfsFileSearch] Scanning [22/200]: batch of 3
+[DEBUG] [BfsFileSearch] Scanning [24/200]: batch of 2
+[DEBUG] [BfsFileSearch] Scanning [25/200]: batch of 1
+[DEBUG] [MemoryDiscovery] Final ordered GEMINI.md paths to read: ["/home/runner/work/GAS-Auto/GAS-Auto/GEMINI.md"]
+[DEBUG] [MemoryDiscovery] Successfully read and processed imports: /home/runner/work/GAS-Auto/GAS-Auto/GEMINI.md (Length: 2266)
+[DEBUG] [MemoryDiscovery] Combined instructions length: 2336
+[DEBUG] [MemoryDiscovery] Combined instructions (snippet): --- Context from: GEMINI.md ---
+プロジェクト AI エージェント ルールブック
+
+これは、このリポジトリのコード修正およびレビューを行う AI エージェント（@gemini-cli）のための基本ルールとコンテキストです。
+
+開発の目的と技術スタック
+
+主な目的: このプロジェクトはウェブアプリケーション開発であり、ユーザー体験とセキュリティを最優先とします。
+
+使用技術: Google Apps Script (GAS), JavaScript (ES6+), Tailwind CSS
+
+コーディング規約: 変数名はキャメルケースを使用。
+
+Issue 処理のルール（自律実行の基準）
+
+AIエージェントは、以下の条件を満たした Issue のみを自動で処理し、Pull Request を作成します。
+
+必須トリガー: Issueのラベルに ready-for-ai が付与されていること。
+
+必須の記述要素: Issue本文には、以下の項目が明確に含まれていること。
+
+ゴール: 達成すべき具体的な結果 (例: ログイン機能を修正)。
+
+ターゲットファイル:...
+[AgentRegistry] Initialized with 0 agents.
+Flushing log events to Clearcut.
+Session ID: 98116dbb-787d-4f2c-9b01-9d94e884239e
+[GrepTool] Total result limit: 20000
+[DEBUG] [IDEClient] Failed to read IDE connection directory: Error: ENOENT: no such file or directory, scandir '/tmp/gemini/ide'
+    at async Object.readdir (node:internal/fs/promises:952:18)
+    at async IdeClient.getConnectionConfigFromFile (file:///usr/local/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/ide/ide-client.js:441:25)
+    at async file:///usr/local/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/ide/ide-client.js:73:43
+    at async EditToolInvocation.shouldConfirmExecute (file:///usr/local/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/tools/smart-edit.js:432:27)
+    at async CoreToolScheduler._schedule (file:///usr/local/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/coreToolScheduler.js:441:49) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: '/tmp/gemini/ide'
+}
