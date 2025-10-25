@@ -191,6 +191,47 @@ function getWorkflowFolderUrl(workflowName) {
 }
 
 /**
+ * Gets a list of files in the specified workflow's folder.
+ * @param {string} workflowName The name of the workflow.
+ * @returns {Array<{name: string, url: string, id: string}>} A list of files.
+ */
+function getFilesInWorkflowFolder(workflowName) {
+  if (!workflowName) {
+    return [];
+  }
+
+  try {
+    // Note: Using a private method of another service. Consider making it public if this pattern repeats.
+    const workflowFolder = WorkflowService._getWorkflowFolder(workflowName);
+    if (!workflowFolder) {
+      return [];
+    }
+
+    const files = workflowFolder.getFiles();
+    const fileList = [];
+    while (files.hasNext()) {
+      const file = files.next();
+      const fileName = file.getName();
+      if (fileName !== 'workflow.json') {
+        fileList.push({
+          name: fileName,
+          url: file.getUrl(),
+          id: file.getId(),
+        });
+      }
+    }
+
+    // Sort alphabetically by name
+    fileList.sort((a, b) => a.name.localeCompare(b.name));
+
+    return fileList;
+  } catch (e) {
+    Logger.log(`Error getting files for workflow "${workflowName}": ${e.message}`);
+    return []; // Return empty array on error
+  }
+}
+
+/**
  * Gets the URL of the template folder, creating it if it doesn't exist.
  * @returns {string} The URL of the template folder.
  */
