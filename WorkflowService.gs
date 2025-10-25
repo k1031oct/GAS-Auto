@@ -194,7 +194,13 @@ var WorkflowService = {
 
     const folders = workflowsRootFolder.getFoldersByName(workflowName);
     if (folders.hasNext()) {
-      folders.next().setTrashed(true);
+      const folder = folders.next();
+      // Before deleting the workflow folder, trash bookmarks.json if it exists.
+      const bookmarkFile = BookmarkService._getBookmarkFile(workflowName);
+      if (bookmarkFile) {
+        bookmarkFile.setTrashed(true);
+      }
+      folder.setTrashed(true);
       deleted = true;
     }
 
