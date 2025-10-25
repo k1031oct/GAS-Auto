@@ -131,7 +131,7 @@ jobs:
                 ### ${title}
                 AIエージェントの修正を含むバージョンが、以下のURLで確認可能です。
                 
-                **レビュー用Webアプリ URL:** [デプロイされたアプリを開く](${deployUrl})
+                <a href="${deployUrl}"><img src="https://img.shields.io/badge/Review%20App-Open-blue?style=for-the-badge&logo=google-apps-script" alt="Open Review App"></a>
                 ${summarySection}
                 
                 レビュー後、問題がなければPRをマージしてください。
