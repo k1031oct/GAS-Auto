@@ -101,6 +101,28 @@
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center gap-2">
           <button id="new-workflow-btn" title="新規作成" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-plus"></i></button>
+          <!-- Bookmarks Dropdown -->
+          <div class="relative inline-block text-left">
+            <button id="bookmarks-btn" title="ブックマーク" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-star"></i></button>
+            <div id="bookmarks-menu" class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
+              <div class="p-2">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                  <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                    <button id="workflow-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400">ワークフロー</button>
+                    <button id="global-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">共通</button>
+                  </nav>
+                </div>
+                <div id="workflow-bookmarks-content" class="py-2">
+                  <div id="workflow-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                  <button id="add-workflow-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"><i class="fas fa-plus mr-1"></i>ワークフローに追加</button>
+                </div>
+                <div id="global-bookmarks-content" class="hidden py-2">
+                  <div id="global-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
+                  <button id="add-global-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"><i class="fas fa-plus mr-1"></i>共通に追加</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <button id="save-workflow-btn" title="保存" class="p-1.5 md:p-2 rounded-full bg-green-500 text-white hover:bg-green-600 shadow-md transition-colors"><i class="fas fa-save"></i></button>
           <button id="delete-workflow-btn" title="削除" class="p-1.5 md:p-2 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-md transition-colors disabled:bg-gray-300" disabled><i class="fas fa-trash"></i></button>
           <button id="trigger-btn" title="定期実行/トリガーを設定" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-clock"></i></button>
@@ -124,29 +146,6 @@
                   <div id="workflow-folder-files-list" class="mt-2 max-h-48 overflow-y-auto scrollbar">
                     <!-- File list will be injected here -->
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bookmarks Dropdown -->
-          <div class="relative inline-block text-left">
-            <button id="bookmarks-btn" title="ブックマーク" class="p-1.5 md:p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"><i class="fas fa-star"></i></button>
-            <div id="bookmarks-menu" class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 z-20">
-              <div class="p-2">
-                <div class="border-b border-gray-200 dark:border-gray-700">
-                  <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-                    <button id="workflow-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600 dark:border-blue-400 dark:text-blue-400">ワークフロー</button>
-                    <button id="global-bookmarks-tab" class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:border-gray-500">共通</button>
-                  </nav>
-                </div>
-                <div id="workflow-bookmarks-content" class="py-2">
-                  <div id="workflow-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
-                  <button id="add-workflow-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"><i class="fas fa-plus mr-1"></i>ワークフローに追加</button>
-                </div>
-                <div id="global-bookmarks-content" class="hidden py-2">
-                  <div id="global-bookmarks-list" class="max-h-60 overflow-y-auto scrollbar text-sm space-y-1"></div>
-                  <button id="add-global-bookmark-btn" class="mt-2 w-full text-center px-3 py-1.5 text-xs bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"><i class="fas fa-plus mr-1"></i>共通に追加</button>
                 </div>
               </div>
             </div>
