@@ -593,3 +593,39 @@ function deleteArchiveConfig(workflowName) {
 
   return WorkflowService.deleteWorkflow(workflowName);
 }
+
+//================================================================
+// 7. Bookmark Functions
+//================================================================
+
+function getBookmarksForWorkflow(workflowName) {
+  return BookmarkService.getBookmarksForWorkflow(workflowName);
+}
+
+function getGlobalBookmarks() {
+  return BookmarkService.getGlobalBookmarks();
+}
+
+function addBookmarkToWorkflow(workflowName, bookmarkData) {
+  return BookmarkService.addBookmarkToWorkflow(workflowName, bookmarkData);
+}
+
+function addGlobalBookmark(bookmarkData) {
+  return BookmarkService.addGlobalBookmark(bookmarkData);
+}
+
+function updateBookmarkInWorkflow(workflowName, bookmarkId, updatedData) {
+  return BookmarkService.updateBookmarkInWorkflow(workflowName, bookmarkId, updatedData);
+}
+
+function updateGlobalBookmark(bookmarkId, updatedData) {
+  return BookmarkService.updateGlobalBookmark(bookmarkId, updatedData);
+}
+
+function deleteBookmarkFromWorkflow(workflowName, bookmarkId) {
+  return BookmarkService.deleteBookmarkFromWorkflow(workflowName, bookmarkId);
+}
+
+function deleteGlobalBookmark(bookmarkId) {
+  return BookmarkService.deleteGlobalBookmark(bookmarkId);
+}
