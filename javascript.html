@@ -113,7 +113,7 @@
                         globalBookmarksList: document.getElementById('global-bookmarks-list'),
                         addWorkflowBookmarkBtn: document.getElementById('add-workflow-bookmark-btn'),
                         addGlobalBookmarkBtn: document.getElementById('add-global-bookmark-btn'),
-                        mobileBookmarksBtn: document.getElementById('mobile-bookmarks-btn'),
+                        mobileHeaderBookmarksBtn: document.getElementById('mobile-header-bookmarks-btn'),
                         mobileBookmarksMenu: document.getElementById('mobile-bookmarks-menu'),
                         mobileWorkflowBookmarksTab: document.getElementById('mobile-workflow-bookmarks-tab'),
                         mobileGlobalBookmarksTab: document.getElementById('mobile-global-bookmarks-tab'),
@@ -1183,7 +1183,7 @@
                                                   toggleBookmarksMenu();
                                                 });
 
-                                                app.mobileBookmarksBtn.addEventListener('click', (e) => {
+                                                app.mobileHeaderBookmarksBtn.addEventListener('click', (e) => {
                                                   e.stopPropagation();
                                                   const isNowOpen = !app.mobileBookmarksMenu.classList.toggle('hidden');
                                                   state.bookmarks.isMenuOpen = isNowOpen;
@@ -1202,7 +1202,7 @@
                                                       !app.bookmarksMenu.contains(e.target) &&
                                                       !app.bookmarksBtn.contains(e.target) &&
                                                       !app.mobileBookmarksMenu.contains(e.target) &&
-                                                      !app.mobileBookmarksBtn.contains(e.target)) {
+                                                      !app.mobileHeaderBookmarksBtn.contains(e.target)) {
                                                     closeBookmarksMenu();
                                                   }
                                                 });
