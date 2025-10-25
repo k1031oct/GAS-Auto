@@ -1156,11 +1156,12 @@
                                                   e.stopPropagation();
                                                   toggleBookmarksMenu();
                                                 });
+
                                                 app.mobileBookmarksBtn.addEventListener('click', (e) => {
                                                   e.stopPropagation();
-                                                  app.mobileBookmarksMenu.classList.toggle('hidden');
-                                                  // Load initial data if opening
-                                                  if (!app.mobileBookmarksMenu.classList.contains('hidden')) {
+                                                  const isNowOpen = !app.mobileBookmarksMenu.classList.toggle('hidden');
+                                                  state.bookmarks.isMenuOpen = isNowOpen;
+                                                  if (isNowOpen) {
                                                     if (state.currentWorkflowName) {
                                                       switchBookmarkTab('workflow');
                                                     } else {
@@ -1171,7 +1172,11 @@
 
                                                 // Close menu when clicking outside
                                                 document.addEventListener('click', (e) => {
-                                                  if (state.bookmarks.isMenuOpen && !app.bookmarksMenu.contains(e.target) && !app.bookmarksBtn.contains(e.target)) {
+                                                  if (state.bookmarks.isMenuOpen &&
+                                                      !app.bookmarksMenu.contains(e.target) &&
+                                                      !app.bookmarksBtn.contains(e.target) &&
+                                                      !app.mobileBookmarksMenu.contains(e.target) &&
+                                                      !app.mobileBookmarksBtn.contains(e.target)) {
                                                     closeBookmarksMenu();
                                                   }
                                                 });
