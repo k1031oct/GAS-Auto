@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "46549959857",
+    "project_id": "gws-auto-for-android-4db4a",
+    "storage_bucket": "gws-auto-for-android-4db4a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46549959857:android:77560d01cb126442d74e90",
+        "android_client_info": {
+          "package_name": "com.gws.auto.for.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_5lILVUcSPArZVcW4Cz5AFdRYjOAWZP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
