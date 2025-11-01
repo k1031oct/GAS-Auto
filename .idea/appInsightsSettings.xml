@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.gws.auto.mobile.android" />
+                  <option name="mobileSdkAppId" value="1:46549959857:android:7f3e4d6965318171d74e90" />
+                  <option name="projectId" value="gws-auto-for-android-4db4a" />
+                  <option name="projectNumber" value="46549959857" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
