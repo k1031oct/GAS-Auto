@@ -19,3 +19,25 @@ echo "Replacing __PACKAGE_NAME__ with $package_name"
 echo "TODO: Implement the logic to rename the package directory structure."
 
 echo "Initialization script finished."
+
+# Create GitHub issue from MANUAL_SETUP.md
+if [ -f "MANUAL_SETUP.md" ]; then
+  issue_title="Manual Setup Tasks"
+  issue_body=$(cat MANUAL_SETUP.md)
+  
+  # Check if gh is installed
+  if ! command -v gh &> /dev/null
+  then
+      echo "GitHub CLI (gh) could not be found. Please install it to create an issue automatically."
+  else
+      echo "Creating GitHub issue..."
+      gh issue create --title "$issue_title" --body "$issue_body"
+      if [ $? -eq 0 ]; then
+        echo "Successfully created issue: '$issue_title'"
+      else
+        echo "Failed to create GitHub issue. Please check your authentication and permissions."
+      fi
+  fi
+else
+  echo "MANUAL_SETUP.md not found. Skipping issue creation."
+fi
