@@ -1,13 +1,24 @@
 name: Create Initial Issues
 
 on:
+  # mainブランチへのプッシュ時に実行 (初期セットアップ用)
   push:
     branches:
       - main
+  # IssueまたはPull Requestへのコメント作成時に実行
+  issue_comment:
+    types: [created]
 
 jobs:
   create-issues:
+    # プッシュ時、またはコメントにコマンドが含まれる場合のみジョブを実行
+    if: github.event_name == 'push' || (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/create-initial-issues'))
     runs-on: ubuntu-latest
+    # Issueを作成・編集するための権限を付与
+    permissions:
+      issues: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,7 +45,7 @@ jobs:
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   state: 'open',
-                  labels: 'initial-setup' // Add a label to identify these issues
+                  labels: 'initial-setup'
                 });
 
                 const issueExists = issues.some(issue => issue.title === title);
@@ -50,4 +61,3 @@ jobs:
                 }
               }
             }
-
