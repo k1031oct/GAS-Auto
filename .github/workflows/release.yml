@@ -1,0 +1,41 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Decode Signing Key
+        run: |
+          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > ${{ github.workspace }}/release.keystore
+
+      - name: Build Release AAB
+        run: |
+          SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }} \
+          SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }} \
+          SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }} \
+          ./gradlew bundleRelease
+
+            - name: (Optional) Upload to Google Play Store
+
+              run: |
+
+                echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
+
+      
