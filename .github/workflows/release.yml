@@ -32,5 +32,10 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
         run: ./gradlew bundleRelease
 
-      - name: (Optional) Upload to Google Play Store
-        run: echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
+            - name: (Optional) Upload to Google Play Store
+
+              run: |
+
+                echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
+
+      
