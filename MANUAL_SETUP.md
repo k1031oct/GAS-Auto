@@ -1,35 +1,35 @@
-# Manual Setup Checklist
+# 手動セットアップ チェックリスト
 
-This checklist outlines the manual steps required after running the `init.sh` script.
+このチェックリストは、`init.sh` スクリプトを実行した後に必要な手動での設定手順をまとめたものです。
 
 ## Firebase
 
-- [ ] **Create a new Firebase project.**
-  - Go to the [Firebase Console](https://console.firebase.google.com/).
-  - Click "Add project" and follow the on-screen instructions.
+- [ ] **Firebaseプロジェクトを新規作成する**
+  - [Firebaseコンソール](https://console.firebase.google.com/) にアクセスします。
+  - 「プロジェクトを追加」をクリックし、画面の指示に従います。
 
-- [ ] **Download the `google-services.json` file and place it in the `app/` directory.**
-  - In your Firebase project settings, under the "General" tab, select your Android app.
-  - Click "google-services.json" to download the file.
-  - Move the downloaded file to the `app/` directory of your project.
+- [ ] **`google-services.json` ファイルをダウンロードし、`app/` ディレクトリに配置する**
+  - Firebaseプロジェクトの設定画面を開き、「全般」タブで対象のAndroidアプリを選択します。
+  - 「google-services.json」をクリックしてファイルをダウンロードします。
+  - ダウンロードしたファイルを、プロジェクトの `app/` ディレクトリに移動します。
 
-- [ ] **Create a tester group in Firebase App Tester.**
-  - In the Firebase Console, navigate to "App Distribution".
-  - Go to the "Testers & Groups" tab.
-  - Click "Add group" to create a new group and add testers to it.
+- [ ] **Firebase App Testerでテスターグループを作成する**
+  - Firebaseコンソールのメニューから「App Distribution」に移動します。
+  - 「テスターとグループ」タブを開きます。
+  - 「グループを追加」をクリックして新しいグループを作成し、テスターを追加します。
 
-## GitHub Repository Secrets
+## GitHubリポジトリのシークレット設定
 
-Navigate to your repository's `Settings > Secrets and variables > Actions` and add the following secrets:
+リポジトリの `Settings > Secrets and variables > Actions` を開き、以下のシークレットを追加します。
 
-- [ ] **`FIREBASE_TOKEN`**: The token obtained from the Firebase CLI.
-  - Run the following command in your terminal: `firebase login:ci`
-  - This will open a browser window to authenticate. After authentication, a token will be displayed in the terminal. Copy this token.
+- [ ] **`FIREBASE_TOKEN`**: Firebase CLIから取得したトークン。
+  - ターミナルで次のコマンドを実行します: `firebase login:ci`
+  - ブラウザが開き、認証が求められます。認証後、ターミナルにトークンが表示されるので、それをコピーします。
 
-- [ ] **`SIGNING_KEY`**: The base64 encoded release signing key.
-  - If you don't have a signing key, generate one using `keytool`.
-  - Then, encode the key file to base64 using the following command: `base64 -w 0 your_key_name.jks`
-  - Copy the output.
+- [ ] **`SIGNING_KEY`**: Base64でエンコードされたリリース署名キー。
+  - 署名キーがない場合は、`keytool` を使って生成します。
+  - 次に、キーファイルをBase64にエンコードします: `base64 -w 0 あなたのキー名.jks`
+  - 出力された文字列をコピーします。
 
-- [ ] **`KEY_PASSWORD`**: The password for the signing key.
-  - This is the password you set when you created the signing key.
+- [ ] **`KEY_PASSWORD`**: 署名キーのパスワード。
+  - 署名キーを作成した際に設定したパスワードです。
