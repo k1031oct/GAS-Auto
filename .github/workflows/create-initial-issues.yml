@@ -1,0 +1,53 @@
+name: Create Initial Issues
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create issues from MANUAL_SETUP.md
+        uses: actions/github-script@v6
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            const fs = require('fs');
+            const manual = fs.readFileSync('MANUAL_SETUP.md', 'utf8');
+            const lines = manual.split('\n');
+
+            let currentSection = '';
+            for (const line of lines) {
+              if (line.startsWith('## ')) {
+                currentSection = line.substring(3);
+              } else if (line.startsWith('- [ ] ')) {
+                const title = line.substring(6);
+                const body = `This task is part of the **${currentSection}** setup.\n\nPlease refer to the [MANUAL_SETUP.md](MANUAL_SETUP.md) file for more details.`;
+
+                // Check if an issue with the same title already exists
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'open',
+                  labels: 'initial-setup' // Add a label to identify these issues
+                });
+
+                const issueExists = issues.some(issue => issue.title === title);
+
+                if (!issueExists) {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: title,
+                    body: body,
+                    labels: ['initial-setup']
+                  });
+                }
+              }
+            }
+
