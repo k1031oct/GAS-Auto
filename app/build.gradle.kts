@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.gws.auto.for.android"
+    namespace = "com.gws.auto.mobile.android"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.gws.auto.for.android"
+        applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
