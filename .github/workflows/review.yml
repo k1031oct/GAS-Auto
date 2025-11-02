@@ -21,8 +21,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # - name: Setup Google Services  <-- Temporarily disabled for debugging
-      #   run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+      - name: Setup Google Services
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
 
       - name: Build debug APK
         run: ./gradlew assembleDebug
