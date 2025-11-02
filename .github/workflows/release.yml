@@ -38,10 +38,9 @@ jobs:
           SIGNING_KEY_FILE: release.keystore
         run: ./gradlew bundleRelease
 
-      - name: Upload artifact to Firebase App Distribution
-        uses: google-github-actions/distribute-app-distribution@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          token: ${{ secrets.FIREBASE_TOKEN }}
-          groups: testers
-          file: app/build/outputs/bundle/release/app-release.aab
+      - name: Distribute to Firebase App Distribution
+        run: |
+          npx --yes firebase-tools app:distribute app/build/outputs/bundle/release/app-release.aab \
+            --app "${{ secrets.FIREBASE_APP_ID }}" \
+            --token "${{ secrets.FIREBASE_TOKEN }}" \
+            --groups "testers"
