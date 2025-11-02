@@ -27,5 +27,8 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
       - name: Distribute debug APK to Firebase App Distribution
-        run: npx --yes firebase-tools app:distribute --app "${{ secrets.FIREBASE_APP_ID }}" --token "${{ secrets.FIREBASE_TOKEN }}" --groups "testers" app/build/outputs/apk/debug/app-debug.apk
+        run: firebase app:distribute app/build/outputs/apk/debug/app-debug.apk --app "${{ secrets.FIREBASE_APP_ID }}" --token "${{ secrets.FIREBASE_TOKEN }}" --groups "testers"
