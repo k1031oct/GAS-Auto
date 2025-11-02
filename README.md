@@ -55,3 +55,6 @@
 *   Gemini を用いた開発フローの確立と、より効果的なプロンプトテンプレートの探求
 *   GitHub Actions ワークフロー (`review.yml`, `release.yml`) の確実な動作設定
 *   Firebase App Distribution および Google Play Console との連携の自動化と安定化
+
+---
+*CI/CD review workflow test.*
