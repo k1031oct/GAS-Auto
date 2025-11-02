@@ -42,7 +42,7 @@
       base64 -w 0 release-key.jks
       ```
       - このコマンドを実行すると、ターミナルに非常に長い文字列が出力されます。その文字列をすべてコピーします。
-    - **Windows の場合:**
+    - **Windows (コマンドプロンプト) の場合:**
       ```bash
       certutil -encode release-key.jks temp_key.txt
       ```
@@ -67,9 +67,9 @@
 
 このリポジトリでは、セットアップを円滑に進めるため、必要なタスクをまとめたGitHub Issuesが自動的に作成されることがあります。
 
-もし、これらのIssuesが誤って削除されたり、何らかの理由で自動作成が失敗したりした場合は、リポジトリの任意のIssueまたはPull Requestのコメント欄に以下のコマンドを書き込むことで、手動で再作成をトリガーできます。
+もし、これらのIssuesが誤って削除されたり、自動作成が失敗した場合は、**GitHubのIssueまたはPull Requestのコメント欄に**以下のコマンドを書き込むことで、手動で再作成をトリガーできます。
 
-**コマンドトリガー:**
+**コマンドトリガー (GitHubコメント用):**
 ```
 /create-initial-issues
 ```
@@ -85,5 +85,13 @@
   - Android Studioで `File > Sync Project with Gradle Files` をクリックし、すべての設定が正しく読み込まれることを確認します。
 
 - [ ] **リリースビルドを生成する**
-  - 署名設定とGitHub Actionsのシークレットが正しく機能するかを確認するため、コマンドラインからリリースビルドを試します: `./gradlew assembleRelease`
+  - **ローカルPCのターミナルで**以下のコマンドを実行し、署名設定が正しく機能するかを確認します。
+    - **macOS / Linux の場合:**
+      ```bash
+      ./gradlew assembleRelease
+      ```
+    - **Windows (コマンドプロンプト) の場合:**
+      ```bash
+      gradlew.bat assembleRelease
+      ```
   - これが成功すれば、CI/CDのための設定が正しく行われていることが確認できます。
