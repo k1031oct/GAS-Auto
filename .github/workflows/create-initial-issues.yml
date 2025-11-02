@@ -11,8 +11,8 @@ on:
 
 jobs:
   create-issues:
-    # if条件を一時的にコメントアウトし、コメントがあれば必ずジョブを実行
-    # if: github.event_name == 'push' || (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/create-initial-issues'))
+    # プッシュ時、またはコメントがコマンドで始まる場合のみジョブを実行
+    if: github.event_name == 'push' || (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/create-initial-issues'))
     runs-on: ubuntu-latest
     # Issueを作成・編集するための権限を付与
     permissions:
@@ -20,19 +20,10 @@ jobs:
       contents: read
 
     steps:
-      - name: "[DEBUG] Dump comment body"
-        if: github.event_name == 'issue_comment'
-        run: |
-          echo "Comment body received:"
-          echo "${{ github.event.comment.body }}"
-          echo "--- End of comment body ---"
-
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Create issues from MANUAL_SETUP.md
-        # 本来のステップにif条件を移動
-        if: github.event_name == 'push' || (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/create-initial-issues'))
         uses: actions/github-script@v6
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
