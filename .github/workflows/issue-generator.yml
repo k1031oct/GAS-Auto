@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write # This permission is required to create issues.
+      contents: read # This permission is required to read repository content.
 
     steps:
       - name: "Checkout code"
@@ -27,8 +28,14 @@ jobs:
         run: |
           echo "🚀 Starting issue generation for Phase $PHASE_INPUT..."
 
-          # Corrected awk command to find the phase section without a space after "フェーズ".
-          # It now looks for "### フェーズ" immediately followed by the number and a colon.
+          # --- Step 1: Ensure all necessary labels exist --- 
+          echo "🎨 Ensuring labels exist..."
+          gh label create "Phase $PHASE_INPUT" --color "0E8A16" --description "Tasks related to Phase $PHASE_INPUT" || echo "Label 'Phase $PHASE_INPUT' already exists."
+          gh label create "enhancement" --color "a2eeef" --description "New feature or request" || echo "Label 'enhancement' already exists."
+          gh label create "frontend" --color "c5def5" --description "Tasks related to UI/UX" || echo "Label 'frontend' already exists."
+          echo "✅ Labels are ready."
+
+          # --- Step 2: Extract the content for the specified phase ---
           PHASE_SECTION=$(awk -v phase="$PHASE_INPUT" '$0 ~ "^### フェーズ" phase ":" {flag=1; next} /^### フェーズ/ {flag=0} flag' DEVELOPMENT_PLAN.md)
 
           if [ -z "$PHASE_SECTION" ]; then
@@ -36,14 +43,13 @@ jobs:
             exit 1
           fi
 
-          # Extract tasks from the section and create issues
+          # --- Step 3: Extract tasks from the section and create issues ---
           echo "$PHASE_SECTION" | while IFS= read -r line; do
-            # This looks for lines starting with "- [ ] **Task:**"
             if [[ $line == *"- [ ] "* ]]; then
               # Extract the title from the markdown task line
               title=$(echo "$line" | sed -e 's/- \[ \] \*\*Task:\*\* //' -e 's/\r//')
 
-              # Determine the label based on task content
+              # Determine the label list based on task content
               label_list="Phase $PHASE_INPUT,enhancement"
               if [[ $title == *"(frontend)"* ]]; then
                 label_list="$label_list,frontend"
