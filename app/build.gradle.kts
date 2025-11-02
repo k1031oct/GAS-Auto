@@ -13,25 +13,32 @@ android {
     namespace = "com.gws.auto.mobile.android"
     compileSdk = 36
 
+    // --- Robust Signing Config --- 
+    val keystorePropertiesFile = rootProject.file("keystore.properties")
+    val signingProperties = Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { signingProperties.load(it) }
+    }
+    // In CI, environment variables can provide the signing info.
+    // These are provided by the release.yml workflow.
+    System.getenv("SIGNING_KEY_FILE")?.let { signingProperties.setProperty("storeFile", it) }
+    System.getenv("SIGNING_STORE_PASSWORD")?.let { signingProperties.setProperty("storePassword", it) }
+    System.getenv("SIGNING_KEY_ALIAS")?.let { signingProperties.setProperty("keyAlias", it) }
+    System.getenv("SIGNING_KEY_PASSWORD")?.let { signingProperties.setProperty("keyPassword", it) }
+
     signingConfigs {
-        create("release") {
-            // In a CI environment, use environment variables. Check if the CI variable is not null.
-            if (System.getenv("CI") != null) {
-                storeFile = file(System.getenv("SIGNING_KEY_FILE")!!)
-                storePassword = System.getenv("SIGNING_STORE_PASSWORD")!!
-                keyAlias = System.getenv("SIGNING_KEY_ALIAS")!!
-                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")!!
-            } else {
-                // For local builds, load from a properties file
-                val keystorePropertiesFile = rootProject.file("keystore.properties")
-                if (keystorePropertiesFile.exists()) {
-                    val properties = Properties()
-                    keystorePropertiesFile.inputStream().use { properties.load(it) }
-                    storeFile = file(properties.getProperty("storeFile"))
-                    storePassword = properties.getProperty("storePassword")
-                    keyAlias = properties.getProperty("keyAlias")
-                    keyPassword = properties.getProperty("keyPassword")
-                }
+        // Only create the 'release' signing config if we have all the necessary properties.
+        // This prevents build errors when doing a debug build in a clean CI environment.
+        if (signingProperties.containsKey("storeFile") &&
+            signingProperties.containsKey("storePassword") &&
+            signingProperties.containsKey("keyAlias") &&
+            signingProperties.containsKey("keyPassword")) {
+
+            create("release") {
+                storeFile = file(signingProperties.getProperty("storeFile"))
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
             }
         }
     }
@@ -56,7 +63,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            // Assign the signing config only if it was successfully created.
+            if (signingConfigs.findByName("release") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
