@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew bundleRelease
 
       - name: Distribute to Firebase App Distribution
-        uses: wzieba/firebase-app-distribution-action@v1
+        uses: firebase/firebase-app-distribution-action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
