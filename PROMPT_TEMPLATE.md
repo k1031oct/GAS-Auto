@@ -15,3 +15,6 @@ Based on the following specifications, please create a prototype for an Android 
 * [Describe the specific features, screen structure, etc. of the app you want to create below]
 * Example: Implement navigation with three tabs at the bottom of the screen.
 * Example: Retrieve data from Firebase Firestore and display it in a list.
+
+  CI/CD test for review workflow.
+    
