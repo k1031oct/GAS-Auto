@@ -63,9 +63,21 @@
 - [ ] **`KEY_ALIAS`**: キーストア内にあるキーのエイリアス。
   - キー生成時に `-alias` フラグで指定した名前です。
 
-- [ ] **`GOOGLE_SERVICES_JSON`**: `google-services.json` ファイルの全内容。
-  - セキュリティのため、このファイルはリポジトリにコミットされません。
-  - ローカルの `app/google-services.json` ファイルを開き、その内容をすべてコピーして、このシークレットの値として貼り付けます。CI/CD実行時に、このシークレットからファイルが動的に生成されます。
+- [ ] **`GOOGLE_SERVICES_JSON`**: Base64でエンコードされた `google-services.json` の内容。
+  - **【重要】** CI/CDでのフォーマット崩れを防ぐため、ファイルの内容をプレーンテキストからBase64形式に切り替えます。
+  - ターミナルで `app` ディレクトリのある階層（プロジェクトルート）に移動し、お使いのOSに合わせて以下のコマンドを実行します。
+    - **macOS / Linux の場合:**
+      ```bash
+      base64 -w 0 app/google-services.json
+      ```
+      - このコマンドを実行すると、ターミナルに非常に長い1行の文字列が出力されます。その文字列をすべてコピーします。
+    - **Windows (コマンドプロンプト) の場合:**
+      ```bash
+      certutil -encode app/google-services.json temp_google_services.txt
+      ```
+      - このコマンドを実行すると、`temp_google_services.txt` というファイルが生成されます。
+      - このファイルをメモ帳などで開き、`-----BEGIN CERTIFICATE-----` と `-----END CERTIFICATE-----` の**間にある文字列だけ**をすべてコピーします。
+  - コピーしたBase64文字列で、GitHubの `GOOGLE_SERVICES_JSON` シークレットの値を**上書き更新**してください。
 
 ## GitHub Issuesの自動作成
 
