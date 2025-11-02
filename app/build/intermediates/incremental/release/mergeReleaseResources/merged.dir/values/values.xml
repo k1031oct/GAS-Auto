@@ -125,7 +125,7 @@
     <string name="close_drawer">"Close navigation menu"</string>
     <string name="close_sheet">"Close sheet"</string>
     <string name="com.google.firebase.crashlytics.mapping_file_id" ns1:ignore="UnusedResources,TypographyDashes" translatable="false">00000000000000000000000000000000</string>
-    <string name="com.google.firebase.crashlytics.version_control_info">"repositories {\n  system: GIT\n  local_root_path: \"$PROJECT_DIR\"\n  revision: \"d554e929c9cdbcdc773a6b9f8f85feaba009999f\"\n}\n"</string>
+    <string name="com.google.firebase.crashlytics.version_control_info">"repositories {\n  system: GIT\n  local_root_path: \"$PROJECT_DIR\"\n  revision: \"a778df92b3db691606e6152cf296120b54b20d56\"\n}\n"</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable</string>
     <string msgid="227660514972886228" name="common_google_play_services_enable_text"><ns2:g id="app_name">%1$s</ns2:g> won\'t work unless you enable Google Play services.</string>
     <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Enable Google Play services</string>
