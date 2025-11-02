@@ -15,7 +15,7 @@
 *.hprof
 
 # Firebase
-app/google-services.json
+# app/google-services.json <-- Temporarily commented out for debugging
 
 # Keystore file
 /keystore.properties
