@@ -4,7 +4,7 @@
             "outputFile": "com.gws.auto.mobile.android.app-mergeReleaseResources-4:/values-v30/values-v30.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\9.0-milestone-1\\transforms\\c19247ae49c46d0609c755eec4bf0be4\\transformed\\jetified-material3\\res\\values-v30\\values-v30.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\9.0-milestone-1\\transforms\\8dfb566e8d54b72556741af3d9e2e431\\transformed\\jetified-material3\\res\\values-v30\\values-v30.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
