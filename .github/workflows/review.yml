@@ -28,9 +28,8 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Distribute debug APK to Firebase App Distribution
-        uses: firebase-tools/action-appdistribution@v0
-        with:
-          token: ${{ secrets.FIREBASE_TOKEN }}
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          groups: testers
-          file: app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          npx --yes firebase-tools app:distribute app/build/outputs/apk/debug/app-debug.apk \
+            --app "${{ secrets.FIREBASE_APP_ID }}" \
+            --token "${{ secrets.FIREBASE_TOKEN }}" \
+            --groups "testers"
