@@ -27,12 +27,9 @@ jobs:
         run: |
           echo "🚀 Starting issue generation for Phase $PHASE_INPUT..."
 
-          # Read the content of the development plan
-          PLAN_CONTENT=$(cat DEVELOPMENT_PLAN.md)
-
-          # Extract the content for the specified phase
-          # This uses awk to find the lines between "### フェーズ X" and the next "### フェーズ" or end of file.
-          PHASE_SECTION=$(awk -v phase="$PHASE_INPUT" '$0 ~ "^### フェーズ " phase {flag=1; next} /^### フェーズ/ {flag=0} flag' DEVELOPMENT_PLAN.md)
+          # Corrected awk command to find the phase section without a space after "フェーズ".
+          # It now looks for "### フェーズ" immediately followed by the number and a colon.
+          PHASE_SECTION=$(awk -v phase="$PHASE_INPUT" '$0 ~ "^### フェーズ" phase ":" {flag=1; next} /^### フェーズ/ {flag=0} flag' DEVELOPMENT_PLAN.md)
 
           if [ -z "$PHASE_SECTION" ]; then
             echo "❌ Error: Could not find Phase $PHASE_INPUT in DEVELOPMENT_PLAN.md"
@@ -40,25 +37,24 @@ jobs:
           fi
 
           # Extract tasks from the section and create issues
-          # This looks for lines starting with "- [ ] **Task:**"
           echo "$PHASE_SECTION" | while IFS= read -r line; do
+            # This looks for lines starting with "- [ ] **Task:**"
             if [[ $line == *"- [ ] "* ]]; then
               # Extract the title from the markdown task line
               title=$(echo "$line" | sed -e 's/- \[ \] \*\*Task:\*\* //' -e 's/\r//')
 
               # Determine the label based on task content
+              label_list="Phase $PHASE_INPUT,enhancement"
               if [[ $title == *"(frontend)"* ]]; then
-                label_frontend=',"frontend"'
+                label_list="$label_list,frontend"
                 # Clean up title
                 title=$(echo "$title" | sed 's/(frontend) //')
-              else
-                label_frontend=''
               fi
 
               echo "🤖 Creating issue: '$title'"
 
               # Create the issue using GitHub CLI
-              gh issue create --title "$title" --body "This issue was automatically generated from the development plan for Phase $PHASE_INPUT." --label "Phase $PHASE_INPUT,enhancement${label_frontend}"
+              gh issue create --title "$title" --body "This issue was automatically generated from the development plan for Phase $PHASE_INPUT." --label "$label_list"
 
               if [ $? -eq 0 ]; then
                 echo "✅ Successfully created issue."
