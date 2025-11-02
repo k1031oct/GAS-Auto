@@ -36,5 +36,5 @@ jobs:
       - name: "[Debug] Show Firebase App Distribute Help"
         run: firebase app:distribute --help
 
-      - name: Distribute debug APK to Firebase App Distribution
-        run: firebase app:distribute app/build/outputs/apk/debug/app-debug.apk --app "${{ secrets.FIREBASE_APP_ID }}" --token "${{ secrets.FIREBASE_TOKEN }}" --groups "testers"
+      # - name: Distribute debug APK to Firebase App Distribution
+      #   run: firebase app:distribute app/build/outputs/apk/debug/app-debug.apk --app "${{ secrets.FIREBASE_APP_ID }}" --token "${{ secrets.FIREBASE_TOKEN }}" --groups "testers"
