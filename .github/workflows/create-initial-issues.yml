@@ -11,8 +11,8 @@ on:
 
 jobs:
   create-issues:
-    # プッシュ時、またはコメントにコマンドが含まれる場合のみジョブを実行
-    if: github.event_name == 'push' || (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/create-initial-issues'))
+    # プッシュ時、またはコメントがコマンドで始まる場合のみジョブを実行
+    if: github.event_name == 'push' || (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/create-initial-issues'))
     runs-on: ubuntu-latest
     # Issueを作成・編集するための権限を付与
     permissions:
