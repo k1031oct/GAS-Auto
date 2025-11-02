@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.gws.auto.mobile.android.app-release-7:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-8:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-release-7:/drawable_ic_launcher_monochrome.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-8:/drawable/ic_launcher_monochrome.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-release-7:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-8:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-release-7:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-8:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-release-7:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-8:/mipmap-anydpi-v26/ic_launcher.xml"
+    }
+]

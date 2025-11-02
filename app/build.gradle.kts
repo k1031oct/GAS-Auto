@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -24,8 +25,8 @@ android {
                 // For local builds, load from a properties file
                 val keystorePropertiesFile = rootProject.file("keystore.properties")
                 if (keystorePropertiesFile.exists()) {
-                    val properties = java.util.Properties()
-                    properties.load(keystorePropertiesFile.inputStream())
+                    val properties = Properties()
+                    keystorePropertiesFile.inputStream().use { properties.load(it) }
                     storeFile = file(properties.getProperty("storeFile"))
                     storePassword = properties.getProperty("storePassword")
                     keyAlias = properties.getProperty("keyAlias")
