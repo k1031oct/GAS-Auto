@@ -1,9 +1,6 @@
 name: Review Distribution
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -30,10 +27,9 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      - name: Upload to Firebase App Tester
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }} # Add your Firebase App ID as a secret
-          token: ${{ secrets.FIREBASE_TOKEN }}
-          groups: testers # Your tester group
-          file: app/build/outputs/apk/debug/app-debug.apk
+      - name: Distribute debug APK to Firebase App Distribution
+        run: |
+          npx --yes firebase-tools app:distribute app/build/outputs/apk/debug/app-debug.apk \
+            --app "${{ secrets.FIREBASE_APP_ID }}" \
+            --token "${{ secrets.FIREBASE_TOKEN }}" \
+            --groups "testers"
