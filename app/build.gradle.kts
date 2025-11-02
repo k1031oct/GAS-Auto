@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -9,6 +11,18 @@ plugins {
 android {
     namespace = "com.gws.auto.mobile.android"
     compileSdk = 36
+
+    signingConfigs {
+        create("release") {
+            // In a CI environment, use environment variables. Check if the CI variable is not null.
+            if (System.getenv("CI") != null) {
+                storeFile = file(System.getenv("SIGNING_KEY_FILE")!!)
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")!!
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")!!
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")!!
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.gws.auto.mobile.android"
@@ -30,15 +44,21 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
+        }
     }
+
     buildFeatures {
         compose = true
     }
@@ -74,5 +94,3 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
-
-// TODO: Add Firebase App Tester and signing configurations
