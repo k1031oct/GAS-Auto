@@ -33,9 +33,9 @@ jobs:
       - name: Build Release App Bundle
         # Use a multi-line run step to export secrets as environment variables before building
         run: |
-          export SIGNING_KEY_ALIAS=${{ secrets.KEY_ALIAS }}
-          export SIGNING_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
-          export SIGNING_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}
+          export SIGNING_KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
+          export SIGNING_KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
+          export SIGNING_STORE_PASSWORD="${{ secrets.KEY_STORE_PASSWORD }}"
           export SIGNING_KEY_FILE=./release.keystore
           ./gradlew bundleRelease
 
