@@ -8,6 +8,9 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub Releaseを作成するためにwrite権限を追加
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,21 +24,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      - name: Setup Google Services
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > app/google-services.json
+
       - name: Decode Signing Key
-        run: |
-          echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > ${{ github.workspace }}/release.keystore
+        run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.keystore
 
       - name: Build Release AAB
-        run: |
-          SIGNING_KEY_ALIAS=${{ secrets.SIGNING_KEY_ALIAS }} \
-          SIGNING_KEY_PASSWORD=${{ secrets.SIGNING_KEY_PASSWORD }} \
-          SIGNING_STORE_PASSWORD=${{ secrets.SIGNING_STORE_PASSWORD }} \
-          ./gradlew bundleRelease
+        env:
+          # MANUAL_SETUP.mdで案内しているシークレット名に修正
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        run: ./gradlew bundleRelease
 
-            - name: (Optional) Upload to Google Play Store
-
-              run: |
-
-                echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
-
-      
+      - name: (Optional) Upload to Google Play Store
+        run: echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
