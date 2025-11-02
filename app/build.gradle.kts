@@ -15,12 +15,13 @@ android {
 
     signingConfigs {
         create("release") {
-            // In a CI environment, use environment variables. Check if the CI variable is not null.
-            if (System.getenv("CI") != null) {
-                storeFile = file(System.getenv("SIGNING_KEY_FILE")!!)
-                storePassword = System.getenv("SIGNING_STORE_PASSWORD")!!
-                keyAlias = System.getenv("SIGNING_KEY_ALIAS")!!
-                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")!!
+            // In a CI environment, use environment variables if they are provided.
+            val signingKeyFile = System.getenv("SIGNING_KEY_FILE")
+            if (System.getenv("CI") != null && signingKeyFile != null) {
+                storeFile = file(signingKeyFile)
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
             } else {
                 // For local builds, load from a properties file
                 val keystorePropertiesFile = rootProject.file("keystore.properties")
