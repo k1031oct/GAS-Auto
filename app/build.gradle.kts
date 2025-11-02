@@ -20,6 +20,17 @@ android {
                 storePassword = System.getenv("SIGNING_STORE_PASSWORD")!!
                 keyAlias = System.getenv("SIGNING_KEY_ALIAS")!!
                 keyPassword = System.getenv("SIGNING_KEY_PASSWORD")!!
+            } else {
+                // For local builds, load from a properties file
+                val keystorePropertiesFile = rootProject.file("keystore.properties")
+                if (keystorePropertiesFile.exists()) {
+                    val properties = java.util.Properties()
+                    properties.load(keystorePropertiesFile.inputStream())
+                    storeFile = file(properties.getProperty("storeFile"))
+                    storePassword = properties.getProperty("storePassword")
+                    keyAlias = properties.getProperty("keyAlias")
+                    keyPassword = properties.getProperty("keyPassword")
+                }
             }
         }
     }
