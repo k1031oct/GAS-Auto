@@ -31,13 +31,17 @@ jobs:
         run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.keystore
 
       - name: Build Release App Bundle
-        # Use a multi-line run step to export secrets as environment variables before building
-        run: |
-          export SIGNING_KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
-          export SIGNING_KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
-          export SIGNING_STORE_PASSWORD="${{ secrets.KEY_STORE_PASSWORD }}"
-          export SIGNING_KEY_FILE=./release.keystore
-          ./gradlew bundleRelease
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          SIGNING_KEY_FILE: release.keystore
+        run: ./gradlew bundleRelease
 
-      - name: (Optional) Upload to Google Play Store
-        run: echo "TODO: Upload app/build/outputs/bundle/release/app-release.aab to Google Play Store"
+      - name: Distribute to Firebase App Distribution
+        uses: wzieba/firebase-app-distribution-action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: app/build/outputs/bundle/release/app-release.aab
