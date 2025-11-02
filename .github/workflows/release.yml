@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew bundleRelease
 
       - name: Upload artifact to Firebase App Distribution
-        uses: firebase/app-distribution-action@v1.4.1
+        uses: google-github-actions/distribute-app-distribution@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
