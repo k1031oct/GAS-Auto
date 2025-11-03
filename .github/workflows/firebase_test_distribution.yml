@@ -39,10 +39,14 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug
 
-      # 7. Firebase App Distributionへアップロード (Firebase CLI使用)
+      # 7. Firebase CLIをインストール
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      # 8. Firebase App Distributionへアップロード
       - name: Distribute to Firebase App Distribution
         run: |
-          npx --yes firebase-tools app:distribute app/build/outputs/apk/debug/app-debug.apk \
+          firebase app:distribute app/build/outputs/apk/debug/app-debug.apk \
             --app "${{ secrets.FIREBASE_APP_ID }}" \
             --token "${{ secrets.FIREBASE_TOKEN }}" \
             --groups "testers"
