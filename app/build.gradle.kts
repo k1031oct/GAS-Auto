@@ -111,14 +111,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-    
-    // Force the use of the correct googleid version, overriding any transitive dependencies from Firebase BOM
-    implementation(libs.googleid) {
-        version {
-            strictly(libs.versions.googleId.get())
-        }
-    }
-
+    implementation(libs.googleid)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
     implementation(libs.google.api.services.drive)
