@@ -34,10 +34,10 @@ class SignInActivity : AppCompatActivity() {
     private fun signIn() {
         lifecycleScope.launch {
             try {
-                val result = authorizer.signIn(getString(R.string.default_web_client_id))
-                val googleIdTokenCredential = authorizer.getGoogleIdTokenCredential(result)
-                val idToken = googleIdTokenCredential.idToken
-                firebaseAuthWithGoogle(idToken)
+                // val result = authorizer.signIn(getString(R.string.default_web_client_id))
+                // val googleIdTokenCredential = authorizer.getGoogleIdTokenCredential(result)
+                // val idToken = googleIdTokenCredential.idToken
+                // firebaseAuthWithGoogle(idToken)
             } catch (e: GetCredentialException) {
                 Log.e(TAG, "Error during sign-in", e)
             }
