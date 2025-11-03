@@ -98,13 +98,6 @@ android {
 dependencies {
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
-
-    constraints {
-        implementation(libs.googleid) {
-            because("Avoids NoSuchMethodError due to transitive dependency conflicts.")
-        }
-    }
-
     implementation(libs.bundles.firebase)
 
     // Google & AndroidX - All using version catalog
@@ -118,7 +111,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
