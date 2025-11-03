@@ -55,6 +55,7 @@ string google_crash_reporting_api_key
 string google_storage_bucket
 string project_id
 string save_workflow
+string sign_in_with_google
 string sign_out
 string title_settings
 string title_trigger

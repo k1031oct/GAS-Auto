@@ -20,6 +20,7 @@
     <string name="google_storage_bucket" translatable="false">gws-auto-for-android-4db4a.firebasestorage.app</string>
     <string name="project_id" translatable="false">gws-auto-for-android-4db4a</string>
     <string name="save_workflow">Save Workflow</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_out">Sign Out</string>
     <string name="title_settings">Settings</string>
     <string name="title_trigger">Trigger</string>

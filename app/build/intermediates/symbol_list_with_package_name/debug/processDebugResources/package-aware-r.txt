@@ -4885,6 +4885,7 @@ string searchview_navigation_content_description
 string selected
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
+string sign_in_with_google
 string sign_out
 string snackbar_pane_title
 string state_empty
