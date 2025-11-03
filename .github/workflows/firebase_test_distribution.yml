@@ -39,11 +39,10 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug
 
-      # 7. Firebase App Distributionへアップロード (公式アクション使用)
-      - name: Upload to Firebase App Distribution
-        uses: firebase-actions/firebase-app-distribution@v1
-        with:
-          appId: ${{ secrets.FIREBASE_APP_ID }}
-          token: ${{ secrets.FIREBASE_TOKEN }}
-          groups: testers
-          file: app/build/outputs/apk/debug/app-debug.apk
+      # 7. Firebase App Distributionへアップロード (Firebase CLI使用)
+      - name: Distribute to Firebase App Distribution
+        run: |
+          npx --yes firebase-tools app:distribute app/build/outputs/apk/debug/app-debug.apk \
+            --app "${{ secrets.FIREBASE_APP_ID }}" \
+            --token "${{ secrets.FIREBASE_TOKEN }}" \
+            --groups "testers"
