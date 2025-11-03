@@ -1,3 +1,29 @@
+import java.util.Properties
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
+// --- Start of Version Auto-Increment Logic ---
+val versionPropsFile = file("version.properties")
+
+if (!versionPropsFile.canRead()) {
+    throw GradleException("Could not read version.properties! Create one with: \nVERSION_CODE=1\nVERSION_MAJOR=1\nVERSION_MINOR=0\nVERSION_PATCH=0")
+}
+
+val versionProps = Properties()
+versionProps.load(versionPropsFile.reader())
+
+var versionCode = versionProps["VERSION_CODE"].toString().toInt()
+var versionPatch = versionProps["VERSION_PATCH"].toString().toInt()
+
+// Increment for the current build
+versionCode++
+versionPatch++
+
+// Update properties file for the next build
+versionProps["VERSION_CODE"] = versionCode.toString()
+versionProps["VERSION_PATCH"] = versionPatch.toString()
+versionProps.store(versionPropsFile.writer(), "Auto-updated by Gradle build")
+// --- End of Version Auto-Increment Logic ---
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,8 +41,11 @@ android {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        
+        // Set the updated versions from the logic above
+        this.versionCode = versionCode
+        this.versionName = "${versionProps["VERSION_MAJOR"]}.${versionProps["VERSION_MINOR"]}.$versionPatch"
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
