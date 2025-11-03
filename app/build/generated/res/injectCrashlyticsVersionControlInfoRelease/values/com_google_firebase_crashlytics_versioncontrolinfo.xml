@@ -1,3 +1,0 @@
-<resources>
-  <string name="com.google.firebase.crashlytics.version_control_info">"repositories {\n  system: GIT\n  local_root_path: \"$PROJECT_DIR\"\n  revision: \"aeb74d4a35527aa0de71ebd18865996e9b1f3e6f\"\n}\n"</string>
-</resources>

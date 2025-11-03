@@ -1,7 +1,0 @@
-com.gws.auto.mobile.android.test.app-androidTest-0 C:\Engineering\Android\GWS-Auto-for-Android\app\build\generated\res\resValues\androidTest\debug
-com.gws.auto.mobile.android.test.app-updated_navigation_xml-1 C:\Engineering\Android\GWS-Auto-for-Android\app\build\generated\updated_navigation_xml\debugAndroidTest
-com.gws.auto.mobile.android.test.app-mergeDebugAndroidTestResources-2 C:\Engineering\Android\GWS-Auto-for-Android\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
-com.gws.auto.mobile.android.test.app-mergeDebugAndroidTestResources-3 C:\Engineering\Android\GWS-Auto-for-Android\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
-com.gws.auto.mobile.android.test.app-debugAndroidTest-4 C:\Engineering\Android\GWS-Auto-for-Android\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
-com.gws.auto.mobile.android.test.app-jetified-core-1.7.0-5 C:\Users\k1031\.gradle\caches\9.0-milestone-1\transforms\4148fd6cb449ec11c5105bedc260e4dc\transformed\jetified-core-1.7.0\res
-com.gws.auto.mobile.android.test.app-jetified-tracing-1.2.0-6 C:\Users\k1031\.gradle\caches\9.0-milestone-1\transforms\5274bf998c2b491968f721e5c4fbcb23\transformed\jetified-tracing-1.2.0\res
