@@ -1,0 +1,82 @@
+name: Create Release Issues from Plan
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse Plan and Create Hierarchical Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # シェル関数を定義：Issueを作成する
+          create_issue() {
+            local title="$1"
+            local body="$2"
+            
+            echo "-----------------------------------------------------"
+            echo "Checking for parent task: $title"
+            
+            # 同じタイトルのIssueが既に存在するか確認
+            if gh issue list --search "$title in:title" --state all --limit 1 | grep -q "$title"; then
+              echo "Issue '$title' already exists. Skipping."
+            else
+              echo "Creating new issue: $title"
+              # Issueを作成し、ラベルを付与
+              gh issue create --title "$title" --body "$body" --label "release-plan"
+            fi
+          }
+          export -f create_issue # awkから関数を呼び出せるようにする
+
+          # awkスクリプトでRELEASE_PLAN.mdを解析し、issue作成コマンドを生成して実行する
+          awk '
+            # issue作成関数を呼び出すラッパー
+            function create_current_issue() {
+              if (parent_title != "") {
+                # 本文の末尾にフッターを追加
+                body = body "\n\n---\n*This issue was automatically generated from [RELEASE_PLAN.md](RELEASE_PLAN.md).*"
+                # シェルエスケープして関数呼び出し
+                system("create_issue \"" parent_title "\" \"" body "\"")
+              }
+            }
+
+            # メインのタスク行を検出 (インデントなし)
+            /^- \[ \] / {
+              # 処理中の親Issueがあれば、まずそれを作成する
+              create_current_issue()
+              
+              # 新しい親Issueの準備
+              parent_title = $0
+              sub(/^- \[ \] /, "", parent_title) # 行頭の"- [ ] "を削除
+              sub(/\*\*$/, "", parent_title) # 行末の"**"を削除
+              sub(/\*\* /, " ", parent_title) # "** "をスペースに
+              
+              body = "### " parent_title "\n\nThis is a parent task derived from the release plan. All related sub-tasks are listed below as a checklist."
+            }
+
+            # サブタスク行を検出 (インデントあり)
+            /^ +- \[ \] / {
+              if (parent_title != "") {
+                sub_task = $0
+                sub(/^ +- \[ \] /, "", sub_task) # 行頭のインデントと"- [ ] "を削除
+                body = body "\n- [ ] " sub_task
+              }
+            }
+            
+            # ファイルの最後に到達した時、最後のIssueを作成する
+            END {
+              create_current_issue()
+            }
+          ' RELEASE_PLAN.md
+          
+          echo "-----------------------------------------------------"
+          echo "Issue creation process complete."
