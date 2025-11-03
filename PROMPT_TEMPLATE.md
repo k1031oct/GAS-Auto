@@ -7,7 +7,7 @@ Based on the following specifications, please create a prototype for an Android 
 * **Language:** Kotlin
 * **Architecture:** MVVM (ViewModel, LiveData/Flow, Repository)
 * **UI:** Jetpack Compose
-* **Package Name:** `__PACKAGE_NAME__`
+* **Package Name:** `com.gws.auto.mobile.android`
 * **Dependencies:** Please add the necessary libraries to `build.gradle.kts`.
 
 ## Application Specifications

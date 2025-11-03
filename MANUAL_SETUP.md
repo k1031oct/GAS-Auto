@@ -18,7 +18,6 @@
   - Firebaseコンソールのメニューから「App Distribution」に移動します。
   - 「テスターとグループ」タブを開きます。
   - 「グループを追加」をクリックして新しいグループを作成し、テスターを追加します。
-  - **【重要】** 自動レビューサイクル（CI/CD）が正しく機能するためには、ここで作成するグループの名前（グループのエイリアス）を **`testers`** にする必要があります。
 
 ## GitHubリポジトリのシークレット設定
 
@@ -26,7 +25,7 @@
 
 - [ ] **`FIREBASE_APP_ID`**: Firebaseアプリの一意のID。
   - Firebaseコンソールの `プロジェクト設定 > 全般 > マイアプリ` を開きます。
-  - 対象のAndroidアプリを選択し、**`アプリ ID`** (`1:1234...`のような形式) をコピーして、このシークレットの値として貼り付けます。これはテストアプリの自動配布に必要です。 
+  - 対象のAndroidアプリを選択し、**`アプリ ID`** (`1:1234...`のような形式) をコピーして、このシークレットの値として貼り付けます。これはテストアプリの自動配布に必要です。
 
 - [ ] **`FIREBASE_TOKEN`**: Firebase CLIから取得したトークン。
   - ターミナルで次のコマンドを実行します: `firebase login:ci`
@@ -37,23 +36,36 @@
     ```bash
     keytool -genkeypair -v -keystore release-key.jks -alias your-alias -keyalg RSA -keysize 2048 -validity 10000
     ```
+  - **`keytool`実行時の注意点:**
+    - **パスワード入力:** 「キーストアのパスワードを入力してください:」と表示された後、パスワードを入力しても画面には何も表示されませんが、これは正常な動作です。入力後にEnterキーを押してください。
+    - **所有者情報:** 「姓名は何ですか。」などの質問には、開発者や会社の情報を入力します。これはリリース用キーの所有者情報となります。必須ではありませんが、入力が推奨されます。
+    - **最終確認:** 最後に `... is correct? [no]:` と表示されたら、**`yes` と入力してEnterキーを押す**ことで内容を確定できます。デフォルトの `[no]` のままEnterを押すとキャンセルされます。
   - 次に、生成されたキーファイルをBase64にエンコードします。お使いのOSによってコマンドが異なります。
-    - **macOS / Linux の場合:** `base64 -w 0 release-key.jks`
-    - **Windows の場合:** `certutil -encode release-key.jks temp_key.txt` して生成されたファイルから `-----BEGIN...` と `-----END...` の間の文字列のみコピーします。
+    - **macOS / Linux の場合:**
+      ```bash
+      base64 -w 0 release-key.jks
+      ```
+      - このコマンドを実行すると、ターミナルに非常に長い文字列が出力されます。その文字列をすべてコピーします。
+    - **Windows (コマンドプロンプト) の場合:**
+      ```bash
+      certutil -encode release-key.jks temp_key.txt
+      ```
+      - このコマンドを実行すると、`temp_key.txt` というファイルが生成されます。
+      - このファイルをメモ帳などで開き、`-----BEGIN CERTIFICATE-----` と `-----END CERTIFICATE-----` の**間にある文字列だけ**をすべてコピーします。
   - コピーした長い文字列を、GitHubのシークレットに設定します。
 
 - [ ] **`KEY_PASSWORD`**: 署名キーのパスワード。
+  - 署名キーを作成した際に設定したパスワードです。
 
 - [ ] **`KEY_STORE_PASSWORD`**: キーストアファイルのパスワード。
+  - 署名キー（`.jks`ファイル）自体のパスワードです。
 
 - [ ] **`KEY_ALIAS`**: キーストア内にあるキーのエイリアス。
+  - キー生成時に `-alias` フラグで指定した名前です。
 
-- [ ] **`GOOGLE_SERVICES_JSON`**: Base64でエンコードされた `google-services.json` の内容。
-  - **【重要】** CI/CDでのフォーマット崩れを防ぐため、ファイルの内容をBase64形式で設定します。
-  - ターミナルで `app` ディレクトリのある階層（プロジェクトルート）に移動し、以下のコマンドでBase64文字列を生成します。
-    - **macOS / Linux の場合:** `base64 -w 0 app/google-services.json`
-    - **Windows の場合:** `certutil -encode app/google-services.json temp_google_services.txt` して生成されたファイルから `-----BEGIN...` と `-----END...` の間の文字列のみコピーします。
-  - コピーしたBase64文字列で、GitHubの `GOOGLE_SERVICES_JSON` シークレットの値を**上書き更新**してください。
+- [ ] **`GOOGLE_SERVICES_JSON`**: `google-services.json` ファイルの全内容。
+  - セキュリティのため、このファイルはリポジトリにコミットされません。
+  - ローカルの `app/google-services.json` ファイルを開き、その内容をすべてコピーして、このシークレットの値として貼り付けます。CI/CD実行時に、このシークレットからファイルが動的に生成されます。
 
 ## GitHub Issuesの自動作成
 
@@ -70,7 +82,7 @@
 
 - [ ] **Firebaseコンソールでパッケージ名を確認・更新する**
   - Firebaseコンソールで `プロジェクト設定 > 全般 > マイアプリ` を開きます。
-  - 対象のAndroidアプリを選択し、**パッケージ名**が `app/build.gradle.kts` の `applicationId` と一致していることを確認します。
+  - 対象のAndroidアプリを選択し、**パッケージ名**が `app/build.gradle.kts` の `applicationId` (`com.gws.auto.mobile.android`) と一致していることを確認します。
   - **【重要】** もし一致していなければ、Firebaseコンソールのパッケージ名を更新し、新しい `google-services.json` を再ダウンロードしてローカルに配置し、さらに `GOOGLE_SERVICES_JSON` シークレットも更新してください。
 
 - [ ] **Gradleの同期を実行する**
@@ -78,6 +90,12 @@
 
 - [ ] **リリースビルドを生成する**
   - **ローカルPCのターミナルで**以下のコマンドを実行し、署名設定が正しく機能するかを確認します。
-    - **macOS / Linux の場合:** `./gradlew assembleRelease`
-    - **Windows の場合:** `gradlew.bat assembleRelease`
+    - **macOS / Linux の場合:**
+      ```bash
+      ./gradlew assembleRelease
+      ```
+    - **Windows (コマンドプロンプト) の場合:**
+      ```bash
+      gradlew.bat assembleRelease
+      ```
   - これが成功すれば、CI/CDのための設定が正しく行われていることが確認できます。
