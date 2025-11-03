@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.gms.common.SignInButton;
+import com.google.android.material.button.MaterialButton;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -20,10 +20,10 @@ public final class ActivitySignInBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final SignInButton signInButton;
+  public final MaterialButton signInButton;
 
   private ActivitySignInBinding(@NonNull ConstraintLayout rootView,
-      @NonNull SignInButton signInButton) {
+      @NonNull MaterialButton signInButton) {
     this.rootView = rootView;
     this.signInButton = signInButton;
   }
@@ -56,7 +56,7 @@ public final class ActivitySignInBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.sign_in_button;
-      SignInButton signInButton = ViewBindings.findChildViewById(rootView, id);
+      MaterialButton signInButton = ViewBindings.findChildViewById(rootView, id);
       if (signInButton == null) {
         break missingId;
       }
