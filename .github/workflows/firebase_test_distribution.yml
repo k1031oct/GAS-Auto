@@ -1,4 +1,4 @@
-name: Manual Firebase Test Distribution
+name: Manual Firebase Test Distribution (via Gradle)
 
 on:
   workflow_dispatch:
@@ -35,18 +35,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 6. DebugビルドのAPKをビルド (キーストア不要)
-      - name: Build Debug APK
-        run: ./gradlew :app:assembleDebug
-
-      # 7. Firebase CLIをローカルにインストール
-      - name: Install Firebase CLI Locally
-        run: npm install firebase-tools@latest
-
-      # 8. Firebase App Distributionへアップロード
-      - name: Distribute to Firebase App Distribution
-        run: |
-          ./node_modules/.bin/firebase app:distribute app/build/outputs/apk/debug/app-debug.apk \
-            --app "${{ secrets.FIREBASE_APP_ID }}" \
-            --token "${{ secrets.FIREBASE_TOKEN }}" \
-            --groups "testers"
+      # 6. ビルドとFirebaseへのアップロードをGradleで実行
+      - name: Build and Upload to Firebase App Distribution
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: ./gradlew :app:appDistributionUploadDebug

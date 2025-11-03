@@ -1,44 +1,15 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.firebase.appdistribution")
 }
 
 android {
     namespace = "com.gws.auto.mobile.android"
     compileSdk = 36
-
-    // --- Robust Signing Config ---
-    val signingProperties = Properties()
-    val keystorePropertiesFile = rootProject.file("keystore.properties")
-    if (keystorePropertiesFile.exists()) {
-        keystorePropertiesFile.inputStream().use { signingProperties.load(it) }
-    }
-
-    System.getenv("SIGNING_KEY_FILE")?.let { signingProperties.setProperty("storeFile", it) }
-    System.getenv("KEY_STORE_PASSWORD")?.let { signingProperties.setProperty("storePassword", it) }
-    System.getenv("KEY_ALIAS")?.let { signingProperties.setProperty("keyAlias", it) }
-    System.getenv("KEY_PASSWORD")?.let { signingProperties.setProperty("keyPassword", it) }
-
-    signingConfigs {
-        if (signingProperties.getProperty("storeFile") != null &&
-            signingProperties.getProperty("storePassword") != null &&
-            signingProperties.getProperty("keyAlias") != null &&
-            signingProperties.getProperty("keyPassword") != null) {
-
-            create("release") {
-                storeFile = file(signingProperties.getProperty("storeFile"))
-                storePassword = signingProperties.getProperty("storePassword")
-                keyAlias = signingProperties.getProperty("keyAlias")
-                keyPassword = signingProperties.getProperty("keyPassword")
-            }
-        }
-    }
 
     defaultConfig {
         applicationId = "com.gws.auto.mobile.android"
@@ -46,7 +17,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -56,11 +26,15 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.findByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            firebaseAppDistribution {
+                // The 'token' property was removed in a recent version of the App Distribution plugin.
+                // The plugin now automatically uses the FIREBASE_TOKEN environment variable if it's set.
+                appId = System.getenv("FIREBASE_APP_ID")
+                groups = "testers"
+            }
         }
     }
 
@@ -71,81 +45,67 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
-
-
     buildFeatures {
-        viewBinding = true
         compose = true
+        viewBinding = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "/META-INF/INDEX.LIST"
-            excludes += "/META-INF/DEPENDENCIES"
         }
     }
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+    // Firebase - Now using version catalog
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
 
-    implementation("com.google.android.gms:play-services-auth:21.4.0")
-    implementation("androidx.credentials:credentials:1.5.0")
-    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
-    // implementation("com.google.android.libraries.identity:googleid:1.1.0")
-    implementation("com.google.api-client:google-api-client-android:2.8.1")
-    implementation("com.google.http-client:google-http-client-gson:2.0.2")
-    implementation("com.google.apis:google-api-services-drive:v3-rev20230822-2.0.0")
-    implementation("com.google.apis:google-api-services-sheets:v4-rev20230815-2.0.0")
-    implementation("com.google.oauth-client:google-oauth-client:1.39.0")
-    implementation("com.google.http-client:google-http-client-android:2.0.2")
+    // Google & AndroidX - All using version catalog
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.http.client.gson)
+    implementation(libs.google.api.services.drive)
+    implementation(libs.google.api.services.sheets)
+    implementation(libs.google.oauth.client)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.bundles.navigation)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    debugImplementation(libs.androidx.ui.tooling)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+    // Third Party
+    implementation(libs.bundles.vico)
+    implementation(libs.coil.compose)
 
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
-    implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("androidx.work:work-runtime-ktx:2.11.0")
-
-    // Android UI libraries
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
-
-    // Navigation Component
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.5")
-
-    // Jetpack Compose
-    val composeBom = platform("androidx.compose:compose-bom:2025.10.01")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.activity:activity-compose")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
-
-    // charts
-    implementation("com.patrykandpatrick.vico:core:2.2.1")
-    implementation("com.patrykandpatrick.vico:compose:2.2.1")
-    implementation("com.patrykandpatrick.vico:compose-m3:2.2.1")
-    // coil
-    implementation("io.coil-kt:coil-compose:2.7.0")
-
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
 }
