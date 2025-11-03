@@ -13,14 +13,14 @@ class GoogleApiAuthorizer(private val activity: Activity) {
     private val credentialManager by lazy { CredentialManager.create(activity) }
 
     suspend fun signIn(serverClientId: String): GetCredentialResponse {
-        val googleIdOption = GetGoogleIdOption.builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(serverClientId)
-            .build()
+        val googleIdOption = GetGoogleIdOption(
+            serverClientId = serverClientId,
+            filterByAuthorizedAccounts = false
+        )
 
-        val request = GetCredentialRequest.builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+        val request = GetCredentialRequest(
+            listOf(googleIdOption)
+        )
 
         return credentialManager.getCredential(activity, request)
     }
