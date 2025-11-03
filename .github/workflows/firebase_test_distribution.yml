@@ -26,7 +26,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       # 4. google-services.json を Secret から作成
-      # このSecretが存在しない場合は、手動でファイルを追加するか、このステップをコメントアウトしてください
       - name: Setup Google Services
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -40,9 +39,9 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew :app:assembleDebug
 
-      # 7. Firebase App Distributionへアップロード
+      # 7. Firebase App Distributionへアップロード (公式アクション使用)
       - name: Upload to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Action@v1
+        uses: firebase-actions/firebase-app-distribution@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
