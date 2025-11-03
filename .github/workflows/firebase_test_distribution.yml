@@ -1,0 +1,50 @@
+name: Manual Firebase Test Distribution
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 最新のmainブランチのコードをチェックアウト
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'main'
+
+      # 2. JDK 17 をセットアップ
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3. Gradleのキャッシュ設定
+      - name: Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      # 4. google-services.json を Secret から作成
+      # このSecretが存在しない場合は、手動でファイルを追加するか、このステップをコメントアウトしてください
+      - name: Setup Google Services
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
+
+      # 5. Gradle Wrapper を実行可能にする
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      # 6. DebugビルドのAPKをビルド (キーストア不要)
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug
+
+      # 7. Firebase App Distributionへアップロード
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: app/build/outputs/apk/debug/app-debug.apk
