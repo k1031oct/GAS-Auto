@@ -25,12 +25,12 @@ versionProps.store(versionPropsFile.writer(), "Auto-updated by Gradle build")
 // --- End of Version Auto-Increment Logic ---
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.firebase.appdistribution")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 android {
