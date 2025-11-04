@@ -22,36 +22,19 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. DEBUG - Verify Git State
-      - name: DEBUG - Verify Git State
-        run: |
-          echo "--- Git Version ---"
-          git --version
-          echo "--- Git Status ---"
-          git status
-          echo "--- Git Remote URL ---"
-          git remote -v
-          echo "--- Git Branch ---"
-          git branch -a
-          echo "--- Git Log (Last 10) ---"
-          git log -10 --graph --pretty=format:'%h -%d %s (%cr) <%an>'
-          echo "--- Git Commit Count ---"
-          echo "Commit count: $(git rev-list --count HEAD)"
-          echo "----------------------"
-
-      # 4. Setup Google Services
+      # 3. Setup Google Services
       - name: Setup Google Services
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
-      # 5. Make gradlew executable
+      # 4. Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 6. Build and Upload to Firebase App Distribution
+      # 5. Build and Upload to Firebase App Distribution (with cache disabled)
       - name: Build and Upload to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: ./gradlew :app:bundleDebug && ./gradlew :app:appDistributionUploadDebug
+        run: ./gradlew :app:bundleDebug --no-build-cache && ./gradlew :app:appDistributionUploadDebug
