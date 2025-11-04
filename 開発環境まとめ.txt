@@ -1,0 +1,117 @@
+開発ワークフローと環境仕様のまとめ
+この文書は、GWS-Auto-for-Android アプリケーション開発における、PC（Android Studio）とAndroidスマートフォン（Pixel 8）を連携させたハイブリッド開発体制を定義します。
+
+■ 1. アプリケーション
+1.1. 技術仕様
+ターゲットプラットフォーム: Android
+
+開発言語: Kotlin (推測)
+
+主要リポジトリ: https://github.com/k1031oct/GWS-Auto-for-Android
+
+ビルドシステム: Gradle
+
+CI/CD:
+
+GitHub Actionsによるテストビルド
+
+Firebase App Distribution (App Tester) へのデプロイ
+
+ログ出力 (推奨仕様):
+
+ロギングライブラリ (Timber など) を導入。
+
+デバッグビルド時、DEBUG レベル以上のすべてのログを、Logcatと同時に外部ストレージのアプリ固有領域 (getExternalFilesDir(null)) にファイル (debug.log など) として書き出す。
+
+INFO や DEBUG レベルのログには、処理の文脈（コンテキスト）が追えるよう、適切なタグやメッセージを含める。
+
+■ 2. PC開発環境 (Android Studio)
+PC環境は、精密な実装、ビルド、および詳細なデバッグを行う「開発本拠点」として機能します。
+
+2.1. 開発フロー
+コーディング: Android StudioでKotlin/XMLの編集を行います。
+
+AI支援: Android Studio標準搭載の Gemini エージェント を活用し、コード生成、リファクタリング、ドキュメント作成の支援を受けます。
+
+ビルド: Gradleタスクを実行し、ローカルでビルドします。
+
+デプロイ (テスト):
+
+Run コマンドで接続中のPixel 8に直接デプロイ。
+
+または、Gradleワークフローを実行し、Firebase経由でApp Testerにデプロイ。
+
+バージョン管理: コード変更をGitでコミットし、GitHubリポジトリにPushします。
+
+2.2. デバッグフロー (PC接続時)
+ログ分析 (リアルタイム):
+
+Pixel 8をPCにUSB接続します。
+
+Android Studioの Logcat ウィンドウを開き、リアルタイムで流れるログ（Error, Warn, Debug, Info）を確認します。
+
+Logcatの強力なGUIフィルタ（レベル別、タグ別、キーワード検索）を使用し、問題箇所を特定します。
+
+AIによる分析:
+
+Logcatで特定したエラー箇所や関連ログをコピーし、Gemini エージェント にペーストして、原因の分析や解決策を問い合わせます。
+
+ステップ実行:
+
+疑わしいコード箇所にブレークポイントを設定し、デバッガを接続して実行します。
+
+変数の内容やコールスタックをリアルタイムで確認し、ロジックの不具合を精密に特定します。
+
+ログファイル分析 (Gitsync連携):
+
+git pull を実行し、Pixel 8からPushされたログファイル（.logs/ ディレクトリ内）を取得します。
+
+Android StudioのLogcatの「Import Logs」機能でログファイルを読み込み、GUIで詳細に分析します。
+
+または、Geminiエージェントに @file などでログファイルを読み込ませ、分析を依頼します。
+
+■ 3. Androidスマートフォン (Pixel 8)
+スマートフォン環境は、実機での動作確認、外出先でのコーディング、および迅速な一次デバッグを行う「機動拠点」として機能します。
+
+3.1. 開発フロー
+コーディング (補助):
+
+Termux を起動し、vim/nano などで軽微なコード修正を行います。
+
+Gemini CLI を使用し、Termux上で直接AIに質問やコード生成の相談を行います。
+
+デプロイ (テスト):
+
+Firebase App Testerから最新のテストビルドをインストールします。
+
+（または、Termux内でGitHub Actionsの手動実行をトリガーし、ビルドを開始させます）
+
+バージョン管理 (ログ同期):
+
+Gitsync アプリケーション を使用し、ローカルの変更（特に後述のログファイル）をGitHubリポジトリにPush/Pullします。
+
+3.2. デバッグフロー (スマートフォン単体)
+バグ発見: アプリを実機操作中に不具合やクラッシュを発見します。
+
+一次分析 (AI活用):
+
+Termux を起動します。
+
+cat コマンドでアプリが出力したログファイル（debug.log）を読み込みます。
+
+grep コマンドでログをフィルタリングします（例: E/ や W/ のみ）。
+
+フィルタした結果をパイプ（|）で Gemini CLI に渡し、エラーの概要や原因の推定を依頼します。
+
+Bash
+
+# 例: エラーログだけを抽出しGeminiに分析させる
+$ LOGFILE="~/storage/shared/Android/data/[パッケージ名]/files/debug.log"
+$ cat $LOGFILE | grep "E/" | gemini "このエラーログを分析して原因を推定して"
+ログの永続化 (PC連携準備):
+
+（Termux または Gitsyncアプリを使用して）分析対象のログファイル (debug.log) をリポジトリの .logs/ ディレクトリにコピーします。
+
+git add/commit を実行し、Gitsyncアプリ または git push でログファイルをGitHubリポジトリにPushします。
+
+これにより、後でPC（Android Studio）で詳細な分析を行うための準備が完了します。
