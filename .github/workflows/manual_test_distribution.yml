@@ -21,17 +21,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Gradle Cache
-      # - name: Gradle Cache
-      #   uses: gradle/actions/setup-gradle@v3
-
-      # 4. Decode Keystore
+      # 3. Decode Keystore
       - name: Decode Keystore
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
         run: echo "$RELEASE_KEYSTORE_BASE64" | base64 --decode > app/release.keystore
 
-      # 5. Create Keystore Properties
+      # 4. Create Keystore Properties
       - name: Create Keystore Properties
         env:
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -43,19 +39,26 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> app/keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> app/keystore.properties
 
-      # 6. Setup Google Services
+      # 5. Setup Google Services
       - name: Setup Google Services
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
-      # 7. Make gradlew executable
+      # 6. Make gradlew executable
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      # 7. DEBUG - Show version.properties
+      - name: DEBUG - Show version.properties
+        run: |
+          echo "--- Content of app/version.properties ---"
+          cat app/version.properties
+          echo "-----------------------------------------"
 
       # 8. Build and Upload to Firebase App Distribution
       - name: Build and Upload Debug to Firebase
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: ./gradlew :app:assembleDebug && ./gradlew :app:appDistributionUploadDebug
+        run: ./gradlew :app:bundleDebug && ./gradlew :app:appDistributionUploadDebug
