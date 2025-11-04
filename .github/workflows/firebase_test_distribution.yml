@@ -22,8 +22,8 @@ jobs:
           distribution: 'temurin'
 
       # 3. Gradleのキャッシュ設定
-      - name: Gradle Cache
-        uses: gradle/actions/setup-gradle@v3
+      # - name: Gradle Cache
+      #   uses: gradle/actions/setup-gradle@v3
 
       # 4. google-services.json を Secret から作成
       - name: Setup Google Services

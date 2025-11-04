@@ -22,8 +22,8 @@ jobs:
           distribution: 'temurin'
 
       # 3. Gradle Cache
-      - name: Gradle Cache
-        uses: gradle/actions/setup-gradle@v3
+      # - name: Gradle Cache
+      #   uses: gradle/actions/setup-gradle@v3
 
       # 4. Decode Keystore
       - name: Decode Keystore
