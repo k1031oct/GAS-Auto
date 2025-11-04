@@ -1,4 +1,4 @@
-apu# GWS-Auto-for-Android: 開発計画書
+# GWS-Auto-for-Android: 開発計画書
 
 このドキュメントは、開発計画をフェーズごとに分割して記したものです。各タスクは、GitHubのIssueとして登録されることを想定しています。
 
@@ -15,6 +15,7 @@ apu# GWS-Auto-for-Android: 開発計画書
 - [x] **Task:** ユーザープロファイルと設定情報を保存するための、Firestoreの基本データベース構造を定義する。
 - [x] **Task:** 「サインアウト」ボタンを含む、基本的な「設定」画面のUIを実装する。
 - [x] **Task:** アプリケーションの基本的なMaterial 3テーマ（色、タイポグラフィ）をセットアップする。
+- [x] **Task:** 起動時の強制ログインを廃止し、アプリ内部（設定画面）から任意にログイン/ログアウトできるように再配置する。
 
 ---
 
@@ -77,3 +78,38 @@ apu# GWS-Auto-for-Android: 開発計画書
 - [ ] **Task:** 条件分岐（"If/Else"）など、複雑なワークフローロジックを実装する。
 - [ ] **Task:** アプリ全体のUI/UXレビューを実施し、最終的な磨き込みを行う。
 - [ ] **Task:** アプリ全体に、包括的なエラーハンドリングとユーザーフィードバックの仕組みを追加する。
+
+---
+
+### フェーズ7: UI基盤の強化とデザインシステム導入 (Web版準拠)
+
+**目標:** Webアプリ版の技術仕様書に基づき、AndroidアプリのUIテーマとコンポーネントスタイルを統一し、一貫性のあるモダンなデザイン基盤を構築する。
+
+- [ ] **Task:** カラーテーマの適用: 技術仕様書のカラーパレット (`Primary`, `Background`, `Card`等) を、`res/values/colors.xml`とMaterial 3テーマに反映させる。
+- [ ] **Task:** タイポグラフィの適用: `PT Sans`と`Noto Sans JP`フォントをプロジェクトに追加し、`TextView`や`Button`のデフォルトスタイルとして適用する。
+- [ ] **Task:** `MaterialCardView`の共通スタイルを定義し、Web版の`Card`コンポーネントのような見た目（角丸、影、余白）に統一する。
+- [ ] **Task:** `Chip`コンポーネントのスタイルを定義し、ステータス表示（`アクティブ`, `エラー`など）に使えるように準備する。
+
+---
+
+### フェーズ8: 主要画面のUI実装 (Web版準拠)
+
+**目標:** 「ワークフロー」「トリガー」「設定」の各主要画面を、技術仕様書の設計に基づいて具体的に実装し、ユーザー体験を向上させる。
+
+- [x] **Task (Workflow):** `fragment_workflow.xml`にタイトルを追加し、`RecyclerView`と`FloatingActionButton`の基本レイアウトを構築する。
+- [x] **Task (Workflow):** `list_item_workflow.xml`を作成し、`MaterialCardView`をベースにしたカードUIの骨格を実装する。
+- [ ] **Task (Workflow):** `WorkflowAdapter`をリファクタリングし、実際の`Workflow`オブジェクトのデータ（名前、トリガー、ステータス）をカードUIにバインドする。
+- [ ] **Task (Trigger):** `fragment_trigger.xml`のUIを設計する。技術仕様書の「縦型タイムライン」を参考に、`RecyclerView`を使ったレイアウトを構築する。
+- [ ] **Task (Settings):** `fragment_settings.xml`のUIを再設計する。技術仕様書に基づき、`TabLayout`を使って「テーマ」「言語」「カレンダー」などの設定項目を分類する。
+- [ ] **Task (Settings):** テーマ設定（ライト/ダーク）機能を`Tabs`コンポーネントを使って実装する。
+- [ ] **Task (Settings):** 言語設定機能を`Spinner`または`ExposedDropdownMenu`を使って実装する。
+
+---
+
+### フェーズ9: デバッグと開発環境の整備
+
+**目標:** `開発環境まとめ.txt`に記載された、効率的なハイブリッド開発体制を完成させる。
+
+- [x] **Task:** `Timber`を導入し、Logcatへのログ出力基盤を構築する。
+- [x] **Task:** `FileLoggingTree`を実装し、Logcatと同時に`debug.log`ファイルへログを書き出す仕組みを構築する。
+- [ ] **Task:** アプリ内の主要な処理（画面遷移、データ取得、ボタンクリックなど）に、`Timber`によるデバッグログを適切に配置する。

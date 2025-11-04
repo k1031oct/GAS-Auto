@@ -34,27 +34,32 @@ class WorkflowFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("onViewCreated called")
         binding.workflowRecyclerView.layoutManager = LinearLayoutManager(context)
 
         binding.fabAddWorkflow.setOnClickListener {
+            Timber.d("fabAddWorkflow clicked")
             startActivity(Intent(activity, WorkflowEditorActivity::class.java))
         }
     }
 
     override fun onResume() {
         super.onResume()
+        Timber.d("onResume called")
         updateUI()
     }
 
     private fun updateUI() {
         if (auth.currentUser != null) {
             // User is logged in
+            Timber.d("User is logged in. Loading workflows.")
             binding.workflowRecyclerView.isVisible = true
             binding.loginPromptText.isVisible = false
             binding.fabAddWorkflow.show()
             loadWorkflows()
         } else {
             // User is not logged in
+            Timber.d("User is not logged in.")
             binding.workflowRecyclerView.isVisible = false
             binding.loginPromptText.isVisible = true
             binding.fabAddWorkflow.hide()
@@ -66,6 +71,7 @@ class WorkflowFragment : Fragment() {
         workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
             val workflows = documents.toObjects(Workflow::class.java)
             binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
+            Timber.d("Successfully loaded ${workflows.size} workflows.")
         }.addOnFailureListener { exception ->
             Timber.w(exception, "Error getting documents")
         }

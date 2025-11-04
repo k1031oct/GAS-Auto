@@ -13,6 +13,7 @@ import com.gws.auto.mobile.android.SignInActivity
 import com.gws.auto.mobile.android.databinding.FragmentSettingsBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SettingsFragment : Fragment() {
 
@@ -34,20 +35,25 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("onViewCreated called")
         updateUI()
     }
 
     private fun updateUI() {
         if (auth.currentUser != null) {
             // User is signed in
+            Timber.d("User is logged in. Auth button set to 'Sign Out'.")
             binding.authButton.text = getString(R.string.sign_out)
             binding.authButton.setOnClickListener {
+                Timber.d("Sign out button clicked.")
                 signOut()
             }
         } else {
             // User is signed out
+            Timber.d("User is not logged in. Auth button set to 'Sign In'.")
             binding.authButton.text = getString(R.string.sign_in)
             binding.authButton.setOnClickListener {
+                Timber.d("Sign in button clicked.")
                 startActivity(Intent(activity, SignInActivity::class.java))
             }
         }
@@ -57,6 +63,7 @@ class SettingsFragment : Fragment() {
         lifecycleScope.launch {
             authorizer.signOut()
             auth.signOut()
+            Timber.i("User signed out successfully.")
             // Re-update the UI after sign out
             updateUI()
         }
@@ -64,6 +71,7 @@ class SettingsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        Timber.d("onResume called")
         // Update UI in case the user signs in and returns to this fragment
         updateUI()
     }
