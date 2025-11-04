@@ -13,6 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: 'master'
+          fetch-depth: 0 # Fetch all history for all tags and branches
 
       # 2. JDK 17 をセットアップ
       - name: Set up JDK 17
@@ -31,14 +32,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 5. DEBUG - Show version.properties
-      - name: DEBUG - Show version.properties
-        run: |
-          echo "--- Content of app/version.properties ---"
-          cat app/version.properties
-          echo "-----------------------------------------"
-
-      # 6. ビルドとFirebaseへのアップロードをGradleで実行
+      # 5. ビルドとFirebaseへのアップロードをGradleで実行
       - name: Build and Upload to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
