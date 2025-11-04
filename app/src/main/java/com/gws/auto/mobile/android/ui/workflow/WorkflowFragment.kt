@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
 import com.gws.auto.mobile.android.domain.model.Workflow
@@ -19,6 +20,7 @@ class WorkflowFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val workflowRepository = WorkflowRepository()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,15 +35,29 @@ class WorkflowFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.workflowRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
-            val workflows = documents.toObjects(Workflow::class.java)
-            binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
-        }.addOnFailureListener { exception ->
-            Timber.w(exception, "Error getting documents")
-        }
-
         binding.fabAddWorkflow.setOnClickListener {
             startActivity(Intent(activity, WorkflowEditorActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadWorkflows()
+    }
+
+    private fun loadWorkflows() {
+        if (auth.currentUser != null) {
+            // User is logged in, load their workflows
+            workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
+                val workflows = documents.toObjects(Workflow::class.java)
+                binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
+            }.addOnFailureListener { exception ->
+                Timber.w(exception, "Error getting documents")
+            }
+        } else {
+            // User is not logged in, show an empty list
+            binding.workflowRecyclerView.adapter = WorkflowAdapter(emptyList())
+            // TODO: Show a "Please log in" message in the UI
         }
     }
 
