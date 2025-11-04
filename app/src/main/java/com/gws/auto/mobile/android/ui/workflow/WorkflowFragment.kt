@@ -2,7 +2,6 @@ package com.gws.auto.mobile.android.ui.workflow
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +11,7 @@ import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
 import com.gws.auto.mobile.android.domain.model.Workflow
 import com.gws.auto.mobile.android.ui.workflow.editor.WorkflowEditorActivity
+import timber.log.Timber
 
 class WorkflowFragment : Fragment() {
 
@@ -37,7 +37,7 @@ class WorkflowFragment : Fragment() {
             val workflows = documents.toObjects(Workflow::class.java)
             binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
         }.addOnFailureListener { exception ->
-            Log.w(TAG, "Error getting documents: ", exception)
+            Timber.w(exception, "Error getting documents")
         }
 
         binding.fabAddWorkflow.setOnClickListener {
@@ -48,9 +48,5 @@ class WorkflowFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val TAG = "WorkflowFragment"
     }
 }

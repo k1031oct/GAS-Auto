@@ -2,17 +2,34 @@
 <resources>
     <string name="app_name">GWS Auto for Android</string>
     <string name="default_web_client_id">YOUR_DEFAULT_WEB_CLIENT_ID</string>
+
+    <!-- Titles -->
     <string name="title_workflow">Workflow</string>
     <string name="title_trigger">Trigger</string>
     <string name="title_settings">Settings</string>
+
+    <!-- Fragments -->
     <string name="trigger_fragment">Trigger Fragment</string>
     <string name="workflow_fragment">Workflow Fragment</string>
+
+    <!-- Authentication -->
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+
+    <!-- Workflow -->
     <string name="workflow_name">Workflow Name</string>
     <string name="workflow_description">Workflow Description</string>
     <string name="add_module">Add Module</string>
     <string name="save_workflow">Save Workflow</string>
     <string name="add_new_workflow">Add new workflow</string>
-    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="workflow_list_title">ワークフロー</string>
+    <string name="workflow_actions_menu">Actions</string>
+    <string name="workflow_run_button">実行</string>
+    <string name="workflow_trigger_icon_desc">Trigger icon</string>
+
+    <!-- Dummy Data -->
+    <string name="dummy_status_active">アクティブ</string>
+    <string name="dummy_trigger_daily">毎日 9:00</string>
+
 </resources>

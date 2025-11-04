@@ -1,6 +1,5 @@
 import java.util.Properties
 import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
-import java.io.ByteArrayOutputStream
 
 // --- Start of Dynamic Versioning Logic ---
 
@@ -13,7 +12,7 @@ fun fetchGitCommitCount(): Int {
         val output = process.inputStream.bufferedReader().readText()
         process.waitFor()
         output.trim().toInt()
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         // Fallback for environments where git isn't available or during initial Gradle sync.
         1
     }
@@ -140,6 +139,7 @@ dependencies {
     // Third Party
     implementation(libs.bundles.vico)
     implementation(libs.coil.compose)
+    implementation(libs.jakewharton.timber)
 
     // Testing
     testImplementation(libs.junit)
