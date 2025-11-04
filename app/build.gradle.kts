@@ -5,37 +5,29 @@ import java.io.ByteArrayOutputStream
 // --- Start of Dynamic Versioning Logic ---
 
 // Returns the total number of git commits as an integer.
-// This is used for a unique, always-incrementing versionCode.
 fun getGitCommitCount(): Int {
     return try {
-        val stdout = ByteArrayOutputStream()
-        exec {
-            commandLine("git", "rev-list", "--count", "HEAD")
-            standardOutput = stdout
-        }
-        stdout.toString().trim().toInt()
+        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().readText()
+        process.waitFor()
+        output.trim().toInt()
     } catch (e: Exception) {
-        // Fallback for environments where git isn't available (like a fresh clone before git init)
-        // or during initial Gradle sync in the IDE.
+        // Fallback for environments where git isn't available or during initial Gradle sync.
         1
     }
 }
 
 // Read version properties for major and minor versions.
-// These should be manually updated in the version.properties file for new releases.
 val versionProps = Properties()
 val versionPropsFile = file("version.properties")
-val major: String
-val minor: String
-
-if (versionPropsFile.canRead()) {
+val (major, minor) = if (versionPropsFile.canRead()) {
     versionProps.load(versionPropsFile.reader())
-    major = versionProps["VERSION_MAJOR"].toString()
-    minor = versionProps["VERSION_MINOR"].toString()
+    Pair(versionProps["VERSION_MAJOR"].toString(), versionProps["VERSION_MINOR"].toString())
 } else {
     // Provide default values if version.properties is missing
-    major = "1"
-    minor = "0"
+    Pair("1", "0")
 }
 
 val gitCommitCount = getGitCommitCount()
@@ -77,8 +69,6 @@ android {
         }
         debug {
             firebaseAppDistribution {
-                // The 'token' property was removed in a recent version of the App Distribution plugin.
-                // The plugin now automatically uses the FIREBASE_TOKEN environment variable if it's set.
                 appId = System.getenv("FIREBASE_APP_ID")
                 groups = "testers"
                 artifactType = "APK" // Use APK for test distribution
