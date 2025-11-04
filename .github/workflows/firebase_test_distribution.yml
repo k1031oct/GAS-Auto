@@ -21,19 +21,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Gradleのキャッシュ設定
-      # - name: Gradle Cache
-      #   uses: gradle/actions/setup-gradle@v3
-
-      # 4. google-services.json を Secret から作成
+      # 3. google-services.json を Secret から作成
       - name: Setup Google Services
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: echo "$GOOGLE_SERVICES_JSON" > app/google-services.json
 
-      # 5. Gradle Wrapper を実行可能にする
+      # 4. Gradle Wrapper を実行可能にする
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      # 5. DEBUG - Show version.properties
+      - name: DEBUG - Show version.properties
+        run: |
+          echo "--- Content of app/version.properties ---"
+          cat app/version.properties
+          echo "-----------------------------------------"
 
       # 6. ビルドとFirebaseへのアップロードをGradleで実行
       - name: Build and Upload to Firebase App Distribution
