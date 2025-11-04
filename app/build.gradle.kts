@@ -5,7 +5,7 @@ import java.io.ByteArrayOutputStream
 // --- Start of Dynamic Versioning Logic ---
 
 // Returns the total number of git commits as an integer.
-fun getGitCommitCount(): Int {
+fun fetchGitCommitCount(): Int {
     return try {
         val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
             .redirectErrorStream(true)
@@ -30,7 +30,7 @@ val (major, minor) = if (versionPropsFile.canRead()) {
     Pair("1", "0")
 }
 
-val gitCommitCount = getGitCommitCount()
+val gitCommitCount = fetchGitCommitCount()
 
 // --- End of Dynamic Versioning Logic ---
 
