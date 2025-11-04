@@ -63,6 +63,7 @@ android {
                 // The plugin now automatically uses the FIREBASE_TOKEN environment variable if it's set.
                 appId = System.getenv("FIREBASE_APP_ID")
                 groups = "testers"
+                artifactType = "AAB"
             }
         }
     }
