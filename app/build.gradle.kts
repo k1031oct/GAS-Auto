@@ -1,28 +1,46 @@
 import java.util.Properties
 import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+import java.io.ByteArrayOutputStream
 
-// --- Start of Version Auto-Increment Logic ---
-val versionPropsFile = file("version.properties")
+// --- Start of Dynamic Versioning Logic ---
 
-if (!versionPropsFile.canRead()) {
-    throw GradleException("Could not read version.properties! Create one with: \nVERSION_CODE=1\nVERSION_MAJOR=1\nVERSION_MINOR=0\nVERSION_PATCH=0")
+// Returns the total number of git commits as an integer.
+// This is used for a unique, always-incrementing versionCode.
+fun getGitCommitCount(): Int {
+    return try {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().toInt()
+    } catch (e: Exception) {
+        // Fallback for environments where git isn't available (like a fresh clone before git init)
+        // or during initial Gradle sync in the IDE.
+        1
+    }
 }
 
+// Read version properties for major and minor versions.
+// These should be manually updated in the version.properties file for new releases.
 val versionProps = Properties()
-versionProps.load(versionPropsFile.reader())
+val versionPropsFile = file("version.properties")
+val major: String
+val minor: String
 
-var versionCode = versionProps["VERSION_CODE"].toString().toInt()
-var versionPatch = versionProps["VERSION_PATCH"].toString().toInt()
+if (versionPropsFile.canRead()) {
+    versionProps.load(versionPropsFile.reader())
+    major = versionProps["VERSION_MAJOR"].toString()
+    minor = versionProps["VERSION_MINOR"].toString()
+} else {
+    // Provide default values if version.properties is missing
+    major = "1"
+    minor = "0"
+}
 
-// Increment for the current build
-versionCode++
-versionPatch++
+val gitCommitCount = getGitCommitCount()
 
-// Update properties file for the next build
-versionProps["VERSION_CODE"] = versionCode.toString()
-versionProps["VERSION_PATCH"] = versionPatch.toString()
-versionProps.store(versionPropsFile.writer(), "Auto-updated by Gradle build")
-// --- End of Version Auto-Increment Logic ---
+// --- End of Dynamic Versioning Logic ---
 
 plugins {
     alias(libs.plugins.android.application)
@@ -41,11 +59,11 @@ android {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
         targetSdk = 36
-        
-        // Set the updated versions from the logic above
-        this.versionCode = versionCode
-        this.versionName = "${versionProps["VERSION_MAJOR"]}.${versionProps["VERSION_MINOR"]}.$versionPatch"
-        
+
+        // Set the version codes dynamically using Git commit count
+        versionCode = gitCommitCount
+        versionName = "$major.$minor.$gitCommitCount"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
@@ -63,7 +81,7 @@ android {
                 // The plugin now automatically uses the FIREBASE_TOKEN environment variable if it's set.
                 appId = System.getenv("FIREBASE_APP_ID")
                 groups = "testers"
-                artifactType = "AAB"
+                artifactType = "APK" // Use APK for test distribution
             }
         }
     }
