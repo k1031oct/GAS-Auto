@@ -1,30 +1,27 @@
 package com.gws.auto.mobile.android
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var binding: ActivityMainBinding
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
-        auth = FirebaseAuth.getInstance()
-        if (auth.currentUser == null) {
-            startActivity(Intent(this, SignInActivity::class.java))
-            finish()
-            return
-        }
+//        auth = FirebaseAuth.getInstance()
+//        if (auth.currentUser == null) {
+//            startActivity(Intent(this, SignInActivity::class.java))
+//            finish()
+//            return
+//        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
