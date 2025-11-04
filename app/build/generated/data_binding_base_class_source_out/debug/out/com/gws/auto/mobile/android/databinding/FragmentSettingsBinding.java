@@ -20,12 +20,11 @@ public final class FragmentSettingsBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final Button signOutButton;
+  public final Button authButton;
 
-  private FragmentSettingsBinding(@NonNull ConstraintLayout rootView,
-      @NonNull Button signOutButton) {
+  private FragmentSettingsBinding(@NonNull ConstraintLayout rootView, @NonNull Button authButton) {
     this.rootView = rootView;
-    this.signOutButton = signOutButton;
+    this.authButton = authButton;
   }
 
   @Override
@@ -55,13 +54,13 @@ public final class FragmentSettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.sign_out_button;
-      Button signOutButton = ViewBindings.findChildViewById(rootView, id);
-      if (signOutButton == null) {
+      id = R.id.auth_button;
+      Button authButton = ViewBindings.findChildViewById(rootView, id);
+      if (authButton == null) {
         break missingId;
       }
 
-      return new FragmentSettingsBinding((ConstraintLayout) rootView, signOutButton);
+      return new FragmentSettingsBinding((ConstraintLayout) rootView, authButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

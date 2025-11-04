@@ -11,6 +11,7 @@ drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_launcher_monochrome
 id add_module_button
+id auth_button
 id bottom_nav_view
 id fab_add_workflow
 id module_recycler_view
@@ -23,7 +24,6 @@ id navigation_workflow
 id progressBar
 id save_workflow_button
 id sign_in_button
-id sign_out_button
 id workflow_description
 id workflow_description_editor
 id workflow_name
@@ -55,6 +55,7 @@ string google_crash_reporting_api_key
 string google_storage_bucket
 string project_id
 string save_workflow
+string sign_in
 string sign_in_with_google
 string sign_out
 string title_settings
