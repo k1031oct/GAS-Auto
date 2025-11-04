@@ -19,3 +19,6 @@ app/google-services.json
 
 # Keystore file
 /keystore.properties
+
+# Local files
+/Firebase Studio -backup/
