@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -42,22 +43,31 @@ class WorkflowFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadWorkflows()
+        updateUI()
+    }
+
+    private fun updateUI() {
+        if (auth.currentUser != null) {
+            // User is logged in
+            binding.workflowRecyclerView.isVisible = true
+            binding.loginPromptText.isVisible = false
+            binding.fabAddWorkflow.show()
+            loadWorkflows()
+        } else {
+            // User is not logged in
+            binding.workflowRecyclerView.isVisible = false
+            binding.loginPromptText.isVisible = true
+            binding.fabAddWorkflow.hide()
+            binding.workflowRecyclerView.adapter = WorkflowAdapter(emptyList()) // Clear the list
+        }
     }
 
     private fun loadWorkflows() {
-        if (auth.currentUser != null) {
-            // User is logged in, load their workflows
-            workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
-                val workflows = documents.toObjects(Workflow::class.java)
-                binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
-            }.addOnFailureListener { exception ->
-                Timber.w(exception, "Error getting documents")
-            }
-        } else {
-            // User is not logged in, show an empty list
-            binding.workflowRecyclerView.adapter = WorkflowAdapter(emptyList())
-            // TODO: Show a "Please log in" message in the UI
+        workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
+            val workflows = documents.toObjects(Workflow::class.java)
+            binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
+        }.addOnFailureListener { exception ->
+            Timber.w(exception, "Error getting documents")
         }
     }
 
