@@ -1,4 +1,4 @@
-name: Manual Release Distribution
+name: Manual Test Distribution
 
 on:
   workflow_dispatch:
@@ -54,8 +54,8 @@ jobs:
         run: chmod +x ./gradlew
 
       # 8. Build and Upload to Firebase App Distribution
-      - name: Build and Upload Release to Firebase
+      - name: Build and Upload Debug to Firebase
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: ./gradlew :app:bundleRelease && ./gradlew :app:appDistributionUploadRelease
+        run: ./gradlew :app:assembleDebug && ./gradlew :app:appDistributionUploadDebug
