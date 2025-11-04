@@ -20,6 +20,7 @@
     <string name="google_app_id" translatable="false">1:46549959857:android:7f3e4d6965318171d74e90</string>
     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyC_5lILVUcSPArZVcW4Cz5AFdRYjOAWZP8</string>
     <string name="google_storage_bucket" translatable="false">gws-auto-for-android-4db4a.firebasestorage.app</string>
+    <string name="please_log_in">Please log in to see your workflows.</string>
     <string name="project_id" translatable="false">gws-auto-for-android-4db4a</string>
     <string name="save_workflow">Save Workflow</string>
     <string name="sign_in">Sign In</string>

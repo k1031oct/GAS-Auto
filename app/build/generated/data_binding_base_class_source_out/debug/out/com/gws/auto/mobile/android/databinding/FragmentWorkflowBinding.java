@@ -25,16 +25,20 @@ public final class FragmentWorkflowBinding implements ViewBinding {
   public final FloatingActionButton fabAddWorkflow;
 
   @NonNull
+  public final TextView loginPromptText;
+
+  @NonNull
   public final TextView titleTextWorkflow;
 
   @NonNull
   public final RecyclerView workflowRecyclerView;
 
   private FragmentWorkflowBinding(@NonNull ConstraintLayout rootView,
-      @NonNull FloatingActionButton fabAddWorkflow, @NonNull TextView titleTextWorkflow,
-      @NonNull RecyclerView workflowRecyclerView) {
+      @NonNull FloatingActionButton fabAddWorkflow, @NonNull TextView loginPromptText,
+      @NonNull TextView titleTextWorkflow, @NonNull RecyclerView workflowRecyclerView) {
     this.rootView = rootView;
     this.fabAddWorkflow = fabAddWorkflow;
+    this.loginPromptText = loginPromptText;
     this.titleTextWorkflow = titleTextWorkflow;
     this.workflowRecyclerView = workflowRecyclerView;
   }
@@ -72,6 +76,12 @@ public final class FragmentWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.login_prompt_text;
+      TextView loginPromptText = ViewBindings.findChildViewById(rootView, id);
+      if (loginPromptText == null) {
+        break missingId;
+      }
+
       id = R.id.title_text_workflow;
       TextView titleTextWorkflow = ViewBindings.findChildViewById(rootView, id);
       if (titleTextWorkflow == null) {
@@ -85,7 +95,7 @@ public final class FragmentWorkflowBinding implements ViewBinding {
       }
 
       return new FragmentWorkflowBinding((ConstraintLayout) rootView, fabAddWorkflow,
-          titleTextWorkflow, workflowRecyclerView);
+          loginPromptText, titleTextWorkflow, workflowRecyclerView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

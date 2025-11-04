@@ -16,6 +16,7 @@ id add_module_button
 id auth_button
 id bottom_nav_view
 id fab_add_workflow
+id login_prompt_text
 id menu_button
 id module_recycler_view
 id module_type
@@ -65,6 +66,7 @@ string google_api_key
 string google_app_id
 string google_crash_reporting_api_key
 string google_storage_bucket
+string please_log_in
 string project_id
 string save_workflow
 string sign_in

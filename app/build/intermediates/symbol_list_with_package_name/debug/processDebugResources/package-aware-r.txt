@@ -4066,6 +4066,7 @@ id linear
 id listMode
 id list_item
 id locale
+id login_prompt_text
 id ltr
 id m3_side_sheet
 id marquee
@@ -4886,6 +4887,7 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string please_log_in
 string project_id
 string range_end
 string range_start
