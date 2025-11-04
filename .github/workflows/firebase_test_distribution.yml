@@ -32,9 +32,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 5. Build and Upload to Firebase App Distribution (with cache disabled)
+      # 5. Build APK and Upload to Firebase
       - name: Build and Upload to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: ./gradlew :app:bundleDebug --no-build-cache && ./gradlew :app:appDistributionUploadDebug
+        run: ./gradlew :app:assembleDebug :app:appDistributionUploadDebug

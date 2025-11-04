@@ -43,13 +43,6 @@ plugins {
     alias(libs.plugins.firebase.appdistribution)
 }
 
-// DEBUG: Print the version values before they are used.
-println("--- Versioning Info (Top Level) ---")
-println("Major: $major")
-println("Minor: $minor")
-println("Git Commit Count: $gitCommitCount")
-println("-----------------------------------")
-
 android {
     namespace = "com.gws.auto.mobile.android"
     compileSdk = 36
@@ -58,12 +51,6 @@ android {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
         targetSdk = 36
-
-        // DEBUG: Print values inside defaultConfig just before assignment
-        println("--- Versioning Info (Inside defaultConfig) ---")
-        println("Value for versionCode: $gitCommitCount")
-        println("Value for versionName: $major.$minor.$gitCommitCount")
-        println("----------------------------------------------")
 
         // Set the version codes dynamically using Git commit count
         versionCode = gitCommitCount
