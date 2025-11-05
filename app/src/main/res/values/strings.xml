@@ -4,6 +4,8 @@
     <string name="default_web_client_id">YOUR_DEFAULT_WEB_CLIENT_ID</string>
 
     <!-- Titles -->
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_history">History</string>
     <string name="title_workflow">Workflow</string>
     <string name="title_trigger">Trigger</string>
     <string name="title_settings">Settings</string>

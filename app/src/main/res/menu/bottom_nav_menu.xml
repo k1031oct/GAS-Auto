@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="@string/title_dashboard" />
+    <item
         android:id="@+id/navigation_workflow"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="@string/title_workflow" />
@@ -9,7 +13,7 @@
         android:icon="@android:drawable/ic_menu_my_calendar"
         android:title="@string/title_trigger" />
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/title_settings" />
+        android:id="@+id/navigation_history"
+        android:icon="@drawable/ic_history"
+        android:title="@string/title_history" />
 </menu>
