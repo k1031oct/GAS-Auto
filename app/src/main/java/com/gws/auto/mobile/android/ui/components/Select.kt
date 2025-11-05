@@ -41,7 +41,7 @@ fun AppSelect(
             value = selectedOption,
             onValueChange = {},
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = enabled)
                 .fillMaxWidth(),
             readOnly = true,
             label = label?.let { { Text(it) } },
