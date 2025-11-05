@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GWS Auto for Android</string>
+
+    <!-- Titles -->
+    <string name="title_dashboard">仪表板</string>
+    <string name="title_history">历史</string>
+    <string name="title_workflow">工作流程</string>
+    <string name="title_schedule">时间表</string>
+    <string name="title_settings">设置</string>
+
+    <!-- Fragments -->
+    <string name="workflow_fragment">工作流程片段</string>
+
+    <!-- Authentication -->
+    <string name="sign_in">登录</string>
+    <string name="sign_out">登出</string>
+    <string name="sign_in_with_google">使用Google登录</string>
+    <string name="please_log_in">请登录以查看您的工作流程。</string>
+
+    <!-- Workflow -->
+    <string name="workflow_name">工作流程名称</string>
+    <string name="workflow_description">工作流程说明</string>
+    <string name="add_module">添加模块</string>
+    <string name="save_workflow">保存工作流程</string>
+    <string name="add_new_workflow">添加新工作流程</string>
+    <string name="workflow_list_title">工作流程</string>
+    <string name="workflow_actions_menu">动作</string>
+    <string name="workflow_run_button">跑步</string>
+    <string name="workflow_trigger_icon_desc">触发图标</string>
+
+</resources>

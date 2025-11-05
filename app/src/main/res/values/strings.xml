@@ -35,4 +35,30 @@
     <string name="dummy_status_active">アクティブ</string>
     <string name="dummy_trigger_daily">毎日 9:00</string>
 
+    <string-array name="first_day_of_week_entries">
+        <item>Sunday</item>
+        <item>Monday</item>
+    </string-array>
+
+    <string-array name="country_entries">
+        <item>USA</item>
+        <item>Japan</item>
+        <item>China</item>
+        <item>South Korea</item>
+    </string-array>
+
+    <string-array name="country_values">
+        <item>US</item>
+        <item>JP</item>
+        <item>CN</item>
+        <item>KR</item>
+    </string-array>
+
+    <string-array name="language_entries">
+        <item>English</item>
+        <item>Japanese</item>
+        <item>Chinese</item>
+        <item>Korean</item>
+    </string-array>
+
 </resources>
