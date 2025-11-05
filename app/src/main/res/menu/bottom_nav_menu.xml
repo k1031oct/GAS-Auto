@@ -9,9 +9,9 @@
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="@string/title_workflow" />
     <item
-        android:id="@+id/navigation_trigger"
+        android:id="@+id/navigation_schedule"
         android:icon="@android:drawable/ic_menu_my_calendar"
-        android:title="@string/title_trigger" />
+        android:title="@string/title_schedule" />
     <item
         android:id="@+id/navigation_history"
         android:icon="@drawable/ic_history"

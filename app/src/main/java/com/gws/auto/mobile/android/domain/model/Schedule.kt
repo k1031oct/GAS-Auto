@@ -3,7 +3,7 @@ package com.gws.auto.mobile.android.domain.model
 /**
  * Defines the condition that starts a workflow.
  */
-data class Trigger(
+data class Schedule(
     val id: String,
     val workflowId: String,
     val type: String, // e.g., "SCHEDULED", "MANUAL"
