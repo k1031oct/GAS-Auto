@@ -10,7 +10,7 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipPositionProvider
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,9 +24,8 @@ fun AppTooltip(
     tooltipText: String,
     content: @Composable () -> Unit
 ) {
-    @Suppress("DEPRECATION")
     TooltipBox(
-        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
+        positionProvider = rememberTooltipPositionProvider(),
         tooltip = {
             PlainTooltip {
                 Text(tooltipText)
