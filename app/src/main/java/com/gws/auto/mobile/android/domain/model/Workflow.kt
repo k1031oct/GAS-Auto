@@ -7,5 +7,7 @@ data class Workflow(
     val id: String,
     val name: String,
     val description: String,
-    val modules: List<Module>
+    val modules: List<Module>,
+    val status: String,
+    val trigger: String
 )

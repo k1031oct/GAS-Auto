@@ -25,7 +25,7 @@ class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.
         val currentItem = historyList[position]
         holder.workflowName.text = currentItem.workflowName
         holder.status.text = currentItem.status
-        holder.date.text = currentItem.date
+        holder.date.text = currentItem.timestamp
     }
 
     override fun getItemCount() = historyList.size
