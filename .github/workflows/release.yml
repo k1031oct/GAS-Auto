@@ -30,6 +30,9 @@ jobs:
       - name: Decode Signing Key
         run: echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.keystore
 
+      - name: Clean build cache
+        run: ./gradlew clean
+
       - name: Build Release App Bundle
         env:
           SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}

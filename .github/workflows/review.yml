@@ -24,6 +24,9 @@ jobs:
       - name: Setup Google Services (from Base64)
         run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
 
+      - name: Clean build cache
+        run: ./gradlew clean
+
       - name: Build debug APK
         run: ./gradlew assembleDebug
 

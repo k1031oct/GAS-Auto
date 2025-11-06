@@ -138,6 +138,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.preference)
 
     // Third Party
     implementation(libs.bundles.vico)
