@@ -139,6 +139,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.preference)
+    implementation(project(":app"))
 
     // Third Party
     implementation(libs.bundles.vico)
