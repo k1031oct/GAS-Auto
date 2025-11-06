@@ -58,7 +58,9 @@ class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.Mod
             id = UUID.randomUUID().toString(),
             name = binding.workflowNameEditor.text.toString(),
             description = binding.workflowDescriptionEditor.text.toString(),
-            modules = modules
+            modules = modules,
+            status = "Pending",
+            trigger = "Manual"
         )
 
         workflowRepository.saveWorkflow(workflow).addOnSuccessListener {

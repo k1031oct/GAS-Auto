@@ -5,7 +5,7 @@ kotlin = "2.2.21"
 googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
-compose-compiler = "1.5.11"
+compose-compiler = "1.6.10"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
