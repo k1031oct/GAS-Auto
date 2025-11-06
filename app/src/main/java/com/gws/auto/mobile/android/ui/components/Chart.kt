@@ -12,16 +12,16 @@ import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 
 @Composable
 fun AppChart(modifier: Modifier = Modifier) {
-    val model = com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModel(
-        com.patrykandpatrick.vico.core.cartesian.data.entrySeriesOf(2, 1, 4, 3, 5)
+    val model = CartesianChartModel(
+        entrySeriesOf(2, 1, 4, 3, 5)
     )
-    com.patrykandpatrick.vico.compose.cartesian.CartesianChart(
+    CartesianChart(
         modifier = modifier.height(250.dp),
         model = model,
-        chart = com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart(
-            com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer(),
-            startAxis = com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis(),
-            bottomAxis = com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis(),
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(),
+            startAxis = rememberStartAxis(),
+            bottomAxis = rememberBottomAxis(),
         )
     )
 }
