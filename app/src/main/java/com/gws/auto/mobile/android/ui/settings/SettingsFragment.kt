@@ -20,6 +20,7 @@ import com.gws.auto.mobile.android.databinding.FragmentSettingsBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import coil.load
 
 class SettingsFragment : Fragment() {
 
@@ -112,16 +113,48 @@ class SettingsFragment : Fragment() {
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        // Theme spinner
+        val themeAdapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.theme_entries,
+            android.R.layout.simple_spinner_item
+        )
+        themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.themeSpinner.adapter = themeAdapter
+        val theme = prefs.getString("theme", "Default")
+        val themePosition = themeAdapter.getPosition(theme)
+        binding.themeSpinner.setSelection(themePosition)
+        binding.themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedTheme = parent.getItemAtPosition(position).toString()
+                prefs.edit().putString("theme", selectedTheme).apply()
+                when (selectedTheme) {
+                    "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
     }
 
     private fun updateUI() {
-        if (auth.currentUser != null) {
+        val user = auth.currentUser
+        if (user != null) {
             // User is signed in
             Timber.d("User is logged in. Auth button set to 'Sign Out'.")
             binding.authButton.text = getString(R.string.sign_out)
             binding.authButton.setOnClickListener {
                 Timber.d("Sign out button clicked.")
                 signOut()
+            }
+            binding.userName.text = user.displayName
+            binding.userEmail.text = user.email
+            binding.profileImage.load(user.photoUrl) {
+                crossfade(true)
+                placeholder(R.mipmap.ic_launcher_round)
+                error(R.mipmap.ic_launcher_round)
             }
         } else {
             // User is signed out
@@ -131,6 +164,9 @@ class SettingsFragment : Fragment() {
                 Timber.d("Sign in button clicked.")
                 startActivity(Intent(activity, SignInActivity::class.java))
             }
+            binding.userName.text = "User Name"
+            binding.userEmail.text = "user@example.com"
+            binding.profileImage.setImageResource(R.mipmap.ic_launcher_round)
         }
     }
 
