@@ -8,26 +8,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.domain.model.HistoryItem
 
-class HistoryAdapter(private val historyItems: List<HistoryItem>) : RecyclerView.Adapter<HistoryAdapter.ViewHolder>() {
+class HistoryAdapter(private val historyList: List<HistoryItem>) : RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val workflowName: TextView = view.findViewById(R.id.workflow_name)
-        val status: TextView = view.findViewById(R.id.status)
-        val timestamp: TextView = view.findViewById(R.id.timestamp)
+    class HistoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val workflowName: TextView = itemView.findViewById(R.id.workflow_name)
+        val status: TextView = itemView.findViewById(R.id.status)
+        val date: TextView = itemView.findViewById(R.id.date)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_history, parent, false)
-        return ViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_history_table, parent, false)
+        return HistoryViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = historyItems[position]
-        holder.workflowName.text = item.workflowName
-        holder.status.text = item.status
-        holder.timestamp.text = item.timestamp
+    override fun onBindViewHolder(holder: HistoryViewHolder, position: Int) {
+        val currentItem = historyList[position]
+        holder.workflowName.text = currentItem.workflowName
+        holder.status.text = currentItem.status
+        holder.date.text = currentItem.date
     }
 
-    override fun getItemCount() = historyItems.size
+    override fun getItemCount() = historyList.size
 }
