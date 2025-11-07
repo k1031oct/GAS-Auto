@@ -41,7 +41,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.kotlin.kapt)
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
