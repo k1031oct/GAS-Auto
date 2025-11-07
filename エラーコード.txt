@@ -1,4 +1,4 @@
-﻿2025-11-06T23:07:53.7971309Z ##[group]Run ./gradlew :app:assembleDebug :app:appDistributionUploadDebug
+﻿2025-11-07T00:06:23.0452432Z ##[group]Run ./gradlew :app:assembleDebug :app:appDistributionUploadDebug
 ./gradlew :app:assembleDebug :app:appDistributionUploadDebug
 shell: /usr/bin/bash -e ***0***
 env:
@@ -43,34 +43,31 @@ Daemon will be stopped at the end of the build
 > Task :app:extractDeepLinksDebug
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
-> Task :app:processDebugManifestForPackage
 > Task :app:desugarDebugFileDependencies
 > Task :app:processDebugResources
 > Task :app:checkDebugDuplicateClasses
 > Task :app:compileDebugKotlin
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:11:52 Unresolved reference 'CartesianChart'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:12:57 Unresolved reference 'rememberBottomAxis'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:13:57 Unresolved reference 'rememberStartAxis'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:17:54 Unresolved reference 'entrySeriesOf'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:23:9 Unresolved reference 'entrySeriesOf'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:25:5 Unresolved reference 'CartesianChart'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:30:25 Unresolved reference 'rememberStartAxis'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:31:26 Unresolved reference 'rememberBottomAxis'.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Tabs.kt:31:9 This material API is experimental and is likely to change or to be removed in the future.
-e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Tooltip.kt:29:44 Unresolved reference 'rememberTooltipPositionProvider'.
 
-> Task :app:mergeExtDexDebug
 > Task :app:compileDebugKotlin FAILED
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:14:57 Unresolved reference 'rememberBottomAxis'.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:15:57 Unresolved reference 'rememberStartAxis'.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:38:25 Unresolved reference 'rememberStartAxis'.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Chart.kt:39:26 Unresolved reference 'rememberBottomAxis'.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Tabs.kt:31:9 This material API is experimental and is likely to change or to be removed in the future.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Tooltip.kt:13:35 Unresolved reference 'rememberTooltipPositionProvider'.
+e: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/app/src/main/java/com/gws/auto/mobile/android/ui/components/Tooltip.kt:28:28 Unresolved reference 'rememberTooltipPositionProvider'.
+> Task :app:mergeExtDexDebug
 
 
-FAILURE: Build failed with an exception.
 [Incubating] Problems report is available at: file:///home/runner/work/GWS-Auto-for-Android/GWS-Auto-for-Android/build/reports/problems/problems-report.html
+FAILURE: Build failed with an exception.
 
 * What went wrong:
 Execution failed for task ':app:compileDebugKotlin'.
@@ -83,7 +80,7 @@ Execution failed for task ':app:compileDebugKotlin'.
 > Run with --scan to generate a Build Scan (powered by Develocity).
 > Get more help at https://help.gradle.org.
 
-BUILD FAILED in 6m 31s
+BUILD FAILED in 5m 58s
 
 Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
 
