@@ -25,12 +25,7 @@ class MainActivity : AppCompatActivity() {
         Timber.d("onCreate called")
         installSplashScreen()
 
-//        auth = FirebaseAuth.getInstance()
-//        if (auth.currentUser == null) {
-//            startActivity(Intent(this, SignInActivity::class.java))
-//            finish()
-//            return
-//        }
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

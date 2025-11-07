@@ -59,8 +59,8 @@ class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.Mod
             name = binding.workflowNameEditor.text.toString(),
             description = binding.workflowDescriptionEditor.text.toString(),
             modules = modules,
-            status = "Pending",
-            trigger = "Manual"
+            status = WORKFLOW_STATUS_PENDING,
+            trigger = WORKFLOW_TRIGGER_MANUAL
         )
 
         workflowRepository.saveWorkflow(workflow).addOnSuccessListener {
@@ -70,4 +70,8 @@ class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.Mod
             Toast.makeText(this, "Error saving workflow: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-}
+
+    companion object {
+        private const val WORKFLOW_STATUS_PENDING = "Pending"
+        private const val WORKFLOW_TRIGGER_MANUAL = "Manual"
+    }

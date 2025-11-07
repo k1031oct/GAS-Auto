@@ -22,3 +22,10 @@ app/google-services.json
 
 # Local files
 /Firebase Studio -backup/
+
+# Keystore files
+*.jks
+release-key.jks
+
+# Temporary files
+temp_key.txt
