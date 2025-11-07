@@ -7,3 +7,5 @@ plugins {
     id("com.google.firebase.appdistribution") version "5.2.0" apply false
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.21" apply false
 }
+
+// Cache invalidation comment
