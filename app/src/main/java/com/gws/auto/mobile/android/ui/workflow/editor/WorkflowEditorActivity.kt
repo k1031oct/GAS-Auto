@@ -9,8 +9,10 @@ import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.databinding.ActivityWorkflowEditorBinding
 import com.gws.auto.mobile.android.domain.model.Module
 import com.gws.auto.mobile.android.domain.model.Workflow
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
+@AndroidEntryPoint
 class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.ModuleListListener, ModuleParameterDialogFragment.ModuleParameterListener {
 
     private lateinit var binding: ActivityWorkflowEditorBinding

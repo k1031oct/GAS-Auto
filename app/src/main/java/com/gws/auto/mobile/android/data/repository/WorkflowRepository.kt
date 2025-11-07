@@ -5,11 +5,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.gws.auto.mobile.android.domain.model.Workflow
+import javax.inject.Inject
 
-class WorkflowRepository {
-
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+class WorkflowRepository @Inject constructor(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth
+) {
 
     private fun getWorkflowsCollection() = db.collection("users")
         .document(auth.currentUser!!.uid)

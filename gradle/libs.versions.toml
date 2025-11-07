@@ -6,6 +6,7 @@ googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
 compose-compiler = "1.6.10"
+hilt = "2.51.1"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -88,6 +89,8 @@ jakewharton-timber = { group = "com.jakewharton.timber", name = "timber", versio
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "extJunit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 
 [plugins]
@@ -97,6 +100,8 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 
 [bundles]
 vico = ["vico-core", "vico-compose", "vico-compose-m3"]

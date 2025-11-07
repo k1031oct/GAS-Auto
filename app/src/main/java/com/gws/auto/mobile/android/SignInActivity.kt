@@ -11,8 +11,10 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.gws.auto.mobile.android.databinding.ActivitySignInBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class SignInActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignInBinding

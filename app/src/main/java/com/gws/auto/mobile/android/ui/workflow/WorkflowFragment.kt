@@ -8,20 +8,25 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
-import com.gws.auto.mobile.android.domain.model.Workflow
 import com.gws.auto.mobile.android.ui.workflow.editor.WorkflowEditorActivity
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class WorkflowFragment : Fragment() {
 
     private var _binding: FragmentWorkflowBinding? = null
     private val binding get() = _binding!!
 
-    private val workflowRepository = WorkflowRepository()
-    private val auth = FirebaseAuth.getInstance()
+    private val viewModel: WorkflowViewModel by viewModels()
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +46,11 @@ class WorkflowFragment : Fragment() {
             Timber.d("fabAddWorkflow clicked")
             startActivity(Intent(activity, WorkflowEditorActivity::class.java))
         }
+
+        viewModel.workflows.observe(viewLifecycleOwner) { workflows ->
+            binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
+            Timber.d("Successfully loaded ${workflows.size} workflows.")
+        }
     }
 
     override fun onResume() {
@@ -56,7 +66,7 @@ class WorkflowFragment : Fragment() {
             binding.workflowRecyclerView.isVisible = true
             binding.loginPromptText.isVisible = false
             binding.fabAddWorkflow.show()
-            loadWorkflows()
+            viewModel.loadWorkflows()
         } else {
             // User is not logged in
             Timber.d("User is not logged in.")
@@ -64,16 +74,6 @@ class WorkflowFragment : Fragment() {
             binding.loginPromptText.isVisible = true
             binding.fabAddWorkflow.hide()
             binding.workflowRecyclerView.adapter = WorkflowAdapter(emptyList()) // Clear the list
-        }
-    }
-
-    private fun loadWorkflows() {
-        workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
-            val workflows = documents.toObjects(Workflow::class.java)
-            binding.workflowRecyclerView.adapter = WorkflowAdapter(workflows)
-            Timber.d("Successfully loaded ${workflows.size} workflows.")
-        }.addOnFailureListener { exception ->
-            Timber.w(exception, "Error getting documents")
         }
     }
 
