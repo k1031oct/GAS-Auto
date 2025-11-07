@@ -30,7 +30,7 @@ workRuntimeKtx = "2.11.0"
 firebaseBom = "34.5.0"
 
 # Third Party
-vico = "2.2.1"
+vico = "1.13.1"
 coil = "2.7.0"
 timber = "5.0.1"
 
