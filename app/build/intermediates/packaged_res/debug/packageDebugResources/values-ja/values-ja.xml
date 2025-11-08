@@ -2,7 +2,10 @@
 <resources>
     <string name="add_module">モジュールを追加</string>
     <string name="add_new_workflow">新しいワークフローを追加</string>
+    <string name="add_schedule">予約の追加</string>
     <string name="app_name">GWS Auto for Android</string>
+    <string name="dummy_status_active">アクティブ</string>
+    <string name="dummy_trigger_daily">毎日 9:00</string>
     <string name="please_log_in">ワークフローを表示するにはログインしてください。</string>
     <string name="save_workflow">ワークフローを保存</string>
     <string name="sign_in">サインイン</string>

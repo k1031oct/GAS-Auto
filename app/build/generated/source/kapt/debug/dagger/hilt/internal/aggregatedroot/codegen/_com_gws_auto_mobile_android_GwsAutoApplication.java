@@ -13,8 +13,10 @@ import javax.annotation.processing.Generated;
     originatingRoot = "com.gws.auto.mobile.android.GwsAutoApplication",
     originatingRootPackage = "com.gws.auto.mobile.android",
     rootAnnotation = HiltAndroidApp.class,
+    rootComponentPackage = "dagger.hilt.components",
     rootSimpleNames = "GwsAutoApplication",
-    originatingRootSimpleNames = "GwsAutoApplication"
+    originatingRootSimpleNames = "GwsAutoApplication",
+    rootComponentSimpleNames = "SingletonComponent"
 )
 @Generated("dagger.hilt.processor.internal.root.AggregatedRootGenerator")
 public class _com_gws_auto_mobile_android_GwsAutoApplication {
