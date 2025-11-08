@@ -1,17 +1,17 @@
 [versions]
 # Gradle and Plugins
-agp = "8.13.0"
-kotlin = "2.2.21"
+agp = "8.9.3"
+kotlin = "2.0.0"
 googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
-hilt = "2.51.1"
+hilt = "2.57.2"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
-composeBom = "2024.05.00"
+composeBom = "2025.11.00"
 credentials = "1.5.0"
 googleId = "1.1.1"
 googleApiClientAndroid = "2.8.1"

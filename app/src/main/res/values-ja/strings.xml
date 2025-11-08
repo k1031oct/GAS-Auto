@@ -28,5 +28,10 @@
     <string name="workflow_actions_menu">アクション</string>
     <string name="workflow_run_button">実行</string>
     <string name="workflow_trigger_icon_desc">トリガーアイコン</string>
+    <string name="add_schedule">予約の追加</string>
+
+    <!-- Dummy Data -->
+    <string name="dummy_status_active">アクティブ</string>
+    <string name="dummy_trigger_daily">毎日 9:00</string>
 
 </resources>

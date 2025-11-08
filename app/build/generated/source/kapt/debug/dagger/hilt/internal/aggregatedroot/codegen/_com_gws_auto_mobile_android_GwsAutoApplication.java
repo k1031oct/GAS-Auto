@@ -1,0 +1,21 @@
+package dagger.hilt.internal.aggregatedroot.codegen;
+
+import dagger.hilt.android.HiltAndroidApp;
+import dagger.hilt.internal.aggregatedroot.AggregatedRoot;
+import javax.annotation.processing.Generated;
+
+/**
+ * This class should only be referenced by generated code! This class aggregates information across multiple compilations.
+ */
+@AggregatedRoot(
+    root = "com.gws.auto.mobile.android.GwsAutoApplication",
+    rootPackage = "com.gws.auto.mobile.android",
+    originatingRoot = "com.gws.auto.mobile.android.GwsAutoApplication",
+    originatingRootPackage = "com.gws.auto.mobile.android",
+    rootAnnotation = HiltAndroidApp.class,
+    rootSimpleNames = "GwsAutoApplication",
+    originatingRootSimpleNames = "GwsAutoApplication"
+)
+@Generated("dagger.hilt.processor.internal.root.AggregatedRootGenerator")
+public class _com_gws_auto_mobile_android_GwsAutoApplication {
+}

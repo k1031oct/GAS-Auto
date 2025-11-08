@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android.ui.schedule
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.gws.auto.mobile.android.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,6 +38,10 @@ class ScheduleFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_schedule, container, false)
 
         fetchHolidays()
+
+        view.findViewById<FloatingActionButton>(R.id.fab_add_schedule).setOnClickListener {
+            startActivity(Intent(activity, ScheduleSettingsActivity::class.java))
+        }
 
         return view
     }
@@ -80,8 +86,6 @@ class ScheduleFragment : Fragment() {
         calendarGrid.removeAllViews()
 
         val calendar = Calendar.getInstance()
-        val month = calendar.get(Calendar.MONTH)
-        val year = calendar.get(Calendar.YEAR)
 
         val firstDayOfWeekPref = prefs.getString("first_day_of_week", "Sunday")
         val daysOfWeek = if (firstDayOfWeekPref == "Sunday") {
@@ -120,18 +124,18 @@ class ScheduleFragment : Fragment() {
             calendarGrid.addView(textView)
         }
 
-        for (i in 1..daysInMonth) {
+        for (day in 1..daysInMonth) {
             val textView = TextView(context)
-            textView.text = i.toString()
+            textView.text = day.toString()
             textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
 
-            if (holidays.containsKey(i)) {
-                for (holiday in holidays[i]!!) {
+            if (holidays.containsKey(day)) {
+                for (holiday in holidays[day]!!) {
                     textView.append("\n($holiday)")
                 }
             }
 
-            if (i == 10 || i == 22) {
+            if (day == 10 || day == 22) {
                 textView.append("\n(Schedule)")
             }
 

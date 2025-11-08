@@ -1,0 +1,122 @@
+[
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_schedule.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_schedule.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_menu_hamburger.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_menu_hamburger.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_activity_workflow_editor.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\activity_workflow_editor.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_activity_sign_in.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\activity_sign_in.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_schedule.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_schedule.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\menu_bottom_nav_menu.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\menu\\bottom_nav_menu.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_list_item_workflow.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\list_item_workflow.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\menu_main_menu.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\menu\\main_menu.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\navigation_nav_graph.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\navigation\\nav_graph.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_schedule.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_schedule.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_item_workflow.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\item_workflow.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_item_module.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\item_module.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_item_workflow_table.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\item_workflow_table.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_item_history_table.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\item_history_table.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_workflow.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_workflow.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_more_vert.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_more_vert.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/drawable_ic_add.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/drawable/ic_add.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_dashboard.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_history.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_history.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_item_history.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\item_history.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_dashboard.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_settings.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_settings.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_activity_splash.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\activity_splash.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_launcher_monochrome.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_launcher_monochrome.xml"
+    },
+    {
+        "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_history.xml.flat",
+        "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_history.xml"
+    }
+]

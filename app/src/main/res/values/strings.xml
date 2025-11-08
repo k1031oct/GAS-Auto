@@ -30,6 +30,7 @@
     <string name="workflow_actions_menu">Actions</string>
     <string name="workflow_run_button">実行</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
+    <string name="add_schedule">Add schedule</string>
 
     <!-- Dummy Data -->
     <string name="dummy_status_active">アクティブ</string>

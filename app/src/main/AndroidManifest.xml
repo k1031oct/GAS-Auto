@@ -31,6 +31,11 @@
         <activity
             android:name=".ui.workflow.editor.WorkflowEditorActivity"
             android:exported="false" />
+            
+        <activity
+            android:name=".ui.schedule.ScheduleSettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GWSAutoforAndroid" />
 
     </application>
 

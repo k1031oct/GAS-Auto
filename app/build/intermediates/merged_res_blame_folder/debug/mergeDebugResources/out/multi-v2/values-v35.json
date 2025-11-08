@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.gws.auto.mobile.android.app-mergeDebugResources-5:/values-v35/values-v35.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\a465cb966ab92c5b0a3bf2f2bee88a1c\\transformed\\material-1.13.0\\res\\values-v35\\values-v35.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,149,247,349",
+                        "endColumns": "93,97,101,99",
+                        "endOffsets": "144,242,344,444"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -91,6 +91,10 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = "2.0.0-beta04"
+    }
 
     packaging {
         resources {
@@ -147,10 +151,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-}
-
-configurations.all {
-    resolutionStrategy {
-        force("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
-    }
 }
