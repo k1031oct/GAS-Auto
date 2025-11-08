@@ -21,13 +21,11 @@ fun fetchGitCommitCount(): Int {
 // Read version properties for major and minor versions.
 val versionProps = Properties()
 val versionPropsFile = file("version.properties")
-val (major, minor) = if (versionPropsFile.canRead()) {
+if (versionPropsFile.canRead()) {
     versionProps.load(versionPropsFile.reader())
-    Pair(versionProps["VERSION_MAJOR"].toString(), versionProps["VERSION_MINOR"].toString())
-} else {
-    // Provide default values if version.properties is missing
-    Pair("1", "0")
 }
+val major = versionProps.getProperty("VERSION_MAJOR", "1")
+val minor = versionProps.getProperty("VERSION_MINOR", "0")
 
 val gitCommitCount = fetchGitCommitCount()
 
@@ -38,7 +36,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.hilt)
     id("org.jetbrains.kotlin.kapt")

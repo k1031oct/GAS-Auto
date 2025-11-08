@@ -1,5 +1,13 @@
 [
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_history.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_history.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_schedule.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_schedule.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_workflow.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_workflow.xml"
     },
@@ -12,16 +20,24 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_sign_in.xml"
     },
     {
-        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_module.xml",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_module.xml"
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_history.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_history.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_settings.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_settings.xml"
     },
     {
-        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_trigger.xml",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_trigger.xml"
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_history_table.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_history_table.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_module.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_module.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_workflow_table.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_workflow_table.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_workflow.xml",
@@ -30,6 +46,10 @@
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_workflow.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_workflow.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_dashboard.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_dashboard.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/activity_main.xml",

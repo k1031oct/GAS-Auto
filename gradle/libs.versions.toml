@@ -1,12 +1,11 @@
 [versions]
 # Gradle and Plugins
-agp = "8.13.0"
-kotlin = "2.2.21"
+agp = "8.4.2"
+kotlin = "1.9.23"
 googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
-compose-compiler = "1.6.10"
-hilt = "2.51.1"
+hilt = "2.52"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -21,16 +20,17 @@ googleApiServicesDrive = "v3-rev20230822-2.0.0"
 googleApiServicesSheets = "v4-rev20230815-2.0.0"
 googleOauthClient = "1.39.0"
 coroutinesPlayServices = "1.10.2"
-splashscreen = "1.0.1"
+splashscreen = "1.2.0"
 appcompat = "1.7.1"
 material = "1.13.0"
 constraintlayout = "2.2.1"
-navigation = "2.9.5"
+navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
 firebaseBom = "34.5.0"
+compose-compiler = "1.5.11"
 
 # Third Party
-vico = "1.13.1"
+vico = "2.2.1"
 coil = "2.7.0"
 timber = "5.0.1"
 
@@ -79,9 +79,9 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 
 
 # Third Party
-vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
-vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
-vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+vico-core = { group = "com.patrykandpatrick.vico", name = "vico-core", version.ref = "vico" }
+vico-compose = { group = "com.patrykandpatrick.vico", name = "vico-compose", version.ref = "vico" }
+vico-m3 = { group = "com.patrykandpatrick.vico", name = "vico-m3", version.ref = "vico" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 jakewharton-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
@@ -99,11 +99,9 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 
 [bundles]
-vico = ["vico-core", "vico-compose", "vico-compose-m3"]
+vico = ["vico-core", "vico-compose", "vico-m3"]
 navigation = ["androidx-navigation-fragment-ktx", "androidx-navigation-ui-ktx"]
 firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-auth", "firebase-firestore"]

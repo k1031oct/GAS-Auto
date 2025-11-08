@@ -3,6 +3,7 @@ package com.gws.auto.mobile.android.ui.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Surface
@@ -18,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GwsTabs(
     tabs: List<String>,
@@ -54,6 +56,7 @@ fun GwsTabs(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun GwsTabsPreview() {

@@ -5,9 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.gws.auto.mobile.android.R;
@@ -17,19 +20,50 @@ import java.lang.String;
 
 public final class FragmentSettingsBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final LinearLayout rootView;
 
   @NonNull
   public final Button authButton;
 
-  private FragmentSettingsBinding(@NonNull ConstraintLayout rootView, @NonNull Button authButton) {
+  @NonNull
+  public final Spinner countrySpinner;
+
+  @NonNull
+  public final Spinner firstDayOfWeekSpinner;
+
+  @NonNull
+  public final Spinner languageSpinner;
+
+  @NonNull
+  public final ImageView profileImage;
+
+  @NonNull
+  public final Spinner themeSpinner;
+
+  @NonNull
+  public final TextView userEmail;
+
+  @NonNull
+  public final TextView userName;
+
+  private FragmentSettingsBinding(@NonNull LinearLayout rootView, @NonNull Button authButton,
+      @NonNull Spinner countrySpinner, @NonNull Spinner firstDayOfWeekSpinner,
+      @NonNull Spinner languageSpinner, @NonNull ImageView profileImage,
+      @NonNull Spinner themeSpinner, @NonNull TextView userEmail, @NonNull TextView userName) {
     this.rootView = rootView;
     this.authButton = authButton;
+    this.countrySpinner = countrySpinner;
+    this.firstDayOfWeekSpinner = firstDayOfWeekSpinner;
+    this.languageSpinner = languageSpinner;
+    this.profileImage = profileImage;
+    this.themeSpinner = themeSpinner;
+    this.userEmail = userEmail;
+    this.userName = userName;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public LinearLayout getRoot() {
     return rootView;
   }
 
@@ -60,7 +94,50 @@ public final class FragmentSettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentSettingsBinding((ConstraintLayout) rootView, authButton);
+      id = R.id.country_spinner;
+      Spinner countrySpinner = ViewBindings.findChildViewById(rootView, id);
+      if (countrySpinner == null) {
+        break missingId;
+      }
+
+      id = R.id.first_day_of_week_spinner;
+      Spinner firstDayOfWeekSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (firstDayOfWeekSpinner == null) {
+        break missingId;
+      }
+
+      id = R.id.language_spinner;
+      Spinner languageSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (languageSpinner == null) {
+        break missingId;
+      }
+
+      id = R.id.profile_image;
+      ImageView profileImage = ViewBindings.findChildViewById(rootView, id);
+      if (profileImage == null) {
+        break missingId;
+      }
+
+      id = R.id.theme_spinner;
+      Spinner themeSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (themeSpinner == null) {
+        break missingId;
+      }
+
+      id = R.id.user_email;
+      TextView userEmail = ViewBindings.findChildViewById(rootView, id);
+      if (userEmail == null) {
+        break missingId;
+      }
+
+      id = R.id.user_name;
+      TextView userName = ViewBindings.findChildViewById(rootView, id);
+      if (userName == null) {
+        break missingId;
+      }
+
+      return new FragmentSettingsBinding((LinearLayout) rootView, authButton, countrySpinner,
+          firstDayOfWeekSpinner, languageSpinner, profileImage, themeSpinner, userEmail, userName);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

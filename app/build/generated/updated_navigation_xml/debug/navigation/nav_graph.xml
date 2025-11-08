@@ -5,15 +5,25 @@ xmlns:tools="http://schemas.android.com/tools"
 android:id="@+id/nav_graph"
 app:startDestination="@id/navigation_workflow" >
 <fragment
+    android:id="@+id/navigation_dashboard"
+    android:name="com.gws.auto.mobile.android.ui.dashboard.DashboardFragment"
+    android:label="Dashboard"
+    tools:layout="@layout/fragment_dashboard" />
+<fragment
+    android:id="@+id/navigation_history"
+    android:name="com.gws.auto.mobile.android.ui.history.HistoryFragment"
+    android:label="History"
+    tools:layout="@layout/fragment_history" />
+<fragment
     android:id="@+id/navigation_workflow"
     android:name="com.gws.auto.mobile.android.ui.workflow.WorkflowFragment"
     android:label="Workflow"
     tools:layout="@layout/fragment_workflow" />
 <fragment
-    android:id="@+id/navigation_trigger"
-    android:name="com.gws.auto.mobile.android.ui.trigger.TriggerFragment"
-    android:label="Trigger"
-    tools:layout="@layout/fragment_trigger" />
+    android:id="@+id/navigation_schedule"
+    android:name="com.gws.auto.mobile.android.ui.schedule.ScheduleFragment"
+    android:label="Schedule"
+    tools:layout="@layout/fragment_schedule" />
 <fragment
     android:id="@+id/navigation_settings"
     android:name="com.gws.auto.mobile.android.ui.settings.SettingsFragment"

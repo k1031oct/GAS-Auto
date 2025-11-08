@@ -11,13 +11,17 @@ import com.gws.auto.mobile.android.domain.model.Module
 import com.gws.auto.mobile.android.domain.model.Workflow
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.ModuleListListener, ModuleParameterDialogFragment.ModuleParameterListener {
 
     private lateinit var binding: ActivityWorkflowEditorBinding
     private lateinit var moduleAdapter: ModuleAdapter
-    private val workflowRepository = WorkflowRepository()
+
+    @Inject
+    lateinit var workflowRepository: WorkflowRepository
+
     private val modules = mutableListOf<Module>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,3 +81,4 @@ class WorkflowEditorActivity : AppCompatActivity(), ModuleListDialogFragment.Mod
         private const val WORKFLOW_STATUS_PENDING = "Pending"
         private const val WORKFLOW_TRIGGER_MANUAL = "Manual"
     }
+}
