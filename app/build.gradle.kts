@@ -34,6 +34,7 @@ val gitCommitCount = fetchGitCommitCount()
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.appdistribution)
@@ -43,12 +44,12 @@ plugins {
 
 android {
     namespace = "com.gws.auto.mobile.android"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
 
         // Set the version codes dynamically using Git commit count
         versionCode = gitCommitCount
@@ -90,12 +91,6 @@ android {
         viewBinding = true
         buildConfig = true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
-
-
 
     packaging {
         resources {
@@ -144,7 +139,6 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     // Third Party
-    implementation(libs.bundles.vico)
     implementation(libs.coil.compose)
     implementation(libs.jakewharton.timber)
 

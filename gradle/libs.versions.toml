@@ -1,17 +1,17 @@
 [versions]
 # Gradle and Plugins
-agp = "8.4.2"
-kotlin = "1.9.23"
+agp = "8.13.0"
+kotlin = "2.2.21"
 googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
-hilt = "2.52"
+hilt = "2.57.2"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
 lifecycleRuntimeKtx = "2.9.4"
 activityCompose = "1.11.0"
-composeBom = "2024.04.00"
+composeBom = "2024.05.00"
 credentials = "1.5.0"
 googleId = "1.1.1"
 googleApiClientAndroid = "2.8.1"
@@ -29,7 +29,6 @@ workRuntimeKtx = "2.11.0"
 firebaseBom = "34.5.0"
 
 # Third Party
-vico = "2.0.0"
 coil = "2.7.0"
 timber = "5.0.1"
 
@@ -78,9 +77,6 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 
 
 # Third Party
-vico-core = { group = "com.patrykandpatrick.vico", name = "vico-core", version.ref = "vico" }
-vico-compose = { group = "com.patrykandpatrick.vico", name = "vico-compose", version.ref = "vico" }
-vico-m3 = { group = "com.patrykandpatrick.vico", name = "vico-compose-m3", version.ref = "vico" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 jakewharton-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
@@ -95,12 +91,12 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [bundles]
-vico = ["vico-core", "vico-compose", "vico-m3"]
 navigation = ["androidx-navigation-fragment-ktx", "androidx-navigation-ui-ktx"]
 firebase = ["firebase-analytics", "firebase-crashlytics", "firebase-auth", "firebase-firestore"]
