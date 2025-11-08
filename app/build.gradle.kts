@@ -43,12 +43,12 @@ plugins {
 
 android {
     namespace = "com.gws.auto.mobile.android"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
 
         // Set the version codes dynamically using Git commit count
         versionCode = gitCommitCount
@@ -92,7 +92,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 
 
