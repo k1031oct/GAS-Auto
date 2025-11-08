@@ -3,23 +3,26 @@ package com.gws.auto.mobile.android.ui.schedule
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ScheduleSettingsActivity : ComponentActivity() {
+    private val viewModel: ScheduleSettingsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             GWSAutoForAndroidTheme {
-                ScheduleSettingsScreen()
+                ScheduleSettingsScreen(viewModel)
             }
         }
     }
@@ -27,9 +30,9 @@ class ScheduleSettingsActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleSettingsScreen() {
+fun ScheduleSettingsScreen(viewModel: ScheduleSettingsViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
     val scheduleTypes = listOf("時間毎", "日毎", "週毎", "月毎")
-    var selectedType by remember { mutableStateOf(scheduleTypes[0]) }
     var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -41,15 +44,13 @@ fun ScheduleSettingsScreen() {
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
-            // Schedule Type Selector
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
             ) {
-                 TextField(
-                    value = selectedType,
+                TextField(
+                    value = uiState.scheduleType,
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("繰り返し") },
@@ -64,7 +65,7 @@ fun ScheduleSettingsScreen() {
                         DropdownMenuItem(
                             text = { Text(type) },
                             onClick = {
-                                selectedType = type
+                                viewModel.onScheduleTypeChange(type)
                                 expanded = false
                             }
                         )
@@ -74,16 +75,32 @@ fun ScheduleSettingsScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            when (selectedType) {
-                "時間毎" -> HourlySettings()
-                "日毎" -> DailySettings()
-                "週毎" -> WeeklySettings()
-                "月毎" -> MonthlySettings()
+            Box(modifier = Modifier.weight(1f)) {
+                when (uiState.scheduleType) {
+                    "時間毎" -> HourlySettings(
+                        interval = uiState.hourlyInterval,
+                        onIntervalChange = { viewModel.setHourlyInterval(it) }
+                    )
+                    "日毎" -> DailySettings(
+                        time = uiState.dailyTime,
+                        onTimeChange = { viewModel.setDailyTime(it) }
+                    )
+                    "週毎" -> WeeklySettings(
+                        selectedDays = uiState.weeklyDays,
+                        onDayToggle = { viewModel.toggleWeeklyDay(it) },
+                        time = uiState.weeklyTime,
+                        onTimeChange = { viewModel.setWeeklyTime(it) }
+                    )
+                    "月毎" -> MonthlySettings(
+                        selectedDays = uiState.monthlyDays,
+                        onDayToggle = { viewModel.toggleMonthlyDay(it) },
+                        time = uiState.monthlyTime,
+                        onTimeChange = { viewModel.setMonthlyTime(it) }
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(onClick = { /* TODO: Save schedule */ }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { viewModel.saveSchedule() }, modifier = Modifier.fillMaxWidth()) {
                 Text("保存")
             }
         }
@@ -91,13 +108,12 @@ fun ScheduleSettingsScreen() {
 }
 
 @Composable
-fun HourlySettings() {
-    var selectedHour by remember { mutableStateOf(1) }
+fun HourlySettings(interval: Int, onIntervalChange: (Int) -> Unit) {
     Column {
-        Text("実行間隔: ${selectedHour}時間毎")
+        Text("実行間隔: ${interval}時間毎")
         Slider(
-            value = selectedHour.toFloat(),
-            onValueChange = { selectedHour = it.toInt() },
+            value = interval.toFloat(),
+            onValueChange = { onIntervalChange(it.toInt()) },
             valueRange = 1f..12f,
             steps = 10
         )
@@ -106,17 +122,29 @@ fun HourlySettings() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DailySettings() {
-    val timePickerState = rememberTimePickerState()
+fun DailySettings(time: java.time.LocalTime, onTimeChange: (java.time.LocalTime) -> Unit) {
+    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
+    // Update ViewModel when state changes
+    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
+        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
+    }
     TimePicker(state = timePickerState)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeeklySettings() {
+fun WeeklySettings(
+    selectedDays: Set<String>,
+    onDayToggle: (String) -> Unit,
+    time: java.time.LocalTime,
+    onTimeChange: (java.time.LocalTime) -> Unit
+) {
     val daysOfWeek = listOf("日", "月", "火", "水", "木", "金", "土")
-    val selectedDays = remember { mutableStateListOf<String>() }
-    val timePickerState = rememberTimePickerState()
+    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
+    // Update ViewModel when state changes
+    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
+        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
+    }
 
     Column {
         Text("実行する曜日")
@@ -124,13 +152,7 @@ fun WeeklySettings() {
             daysOfWeek.forEach { day ->
                 FilterChip(
                     selected = day in selectedDays,
-                    onClick = {
-                        if (day in selectedDays) {
-                            selectedDays.remove(day)
-                        } else {
-                            selectedDays.add(day)
-                        }
-                    },
+                    onClick = { onDayToggle(day) },
                     label = { Text(day) }
                 )
             }
@@ -142,29 +164,32 @@ fun WeeklySettings() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthlySettings() {
+fun MonthlySettings(
+    selectedDays: Set<Int>,
+    onDayToggle: (Int) -> Unit,
+    time: java.time.LocalTime,
+    onTimeChange: (java.time.LocalTime) -> Unit
+) {
     val daysInMonth = (1..31).toList()
-    val selectedDays = remember { mutableStateListOf<Int>() }
-    val timePickerState = rememberTimePickerState()
+    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
+    // Update ViewModel when state changes
+    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
+        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
+    }
 
-    Column {
+    Column(modifier = Modifier.fillMaxHeight()) {
         Text("実行する日")
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.weight(1f)
         ) {
             items(daysInMonth.size) { index ->
                 val day = daysInMonth[index]
                 FilterChip(
                     selected = day in selectedDays,
-                    onClick = {
-                        if (day in selectedDays) {
-                            selectedDays.remove(day)
-                        } else {
-                            selectedDays.add(day)
-                        }
-                    },
+                    onClick = { onDayToggle(day) },
                     label = { Text(day.toString()) }
                 )
             }

@@ -78,6 +78,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlin {
@@ -105,6 +106,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.android.desugar.jdk.libs)
+
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)

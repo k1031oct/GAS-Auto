@@ -59,11 +59,12 @@
 
 **目標:** スケジュールに基づいてワークフローを自動実行する機能を実装する。
 
+- [x] **Task:** 予約実行（トリガー）の追加ボタン（FAB）をスケジュール画面に設置する。
+- [x] **Task:** 予約実行の設定画面をComposeで作成し、ナビゲーションを実装する。
+- [x] **Task:** 予約実行の設定画面で、各種設定項目（時間毎、日毎、週毎、月毎）の具体的なUIを実装する。
 - [ ] **Task:** `WorkManager`を使用して、信頼性の高いバックグラウンド実行のためのスケジューリングロジックを実装する。
-- [ ] **Task:** スケジュールされたトリガーの一覧を表示する「トリガー」画面のUIを作成する。
-- [ ] **Task:** トリガー（時間指定、繰り返しなど）を作成・編集するためのUIを実装する。
+- [ ] **Task:** スケジュールされたトリガーの一覧をカレンダー上に表示する。
 - [ ] **Task:** スケジュールされた時間に、対応するワークフローを呼び出すトリガーハンドラを開発する。
-- [ ] **Task:** [発展目標] トリガーのスケジュールを視覚化するためのカレンダービューを実装する。
 
 ---
 
@@ -85,10 +86,10 @@
 
 **目標:** Webアプリ版の技術仕様書に基づき、AndroidアプリのUIテーマとコンポーネントスタイルを統一し、一貫性のあるモダンなデザイン基盤を構築する。
 
-- [ ] **Task:** カラーテーマの適用: 技術仕様書のカラーパレット (`Primary`, `Background`, `Card`等) を、`res/values/colors.xml`とMaterial 3テーマに反映させる。
-- [ ] **Task:** タイポグラフィの適用: `PT Sans`と`Noto Sans JP`フォントをプロジェクトに追加し、`TextView`や`Button`のデフォルトスタイルとして適用する。
-- [ ] **Task:** `MaterialCardView`の共通スタイルを定義し、Web版の`Card`コンポーネントのような見た目（角丸、影、余白）に統一する。
-- [ ] **Task:** `Chip`コンポーネントのスタイルを定義し、ステータス表示（`アクティブ`, `エラー`など）に使えるように準備する。
+- [x] **Task:** カラーテーマの適用: アプリのメインカラーをシンプルな青系の配色に修正する。
+- [x] **Task:** タイポグラフィの適用: `PT Sans`と`Noto Sans JP`フォントをプロジェクトに追加し、`TextView`や`Button`のデフォルトスタイルとして適用する。
+- [x] **Task:** `MaterialCardView`の共通スタイルを定義し、Web版の`Card`コンポーネントのような見た目（角丸、影、余白）に統一する。
+- [x] **Task:** `Chip`コンポーネントのスタイルを定義し、ステータス表示（`アクティブ`, `エラー`など）に使えるように準備する。
 
 ---
 
@@ -98,11 +99,11 @@
 
 - [x] **Task (Workflow):** `fragment_workflow.xml`にタイトルを追加し、`RecyclerView`と`FloatingActionButton`の基本レイアウトを構築する。
 - [x] **Task (Workflow):** `list_item_workflow.xml`を作成し、`MaterialCardView`をベースにしたカードUIの骨格を実装する。
-- [ ] **Task (Workflow):** `WorkflowAdapter`をリファクタリングし、実際の`Workflow`オブジェクトのデータ（名前、トリガー、ステータス）をカードUIにバインドする。
-- [ ] **Task (Trigger):** `fragment_trigger.xml`のUIを設計する。技術仕様書の「縦型タイムライン」を参考に、`RecyclerView`を使ったレイアウトを構築する。
-- [ ] **Task (Settings):** `fragment_settings.xml`のUIを再設計する。技術仕様書に基づき、`TabLayout`を使って「テーマ」「言語」「カレンダー」などの設定項目を分類する。
-- [ ] **Task (Settings):** テーマ設定（ライト/ダーク）機能を`Tabs`コンポーネントを使って実装する。
-- [ ] **Task (Settings):** 言語設定機能を`Spinner`または`ExposedDropdownMenu`を使って実装する。
+- [x] **Task (Workflow):** `WorkflowAdapter`をリファクタリングし、実際の`Workflow`オブジェクトのデータ（名前、トリガー、ステータス）をカードUIにバインドする。
+- [x] **Task (Trigger):** `fragment_schedule.xml`のUIを設計する。カレンダー表示のための`GridLayout`を構築する。
+- [x] **Task (Settings):** `fragment_settings.xml`のUIを実装する。`Spinner`を使って「テーマ」「言語」「カレンダー」などの設定項目を配置する。
+- [x] **Task (Settings):** テーマ設定（ライト/ダーク）機能を実装する。
+- [x] **Task (Settings):** 言語設定機能を実装する。
 
 ---
 
@@ -113,3 +114,12 @@
 - [x] **Task:** `Timber`を導入し、Logcatへのログ出力基盤を構築する。
 - [x] **Task:** `FileLoggingTree`を実装し、Logcatと同時に`debug.log`ファイルへログを書き出す仕組みを構築する。
 - [ ] **Task:** アプリ内の主要な処理（画面遷移、データ取得、ボタンクリックなど）に、`Timber`によるデバッグログを適切に配置する。
+
+---
+
+### 次の計画
+
+- **Task:** `ScheduleSettingsViewModel`に、時間、時刻、曜日、日付など、各設定項目の状態を保持するロジックを実装する。
+- **Task:** 予約実行のデータモデルを定義し、Firestoreに保存・取得するための`Repository`を実装する。
+- **Task:** `WorkManager`を導入し、保存された予約実行設定に基づいてバックグラウンドタスクをスケジュールする。
+- **Task:** `ScheduleFragment`のカレンダーに、保存された予約実行の情報を表示する。

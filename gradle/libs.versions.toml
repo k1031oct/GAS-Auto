@@ -6,6 +6,7 @@ googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
 hilt = "2.57.2"
+androidDesugarJdkLibs = "2.0.4"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -41,6 +42,7 @@ androidx-preference = "1.2.1"
 
 [libraries]
 # AndroidX & Google Libraries
+android-desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 androidx-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "androidx-preference" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
