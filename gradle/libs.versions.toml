@@ -6,6 +6,7 @@ googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
 hilt = "2.52"
+compose-compiler = "1.5.11"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -27,7 +28,6 @@ constraintlayout = "2.2.1"
 navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
 firebaseBom = "34.5.0"
-compose-compiler = "1.5.11"
 
 # Third Party
 vico = "2.2.1"
@@ -81,7 +81,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 # Third Party
 vico-core = { group = "com.patrykandpatrick.vico", name = "vico-core", version.ref = "vico" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "vico-compose", version.ref = "vico" }
-vico-m3 = { group = "com.patrykandpatrick.vico", name = "vico-m3", version.ref = "vico" }
+vico-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 jakewharton-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
