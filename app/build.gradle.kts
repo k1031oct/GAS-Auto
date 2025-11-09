@@ -106,7 +106,7 @@ android {
 
     packaging {
         resources {
-            pickFirsts += "META-INF/services/io.grpc.ManagedChannelProvider"
+            merges += "META-INF/services/io.grpc.ManagedChannelProvider"
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/DEPENDENCIES"
         }
