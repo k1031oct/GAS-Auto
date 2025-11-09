@@ -48,6 +48,8 @@
     <string name="previous_month">&lt;</string>
     <string name="next_month">&gt;</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
+    <string name="event_time_placeholder">10:00 AM</string>
+    <string name="event_title_placeholder">Google Calendar Event</string>
 
     <!-- Announcements -->
     <string name="announcement_unread_indicator">Unread indicator</string>

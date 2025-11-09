@@ -208,15 +208,15 @@ class ScheduleFragment : Fragment() {
         }
 
         // Add day of week headers
-        daysOfWeek.forEach { day ->
+        daysOfWeek.forEachIndexed { index, day ->
             val textView = TextView(requireContext()).apply {
                 text = day
                 textAlignment = View.TEXT_ALIGNMENT_CENTER
-                layoutParams = GridLayout.LayoutParams(
-                    GridLayout.spec(GridLayout.UNDEFINED, 1f),
-                ).apply {
+                val params = GridLayout.LayoutParams().apply {
                     width = 0
+                    columnSpec = GridLayout.spec(index, 1f)
                 }
+                layoutParams = params
             }
             calendarGrid.addView(textView)
         }
@@ -238,12 +238,12 @@ class ScheduleFragment : Fragment() {
         // Add empty cells
         repeat(startOffset) {
             val textView = TextView(requireContext()).apply {
-                layoutParams = GridLayout.LayoutParams(
-                    GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                ).apply {
+                val params = GridLayout.LayoutParams().apply {
                     width = 0
                     height = 200
+                    columnSpec = GridLayout.spec(it, 1f)
                 }
+                layoutParams = params
             }
             calendarGrid.addView(textView)
         }
@@ -299,12 +299,14 @@ class ScheduleFragment : Fragment() {
                 allSchedulesRecyclerView.isVisible = false // Hide all schedules list
             }
 
-            textView.layoutParams = GridLayout.LayoutParams(
-                GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            ).apply {
+            val params = GridLayout.LayoutParams().apply {
                 width = 0
                 height = 300 // Increased height for more content
+                val currentPos = startOffset + day - 1
+                rowSpec = GridLayout.spec(currentPos / 7 + 1)
+                columnSpec = GridLayout.spec(currentPos % 7, 1f)
             }
+            textView.layoutParams = params
             calendarGrid.addView(textView)
         }
 

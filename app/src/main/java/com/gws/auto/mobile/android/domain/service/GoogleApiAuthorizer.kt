@@ -1,15 +1,16 @@
 package com.gws.auto.mobile.android.domain.service
 
-import android.app.Activity
 import android.content.Context
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class GoogleApiAuthorizer @Inject constructor(@ActivityContext private val context: Context) {
+@Singleton
+class GoogleApiAuthorizer @Inject constructor(@ApplicationContext private val context: Context) {
 
     companion object {
         // Define the scopes you need here. Add more as required.

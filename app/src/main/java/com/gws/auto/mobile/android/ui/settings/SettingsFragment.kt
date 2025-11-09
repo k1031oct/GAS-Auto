@@ -12,23 +12,26 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import coil.load
 import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.SignInActivity
 import com.gws.auto.mobile.android.databinding.FragmentSettingsBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import coil.load
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
-    private lateinit var authorizer: GoogleApiAuthorizer
+
+    @Inject
+    lateinit var authorizer: GoogleApiAuthorizer
     private lateinit var auth: FirebaseAuth
     private lateinit var prefs: SharedPreferences
     private val tags = mutableSetOf<String>()
@@ -39,7 +42,6 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        authorizer = GoogleApiAuthorizer(requireActivity())
         auth = FirebaseAuth.getInstance()
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         return binding.root
@@ -214,12 +216,13 @@ class SettingsFragment : Fragment() {
     }
 
     private fun signOut() {
-        lifecycleScope.launch {
-            authorizer.signOut()
+        authorizer.signOut(getString(R.string.default_web_client_id)) {
             auth.signOut()
             Timber.i("User signed out successfully.")
-            // Re-update the UI after sign out
-            updateUI()
+            // Ensure UI update is on the main thread
+            activity?.runOnUiThread {
+                updateUI()
+            }
         }
     }
 

@@ -29,8 +29,13 @@ class SignInActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
-                val account = task.getResult(ApiException::class.java)!!
-                firebaseAuthWithGoogle(account.idToken!!)
+                val account = task.getResult(ApiException::class.java)
+                if (account?.idToken != null) {
+                    firebaseAuthWithGoogle(account.idToken!!)
+                } else {
+                    Timber.w("Google sign in failed: idToken was null")
+                    updateUI(null)
+                }
             } catch (e: ApiException) {
                 Timber.w(e, "Google sign in failed")
                 updateUI(null)
