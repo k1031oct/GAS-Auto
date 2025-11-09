@@ -4,7 +4,9 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -26,11 +28,25 @@ public final class FragmentScheduleBinding implements ViewBinding {
   @NonNull
   public final FloatingActionButton fabAddSchedule;
 
+  @NonNull
+  public final TextView monthYearTextView;
+
+  @NonNull
+  public final Button nextMonthButton;
+
+  @NonNull
+  public final Button prevMonthButton;
+
   private FragmentScheduleBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull GridLayout calendarGrid, @NonNull FloatingActionButton fabAddSchedule) {
+      @NonNull GridLayout calendarGrid, @NonNull FloatingActionButton fabAddSchedule,
+      @NonNull TextView monthYearTextView, @NonNull Button nextMonthButton,
+      @NonNull Button prevMonthButton) {
     this.rootView = rootView;
     this.calendarGrid = calendarGrid;
     this.fabAddSchedule = fabAddSchedule;
+    this.monthYearTextView = monthYearTextView;
+    this.nextMonthButton = nextMonthButton;
+    this.prevMonthButton = prevMonthButton;
   }
 
   @Override
@@ -72,8 +88,26 @@ public final class FragmentScheduleBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentScheduleBinding((CoordinatorLayout) rootView, calendarGrid,
-          fabAddSchedule);
+      id = R.id.month_year_text_view;
+      TextView monthYearTextView = ViewBindings.findChildViewById(rootView, id);
+      if (monthYearTextView == null) {
+        break missingId;
+      }
+
+      id = R.id.next_month_button;
+      Button nextMonthButton = ViewBindings.findChildViewById(rootView, id);
+      if (nextMonthButton == null) {
+        break missingId;
+      }
+
+      id = R.id.prev_month_button;
+      Button prevMonthButton = ViewBindings.findChildViewById(rootView, id);
+      if (prevMonthButton == null) {
+        break missingId;
+      }
+
+      return new FragmentScheduleBinding((CoordinatorLayout) rootView, calendarGrid, fabAddSchedule,
+          monthYearTextView, nextMonthButton, prevMonthButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -1721,6 +1721,7 @@ color error_color_material_dark
 color error_color_material_light
 color foreground_material_dark
 color foreground_material_light
+color highlight_color
 color highlighted_text_material_dark
 color highlighted_text_material_light
 color m3_appbar_overlay_color
@@ -3934,6 +3935,7 @@ id actions
 id activity_chooser_view_content
 id add
 id add_module_button
+id add_tag_button
 id adjust_height
 id adjust_width
 id advance
@@ -4191,6 +4193,7 @@ id month_navigation_fragment_toggle
 id month_navigation_next
 id month_navigation_previous
 id month_title
+id month_year_text_view
 id motion_base
 id mtrl_calendar_day_selector_frame
 id mtrl_calendar_days_of_week
@@ -4237,6 +4240,7 @@ id navigation_workflow
 id never
 id neverCompleteToEnd
 id neverCompleteToStart
+id next_month_button
 id noScroll
 id noState
 id none
@@ -4287,6 +4291,7 @@ id preferences_detail
 id preferences_header
 id preferences_sliding_pane_layout
 id pressed
+id prev_month_button
 id profile_image
 id progressBar
 id progress_circular
@@ -4384,7 +4389,9 @@ id tag_accessibility_actions
 id tag_accessibility_clickable_spans
 id tag_accessibility_heading
 id tag_accessibility_pane_title
+id tag_chip_group
 id tag_compat_insets_dispatch
+id tag_editor
 id tag_on_apply_window_listener
 id tag_on_receive_content_listener
 id tag_on_receive_content_mime_types
@@ -4467,6 +4474,7 @@ id workflow_name
 id workflow_name_editor
 id workflow_name_text
 id workflow_recycler_view
+id workflow_search_view
 id wrap
 id wrap_content
 id wrap_content_constrained
@@ -4749,6 +4757,9 @@ string abc_searchview_description_voice
 string abc_shareactionprovider_share_with
 string abc_shareactionprovider_share_with_application
 string abc_toolbar_collapse_description
+string add
+string add_a_new_tag
+string add_a_tag
 string add_module
 string add_new_workflow
 string add_schedule
@@ -4799,6 +4810,7 @@ string common_signin_button_text_long
 string confirm_device_credential_password
 string copy
 string copy_toast_msg
+string country_for_holidays
 string default_error_message
 string default_error_msg
 string default_popup_window_title
@@ -4823,6 +4835,7 @@ string fingerprint_error_lockout
 string fingerprint_error_no_fingerprints
 string fingerprint_error_user_canceled
 string fingerprint_not_recognized
+string first_day_of_week
 string gcm_defaultSenderId
 string generic_error_no_device_credential
 string generic_error_no_keyguard
@@ -4836,6 +4849,7 @@ string icon_content_description
 string in_progress
 string indeterminate
 string item_view_role_description
+string language
 string m3_exceed_max_badge_text_suffix
 string m3_loading_indicator_content_description
 string m3_ref_typeface_brand_medium
@@ -4919,6 +4933,7 @@ string m3c_tooltip_long_press_label
 string m3c_tooltip_pane_description
 string m3c_wide_navigation_rail_close_rail
 string m3c_wide_navigation_rail_pane_title
+string manage_tags
 string material_clock_display_divider
 string material_clock_toggle_content_description
 string material_hour_24h_suffix
@@ -5013,6 +5028,7 @@ string nav_app_bar_open_drawer_description
 string nav_rail_collapsed_a11y_label
 string nav_rail_expanded_a11y_label
 string navigation_menu
+string next_month
 string not_selected
 string not_set
 string password_toggle_content_description
@@ -5022,11 +5038,14 @@ string path_password_eye_mask_visible
 string path_password_strike_through
 string please_log_in
 string preference_copied
+string previous_month
+string profile_image_description
 string project_id
 string range_end
 string range_start
 string save_workflow
 string search_menu_title
+string search_workflows_hint
 string searchbar_scrolling_view_behavior
 string searchview_clear_text_content_description
 string searchview_navigation_content_description
@@ -5045,6 +5064,7 @@ string summary_collapsed_preference_list
 string switch_role
 string tab
 string template_percent
+string theme
 string title_dashboard
 string title_history
 string title_schedule
@@ -5052,6 +5072,8 @@ string title_settings
 string title_workflow
 string tooltip_description
 string tooltip_label
+string user_email_placeholder
+string user_name_placeholder
 string v7_preference_off
 string v7_preference_on
 string workflow_actions_menu

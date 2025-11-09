@@ -31,6 +31,25 @@
     <string name="workflow_run_button">実行</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
     <string name="add_schedule">Add schedule</string>
+    <string name="add_a_tag">Add a tag</string>
+    <string name="add">Add</string>
+
+    <!-- Settings -->
+    <string name="user_name_placeholder">User Name</string>
+    <string name="user_email_placeholder">user@example.com</string>
+    <string name="first_day_of_week">First day of week</string>
+    <string name="country_for_holidays">Country for holidays</string>
+    <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="manage_tags">Manage Tags</string>
+    <string name="add_a_new_tag">Add a new tag</string>
+    <string name="profile_image_description">Profile Image</string>
+
+    <!-- Schedule -->
+    <string name="previous_month">&lt;</string>
+    <string name="next_month">&gt;</string>
+    <string name="search_workflows_hint">Search workflows by name or tag</string>
+
 
     <!-- Dummy Data -->
     <string name="dummy_status_active">アクティブ</string>

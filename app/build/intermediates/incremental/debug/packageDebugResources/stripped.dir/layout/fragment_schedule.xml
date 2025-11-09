@@ -11,6 +11,34 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/prev_month_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/previous_month"
+                android:layout_alignParentStart="true"/>
+
+            <TextView
+                android:id="@+id/month_year_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="18sp"
+                tools:text="November 2025" />
+
+            <Button
+                android:id="@+id/next_month_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next_month"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+
         <GridLayout
             android:id="@+id/calendar_grid"
             android:layout_width="match_parent"

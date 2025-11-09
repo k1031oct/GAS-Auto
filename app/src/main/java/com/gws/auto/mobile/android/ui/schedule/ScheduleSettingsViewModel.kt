@@ -1,13 +1,27 @@
 package com.gws.auto.mobile.android.ui.schedule
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.gws.auto.mobile.android.data.model.Schedule
+import com.gws.auto.mobile.android.data.repository.ScheduleRepository
+import com.gws.auto.mobile.android.domain.worker.ScheduleWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
+import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.Duration
 import java.time.LocalTime
+import java.time.ZonedDateTime
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 data class ScheduleSettingsUiState(
     val scheduleType: String = "時間毎",
@@ -24,7 +38,10 @@ data class ScheduleSettingsUiState(
 )
 
 @HiltViewModel
-class ScheduleSettingsViewModel @Inject constructor() : ViewModel() {
+class ScheduleSettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val scheduleRepository: ScheduleRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScheduleSettingsUiState())
     val uiState: StateFlow<ScheduleSettingsUiState> = _uiState.asStateFlow()
@@ -73,9 +90,95 @@ class ScheduleSettingsViewModel @Inject constructor() : ViewModel() {
         _uiState.update { it.copy(monthlyTime = time) }
     }
 
-
     fun saveSchedule() {
-        // TODO: Implement the logic to save the schedule settings
-        println("Saving schedule with state: ${_uiState.value}")
+        val uiState = _uiState.value
+        val schedule = Schedule(
+            // workflowId will be set later
+            scheduleType = uiState.scheduleType,
+            hourlyInterval = if (uiState.scheduleType == "時間毎") uiState.hourlyInterval else null,
+            time = when (uiState.scheduleType) {
+                "日毎" -> uiState.dailyTime.toString()
+                "週毎" -> uiState.weeklyTime.toString()
+                "月毎" -> uiState.monthlyTime.toString()
+                else -> null
+            },
+            weeklyDays = if (uiState.scheduleType == "週毎") uiState.weeklyDays.toList() else null,
+            monthlyDays = if (uiState.scheduleType == "月毎") uiState.monthlyDays.toList() else null,
+            isEnabled = true
+        )
+
+        viewModelScope.launch {
+            scheduleRepository.addSchedule(schedule)
+            scheduleWork(schedule)
+        }
+    }
+
+    private fun scheduleWork(schedule: Schedule) {
+        val workManager = WorkManager.getInstance(context)
+
+        val workRequest = when (schedule.scheduleType) {
+            "時間毎" -> {
+                PeriodicWorkRequestBuilder<ScheduleWorker>(
+                    schedule.hourlyInterval!!.toLong(),
+                    TimeUnit.HOURS
+                ).build()
+            }
+            "日毎" -> {
+                val now = ZonedDateTime.now()
+                var nextRun = now.with(LocalTime.parse(schedule.time))
+                if (nextRun.isBefore(now)) {
+                    nextRun = nextRun.plusDays(1)
+                }
+                val delay = Duration.between(now, nextRun).toMillis()
+                OneTimeWorkRequestBuilder<ScheduleWorker>()
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                    .build()
+            }
+            "週毎" -> {
+                val now = ZonedDateTime.now()
+                val targetTime = LocalTime.parse(schedule.time)
+                val targetDays = schedule.weeklyDays!!.map { dayString ->
+                    when (dayString) {
+                        "月" -> DayOfWeek.MONDAY
+                        "火" -> DayOfWeek.TUESDAY
+                        "水" -> DayOfWeek.WEDNESDAY
+                        "木" -> DayOfWeek.THURSDAY
+                        "金" -> DayOfWeek.FRIDAY
+                        "土" -> DayOfWeek.SATURDAY
+                        "日" -> DayOfWeek.SUNDAY
+                        else -> throw IllegalArgumentException("Invalid day of week")
+                    }
+                }.toSet()
+
+                var nextRun = now.with(targetTime)
+                while (!targetDays.contains(nextRun.dayOfWeek) || nextRun.isBefore(now)) {
+                    nextRun = nextRun.plusDays(1)
+                }
+
+                val delay = Duration.between(now, nextRun).toMillis()
+                OneTimeWorkRequestBuilder<ScheduleWorker>()
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                    .build()
+            }
+            "月毎" -> {
+                val now = ZonedDateTime.now()
+                val targetTime = LocalTime.parse(schedule.time)
+                val targetDays = schedule.monthlyDays!!.toSet()
+
+                var nextRun = now.with(targetTime)
+                while (!targetDays.contains(nextRun.dayOfMonth) || nextRun.isBefore(now)) {
+                    nextRun = nextRun.plusDays(1)
+                }
+                val delay = Duration.between(now, nextRun).toMillis()
+                OneTimeWorkRequestBuilder<ScheduleWorker>()
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                    .build()
+            }
+            else -> null
+        }
+
+        if (workRequest != null) {
+            workManager.enqueue(workRequest)
+        }
     }
 }

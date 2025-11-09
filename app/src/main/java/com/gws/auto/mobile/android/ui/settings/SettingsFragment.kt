@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.SignInActivity
@@ -29,6 +31,7 @@ class SettingsFragment : Fragment() {
     private lateinit var authorizer: GoogleApiAuthorizer
     private lateinit var auth: FirebaseAuth
     private lateinit var prefs: SharedPreferences
+    private val tags = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +50,8 @@ class SettingsFragment : Fragment() {
         Timber.d("onViewCreated called")
         updateUI()
         setupSpinners()
+        setupTagEditor()
+        loadTags()
     }
 
     private fun setupSpinners() {
@@ -63,7 +68,7 @@ class SettingsFragment : Fragment() {
         binding.firstDayOfWeekSpinner.setSelection(firstDayOfWeekPosition)
         binding.firstDayOfWeekSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                prefs.edit().putString("first_day_of_week", parent.getItemAtPosition(position).toString()).apply()
+                prefs.edit { putString("first_day_of_week", parent.getItemAtPosition(position).toString()) }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -82,7 +87,7 @@ class SettingsFragment : Fragment() {
         binding.countrySpinner.setSelection(countryPosition)
         binding.countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                prefs.edit().putString("country", countryValues[position]).apply()
+                prefs.edit { putString("country", countryValues[position]) }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -101,7 +106,7 @@ class SettingsFragment : Fragment() {
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedLanguage = parent.getItemAtPosition(position).toString()
-                prefs.edit().putString("language", selectedLanguage).apply()
+                prefs.edit { putString("language", selectedLanguage) }
                 val locale = when (selectedLanguage) {
                     "Japanese" -> "ja"
                     "Chinese" -> "zh"
@@ -128,7 +133,7 @@ class SettingsFragment : Fragment() {
         binding.themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedTheme = parent.getItemAtPosition(position).toString()
-                prefs.edit().putString("theme", selectedTheme).apply()
+                prefs.edit { putString("theme", selectedTheme) }
                 when (selectedTheme) {
                     "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -137,6 +142,41 @@ class SettingsFragment : Fragment() {
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+    }
+
+    private fun setupTagEditor() {
+        binding.addTagButton.setOnClickListener {
+            val tagText = binding.tagEditor.text.toString().trim()
+            if (tagText.isNotEmpty() && tags.add(tagText)) {
+                addChipToGroup(tagText)
+                saveTags()
+                binding.tagEditor.text.clear()
+            }
+        }
+    }
+
+    private fun loadTags() {
+        tags.clear()
+        tags.addAll(prefs.getStringSet("workflow_tags", emptySet()) ?: emptySet())
+        binding.tagChipGroup.removeAllViews()
+        tags.forEach { addChipToGroup(it) }
+    }
+
+    private fun saveTags() {
+        prefs.edit { putStringSet("workflow_tags", tags) }
+    }
+
+    private fun addChipToGroup(tag: String) {
+        val chip = Chip(requireContext()).apply {
+            text = tag
+            isCloseIconVisible = true
+            setOnCloseIconClickListener {
+                binding.tagChipGroup.removeView(this)
+                tags.remove(tag)
+                saveTags()
+            }
+        }
+        binding.tagChipGroup.addView(chip)
     }
 
     private fun updateUI() {
@@ -164,8 +204,8 @@ class SettingsFragment : Fragment() {
                 Timber.d("Sign in button clicked.")
                 startActivity(Intent(activity, SignInActivity::class.java))
             }
-            binding.userName.text = "User Name"
-            binding.userEmail.text = "user@example.com"
+            binding.userName.text = getString(R.string.user_name_placeholder)
+            binding.userEmail.text = getString(R.string.user_email_placeholder)
             binding.profileImage.setImageResource(R.mipmap.ic_launcher_round)
         }
     }
