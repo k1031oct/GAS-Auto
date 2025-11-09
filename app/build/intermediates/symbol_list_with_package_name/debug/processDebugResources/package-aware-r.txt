@@ -4842,6 +4842,8 @@ string dummy_status_active
 string dummy_trigger_daily
 string error_a11y_label
 string error_icon_content_description
+string event_time_placeholder
+string event_title_placeholder
 string expand_button_title
 string exposed_dropdown_menu_content_description
 string fab_transformation_scrim_behavior
