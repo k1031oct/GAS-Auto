@@ -1,35 +1,36 @@
 package com.gws.auto.mobile.android.domain.service
 
-import android.app.Activity
-import androidx.credentials.ClearCredentialStateRequest
+import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.ClearCredentialStateRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
-class GoogleApiAuthorizer(private val activity: Activity) {
+class GoogleApiAuthorizer @Inject constructor(@ActivityContext private val context: Context) {
 
-    private val credentialManager by lazy { CredentialManager.create(activity) }
+    private val credentialManager = CredentialManager.create(context)
 
-    suspend fun signIn(serverClientId: String): GetCredentialResponse {
-        val googleIdOption = GetGoogleIdOption(
-            serverClientId = serverClientId,
-            filterByAuthorizedAccounts = false
-        )
+    suspend fun signIn(serverClientId: String): GetCredentialRequest {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(serverClientId)
+            .build()
 
-        val request = GetCredentialRequest(
-            listOf(googleIdOption)
-        )
+        return GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+    }
 
-        return credentialManager.getCredential(activity, request)
+    suspend fun getGoogleIdTokenCredential(request: GetCredentialRequest): GoogleIdTokenCredential {
+        val result: GetCredentialResponse = credentialManager.getCredential(context, request)
+        return GoogleIdTokenCredential.createFrom(result.credential.data)
     }
 
     suspend fun signOut() {
         credentialManager.clearCredentialState(ClearCredentialStateRequest())
-    }
-
-    fun getGoogleIdTokenCredential(response: GetCredentialResponse): GoogleIdTokenCredential {
-        return GoogleIdTokenCredential.createFrom(response.credential.data)
     }
 }

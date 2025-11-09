@@ -77,7 +77,7 @@ class ScheduleFragment : Fragment() {
         Timber.d("onViewCreated called")
 
         val timelineRecyclerView = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
-        timelineRecyclerView.layoutManager = LinearLayoutManager(context)
+        timelineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         viewModel.schedules.observe(viewLifecycleOwner) { schedules ->
             this.schedules = schedules
@@ -139,7 +139,7 @@ class ScheduleFragment : Fragment() {
 
         // Add day of week headers
         for (day in daysOfWeek) {
-            val textView = TextView(context)
+            val textView = TextView(requireContext())
             textView.text = day
             textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
             val params = GridLayout.LayoutParams()
@@ -164,7 +164,7 @@ class ScheduleFragment : Fragment() {
                 calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)
 
         for (i in 0 until firstDayOfWeek) {
-            val textView = TextView(context)
+            val textView = TextView(requireContext())
             val params = GridLayout.LayoutParams()
             params.width = 0
             params.height = 100
@@ -174,7 +174,7 @@ class ScheduleFragment : Fragment() {
         }
 
         for (day in 1..daysInMonth) {
-            val textView = TextView(context)
+            val textView = TextView(requireContext())
             textView.text = day.toString()
             textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
 
