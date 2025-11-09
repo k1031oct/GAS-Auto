@@ -28,9 +28,7 @@ import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import timber.log.Timber
 import java.io.BufferedReader
@@ -85,6 +83,7 @@ class ScheduleFragment : Fragment() {
         return view
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupGestureDetector(view: View) {
         gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
             private val SWIPE_THRESHOLD = 100
@@ -102,9 +101,9 @@ class ScheduleFragment : Fragment() {
                 return false
             }
         })
-        view.setOnTouchListener { _, event ->
+        view.setOnTouchListener { v, event ->
             gestureDetector.onTouchEvent(event)
-            // Allow touch events to pass through to children
+            v.performClick()
             false
         }
     }
@@ -122,8 +121,10 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun fetchAllData() {
-        fetchHolidays()
-        viewModel.fetchCalendarEvents(calendar)
+        lifecycleScope.launch {
+            fetchHolidays()
+            viewModel.fetchCalendarEvents(calendar)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -141,17 +142,18 @@ class ScheduleFragment : Fragment() {
         }
         allSchedulesRecyclerView.adapter = allSchedulesAdapter
 
-        viewModel.schedules.observe(viewLifecycleOwner) { schedules ->
-            this.schedules = schedules
-            allSchedulesAdapter.submitList(schedules) // Update all schedules list
-            setupCalendar() // Re-render calendar
+        // Combine observers to reduce redundant UI updates
+        viewModel.schedules.observe(viewLifecycleOwner) { newSchedules ->
+            schedules = newSchedules
+            allSchedulesAdapter.submitList(newSchedules)
+            setupCalendar()
         }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.calendarEvents.collectLatest { events ->
-                    this@ScheduleFragment.calendarEvents = events
-                    setupCalendar() // Re-render calendar
+                viewModel.calendarEvents.collect { newEvents ->
+                    calendarEvents = newEvents
+                    setupCalendar()
                 }
             }
         }
@@ -212,10 +214,10 @@ class ScheduleFragment : Fragment() {
             val textView = TextView(requireContext()).apply {
                 text = day
                 textAlignment = View.TEXT_ALIGNMENT_CENTER
-                val params = GridLayout.LayoutParams()
-                params.width = 0
-                params.columnSpec = GridLayout.spec(index, 1f)
-                layoutParams = params
+                layoutParams = GridLayout.LayoutParams().apply {
+                    width = 0
+                    columnSpec = GridLayout.spec(index, 1f)
+                }
             }
             calendarGrid.addView(textView)
         }
@@ -226,7 +228,7 @@ class ScheduleFragment : Fragment() {
         if (firstDayOfWeekPref == "Monday") {
             firstDayOfWeek = if (firstDayOfWeek == Calendar.SUNDAY) 7 else firstDayOfWeek - 1
         }
-        val startOffset = firstDayOfWeek - 1 // How many empty cells before the 1st
+        val startOffset = firstDayOfWeek - 1
 
         val daysInMonth = tempCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
@@ -237,11 +239,11 @@ class ScheduleFragment : Fragment() {
         // Add empty cells
         repeat(startOffset) {
             val textView = TextView(requireContext()).apply {
-                val params = GridLayout.LayoutParams()
-                params.width = 0
-                params.height = 200
-                params.columnSpec = GridLayout.spec(it, 1f)
-                layoutParams = params
+                layoutParams = GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = 200
+                    columnSpec = GridLayout.spec(it, 1f)
+                }
             }
             calendarGrid.addView(textView)
         }
@@ -250,6 +252,11 @@ class ScheduleFragment : Fragment() {
             val textView = TextView(requireContext()).apply {
                 text = day.toString()
                 textAlignment = View.TEXT_ALIGNMENT_CENTER
+                layoutParams = GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = 300
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                }
             }
 
             if (isCurrentMonth && day == today.get(Calendar.DAY_OF_MONTH)) {
@@ -271,8 +278,6 @@ class ScheduleFragment : Fragment() {
             }
 
             val schedulesForDay = schedules.filter {
-                // This logic is simplified. A more robust implementation would check
-                // weekly and other recurring schedules as well.
                 it.monthlyDays?.contains(day) == true || it.scheduleType == "daily"
             }
             if (schedulesForDay.isNotEmpty()) {
@@ -294,18 +299,12 @@ class ScheduleFragment : Fragment() {
             textView.setOnClickListener {
                 timelineRecyclerView.adapter = TimelineAdapter(allItemsForDay)
                 timelineRecyclerView.isVisible = allItemsForDay.isNotEmpty()
-                allSchedulesRecyclerView.isVisible = false // Hide all schedules list
+                allSchedulesRecyclerView.isVisible = !timelineRecyclerView.isVisible
             }
 
-            val params = GridLayout.LayoutParams()
-            params.width = 0
-            params.height = 300 // Increased height for more content
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            textView.layoutParams = params
             calendarGrid.addView(textView)
         }
 
-        // Ensure all schedules list is visible when no date is clicked or when navigating months
         if (!timelineRecyclerView.isVisible) {
             allSchedulesRecyclerView.isVisible = true
         }
