@@ -43,8 +43,7 @@
             android:id="@+id/calendar_grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="7"
-            android:rowCount="6" />
+            android:columnCount="7" />
 
         <!-- All Schedules List -->
         <TextView
