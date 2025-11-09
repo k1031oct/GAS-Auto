@@ -101,10 +101,8 @@ class ScheduleFragment : Fragment() {
                 return false
             }
         })
-        view.setOnTouchListener { v, event ->
+        view.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
-            v.performClick()
-            false
         }
     }
 

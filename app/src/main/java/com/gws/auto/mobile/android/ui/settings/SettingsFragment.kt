@@ -219,7 +219,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun signOut() {
-        authorizer.signOut(getString(R.string.default_web_client_id)) {
+        authorizer.signOut {
             auth.signOut()
             Timber.i("User signed out successfully.")
             // Ensure UI update is on the main thread
