@@ -119,8 +119,6 @@ dependencies {
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
-    implementation(libs.grpc.android)
-    implementation(libs.grpc.okhttp)
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)
