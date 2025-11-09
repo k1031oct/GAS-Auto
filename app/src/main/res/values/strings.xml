@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GWS Auto for Android</string>
-    <string name="default_web_client_id">YOUR_DEFAULT_WEB_CLIENT_ID</string>
 
     <!-- Titles -->
     <string name="title_dashboard">Dashboard</string>

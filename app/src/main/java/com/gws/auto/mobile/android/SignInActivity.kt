@@ -2,7 +2,7 @@ package com.gws.auto.mobile.android
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
@@ -13,6 +13,7 @@ import com.gws.auto.mobile.android.databinding.ActivitySignInBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class SignInActivity : AppCompatActivity() {
@@ -42,7 +43,8 @@ class SignInActivity : AppCompatActivity() {
                 val idToken = googleIdTokenCredential.idToken
                 firebaseAuthWithGoogle(idToken)
             } catch (e: GetCredentialException) {
-                Log.e(TAG, "Error during sign-in", e)
+                Timber.e(e, "Error during sign-in")
+                Toast.makeText(this@SignInActivity, "Sign-in failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -63,10 +65,8 @@ class SignInActivity : AppCompatActivity() {
         if (user != null) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
+        } else {
+            Toast.makeText(this, "Firebase authentication failed.", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    companion object {
-        private const val TAG = "SignInActivity"
     }
 }

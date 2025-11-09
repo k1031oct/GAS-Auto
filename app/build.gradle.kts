@@ -31,6 +31,12 @@ val gitCommitCount = fetchGitCommitCount()
 
 // --- End of Dynamic Versioning Logic ---
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -59,6 +65,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        resValue("string", "default_web_client_id", localProperties.getProperty("GWS_WEB_CLIENT_ID", ""))
     }
 
     buildTypes {
