@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -37,16 +38,20 @@ public final class FragmentScheduleBinding implements ViewBinding {
   @NonNull
   public final Button prevMonthButton;
 
+  @NonNull
+  public final RecyclerView timelineRecyclerView;
+
   private FragmentScheduleBinding(@NonNull CoordinatorLayout rootView,
       @NonNull GridLayout calendarGrid, @NonNull FloatingActionButton fabAddSchedule,
       @NonNull TextView monthYearTextView, @NonNull Button nextMonthButton,
-      @NonNull Button prevMonthButton) {
+      @NonNull Button prevMonthButton, @NonNull RecyclerView timelineRecyclerView) {
     this.rootView = rootView;
     this.calendarGrid = calendarGrid;
     this.fabAddSchedule = fabAddSchedule;
     this.monthYearTextView = monthYearTextView;
     this.nextMonthButton = nextMonthButton;
     this.prevMonthButton = prevMonthButton;
+    this.timelineRecyclerView = timelineRecyclerView;
   }
 
   @Override
@@ -106,8 +111,14 @@ public final class FragmentScheduleBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.timeline_recycler_view;
+      RecyclerView timelineRecyclerView = ViewBindings.findChildViewById(rootView, id);
+      if (timelineRecyclerView == null) {
+        break missingId;
+      }
+
       return new FragmentScheduleBinding((CoordinatorLayout) rootView, calendarGrid, fabAddSchedule,
-          monthYearTextView, nextMonthButton, prevMonthButton);
+          monthYearTextView, nextMonthButton, prevMonthButton, timelineRecyclerView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

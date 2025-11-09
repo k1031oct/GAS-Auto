@@ -1,5 +1,9 @@
 [
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_list_item_timeline.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_timeline.xml"
+    },
+    {
         "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\drawable_ic_schedule.xml.flat",
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_schedule.xml"
     },
@@ -48,10 +52,6 @@
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\navigation\\nav_graph.xml"
     },
     {
-        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_workflow.xml.flat",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_workflow.xml"
-    },
-    {
         "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\mipmap-anydpi-v26\\ic_launcher.xml"
     },
@@ -88,10 +88,6 @@
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\drawable\\ic_dashboard.xml"
     },
     {
-        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_settings.xml.flat",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_settings.xml"
-    },
-    {
         "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_history.xml.flat",
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_history.xml"
     },
@@ -106,10 +102,6 @@
     {
         "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_dashboard.xml.flat",
         "source": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-main-9:\\layout\\fragment_dashboard.xml"
-    },
-    {
-        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_activity_workflow_editor.xml.flat",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_workflow_editor.xml"
     },
     {
         "merged": "C:\\Users\\k1031\\.gradle\\daemon\\8.13\\com.gws.auto.mobile.android.app-debug-7:\\layout_fragment_settings.xml.flat",

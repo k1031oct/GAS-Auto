@@ -46,6 +46,13 @@
             android:columnCount="7"
             android:rowCount="6" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/timeline_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

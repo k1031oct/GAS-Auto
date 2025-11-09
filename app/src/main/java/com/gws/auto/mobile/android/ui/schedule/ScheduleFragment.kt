@@ -10,10 +10,13 @@ import android.widget.Button
 import android.widget.GridLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
@@ -39,6 +42,7 @@ class ScheduleFragment : Fragment() {
     private var schedules: List<Schedule> = emptyList()
     private val viewModel: ScheduleViewModel by viewModels()
     private val calendar = Calendar.getInstance()
+    private var _binding: View? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +51,7 @@ class ScheduleFragment : Fragment() {
     ): View? {
         prefs = PreferenceManager.getDefaultSharedPreferences(requireContext())
         val view = inflater.inflate(R.layout.fragment_schedule, container, false)
+        _binding = view
 
         fetchHolidays()
 
@@ -70,6 +75,9 @@ class ScheduleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("onViewCreated called")
+
+        val timelineRecyclerView = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
+        timelineRecyclerView.layoutManager = LinearLayoutManager(context)
 
         viewModel.schedules.observe(viewLifecycleOwner) { schedules ->
             this.schedules = schedules
@@ -112,9 +120,11 @@ class ScheduleFragment : Fragment() {
     }
 
     private fun setupCalendar() {
-        val view = view ?: return
+        val view = _binding ?: return
         val calendarGrid = view.findViewById<GridLayout>(R.id.calendar_grid)
         calendarGrid.removeAllViews()
+
+        val timelineRecyclerView = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
 
         val monthYearTextView = view.findViewById<TextView>(R.id.month_year_text_view)
         val sdf = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
@@ -148,10 +158,10 @@ class ScheduleFragment : Fragment() {
         }
 
         val daysInMonth = tempCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        
+
         val today = Calendar.getInstance()
         val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                             calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)
+                calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)
 
         for (i in 0 until firstDayOfWeek) {
             val textView = TextView(context)
@@ -178,11 +188,19 @@ class ScheduleFragment : Fragment() {
                 }
             }
 
-            schedules.forEach { schedule ->
-                if (schedule.monthlyDays?.contains(day) == true) {
-                     textView.append("\n(Schedule)")
+            val schedulesForDay = schedules.filter { it.monthlyDays?.contains(day) == true }
+            if (schedulesForDay.isNotEmpty()) {
+                textView.append("\n(Schedule)")
+                textView.setOnClickListener {
+                    timelineRecyclerView.adapter = TimelineAdapter(schedulesForDay)
+                    timelineRecyclerView.isVisible = true
+                }
+            } else {
+                textView.setOnClickListener {
+                    timelineRecyclerView.isVisible = false
                 }
             }
+
 
             val params = GridLayout.LayoutParams()
             params.width = 0
@@ -191,5 +209,10 @@ class ScheduleFragment : Fragment() {
             textView.layoutParams = params
             calendarGrid.addView(textView)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

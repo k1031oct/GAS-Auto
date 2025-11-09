@@ -53,12 +53,15 @@ id profile_image
 id progressBar
 id run_button
 id save_workflow_button
+id schedule_title_text
 id sign_in_button
 id status
 id status_chip
 id tag_chip_group
 id tag_editor
 id theme_spinner
+id time_text
+id timeline_recycler_view
 id timestamp
 id title_text_workflow
 id toolbar
@@ -88,6 +91,7 @@ layout item_history_table
 layout item_module
 layout item_workflow
 layout item_workflow_table
+layout list_item_timeline
 layout list_item_workflow
 menu bottom_nav_menu
 menu main_menu
