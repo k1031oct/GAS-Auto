@@ -45,7 +45,7 @@
     <string name="com.google.firebase.crashlytics.mapping_file_id" ns1:ignore="UnusedResources,TypographyDashes" translatable="false">00000000000000000000000000000000</string>
     <string name="com.google.firebase.crashlytics.version_control_info">""</string>
     <string name="country_for_holidays">Country for holidays</string>
-    <string name="default_web_client_id">YOUR_DEFAULT_WEB_CLIENT_ID</string>
+    <string name="default_web_client_id" translatable="false">46549959857-ae1ivjnof9s9off7cvub8ms16qb6h7vh.apps.googleusercontent.com</string>
     <string name="dummy_status_active">アクティブ</string>
     <string name="dummy_trigger_daily">毎日 9:00</string>
     <string name="first_day_of_week">First day of week</string>
