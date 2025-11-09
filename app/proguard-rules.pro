@@ -1,14 +1,6 @@
--keep public class com.google.firebase.firestore.** { *; }
--keep public class io.grpc.** { *; }
+-keepattributes Signature, InnerClasses
 -keep class com.google.protobuf.** { *; }
--keep class com.google.android.gms.common.** { *; }
--keep class com.google.android.gms.auth.** { *; }
--keep class com.google.android.libraries.identity.googleid.** { *; }
-
-# Keep the annotations
--keepattributes Signature, InnerClasses, *Annotation*
-
-# Keepclasses with annotation
+-keep class io.grpc.** { *; }
 -keep,allowobfuscation,allowshrinking class * {
     @com.google.firebase.firestore.PropertyName <fields>;
 }

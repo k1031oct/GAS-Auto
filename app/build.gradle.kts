@@ -56,6 +56,7 @@ android {
         applicationId = "com.gws.auto.mobile.android"
         minSdk = 24
         targetSdk = 36
+        multiDexEnabled = true
 
         // Set the version codes dynamically using Git commit count
         versionCode = gitCommitCount
@@ -117,6 +118,11 @@ dependencies {
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
+
+    // gRPC for Firestore
+    implementation("io.grpc:grpc-okhttp:1.62.2")
+    implementation("io.grpc:grpc-protobuf-lite:1.62.2")
+    implementation("io.grpc:grpc-stub:1.62.2")
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)

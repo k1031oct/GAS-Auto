@@ -160,8 +160,8 @@ MERGED from [androidx.print:print:1.0.0] C:\Users\k1031\.gradle\caches\8.13\tran
 MERGED from [androidx.sqlite:sqlite-framework-android:2.5.0] C:\Users\k1031\.gradle\caches\8.13\transforms\89e720e50611b031c948c92531af1202\transformed\jetified-sqlite-framework-release\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.sqlite:sqlite-android:2.5.0] C:\Users\k1031\.gradle\caches\8.13\transforms\800685c99ccf7adf3146620b92f5da39\transformed\jetified-sqlite-release\AndroidManifest.xml:17:1-22:12
 MERGED from [io.grpc:grpc-android:1.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4b11595f343885dde7fd004a4a678f09\transformed\jetified-grpc-android-1.57.2\AndroidManifest.xml:2:1-9:12
-MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:16:1-19:12
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\k1031\.gradle\caches\8.13\transforms\0c39c24b3674acec5841be2137672195\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:16:1-19:12
 	package
 		INJECTED from C:\Engineering\Android\GWS-Auto-for-Android\app\src\main\AndroidManifest.xml
 	android:versionName
@@ -657,10 +657,10 @@ MERGED from [androidx.sqlite:sqlite-android:2.5.0] C:\Users\k1031\.gradle\caches
 MERGED from [androidx.sqlite:sqlite-android:2.5.0] C:\Users\k1031\.gradle\caches\8.13\transforms\800685c99ccf7adf3146620b92f5da39\transformed\jetified-sqlite-release\AndroidManifest.xml:20:5-44
 MERGED from [io.grpc:grpc-android:1.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4b11595f343885dde7fd004a4a678f09\transformed\jetified-grpc-android-1.57.2\AndroidManifest.xml:5:5-44
 MERGED from [io.grpc:grpc-android:1.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4b11595f343885dde7fd004a4a678f09\transformed\jetified-grpc-android-1.57.2\AndroidManifest.xml:5:5-44
-MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:18:3-42
-MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:18:3-42
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\k1031\.gradle\caches\8.13\transforms\0c39c24b3674acec5841be2137672195\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
 MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\k1031\.gradle\caches\8.13\transforms\0c39c24b3674acec5841be2137672195\transformed\jetified-protolite-well-known-types-18.0.0\AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:18:3-42
+MERGED from [com.google.dagger:dagger-lint-aar:2.57.2] C:\Users\k1031\.gradle\caches\8.13\transforms\4780aa7299670a12e0ceb30a748122ae\transformed\jetified-dagger-lint-aar-2.57.2\AndroidManifest.xml:18:3-42
 	tools:overrideLibrary
 		ADDED from [com.google.firebase:firebase-auth:23.0.0] C:\Users\k1031\.gradle\caches\8.13\transforms\2a9160db9214762319d4fc9948e8e68a\transformed\jetified-firebase-auth-23.0.0\AndroidManifest.xml:23:9-148
 	android:targetSdkVersion
