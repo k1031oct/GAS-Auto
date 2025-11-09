@@ -106,6 +106,7 @@ android {
 
     packaging {
         resources {
+            pickFirsts += "META-INF/services/io.grpc.ManagedChannelProvider"
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/DEPENDENCIES"
         }
@@ -119,6 +120,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
     implementation(libs.grpc.android)
+    implementation(libs.grpc.okhttp)
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)
