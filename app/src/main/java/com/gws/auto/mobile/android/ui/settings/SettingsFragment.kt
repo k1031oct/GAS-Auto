@@ -115,6 +115,9 @@ class SettingsFragment : Fragment() {
                 }
                 val appLocale = LocaleListCompat.forLanguageTags(locale)
                 AppCompatDelegate.setApplicationLocales(appLocale)
+
+                // Restart activity to apply language change immediately
+                activity?.recreate()
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }

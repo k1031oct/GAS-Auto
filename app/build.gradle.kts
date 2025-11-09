@@ -119,6 +119,7 @@ dependencies {
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
+    implementation(libs.io.grpc.okhttp)
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)
@@ -132,10 +133,12 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.playServicesAuth)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
     implementation(libs.google.api.services.drive)
     implementation(libs.google.api.services.sheets)
+    implementation(libs.google.api.services.calendar)
     implementation(libs.google.oauth.client)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.splashscreen)

@@ -20,6 +20,7 @@ googleApiClientAndroid = "2.8.1"
 googleHttpClientGson = "2.0.2"
 googleApiServicesDrive = "v3-rev20230822-2.0.0"
 googleApiServicesSheets = "v4-rev20230815-2.0.0"
+googleApiServicesCalendar = "v3-rev20251028-2.0.0"
 googleOauthClient = "1.39.0"
 coroutinesPlayServices = "1.10.2"
 splashscreen = "1.2.0"
@@ -28,6 +29,8 @@ material = "1.13.0"
 constraintlayout = "2.2.1"
 navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
+grpc = "1.62.2"
+playServicesAuth = "21.4.0"
 
 # Third Party
 coil = "2.7.0"
@@ -59,6 +62,7 @@ google-api-client-android = { group = "com.google.api-client", name = "google-ap
 google-http-client-gson = { group = "com.google.http-client", name = "google-http-client-gson", version.ref = "googleHttpClientGson" }
 google-api-services-drive = { group = "com.google.apis", name = "google-api-services-drive", version.ref = "googleApiServicesDrive" }
 google-api-services-sheets = { group = "com.google.apis", name = "google-api-services-sheets", version.ref = "googleApiServicesSheets" }
+google-api-services-calendar = { group = "com.google.apis", name = "google-api-services-calendar", version.ref = "googleApiServicesCalendar" }
 google-oauth-client = { group = "com.google.oauth-client", name = "google-oauth-client", version.ref = "googleOauthClient" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
@@ -76,6 +80,8 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+io-grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp", version.ref = "grpc" }
+playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 
 # Third Party

@@ -1,36 +1,42 @@
 package com.gws.auto.mobile.android.domain.service
 
+import android.app.Activity
 import android.content.Context
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.ClearCredentialStateRequest
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 
 class GoogleApiAuthorizer @Inject constructor(@ActivityContext private val context: Context) {
 
-    private val credentialManager = CredentialManager.create(context)
-
-    suspend fun signIn(serverClientId: String): GetCredentialRequest {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(serverClientId)
-            .build()
-
-        return GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+    companion object {
+        // Define the scopes you need here. Add more as required.
+        val calendarScope = Scope("https://www.googleapis.com/auth/calendar.readonly")
+        val driveScope = Scope("https://www.googleapis.com/auth/drive.file")
+        val sheetsScope = Scope("https://www.googleapis.com/auth/spreadsheets")
     }
 
-    suspend fun getGoogleIdTokenCredential(request: GetCredentialRequest): GoogleIdTokenCredential {
-        val result: GetCredentialResponse = credentialManager.getCredential(context, request)
-        return GoogleIdTokenCredential.createFrom(result.credential.data)
+    fun getSignInIntent(serverClientId: String) =
+        getGoogleSignInClient(serverClientId).signInIntent
+
+    fun signOut(serverClientId: String, onComplete: () -> Unit) {
+        getGoogleSignInClient(serverClientId).signOut().addOnCompleteListener {
+            onComplete()
+        }
     }
 
-    suspend fun signOut() {
-        credentialManager.clearCredentialState(ClearCredentialStateRequest())
-    }
+    fun getLastSignedInAccount(): GoogleSignInAccount? =
+        GoogleSignIn.getLastSignedInAccount(context)
+
+    private fun getGoogleSignInClient(serverClientId: String) =
+        GoogleSignIn.getClient(
+            context,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestServerAuthCode(serverClientId)
+                .requestEmail()
+                .requestScopes(calendarScope, driveScope, sheetsScope)
+                .build()
+        )
 }

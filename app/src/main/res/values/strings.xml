@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">GWS Auto for Android</string>
 
     <!-- Titles -->
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_history">History</string>
     <string name="title_workflow">Workflow</string>
     <string name="title_schedule">Schedule</string>
     <string name="title_settings">Settings</string>
+    <string name="title_announcement">Announcements</string>
+    <string name="all_schedules_title">All Schedules</string>
 
     <!-- Fragments -->
 
@@ -48,6 +48,13 @@
     <string name="previous_month">&lt;</string>
     <string name="next_month">&gt;</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
+
+    <!-- Announcements -->
+    <string name="announcement_unread_indicator">Unread indicator</string>
+    <string name="unread_announcement_popup_title">Unread Announcements</string>
+    <string name="unread_announcement_popup_message">You have new announcements. Would you like to view them?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
     <!-- Dummy Data -->

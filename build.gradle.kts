@@ -16,3 +16,15 @@ subprojects {
         }
     }
 }
+
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force("io.grpc:grpc-core:1.59.1")
+            force("io.grpc:grpc-android:1.59.1")
+            force("io.grpc:grpc-okhttp:1.59.1")
+            force("io.grpc:grpc-protobuf-lite:1.59.1")
+            force("io.grpc:grpc-stub:1.59.1")
+        }
+    }
+}

@@ -1,0 +1,167 @@
+import java.util.Properties
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
+// --- Start of Dynamic Versioning Logic ---
+
+// Returns the total number of git commits as an integer.
+fun fetchGitCommitCount(): Int {
+    return try {
+        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().readText()
+        process.waitFor()
+        output.trim().toInt()
+    } catch (_: Exception) {
+        // Fallback for environments where git isn't available or during initial Gradle sync.
+        1
+    }
+}
+
+// Read version properties for major and minor versions.
+val versionProps = Properties()
+val versionPropsFile = file("version.properties")
+if (versionPropsFile.canRead()) {
+    versionProps.load(versionPropsFile.reader())
+}
+val major = versionProps.getProperty("VERSION_MAJOR", "1")
+val minor = versionProps.getProperty("VERSION_MINOR", "0")
+
+val gitCommitCount = fetchGitCommitCount()
+
+// --- End of Dynamic Versioning Logic ---
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.firebase.appdistribution)
+    alias(libs.plugins.hilt)
+    id("org.jetbrains.kotlin.kapt")
+}
+
+android {
+    namespace = "com.gws.auto.mobile.android"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "com.gws.auto.mobile.android"
+        minSdk = 24
+        targetSdk = 36
+        multiDexEnabled = true
+
+        // Set the version codes dynamically using Git commit count
+        versionCode = gitCommitCount
+        versionName = "$major.$minor.$gitCommitCount"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            firebaseAppDistribution {
+                appId = System.getenv("FIREBASE_APP_ID")
+                groups = "testers"
+                artifactType = "APK" // Use APK for test distribution
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
+
+    buildFeatures {
+        compose = true
+        viewBinding = true
+        buildConfig = true
+    }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = "2.0.0-beta04"
+    }
+
+    packaging {
+        resources {
+            merges += "META-INF/services/io.grpc.ManagedChannelProvider"
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+        }
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring(libs.android.desugar.jdk.libs)
+
+    // Firebase - Now using version catalog
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.bundles.firebase)
+    implementation(libs.io.grpc.okhttp)
+
+    // Google & AndroidX - All using version catalog
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+    implementation(libs.playServicesAuth)
+    implementation(libs.google.api.client.android)
+    implementation(libs.google.http.client.gson)
+    implementation(libs.google.api.services.drive)
+    implementation(libs.google.api.services.sheets)
+    implementation(libs.google.oauth.client)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.bundles.navigation)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.preference)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Third Party
+    implementation(libs.coil.compose)
+    implementation(libs.jakewharton.timber)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+}

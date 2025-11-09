@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android.ui.schedule
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,10 +10,17 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.preference.PreferenceManager
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Month
+import java.time.YearMonth
+import java.time.format.TextStyle
+import java.util.Locale
 
 @AndroidEntryPoint
 class ScheduleSettingsActivity : ComponentActivity() {
@@ -32,8 +40,9 @@ class ScheduleSettingsActivity : ComponentActivity() {
 @Composable
 fun ScheduleSettingsScreen(viewModel: ScheduleSettingsViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val scheduleTypes = listOf("時間毎", "日毎", "週毎", "月毎")
+    val scheduleTypes = listOf("時間毎", "日毎", "週毎", "月毎", "年毎")
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -97,11 +106,36 @@ fun ScheduleSettingsScreen(viewModel: ScheduleSettingsViewModel) {
                         time = uiState.monthlyTime,
                         onTimeChange = { viewModel.setMonthlyTime(it) }
                     )
+                    "年毎" -> YearlySettings(
+                        selectedMonth = uiState.yearlyMonth,
+                        onMonthChange = { viewModel.setYearlyMonth(it) },
+                        selectedDay = uiState.yearlyDayOfMonth,
+                        onDayChange = { viewModel.setYearlyDayOfMonth(it) },
+                        time = uiState.yearlyTime,
+                        onTimeChange = { viewModel.setYearlyTime(it) }
+                    )
                 }
             }
 
-            Button(onClick = { viewModel.saveSchedule() }, modifier = Modifier.fillMaxWidth()) {
-                Text("保存")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(
+                    onClick = { (context as? Activity)?.finish() },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("キャンセル")
+                }
+                Button(
+                    onClick = {
+                        viewModel.saveSchedule()
+                        (context as? Activity)?.finish()
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("保存")
+                }
             }
         }
     }
@@ -128,7 +162,12 @@ fun DailySettings(time: java.time.LocalTime, onTimeChange: (java.time.LocalTime)
     LaunchedEffect(timePickerState.hour, timePickerState.minute) {
         onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
     }
-    TimePicker(state = timePickerState)
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TimePicker(state = timePickerState)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -139,14 +178,23 @@ fun WeeklySettings(
     time: java.time.LocalTime,
     onTimeChange: (java.time.LocalTime) -> Unit
 ) {
-    val daysOfWeek = listOf("日", "月", "火", "水", "木", "金", "土")
+    val context = LocalContext.current
+    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    val startDay = prefs.getString("first_day_of_week", "Sunday")
+
+    val daysOfWeek = if (startDay == "Sunday") {
+        listOf("日", "月", "火", "水", "木", "金", "土")
+    } else {
+        listOf("月", "火", "水", "木", "金", "土", "日")
+    }
+
     val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
     // Update ViewModel when state changes
     LaunchedEffect(timePickerState.hour, timePickerState.minute) {
         onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
     }
 
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text("実行する曜日")
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             daysOfWeek.forEach { day ->
@@ -177,7 +225,7 @@ fun MonthlySettings(
         onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
     }
 
-    Column(modifier = Modifier.fillMaxHeight()) {
+    Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text("実行する日")
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
@@ -194,6 +242,77 @@ fun MonthlySettings(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        TimePicker(state = timePickerState)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun YearlySettings(
+    selectedMonth: Int,
+    onMonthChange: (Int) -> Unit,
+    selectedDay: Int,
+    onDayChange: (Int) -> Unit,
+    time: java.time.LocalTime,
+    onTimeChange: (java.time.LocalTime) -> Unit
+) {
+    val months = Month.entries.map { it.getDisplayName(TextStyle.FULL, Locale.getDefault()) }
+    var monthExpanded by remember { mutableStateOf(false) }
+    val daysInMonth = YearMonth.of(2024, selectedMonth).lengthOfMonth() // Use a leap year for Feb
+    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
+    // Update ViewModel when state changes
+    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
+        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
+    }
+
+    Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
+        ExposedDropdownMenuBox(
+            expanded = monthExpanded,
+            onExpandedChange = { monthExpanded = !monthExpanded }
+        ) {
+            TextField(
+                value = months[selectedMonth - 1],
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("月") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = monthExpanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+            ExposedDropdownMenu(
+                expanded = monthExpanded,
+                onDismissRequest = { monthExpanded = false }
+            ) {
+                months.forEachIndexed { index, monthName ->
+                    DropdownMenuItem(
+                        text = { Text(monthName) },
+                        onClick = {
+                            onMonthChange(index + 1)
+                            monthExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("実行する日")
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(7),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            items(daysInMonth) { dayOfMonth ->
+                val day = dayOfMonth + 1
+                FilterChip(
+                    selected = day == selectedDay,
+                    onClick = { onDayChange(day) },
+                    label = { Text(day.toString()) }
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
         TimePicker(state = timePickerState)
     }

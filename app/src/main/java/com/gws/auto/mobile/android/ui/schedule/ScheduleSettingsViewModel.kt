@@ -35,6 +35,10 @@ data class ScheduleSettingsUiState(
     // Monthly
     val monthlyDays: Set<Int> = emptySet(),
     val monthlyTime: LocalTime = LocalTime.now(),
+    // Yearly
+    val yearlyMonth: Int = ZonedDateTime.now().monthValue,
+    val yearlyDayOfMonth: Int = ZonedDateTime.now().dayOfMonth,
+    val yearlyTime: LocalTime = LocalTime.now(),
 )
 
 @HiltViewModel
@@ -90,6 +94,19 @@ class ScheduleSettingsViewModel @Inject constructor(
         _uiState.update { it.copy(monthlyTime = time) }
     }
 
+    fun setYearlyMonth(month: Int) {
+        _uiState.update { it.copy(yearlyMonth = month) }
+    }
+
+    fun setYearlyDayOfMonth(day: Int) {
+        _uiState.update { it.copy(yearlyDayOfMonth = day) }
+    }
+
+    fun setYearlyTime(time: LocalTime) {
+        _uiState.update { it.copy(yearlyTime = time) }
+    }
+
+
     fun saveSchedule() {
         val uiState = _uiState.value
         val schedule = Schedule(
@@ -100,10 +117,13 @@ class ScheduleSettingsViewModel @Inject constructor(
                 "日毎" -> uiState.dailyTime.toString()
                 "週毎" -> uiState.weeklyTime.toString()
                 "月毎" -> uiState.monthlyTime.toString()
+                "年毎" -> uiState.yearlyTime.toString()
                 else -> null
             },
             weeklyDays = if (uiState.scheduleType == "週毎") uiState.weeklyDays.toList() else null,
             monthlyDays = if (uiState.scheduleType == "月毎") uiState.monthlyDays.toList() else null,
+            yearlyMonth = if (uiState.scheduleType == "年毎") uiState.yearlyMonth else null,
+            yearlyDayOfMonth = if (uiState.scheduleType == "年毎") uiState.yearlyDayOfMonth else null,
             isEnabled = true
         )
 
@@ -168,6 +188,22 @@ class ScheduleSettingsViewModel @Inject constructor(
                 var nextRun = now.with(targetTime)
                 while (!targetDays.contains(nextRun.dayOfMonth) || nextRun.isBefore(now)) {
                     nextRun = nextRun.plusDays(1)
+                }
+                val delay = Duration.between(now, nextRun).toMillis()
+                OneTimeWorkRequestBuilder<ScheduleWorker>()
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                    .build()
+            }
+            "年毎" -> {
+                val now = ZonedDateTime.now()
+                val targetTime = LocalTime.parse(schedule.time)
+                var nextRun = now
+                    .withMonth(schedule.yearlyMonth!!)
+                    .withDayOfMonth(schedule.yearlyDayOfMonth!!)
+                    .with(targetTime)
+
+                if (nextRun.isBefore(now)) {
+                    nextRun = nextRun.plusYears(1)
                 }
                 val delay = Duration.between(now, nextRun).toMillis()
                 OneTimeWorkRequestBuilder<ScheduleWorker>()

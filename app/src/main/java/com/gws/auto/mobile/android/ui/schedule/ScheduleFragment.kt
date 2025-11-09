@@ -1,9 +1,12 @@
 package com.gws.auto.mobile.android.ui.schedule
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -13,15 +16,19 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.api.services.calendar.model.Event
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -31,8 +38,10 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -40,10 +49,14 @@ class ScheduleFragment : Fragment() {
     private lateinit var prefs: SharedPreferences
     private val holidays = mutableMapOf<Int, MutableList<String>>()
     private var schedules: List<Schedule> = emptyList()
+    private var calendarEvents: List<Event> = emptyList()
     private val viewModel: ScheduleViewModel by viewModels()
     private val calendar = Calendar.getInstance()
     private var _binding: View? = null
+    private lateinit var gestureDetector: GestureDetector
+    private lateinit var allSchedulesAdapter: ScheduleListAdapter
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,23 +66,64 @@ class ScheduleFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_schedule, container, false)
         _binding = view
 
-        fetchHolidays()
+        fetchAllData()
 
         view.findViewById<FloatingActionButton>(R.id.fab_add_schedule).setOnClickListener {
             startActivity(Intent(activity, ScheduleSettingsActivity::class.java))
         }
 
         view.findViewById<Button>(R.id.prev_month_button).setOnClickListener {
-            calendar.add(Calendar.MONTH, -1)
-            fetchHolidays()
+            previousMonth()
         }
 
         view.findViewById<Button>(R.id.next_month_button).setOnClickListener {
-            calendar.add(Calendar.MONTH, 1)
-            fetchHolidays()
+            nextMonth()
         }
 
+        setupGestureDetector(view)
+
         return view
+    }
+
+    private fun setupGestureDetector(view: View) {
+        gestureDetector = GestureDetector(requireContext(), object : GestureDetector.SimpleOnGestureListener() {
+            private val SWIPE_THRESHOLD = 100
+            private val SWIPE_VELOCITY_THRESHOLD = 100
+
+            override fun onFling(
+                e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
+            ): Boolean {
+                if (e1 == null) return false
+                val diffX = e2.x - e1.x
+                if (abs(diffX) > SWIPE_THRESHOLD && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffX > 0) previousMonth() else nextMonth()
+                    return true
+                }
+                return false
+            }
+        })
+        view.setOnTouchListener { v, event ->
+            gestureDetector.onTouchEvent(event)
+            // Allow touch events to pass through to children
+            false
+        }
+    }
+
+    private fun previousMonth() {
+        calendar.add(Calendar.MONTH, -1)
+        fetchAllData()
+        hideTimelineAndShowAllSchedules()
+    }
+
+    private fun nextMonth() {
+        calendar.add(Calendar.MONTH, 1)
+        fetchAllData()
+        hideTimelineAndShowAllSchedules()
+    }
+
+    private fun fetchAllData() {
+        fetchHolidays()
+        viewModel.fetchCalendarEvents(calendar)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -79,9 +133,27 @@ class ScheduleFragment : Fragment() {
         val timelineRecyclerView = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
         timelineRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        val allSchedulesRecyclerView = view.findViewById<RecyclerView>(R.id.all_schedules_recycler_view)
+        allSchedulesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        allSchedulesAdapter = ScheduleListAdapter { schedule ->
+            // TODO: Implement click action for all schedules list
+            Timber.d("Clicked schedule: ${schedule.workflowId}")
+        }
+        allSchedulesRecyclerView.adapter = allSchedulesAdapter
+
         viewModel.schedules.observe(viewLifecycleOwner) { schedules ->
             this.schedules = schedules
-            setupCalendar() // Re-render calendar when schedules change
+            allSchedulesAdapter.submitList(schedules) // Update all schedules list
+            setupCalendar() // Re-render calendar
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.calendarEvents.collectLatest { events ->
+                    this@ScheduleFragment.calendarEvents = events
+                    setupCalendar() // Re-render calendar
+                }
+            }
         }
     }
 
@@ -109,22 +181,20 @@ class ScheduleFragment : Fragment() {
                     }
                     holidays[day]?.add(name)
                 }
-
-                withContext(Dispatchers.Main) {
-                    setupCalendar()
-                }
             } catch (e: Exception) {
                 Timber.e(e, "Error fetching holidays")
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupCalendar() {
         val view = _binding ?: return
         val calendarGrid = view.findViewById<GridLayout>(R.id.calendar_grid)
         calendarGrid.removeAllViews()
 
         val timelineRecyclerView = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
+        val allSchedulesRecyclerView = view.findViewById<RecyclerView>(R.id.all_schedules_recycler_view)
 
         val monthYearTextView = view.findViewById<TextView>(R.id.month_year_text_view)
         val sdf = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
@@ -138,24 +208,26 @@ class ScheduleFragment : Fragment() {
         }
 
         // Add day of week headers
-        for (day in daysOfWeek) {
-            val textView = TextView(requireContext())
-            textView.text = day
-            textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
-            val params = GridLayout.LayoutParams()
-            params.width = 0
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            textView.layoutParams = params
+        daysOfWeek.forEach { day ->
+            val textView = TextView(requireContext()).apply {
+                text = day
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(GridLayout.UNDEFINED, 1f),
+                ).apply {
+                    width = 0
+                }
+            }
             calendarGrid.addView(textView)
         }
 
         val tempCalendar = calendar.clone() as Calendar
         tempCalendar.set(Calendar.DAY_OF_MONTH, 1)
-        var firstDayOfWeek = tempCalendar.get(Calendar.DAY_OF_WEEK) - 1 // Sunday is 0
+        var firstDayOfWeek = tempCalendar.get(Calendar.DAY_OF_WEEK)
         if (firstDayOfWeekPref == "Monday") {
-            firstDayOfWeek = (firstDayOfWeek + 6) % 7 // Monday is 0
+            firstDayOfWeek = if (firstDayOfWeek == Calendar.SUNDAY) 7 else firstDayOfWeek - 1
         }
+        val startOffset = firstDayOfWeek - 1 // How many empty cells before the 1st
 
         val daysInMonth = tempCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
@@ -163,52 +235,89 @@ class ScheduleFragment : Fragment() {
         val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH)
 
-        for (i in 0 until firstDayOfWeek) {
-            val textView = TextView(requireContext())
-            val params = GridLayout.LayoutParams()
-            params.width = 0
-            params.height = 100
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            textView.layoutParams = params
+        // Add empty cells
+        repeat(startOffset) {
+            val textView = TextView(requireContext()).apply {
+                layoutParams = GridLayout.LayoutParams(
+                    GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                ).apply {
+                    width = 0
+                    height = 200
+                }
+            }
             calendarGrid.addView(textView)
         }
 
         for (day in 1..daysInMonth) {
-            val textView = TextView(requireContext())
-            textView.text = day.toString()
-            textView.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            val textView = TextView(requireContext()).apply {
+                text = day.toString()
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+            }
 
             if (isCurrentMonth && day == today.get(Calendar.DAY_OF_MONTH)) {
                 textView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.highlight_color))
             }
 
-            if (holidays.containsKey(day)) {
-                for (holiday in holidays[day]!!) {
-                    textView.append("\n($holiday)")
-                }
+            holidays[day]?.forEach { holiday ->
+                textView.append("\n($holiday)")
             }
 
-            val schedulesForDay = schedules.filter { it.monthlyDays?.contains(day) == true }
+            val eventsForDay = calendarEvents.filter {
+                val eventCal = Calendar.getInstance()
+                val eventDate = it.start?.dateTime ?: it.start?.date
+                eventDate?.let { date -> eventCal.timeInMillis = date.value }
+                eventCal.get(Calendar.DAY_OF_MONTH) == day
+            }
+            eventsForDay.forEach { event ->
+                textView.append("\n- ${event.summary}")
+            }
+
+            val schedulesForDay = schedules.filter {
+                // This logic is simplified. A more robust implementation would check
+                // weekly and other recurring schedules as well.
+                it.monthlyDays?.contains(day) == true || it.scheduleType == "daily"
+            }
             if (schedulesForDay.isNotEmpty()) {
                 textView.append("\n(Schedule)")
-                textView.setOnClickListener {
-                    timelineRecyclerView.adapter = TimelineAdapter(schedulesForDay)
-                    timelineRecyclerView.isVisible = true
-                }
-            } else {
-                textView.setOnClickListener {
-                    timelineRecyclerView.isVisible = false
+            }
+
+            val allItemsForDay = (schedulesForDay + eventsForDay).sortedBy { item ->
+                when (item) {
+                    is Schedule -> LocalTime.parse(item.time ?: "00:00")
+                    is Event -> {
+                        val cal = Calendar.getInstance()
+                        cal.timeInMillis = (item.start?.dateTime ?: item.start?.date)?.value ?: 0
+                        LocalTime.of(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+                    }
+                    else -> LocalTime.MAX
                 }
             }
 
+            textView.setOnClickListener {
+                timelineRecyclerView.adapter = TimelineAdapter(allItemsForDay)
+                timelineRecyclerView.isVisible = allItemsForDay.isNotEmpty()
+                allSchedulesRecyclerView.isVisible = false // Hide all schedules list
+            }
 
-            val params = GridLayout.LayoutParams()
-            params.width = 0
-            params.height = 200
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            textView.layoutParams = params
+            textView.layoutParams = GridLayout.LayoutParams(
+                GridLayout.spec(GridLayout.UNDEFINED, 1f)
+            ).apply {
+                width = 0
+                height = 300 // Increased height for more content
+            }
             calendarGrid.addView(textView)
         }
+
+        // Ensure all schedules list is visible when no date is clicked or when navigating months
+        if (!timelineRecyclerView.isVisible) {
+            allSchedulesRecyclerView.isVisible = true
+        }
+    }
+
+    private fun hideTimelineAndShowAllSchedules() {
+        val view = _binding ?: return
+        view.findViewById<RecyclerView>(R.id.timeline_recycler_view).isVisible = false
+        view.findViewById<RecyclerView>(R.id.all_schedules_recycler_view).isVisible = true
     }
 
     override fun onDestroyView() {
