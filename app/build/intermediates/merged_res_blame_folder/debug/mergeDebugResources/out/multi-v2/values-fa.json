@@ -91,13 +91,13 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\37aee53611a3971eb2408b6647db8590\\transformed\\jetified-play-services-basement-18.8.0\\res\\values-fa\\values.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\05f036bdfe6de9bb379a4d6fcd99c13e\\transformed\\jetified-play-services-basement-18.4.0\\res\\values-fa\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
-                        "startOffsets": "218",
+                        "startOffsets": "195",
                         "endColumns": "150",
-                        "endOffsets": "368"
+                        "endOffsets": "345"
                     },
                     "to": {
                         "startLines": "60",

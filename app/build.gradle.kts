@@ -65,7 +65,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-        resValue("string", "default_web_client_id", localProperties.getProperty("GWS_WEB_CLIENT_ID", ""))
     }
 
     buildTypes {
