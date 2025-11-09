@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
     private val announcementViewModel: AnnouncementViewModel by viewModels()
+    private var announcementDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +71,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUnreadAnnouncementPopup() {
-        AlertDialog.Builder(this)
+        if (announcementDialog?.isShowing == true) {
+            return // Don't show if already showing
+        }
+        announcementDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.unread_announcement_popup_title))
             .setMessage(getString(R.string.unread_announcement_popup_message))
             .setPositiveButton(getString(R.string.yes)) { dialog, _ ->
@@ -78,7 +82,14 @@ class MainActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .setNegativeButton(getString(R.string.no), null)
-            .show()
+            .create()
+        announcementDialog?.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Dismiss the dialog to prevent window leaks
+        announcementDialog?.dismiss()
     }
 
 
