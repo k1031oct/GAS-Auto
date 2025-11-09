@@ -106,7 +106,6 @@ android {
 
     packaging {
         resources {
-            merges += "META-INF/services/io.grpc.ManagedChannelProvider"
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "META-INF/DEPENDENCIES"
             excludes += "META-INF/INDEX.LIST"
@@ -119,6 +118,7 @@ dependencies {
 
     // Firebase - Now using version catalog
     implementation(platform(libs.firebase.bom))
+    implementation(platform(libs.grpc.bom))
     implementation(libs.bundles.firebase)
 
     // Google & AndroidX - All using version catalog
@@ -136,9 +136,15 @@ dependencies {
     implementation(libs.playServicesAuth)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
-    implementation(libs.google.api.services.drive)
-    implementation(libs.google.api.services.sheets)
-    implementation(libs.google.api.services.calendar)
+    implementation(libs.google.api.services.drive) {
+        exclude(group = "io.grpc")
+    }
+    implementation(libs.google.api.services.sheets) {
+        exclude(group = "io.grpc")
+    }
+    implementation(libs.google.api.services.calendar) {
+        exclude(group = "io.grpc")
+    }
     implementation(libs.google.oauth.client)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.splashscreen)

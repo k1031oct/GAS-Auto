@@ -30,7 +30,7 @@ material = "1.13.0"
 constraintlayout = "2.2.1"
 navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
-grpc = "1.62.2"
+grpcBom = "1.62.2"
 playServicesAuth = "21.4.0"
 
 # Third Party
@@ -81,7 +81,8 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-io-grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp", version.ref = "grpc" }
+grpc-bom = { group = "io.grpc", name = "grpc-bom", version.ref = "grpcBom" }
+io-grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 

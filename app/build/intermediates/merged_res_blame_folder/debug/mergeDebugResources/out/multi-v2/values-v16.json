@@ -4,7 +4,7 @@
             "outputFile": "com.gws.auto.mobile.android.app-mergeDebugResources-5:/values-v16/values-v16.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\0a291ac5289780f7e0d1164bea9298fe\\transformed\\appcompat-1.7.1\\res\\values-v16\\values-v16.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\efccbe85aadc07c4a5f8bf1394b6e5b9\\transformed\\appcompat-1.7.1\\res\\values-v16\\values-v16.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
