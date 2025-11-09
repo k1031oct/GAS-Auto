@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
-    private val scheduleRepository: ScheduleRepository,
+    scheduleRepository: ScheduleRepository,
     private val calendarRepository: CalendarRepository,
     private val googleApiAuthorizer: GoogleApiAuthorizer
 ) : ViewModel() {
@@ -29,8 +29,8 @@ class ScheduleViewModel @Inject constructor(
     val calendarEvents: StateFlow<List<Event>> = _calendarEvents
 
     fun fetchCalendarEvents(calendar: Calendar) {
-        val account = googleApiAuthorizer.getLastSignedInAccount()
-        if (account?.account == null) {
+        val account = googleApiAuthorizer.getCurrentUser()
+        if (account?.email == null) {
             // Not signed in or no account available
             _calendarEvents.value = emptyList()
             return
@@ -55,7 +55,7 @@ class ScheduleViewModel @Inject constructor(
             val startDateTime = DateTime(startTime.time, TimeZone.getDefault())
             val endDateTime = DateTime(endTime.time, TimeZone.getDefault())
 
-            val events = calendarRepository.getEvents(account.account!!.name, startDateTime, endDateTime)
+            val events = calendarRepository.getEvents(account.email!!, startDateTime, endDateTime)
             _calendarEvents.value = events ?: emptyList()
         }
     }
