@@ -71,9 +71,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUnreadAnnouncementPopup() {
-        if (announcementDialog?.isShowing == true) {
-            return // Don't show if already showing
+        if (isFinishing || isDestroyed) {
+            return
         }
+        announcementDialog?.dismiss() // Dismiss any existing dialog first
         announcementDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.unread_announcement_popup_title))
             .setMessage(getString(R.string.unread_announcement_popup_message))
@@ -86,9 +87,15 @@ class MainActivity : AppCompatActivity() {
         announcementDialog?.show()
     }
 
+    override fun onPause() {
+        super.onPause()
+        // Dismiss dialog when activity is paused to prevent window leak
+        announcementDialog?.dismiss()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        // Dismiss the dialog to prevent window leaks
+        // Final safety net to dismiss the dialog
         announcementDialog?.dismiss()
     }
 
