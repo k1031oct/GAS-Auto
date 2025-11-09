@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_module">모듈 추가</string>
+    <string name="add_new_workflow">새 워크플로 추가</string>
+    <string name="app_name">GWS Auto for Android</string>
+    <string name="please_log_in">워크플로를 보려면 로그인하십시오.</string>
+    <string name="save_workflow">워크플로 저장</string>
+    <string name="sign_in">로그인</string>
+    <string name="sign_in_with_google">Google로 로그인</string>
+    <string name="sign_out">로그 아웃</string>
+    <string name="title_dashboard">대시보드</string>
+    <string name="title_history">역사</string>
+    <string name="title_schedule">일정</string>
+    <string name="title_settings">설정</string>
+    <string name="title_workflow">워크플로</string>
+    <string name="workflow_actions_menu">행위</string>
+    <string name="workflow_description">워크플로 설명</string>
+    <string name="workflow_fragment">워크플로 조각</string>
+    <string name="workflow_list_title">워크플로</string>
+    <string name="workflow_name">워크플로 이름</string>
+    <string name="workflow_run_button">운영</string>
+</resources>

@@ -46,10 +46,27 @@
             android:columnCount="7"
             android:rowCount="6" />
 
+        <!-- All Schedules List -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/all_schedules_title"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:padding="8dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/all_schedules_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:listitem="@layout/list_item_schedule" />
+
+        <!-- Timeline for a specific day (initially hidden) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/timeline_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:visibility="gone"
             tools:visibility="visible" />
 

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_menu_hamburger"
-        android:title="@string/title_settings"
+        android:id="@+id/navigation_announcement"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="@string/title_announcement"
         app:showAsAction="ifRoom" />
+
 </menu>
