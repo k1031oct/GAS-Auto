@@ -108,18 +108,18 @@ class SettingsFragment : Fragment() {
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedLanguage = parent.getItemAtPosition(position).toString()
-                prefs.edit { putString("language", selectedLanguage) }
-                val locale = when (selectedLanguage) {
-                    "Japanese" -> "ja"
-                    "Chinese" -> "zh"
-                    "Korean" -> "ko"
-                    else -> "en"
+                val currentLanguage = prefs.getString("language", "English")
+                if (selectedLanguage != currentLanguage) {
+                    prefs.edit { putString("language", selectedLanguage) }
+                    val locale = when (selectedLanguage) {
+                        "Japanese" -> "ja"
+                        "Chinese" -> "zh"
+                        "Korean" -> "ko"
+                        else -> "en"
+                    }
+                    val appLocale = LocaleListCompat.forLanguageTags(locale)
+                    AppCompatDelegate.setApplicationLocales(appLocale)
                 }
-                val appLocale = LocaleListCompat.forLanguageTags(locale)
-                AppCompatDelegate.setApplicationLocales(appLocale)
-
-                // Restart activity to apply language change immediately
-                activity?.recreate()
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -138,11 +138,14 @@ class SettingsFragment : Fragment() {
         binding.themeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedTheme = parent.getItemAtPosition(position).toString()
-                prefs.edit { putString("theme", selectedTheme) }
-                when (selectedTheme) {
-                    "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                val currentTheme = prefs.getString("theme", "Default")
+                if (selectedTheme != currentTheme) {
+                    prefs.edit { putString("theme", selectedTheme) }
+                    when (selectedTheme) {
+                        "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
