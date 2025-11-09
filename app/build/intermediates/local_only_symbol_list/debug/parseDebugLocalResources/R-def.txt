@@ -111,6 +111,7 @@ layout list_item_workflow
 menu bottom_nav_menu
 menu main_menu
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 navigation nav_graph
 string add

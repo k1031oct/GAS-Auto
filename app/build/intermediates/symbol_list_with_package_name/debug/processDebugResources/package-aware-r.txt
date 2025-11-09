@@ -4744,6 +4744,7 @@ layout support_simple_spinner_dropdown_item
 menu bottom_nav_menu
 menu main_menu
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 navigation nav_graph
 plurals mtrl_badge_content_description

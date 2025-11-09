@@ -29,9 +29,10 @@ class ScheduleViewModel @Inject constructor(
     val calendarEvents: StateFlow<List<Event>> = _calendarEvents
 
     fun fetchCalendarEvents(calendar: Calendar) {
-        val account = googleApiAuthorizer.getCurrentUser()
-        if (account?.email == null) {
-            // Not signed in or no account available
+        val accountEmail = googleApiAuthorizer.getCurrentUser()?.email
+
+        if (accountEmail.isNullOrEmpty()) {
+            // Not signed in or no email available, clear the events
             _calendarEvents.value = emptyList()
             return
         }
@@ -55,7 +56,7 @@ class ScheduleViewModel @Inject constructor(
             val startDateTime = DateTime(startTime.time, TimeZone.getDefault())
             val endDateTime = DateTime(endTime.time, TimeZone.getDefault())
 
-            val events = calendarRepository.getEvents(account.email!!, startDateTime, endDateTime)
+            val events = calendarRepository.getEvents(accountEmail, startDateTime, endDateTime)
             _calendarEvents.value = events ?: emptyList()
         }
     }

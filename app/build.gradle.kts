@@ -116,10 +116,11 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.android.desugar.jdk.libs)
 
-    // Firebase - Now using version catalog
+    // Firebase & gRPC - BOMs for consistent versions
     implementation(platform(libs.firebase.bom))
     implementation(platform(libs.grpc.bom))
     implementation(libs.bundles.firebase)
+    implementation(libs.io.grpc.okhttp)
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)

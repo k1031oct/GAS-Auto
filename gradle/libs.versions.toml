@@ -9,6 +9,7 @@ firebaseAppDistribution = "5.2.0"
 hilt = "2.57.2"
 androidDesugarJdkLibs = "2.0.4"
 firebaseBom = "33.1.1"
+grpcBom = "1.62.2"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -30,7 +31,6 @@ material = "1.13.0"
 constraintlayout = "2.2.1"
 navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
-grpcBom = "1.62.2"
 playServicesAuth = "21.4.0"
 
 # Third Party

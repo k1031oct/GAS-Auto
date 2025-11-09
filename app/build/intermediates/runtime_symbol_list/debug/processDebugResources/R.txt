@@ -4743,7 +4743,8 @@ int layout support_simple_spinner_dropdown_item 0x7f0c0096
 int menu bottom_nav_menu 0x7f0e0000
 int menu main_menu 0x7f0e0001
 int mipmap ic_launcher 0x7f0f0000
-int mipmap ic_launcher_round 0x7f0f0001
+int mipmap ic_launcher_foreground 0x7f0f0001
+int mipmap ic_launcher_round 0x7f0f0002
 int navigation nav_graph 0x7f100000
 int plurals mtrl_badge_content_description 0x7f110000
 int raw firebase_common_keep 0x7f120000

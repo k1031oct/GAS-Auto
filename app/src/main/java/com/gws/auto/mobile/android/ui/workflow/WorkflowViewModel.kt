@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,9 +42,20 @@ class WorkflowViewModel @Inject constructor(
 
     fun loadWorkflows() {
         workflowRepository.getAllWorkflows().addOnSuccessListener { documents ->
-            _workflows.value = documents.toObjects(Workflow::class.java)
-        }.addOnFailureListener {
-            // Handle error
+            val workflowList = mutableListOf<Workflow>()
+            for (document in documents) {
+                try {
+                    // ドキュメントを一つずつ安全に変換
+                    val workflow = document.toObject(Workflow::class.java)
+                    workflowList.add(workflow)
+                } catch (e: Exception) {
+                    // 変換に失敗したドキュメントのIDとエラーをログに出力
+                    Timber.e(e, "Failed to convert document: ${document.id}")
+                }
+            }
+            _workflows.value = workflowList
+        }.addOnFailureListener { exception ->
+            Timber.e(exception, "Failed to fetch workflows")
         }
     }
 }

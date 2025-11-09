@@ -10,6 +10,7 @@ import com.gws.auto.mobile.android.domain.service.Scope
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,10 +18,16 @@ import javax.inject.Singleton
 class CalendarRepository @Inject constructor(@ApplicationContext private val context: Context) {
 
     suspend fun getEvents(
-        accountName: String,
+        accountName: String?,
         startTime: com.google.api.client.util.DateTime,
         endTime: com.google.api.client.util.DateTime
     ): List<Event>? {
+        // アカウント名がnullまたは空の場合はAPIを呼び出さずにnullを返す
+        if (accountName.isNullOrEmpty()) {
+            Timber.w("getEvents called with null or empty accountName.")
+            return null
+        }
+
         return withContext(Dispatchers.IO) {
             try {
                 val credential = GoogleAccountCredential.usingOAuth2(
@@ -44,7 +51,7 @@ class CalendarRepository @Inject constructor(@ApplicationContext private val con
                     .execute()
                     .items
             } catch (e: Exception) {
-                e.printStackTrace()
+                Timber.e(e, "Failed to fetch calendar events.")
                 null
             }
         }
