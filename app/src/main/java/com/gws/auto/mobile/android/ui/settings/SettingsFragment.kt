@@ -210,7 +210,7 @@ class SettingsFragment : Fragment() {
             binding.authButton.text = getString(R.string.sign_in)
             binding.authButton.setOnClickListener {
                 Timber.d("Sign in button clicked.")
-                startActivity(Intent(activity, SignInActivity::class.java))
+                // startActivity(Intent(activity, SignInActivity::class.java))
             }
             binding.userName.text = getString(R.string.user_name_placeholder)
             binding.userEmail.text = getString(R.string.user_email_placeholder)

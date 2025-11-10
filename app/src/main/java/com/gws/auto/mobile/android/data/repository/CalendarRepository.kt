@@ -25,7 +25,7 @@ class CalendarRepository @Inject constructor(@ApplicationContext private val con
         // アカウント名がnullまたは空の場合はAPIを呼び出さずにnullを返す
         if (accountName.isNullOrEmpty()) {
             Timber.w("getEvents called with null or empty accountName.")
-            return null
+            return emptyList() // Return an empty list to avoid crashes downstream
         }
 
         return withContext(Dispatchers.IO) {

@@ -74,6 +74,7 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         debug {
+            multiDexKeepProguard = file("multidex-config.pro")
             firebaseAppDistribution {
                 appId = System.getenv("FIREBASE_APP_ID")
                 groups = "testers"
@@ -107,8 +108,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            excludes += "META-INF/DEPENDENCIES"
-            excludes += "META-INF/INDEX.LIST"
+            pickFirsts += "META-INF/DEPENDENCIES"
+            pickFirsts += "META-INF/INDEX.LIST"
         }
     }
 }
@@ -116,11 +117,9 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.android.desugar.jdk.libs)
 
-    // Firebase & gRPC - BOMs for consistent versions
+    // Firebase - BOM for consistent versions
     implementation(platform(libs.firebase.bom))
-    implementation(platform(libs.grpc.bom))
     implementation(libs.bundles.firebase)
-    implementation(libs.io.grpc.okhttp)
 
     // Google & AndroidX - All using version catalog
     implementation(libs.androidx.core.ktx)

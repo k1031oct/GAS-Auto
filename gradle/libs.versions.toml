@@ -9,7 +9,6 @@ firebaseAppDistribution = "5.2.0"
 hilt = "2.57.2"
 androidDesugarJdkLibs = "2.0.4"
 firebaseBom = "33.1.1"
-grpcBom = "1.62.2"
 
 # AndroidX & Google Libraries
 coreKtx = "1.17.0"
@@ -81,8 +80,6 @@ firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-grpc-bom = { group = "io.grpc", name = "grpc-bom", version.ref = "grpcBom" }
-io-grpc-okhttp = { group = "io.grpc", name = "grpc-okhttp" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 
 
