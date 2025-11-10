@@ -1,7 +1,9 @@
 package com.gws.auto.mobile.android.ui.workflow;
 
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository;
+import dagger.Lazy;
 import dagger.internal.DaggerGenerated;
+import dagger.internal.DoubleCheck;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
 import dagger.internal.QualifierMetadata;
@@ -33,7 +35,7 @@ public final class WorkflowViewModel_Factory implements Factory<WorkflowViewMode
 
   @Override
   public WorkflowViewModel get() {
-    return newInstance(workflowRepositoryProvider.get());
+    return newInstance(DoubleCheck.lazy(workflowRepositoryProvider));
   }
 
   public static WorkflowViewModel_Factory create(
@@ -41,7 +43,7 @@ public final class WorkflowViewModel_Factory implements Factory<WorkflowViewMode
     return new WorkflowViewModel_Factory(workflowRepositoryProvider);
   }
 
-  public static WorkflowViewModel newInstance(WorkflowRepository workflowRepository) {
+  public static WorkflowViewModel newInstance(Lazy<WorkflowRepository> workflowRepository) {
     return new WorkflowViewModel(workflowRepository);
   }
 }

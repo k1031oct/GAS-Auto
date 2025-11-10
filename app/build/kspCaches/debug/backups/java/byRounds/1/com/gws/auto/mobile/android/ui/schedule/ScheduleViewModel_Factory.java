@@ -3,7 +3,9 @@ package com.gws.auto.mobile.android.ui.schedule;
 import com.gws.auto.mobile.android.data.repository.CalendarRepository;
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository;
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer;
+import dagger.Lazy;
 import dagger.internal.DaggerGenerated;
+import dagger.internal.DoubleCheck;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
 import dagger.internal.QualifierMetadata;
@@ -43,7 +45,7 @@ public final class ScheduleViewModel_Factory implements Factory<ScheduleViewMode
 
   @Override
   public ScheduleViewModel get() {
-    return newInstance(scheduleRepositoryProvider.get(), calendarRepositoryProvider.get(), googleApiAuthorizerProvider.get());
+    return newInstance(DoubleCheck.lazy(scheduleRepositoryProvider), DoubleCheck.lazy(calendarRepositoryProvider), googleApiAuthorizerProvider.get());
   }
 
   public static ScheduleViewModel_Factory create(
@@ -53,8 +55,8 @@ public final class ScheduleViewModel_Factory implements Factory<ScheduleViewMode
     return new ScheduleViewModel_Factory(scheduleRepositoryProvider, calendarRepositoryProvider, googleApiAuthorizerProvider);
   }
 
-  public static ScheduleViewModel newInstance(ScheduleRepository scheduleRepository,
-      CalendarRepository calendarRepository, GoogleApiAuthorizer googleApiAuthorizer) {
+  public static ScheduleViewModel newInstance(Lazy<ScheduleRepository> scheduleRepository,
+      Lazy<CalendarRepository> calendarRepository, GoogleApiAuthorizer googleApiAuthorizer) {
     return new ScheduleViewModel(scheduleRepository, calendarRepository, googleApiAuthorizer);
   }
 }

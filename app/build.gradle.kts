@@ -137,15 +137,9 @@ dependencies {
     implementation(libs.playServicesAuth)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
-    implementation(libs.google.api.services.drive) {
-        exclude(group = "io.grpc")
-    }
-    implementation(libs.google.api.services.sheets) {
-        exclude(group = "io.grpc")
-    }
-    implementation(libs.google.api.services.calendar) {
-        exclude(group = "io.grpc")
-    }
+    implementation(libs.google.api.services.drive)
+    implementation(libs.google.api.services.sheets)
+    implementation(libs.google.api.services.calendar)
     implementation(libs.google.oauth.client)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.splashscreen)
