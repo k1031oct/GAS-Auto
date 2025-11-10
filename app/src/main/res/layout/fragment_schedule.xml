@@ -39,14 +39,16 @@
                 android:layout_alignParentEnd="true"/>
         </RelativeLayout>
 
-        <GridLayout
-            android:id="@+id/calendar_grid"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/calendar_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="7" />
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="7"
+            tools:listitem="@layout/list_item_calendar_day"/>
 
-        <!-- All Schedules List -->
         <TextView
+            android:id="@+id/list_header_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/all_schedules_title"
@@ -54,20 +56,20 @@
             android:padding="8dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/all_schedules_recycler_view"
+            android:id="@+id/schedule_list_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:visibility="visible"
             tools:listitem="@layout/list_item_schedule" />
 
-        <!-- Timeline for a specific day (initially hidden) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/timeline_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:visibility="gone"
-            tools:visibility="visible" />
+            tools:listitem="@layout/list_item_timeline_event" />
 
     </LinearLayout>
 

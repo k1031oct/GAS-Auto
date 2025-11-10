@@ -196,7 +196,10 @@ fun WeeklySettings(
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text("実行する曜日")
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             daysOfWeek.forEach { day ->
                 FilterChip(
                     selected = day in selectedDays,

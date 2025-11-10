@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,13 +23,13 @@ public final class FragmentScheduleBinding implements ViewBinding {
   private final CoordinatorLayout rootView;
 
   @NonNull
-  public final RecyclerView allSchedulesRecyclerView;
-
-  @NonNull
-  public final GridLayout calendarGrid;
+  public final RecyclerView calendarRecyclerView;
 
   @NonNull
   public final FloatingActionButton fabAddSchedule;
+
+  @NonNull
+  public final TextView listHeaderText;
 
   @NonNull
   public final TextView monthYearTextView;
@@ -42,20 +41,24 @@ public final class FragmentScheduleBinding implements ViewBinding {
   public final Button prevMonthButton;
 
   @NonNull
+  public final RecyclerView scheduleListRecyclerView;
+
+  @NonNull
   public final RecyclerView timelineRecyclerView;
 
   private FragmentScheduleBinding(@NonNull CoordinatorLayout rootView,
-      @NonNull RecyclerView allSchedulesRecyclerView, @NonNull GridLayout calendarGrid,
-      @NonNull FloatingActionButton fabAddSchedule, @NonNull TextView monthYearTextView,
+      @NonNull RecyclerView calendarRecyclerView, @NonNull FloatingActionButton fabAddSchedule,
+      @NonNull TextView listHeaderText, @NonNull TextView monthYearTextView,
       @NonNull Button nextMonthButton, @NonNull Button prevMonthButton,
-      @NonNull RecyclerView timelineRecyclerView) {
+      @NonNull RecyclerView scheduleListRecyclerView, @NonNull RecyclerView timelineRecyclerView) {
     this.rootView = rootView;
-    this.allSchedulesRecyclerView = allSchedulesRecyclerView;
-    this.calendarGrid = calendarGrid;
+    this.calendarRecyclerView = calendarRecyclerView;
     this.fabAddSchedule = fabAddSchedule;
+    this.listHeaderText = listHeaderText;
     this.monthYearTextView = monthYearTextView;
     this.nextMonthButton = nextMonthButton;
     this.prevMonthButton = prevMonthButton;
+    this.scheduleListRecyclerView = scheduleListRecyclerView;
     this.timelineRecyclerView = timelineRecyclerView;
   }
 
@@ -86,21 +89,21 @@ public final class FragmentScheduleBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.all_schedules_recycler_view;
-      RecyclerView allSchedulesRecyclerView = ViewBindings.findChildViewById(rootView, id);
-      if (allSchedulesRecyclerView == null) {
-        break missingId;
-      }
-
-      id = R.id.calendar_grid;
-      GridLayout calendarGrid = ViewBindings.findChildViewById(rootView, id);
-      if (calendarGrid == null) {
+      id = R.id.calendar_recycler_view;
+      RecyclerView calendarRecyclerView = ViewBindings.findChildViewById(rootView, id);
+      if (calendarRecyclerView == null) {
         break missingId;
       }
 
       id = R.id.fab_add_schedule;
       FloatingActionButton fabAddSchedule = ViewBindings.findChildViewById(rootView, id);
       if (fabAddSchedule == null) {
+        break missingId;
+      }
+
+      id = R.id.list_header_text;
+      TextView listHeaderText = ViewBindings.findChildViewById(rootView, id);
+      if (listHeaderText == null) {
         break missingId;
       }
 
@@ -122,15 +125,21 @@ public final class FragmentScheduleBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.schedule_list_recycler_view;
+      RecyclerView scheduleListRecyclerView = ViewBindings.findChildViewById(rootView, id);
+      if (scheduleListRecyclerView == null) {
+        break missingId;
+      }
+
       id = R.id.timeline_recycler_view;
       RecyclerView timelineRecyclerView = ViewBindings.findChildViewById(rootView, id);
       if (timelineRecyclerView == null) {
         break missingId;
       }
 
-      return new FragmentScheduleBinding((CoordinatorLayout) rootView, allSchedulesRecyclerView,
-          calendarGrid, fabAddSchedule, monthYearTextView, nextMonthButton, prevMonthButton,
-          timelineRecyclerView);
+      return new FragmentScheduleBinding((CoordinatorLayout) rootView, calendarRecyclerView,
+          fabAddSchedule, listHeaderText, monthYearTextView, nextMonthButton, prevMonthButton,
+          scheduleListRecyclerView, timelineRecyclerView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -1,0 +1,20 @@
+package com.gws.auto.mobile.android.data.local.db
+
+import androidx.room.*
+import com.gws.auto.mobile.android.domain.model.Workflow
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface WorkflowDao {
+    @Query("SELECT * FROM workflows")
+    fun getAllWorkflows(): Flow<List<Workflow>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWorkflow(workflow: Workflow)
+
+    @Update
+    suspend fun updateWorkflow(workflow: Workflow)
+
+    @Delete
+    suspend fun deleteWorkflow(workflow: Workflow)
+}

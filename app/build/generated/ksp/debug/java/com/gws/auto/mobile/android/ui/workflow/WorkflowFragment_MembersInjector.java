@@ -1,6 +1,5 @@
 package com.gws.auto.mobile.android.ui.workflow;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.gws.auto.mobile.android.domain.engine.WorkflowEngine;
 import dagger.MembersInjector;
 import dagger.internal.DaggerGenerated;
@@ -25,30 +24,20 @@ import javax.annotation.processing.Generated;
     "nullness:initialization.field.uninitialized"
 })
 public final class WorkflowFragment_MembersInjector implements MembersInjector<WorkflowFragment> {
-  private final Provider<FirebaseAuth> authProvider;
-
   private final Provider<WorkflowEngine> workflowEngineProvider;
 
-  private WorkflowFragment_MembersInjector(Provider<FirebaseAuth> authProvider,
-      Provider<WorkflowEngine> workflowEngineProvider) {
-    this.authProvider = authProvider;
+  private WorkflowFragment_MembersInjector(Provider<WorkflowEngine> workflowEngineProvider) {
     this.workflowEngineProvider = workflowEngineProvider;
   }
 
   @Override
   public void injectMembers(WorkflowFragment instance) {
-    injectAuth(instance, authProvider.get());
     injectWorkflowEngine(instance, workflowEngineProvider.get());
   }
 
-  public static MembersInjector<WorkflowFragment> create(Provider<FirebaseAuth> authProvider,
+  public static MembersInjector<WorkflowFragment> create(
       Provider<WorkflowEngine> workflowEngineProvider) {
-    return new WorkflowFragment_MembersInjector(authProvider, workflowEngineProvider);
-  }
-
-  @InjectedFieldSignature("com.gws.auto.mobile.android.ui.workflow.WorkflowFragment.auth")
-  public static void injectAuth(WorkflowFragment instance, FirebaseAuth auth) {
-    instance.auth = auth;
+    return new WorkflowFragment_MembersInjector(workflowEngineProvider);
   }
 
   @InjectedFieldSignature("com.gws.auto.mobile.android.ui.workflow.WorkflowFragment.workflowEngine")

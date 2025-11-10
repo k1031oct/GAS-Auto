@@ -4,33 +4,25 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.compose.ui.platform.ComposeView;
 import androidx.viewbinding.ViewBinding;
-import androidx.viewbinding.ViewBindings;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
-import java.lang.String;
 
 public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final FrameLayout rootView;
 
-  @NonNull
-  public final ComposeView dashboardComposeView;
-
-  private FragmentDashboardBinding(@NonNull LinearLayout rootView,
-      @NonNull ComposeView dashboardComposeView) {
+  private FragmentDashboardBinding(@NonNull FrameLayout rootView) {
     this.rootView = rootView;
-    this.dashboardComposeView = dashboardComposeView;
   }
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public FrameLayout getRoot() {
     return rootView;
   }
 
@@ -51,19 +43,10 @@ public final class FragmentDashboardBinding implements ViewBinding {
 
   @NonNull
   public static FragmentDashboardBinding bind(@NonNull View rootView) {
-    // The body of this method is generated in a way you would not otherwise write.
-    // This is done to optimize the compiled bytecode for size and performance.
-    int id;
-    missingId: {
-      id = R.id.dashboard_compose_view;
-      ComposeView dashboardComposeView = ViewBindings.findChildViewById(rootView, id);
-      if (dashboardComposeView == null) {
-        break missingId;
-      }
-
-      return new FragmentDashboardBinding((LinearLayout) rootView, dashboardComposeView);
+    if (rootView == null) {
+      throw new NullPointerException("rootView");
     }
-    String missingId = rootView.getResources().getResourceName(id);
-    throw new NullPointerException("Missing required view with ID: ".concat(missingId));
+
+    return new FragmentDashboardBinding((FrameLayout) rootView);
   }
 }

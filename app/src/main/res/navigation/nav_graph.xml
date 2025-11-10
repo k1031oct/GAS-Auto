@@ -5,27 +5,54 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/navigation_workflow">
 
+    <!-- Bottom Navigation Destinations -->
     <fragment
         android:id="@+id/navigation_workflow"
         android:name="com.gws.auto.mobile.android.ui.workflow.WorkflowFragment"
-        android:label="Workflow"
+        android:label="@string/title_workflow"
         tools:layout="@layout/fragment_workflow" />
 
     <fragment
         android:id="@+id/navigation_schedule"
         android:name="com.gws.auto.mobile.android.ui.schedule.ScheduleFragment"
-        android:label="Schedule"
+        android:label="@string/title_schedule"
         tools:layout="@layout/fragment_schedule" />
 
     <fragment
-        android:id="@+id/navigation_settings"
-        android:name="com.gws.auto.mobile.android.ui.settings.SettingsFragment"
-        android:label="Settings"
-        tools:layout="@layout/fragment_settings" />
+        android:id="@+id/navigation_history"
+        android:name="com.gws.auto.mobile.android.ui.history.HistoryFragment"
+        android:label="@string/title_history"
+        tools:layout="@layout/fragment_history" />
 
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.gws.auto.mobile.android.ui.dashboard.DashboardFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
+    <!-- Settings & Other Destinations -->
     <fragment
         android:id="@+id/navigation_announcement"
         android:name="com.gws.auto.mobile.android.ui.announcement.AnnouncementFragment"
-        android:label="Announcements"
+        android:label="@string/title_announcement"
         tools:layout="@layout/fragment_announcement" />
+
+    <fragment
+        android:id="@+id/navigation_user_info"
+        android:name="com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment"
+        android:label="@string/title_user_info"
+        tools:layout="@layout/fragment_user_info" />
+
+    <fragment
+        android:id="@+id/navigation_account_connections"
+        android:name="com.gws.auto.mobile.android.ui.settings.account.AccountConnectionsFragment"
+        android:label="@string/title_account_connections"
+        tools:layout="@layout/fragment_account_connections" />
+
+    <fragment
+        android:id="@+id/navigation_app_settings"
+        android:name="com.gws.auto.mobile.android.ui.settings.app.AppSettingsFragment"
+        android:label="@string/title_app_settings"
+        tools:layout="@layout/fragment_app_settings" />
+
 </navigation>

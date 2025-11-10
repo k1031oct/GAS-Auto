@@ -3,35 +3,42 @@
     <string name="app_name">GWS Auto for Android</string>
 
     <!-- Titles -->
-    <string name="title_dashboard">ダッシュボード</string>
-    <string name="title_history">履歴</string>
     <string name="title_workflow">ワークフロー</string>
     <string name="title_schedule">スケジュール</string>
     <string name="title_settings">設定</string>
+    <string name="title_history">実行履歴</string>
+    <string name="title_dashboard">ダッシュボード</string>
+    <string name="title_announcement">お知らせ</string>
+    <string name="all_schedules_title">全スケジュール</string>
+    <string name="title_user_info">ユーザー情報</string>
+    <string name="title_account_connections">アカウント連携</string>
+    <string name="title_app_settings">アプリ設定</string>
 
-    <!-- Fragments -->
-    <string name="workflow_fragment">ワークフローフラグメント</string>
+    <!-- Dialogs -->
+    <string name="exit_confirmation_title">終了確認</string>
+    <string name="exit_confirmation_message">アプリを終了しますか？</string>
+    <string name="exit">終了</string>
+    <string name="cancel">キャンセル</string>
 
     <!-- Authentication -->
     <string name="sign_in">サインイン</string>
     <string name="sign_out">サインアウト</string>
     <string name="sign_in_with_google">Googleでサインイン</string>
-    <string name="please_log_in">ワークフローを表示するにはログインしてください。</string>
+    <string name="please_log_in">ワークフローを見るにはログインしてください。</string>
+    <string name="sign_in_with_google_to_sync">Googleアカウントで同期</string>
+    <string name="sign_out_and_disable_sync">サインアウトして同期を解除</string>
+    <string name="sync_enabled_with">同期が有効です: %1$s</string>
+    <string name="sync_disabled">同期は現在無効です。</string>
 
-    <!-- Workflow -->
-    <string name="workflow_name">ワークフロー名</string>
-    <string name="workflow_description">ワークフローの説明</string>
-    <string name="add_module">モジュールを追加</string>
-    <string name="save_workflow">ワークフローを保存</string>
-    <string name="add_new_workflow">新しいワークフローを追加</string>
-    <string name="workflow_list_title">ワークフロー</string>
-    <string name="workflow_actions_menu">アクション</string>
-    <string name="workflow_run_button">実行</string>
-    <string name="workflow_trigger_icon_desc">トリガーアイコン</string>
-    <string name="add_schedule">予約の追加</string>
+    <!-- Settings -->
+    <string name="first_day_of_week">週の開始曜日</string>
+    <string name="country_for_holidays">祝日カレンダーの国</string>
+    <string name="language">言語</string>
+    <string name="theme">テーマ</string>
+    <string name="manage_tags">タグの管理</string>
+    <string name="add_a_new_tag">新しいタグを追加</string>
 
-    <!-- Dummy Data -->
-    <string name="dummy_status_active">アクティブ</string>
-    <string name="dummy_trigger_daily">毎日 9:00</string>
+    <!-- Schedule -->
+    <string name="timeline_for_date">%1$s のタイムライン</string>
 
 </resources>

@@ -2,35 +2,31 @@ package com.gws.auto.mobile.android.ui.workflow
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.domain.model.Workflow
-import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
-import java.io.IOException
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class WorkflowViewModel @Inject constructor(
-    private val workflowRepository: Lazy<WorkflowRepository>
+    private val workflowRepository: WorkflowRepository
 ) : ViewModel() {
 
-    private val _workflows = MutableStateFlow<List<Workflow>>(emptyList())
     private val _query = MutableStateFlow("")
-    @Suppress("unused")
-    val query = _query.asStateFlow()
+    val query: StateFlow<String> = _query.asStateFlow()
+
+    private val _workflows = workflowRepository.getAllWorkflows()
+        .catch { e ->
+            Timber.e(e, "Error collecting workflows from local database.")
+            emit(emptyList()) // On error, emit an empty list.
+        }
 
     val filteredWorkflows: StateFlow<List<Workflow>> =
-        _query.combine(_workflows) { query, workflows ->
+        query.combine(_workflows) { query, workflows ->
             if (query.isBlank()) {
                 workflows
             } else {
@@ -45,35 +41,24 @@ class WorkflowViewModel @Inject constructor(
         _query.value = query
     }
 
-    fun loadWorkflows() {
+    fun saveNewWorkflow(name: String, description: String) {
         viewModelScope.launch {
-            try {
-                val documents = workflowRepository.get().getAllWorkflows().await()
-                val workflowList = mutableListOf<Workflow>()
-                for (document in documents) {
-                    try {
-                        // ドキュメントを一つずつ安全に変換
-                        val workflow = document.toObject(Workflow::class.java)
-                        workflowList.add(workflow)
-                    } catch (e: Exception) {
-                        // 変換に失敗したドキュメントのIDとエラーをログに出力
-                        Timber.e(e, "Failed to convert document: ${document.id}")
-                    }
-                }
-                _workflows.value = workflowList
-            } catch (e: FirebaseFirestoreException) {
-                Timber.e(e, "Failed to fetch workflows due to Firestore issue.")
-                // Optionally, update UI state to show an error
-            } catch (e: IOException) {
-                Timber.e(e, "Failed to fetch workflows due to network issue.")
-                // Optionally, update UI state to show an error
-            } catch (e: IllegalStateException) {
-                Timber.e(e, "Failed to fetch workflows, user may not be logged in.")
-                // Optionally, update UI state for login prompt
-            } catch (e: Exception) {
-                Timber.e(e, "An unexpected error occurred while fetching workflows.")
-                // Optionally, update UI state to show a generic error
-            }
+            val newWorkflow = Workflow(
+                id = UUID.randomUUID().toString(),
+                name = name,
+                description = description,
+                status = "active"
+                // modules, trigger, and tags can be added later
+            )
+            workflowRepository.saveWorkflow(newWorkflow)
+            Timber.d("New workflow created: $name")
+        }
+    }
+
+    fun deleteWorkflow(workflow: Workflow) {
+        viewModelScope.launch {
+            workflowRepository.deleteWorkflow(workflow)
+            Timber.d("Workflow deleted: ${workflow.name}")
         }
     }
 }

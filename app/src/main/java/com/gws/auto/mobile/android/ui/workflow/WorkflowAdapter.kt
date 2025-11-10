@@ -1,22 +1,24 @@
 package com.gws.auto.mobile.android.ui.workflow
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.gws.auto.mobile.android.databinding.ListItemWorkflowBinding
-import com.gws.auto.mobile.android.domain.engine.WorkflowEngine
 import com.gws.auto.mobile.android.domain.model.Workflow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class WorkflowAdapter(
     private var workflows: List<Workflow>,
-    private val workflowEngine: WorkflowEngine
+    private val onRunClicked: (Workflow) -> Unit,
+    private val onDeleteClicked: (Workflow) -> Unit
 ) : RecyclerView.Adapter<WorkflowAdapter.WorkflowViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkflowViewHolder {
-        val binding = ListItemWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ListItemWorkflowBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
         return WorkflowViewHolder(binding)
     }
 
@@ -26,16 +28,26 @@ class WorkflowAdapter(
 
     override fun getItemCount() = workflows.size
 
-    inner class WorkflowViewHolder(private val binding: ListItemWorkflowBinding) : RecyclerView.ViewHolder(binding.root) {
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateWorkflows(newWorkflows: List<Workflow>) {
+        workflows = newWorkflows
+        notifyDataSetChanged() // A more efficient diffing mechanism can be used later.
+    }
+
+    inner class WorkflowViewHolder(private val binding: ListItemWorkflowBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(workflow: Workflow) {
-            binding.workflowNameText.text = workflow.name
-            binding.triggerText.text = workflow.trigger
-            binding.statusChip.text = workflow.status
+            binding.workflowName.text = workflow.name
+            binding.workflowDescription.text = workflow.description
+            binding.workflowStatus.text = workflow.status
+            binding.workflowTrigger.text = workflow.trigger
 
             binding.runButton.setOnClickListener {
-                CoroutineScope(Dispatchers.Main).launch {
-                    workflowEngine.execute(workflow.modules)
-                }
+                onRunClicked(workflow)
+            }
+
+            binding.deleteButton.setOnClickListener {
+                onDeleteClicked(workflow)
             }
         }
     }

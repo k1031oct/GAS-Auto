@@ -20,16 +20,16 @@ public final class ListItemTimelineEventBinding implements ViewBinding {
   private final LinearLayout rootView;
 
   @NonNull
-  public final TextView eventTimeText;
+  public final TextView eventTime;
 
   @NonNull
-  public final TextView eventTitleText;
+  public final TextView eventTitle;
 
-  private ListItemTimelineEventBinding(@NonNull LinearLayout rootView,
-      @NonNull TextView eventTimeText, @NonNull TextView eventTitleText) {
+  private ListItemTimelineEventBinding(@NonNull LinearLayout rootView, @NonNull TextView eventTime,
+      @NonNull TextView eventTitle) {
     this.rootView = rootView;
-    this.eventTimeText = eventTimeText;
-    this.eventTitleText = eventTitleText;
+    this.eventTime = eventTime;
+    this.eventTitle = eventTitle;
   }
 
   @Override
@@ -59,20 +59,19 @@ public final class ListItemTimelineEventBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.event_time_text;
-      TextView eventTimeText = ViewBindings.findChildViewById(rootView, id);
-      if (eventTimeText == null) {
+      id = R.id.event_time;
+      TextView eventTime = ViewBindings.findChildViewById(rootView, id);
+      if (eventTime == null) {
         break missingId;
       }
 
-      id = R.id.event_title_text;
-      TextView eventTitleText = ViewBindings.findChildViewById(rootView, id);
-      if (eventTitleText == null) {
+      id = R.id.event_title;
+      TextView eventTitle = ViewBindings.findChildViewById(rootView, id);
+      if (eventTitle == null) {
         break missingId;
       }
 
-      return new ListItemTimelineEventBinding((LinearLayout) rootView, eventTimeText,
-          eventTitleText);
+      return new ListItemTimelineEventBinding((LinearLayout) rootView, eventTime, eventTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -4,83 +4,77 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="16dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- (A) Workflow Name -->
         <TextView
-            android:id="@+id/workflow_name_text"
+            android:id="@+id/workflow_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/menu_button"
-            tools:text="請求書メール自動送信" />
+            app:layout_constraintEnd_toStartOf="@+id/run_button"
+            tools:text="Workflow Name" />
 
-        <!-- (D) Sub-menu Button -->
-        <ImageView
-            android:id="@+id/menu_button"
+        <TextView
+            android:id="@+id/workflow_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/workflow_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="This is a description of the workflow." />
+
+        <TextView
+            android:id="@+id/workflow_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_more_vert"
-            android:contentDescription="@string/workflow_actions_menu"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/workflow_description"
+            tools:text="Status: Active" />
+
+        <TextView
+            android:id="@+id/workflow_trigger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintStart_toEndOf="@id/workflow_status"
+            app:layout_constraintTop_toTopOf="@id/workflow_status"
+            tools:text="Trigger: Manual" />
+
+        <Button
+            android:id="@+id/run_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/workflow_run_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- (B) Trigger Icon -->
-        <ImageView
-            android:id="@+id/trigger_icon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginTop="8dp"
-            android:contentDescription="@string/workflow_trigger_icon_desc"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/workflow_name_text"
-            tools:src="@drawable/ic_schedule" />
-
-        <!-- (B) Trigger Text -->
-        <TextView
-            android:id="@+id/trigger_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-            app:layout_constraintStart_toEndOf="@+id/trigger_icon"
-            app:layout_constraintEnd_toStartOf="@+id/status_chip"
-            app:layout_constraintTop_toTopOf="@id/trigger_icon"
-            app:layout_constraintBottom_toBottomOf="@id/trigger_icon"
-            tools:text="@string/dummy_trigger_daily" />
-
-        <!-- (C) Status Chip -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/status_chip"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintStart_toEndOf="@+id/trigger_text"
-            app:layout_constraintTop_toTopOf="@+id/trigger_icon"
-            app:layout_constraintBottom_toBottomOf="@+id/trigger_icon"
-            tools:text="@string/dummy_status_active" />
-
-        <!-- (D) Main Action Button -->
-        <Button
-            android:id="@+id/run_button"
-            style="@style/Widget.Material3.Button.TextButton"
+        <ImageButton
+            android:id="@+id/delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/workflow_run_button"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete Workflow"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/menu_button" />
+            app:layout_constraintTop_toBottomOf="@id/run_button"
+            android:layout_marginTop="8dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>

@@ -31,6 +31,7 @@ constraintlayout = "2.2.1"
 navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
 playServicesAuth = "21.4.0"
+room = "2.6.1"
 
 # Third Party
 coil = "2.7.0"
@@ -81,7 +82,9 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
-
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 # Third Party
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }

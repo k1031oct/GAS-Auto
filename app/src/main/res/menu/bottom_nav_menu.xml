@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/navigation_workflow"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_workflow"
         android:title="@string/title_workflow" />
+
     <item
         android:id="@+id/navigation_schedule"
-        android:icon="@android:drawable/ic_menu_my_calendar"
+        android:icon="@drawable/ic_schedule"
         android:title="@string/title_schedule" />
+
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@android:drawable/ic_menu_manage"
-        android:title="@string/title_settings" />
+        android:id="@+id/navigation_history"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/title_history" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="@string/title_dashboard" />
+
 </menu>

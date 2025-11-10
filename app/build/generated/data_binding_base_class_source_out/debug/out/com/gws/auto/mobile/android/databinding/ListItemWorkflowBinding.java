@@ -5,14 +5,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.chip.Chip;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -23,33 +22,34 @@ public final class ListItemWorkflowBinding implements ViewBinding {
   private final MaterialCardView rootView;
 
   @NonNull
-  public final ImageView menuButton;
+  public final ImageButton deleteButton;
 
   @NonNull
   public final Button runButton;
 
   @NonNull
-  public final Chip statusChip;
+  public final TextView workflowDescription;
 
   @NonNull
-  public final ImageView triggerIcon;
+  public final TextView workflowName;
 
   @NonNull
-  public final TextView triggerText;
+  public final TextView workflowStatus;
 
   @NonNull
-  public final TextView workflowNameText;
+  public final TextView workflowTrigger;
 
-  private ListItemWorkflowBinding(@NonNull MaterialCardView rootView, @NonNull ImageView menuButton,
-      @NonNull Button runButton, @NonNull Chip statusChip, @NonNull ImageView triggerIcon,
-      @NonNull TextView triggerText, @NonNull TextView workflowNameText) {
+  private ListItemWorkflowBinding(@NonNull MaterialCardView rootView,
+      @NonNull ImageButton deleteButton, @NonNull Button runButton,
+      @NonNull TextView workflowDescription, @NonNull TextView workflowName,
+      @NonNull TextView workflowStatus, @NonNull TextView workflowTrigger) {
     this.rootView = rootView;
-    this.menuButton = menuButton;
+    this.deleteButton = deleteButton;
     this.runButton = runButton;
-    this.statusChip = statusChip;
-    this.triggerIcon = triggerIcon;
-    this.triggerText = triggerText;
-    this.workflowNameText = workflowNameText;
+    this.workflowDescription = workflowDescription;
+    this.workflowName = workflowName;
+    this.workflowStatus = workflowStatus;
+    this.workflowTrigger = workflowTrigger;
   }
 
   @Override
@@ -79,9 +79,9 @@ public final class ListItemWorkflowBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.menu_button;
-      ImageView menuButton = ViewBindings.findChildViewById(rootView, id);
-      if (menuButton == null) {
+      id = R.id.delete_button;
+      ImageButton deleteButton = ViewBindings.findChildViewById(rootView, id);
+      if (deleteButton == null) {
         break missingId;
       }
 
@@ -91,32 +91,32 @@ public final class ListItemWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.status_chip;
-      Chip statusChip = ViewBindings.findChildViewById(rootView, id);
-      if (statusChip == null) {
+      id = R.id.workflow_description;
+      TextView workflowDescription = ViewBindings.findChildViewById(rootView, id);
+      if (workflowDescription == null) {
         break missingId;
       }
 
-      id = R.id.trigger_icon;
-      ImageView triggerIcon = ViewBindings.findChildViewById(rootView, id);
-      if (triggerIcon == null) {
+      id = R.id.workflow_name;
+      TextView workflowName = ViewBindings.findChildViewById(rootView, id);
+      if (workflowName == null) {
         break missingId;
       }
 
-      id = R.id.trigger_text;
-      TextView triggerText = ViewBindings.findChildViewById(rootView, id);
-      if (triggerText == null) {
+      id = R.id.workflow_status;
+      TextView workflowStatus = ViewBindings.findChildViewById(rootView, id);
+      if (workflowStatus == null) {
         break missingId;
       }
 
-      id = R.id.workflow_name_text;
-      TextView workflowNameText = ViewBindings.findChildViewById(rootView, id);
-      if (workflowNameText == null) {
+      id = R.id.workflow_trigger;
+      TextView workflowTrigger = ViewBindings.findChildViewById(rootView, id);
+      if (workflowTrigger == null) {
         break missingId;
       }
 
-      return new ListItemWorkflowBinding((MaterialCardView) rootView, menuButton, runButton,
-          statusChip, triggerIcon, triggerText, workflowNameText);
+      return new ListItemWorkflowBinding((MaterialCardView) rootView, deleteButton, runButton,
+          workflowDescription, workflowName, workflowStatus, workflowTrigger);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

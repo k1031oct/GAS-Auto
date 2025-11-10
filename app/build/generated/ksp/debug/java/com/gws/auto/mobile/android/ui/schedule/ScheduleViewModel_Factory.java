@@ -1,11 +1,8 @@
 package com.gws.auto.mobile.android.ui.schedule;
 
-import com.gws.auto.mobile.android.data.repository.CalendarRepository;
+import android.content.SharedPreferences;
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository;
-import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer;
-import dagger.Lazy;
 import dagger.internal.DaggerGenerated;
-import dagger.internal.DoubleCheck;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
 import dagger.internal.QualifierMetadata;
@@ -31,32 +28,27 @@ import javax.annotation.processing.Generated;
 public final class ScheduleViewModel_Factory implements Factory<ScheduleViewModel> {
   private final Provider<ScheduleRepository> scheduleRepositoryProvider;
 
-  private final Provider<CalendarRepository> calendarRepositoryProvider;
-
-  private final Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider;
+  private final Provider<SharedPreferences> prefsProvider;
 
   private ScheduleViewModel_Factory(Provider<ScheduleRepository> scheduleRepositoryProvider,
-      Provider<CalendarRepository> calendarRepositoryProvider,
-      Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider) {
+      Provider<SharedPreferences> prefsProvider) {
     this.scheduleRepositoryProvider = scheduleRepositoryProvider;
-    this.calendarRepositoryProvider = calendarRepositoryProvider;
-    this.googleApiAuthorizerProvider = googleApiAuthorizerProvider;
+    this.prefsProvider = prefsProvider;
   }
 
   @Override
   public ScheduleViewModel get() {
-    return newInstance(DoubleCheck.lazy(scheduleRepositoryProvider), DoubleCheck.lazy(calendarRepositoryProvider), googleApiAuthorizerProvider.get());
+    return newInstance(scheduleRepositoryProvider.get(), prefsProvider.get());
   }
 
   public static ScheduleViewModel_Factory create(
       Provider<ScheduleRepository> scheduleRepositoryProvider,
-      Provider<CalendarRepository> calendarRepositoryProvider,
-      Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider) {
-    return new ScheduleViewModel_Factory(scheduleRepositoryProvider, calendarRepositoryProvider, googleApiAuthorizerProvider);
+      Provider<SharedPreferences> prefsProvider) {
+    return new ScheduleViewModel_Factory(scheduleRepositoryProvider, prefsProvider);
   }
 
-  public static ScheduleViewModel newInstance(Lazy<ScheduleRepository> scheduleRepository,
-      Lazy<CalendarRepository> calendarRepository, GoogleApiAuthorizer googleApiAuthorizer) {
-    return new ScheduleViewModel(scheduleRepository, calendarRepository, googleApiAuthorizer);
+  public static ScheduleViewModel newInstance(ScheduleRepository scheduleRepository,
+      SharedPreferences prefs) {
+    return new ScheduleViewModel(scheduleRepository, prefs);
   }
 }

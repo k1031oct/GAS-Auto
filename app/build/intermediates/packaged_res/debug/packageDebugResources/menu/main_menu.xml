@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/navigation_announcement"
-        android:icon="@android:drawable/ic_dialog_info"
-        android:title="@string/title_announcement"
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_menu"
+        android:title="@string/title_settings"
         app:showAsAction="ifRoom" />
 
 </menu>

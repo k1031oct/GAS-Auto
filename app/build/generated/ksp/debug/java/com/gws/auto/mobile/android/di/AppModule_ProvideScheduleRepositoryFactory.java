@@ -3,6 +3,7 @@ package com.gws.auto.mobile.android.di;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository;
+import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Preconditions;
@@ -32,24 +33,29 @@ public final class AppModule_ProvideScheduleRepositoryFactory implements Factory
 
   private final Provider<FirebaseAuth> authProvider;
 
+  private final Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider;
+
   private AppModule_ProvideScheduleRepositoryFactory(Provider<FirebaseFirestore> firestoreProvider,
-      Provider<FirebaseAuth> authProvider) {
+      Provider<FirebaseAuth> authProvider,
+      Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider) {
     this.firestoreProvider = firestoreProvider;
     this.authProvider = authProvider;
+    this.googleApiAuthorizerProvider = googleApiAuthorizerProvider;
   }
 
   @Override
   public ScheduleRepository get() {
-    return provideScheduleRepository(firestoreProvider.get(), authProvider.get());
+    return provideScheduleRepository(firestoreProvider.get(), authProvider.get(), googleApiAuthorizerProvider.get());
   }
 
   public static AppModule_ProvideScheduleRepositoryFactory create(
-      Provider<FirebaseFirestore> firestoreProvider, Provider<FirebaseAuth> authProvider) {
-    return new AppModule_ProvideScheduleRepositoryFactory(firestoreProvider, authProvider);
+      Provider<FirebaseFirestore> firestoreProvider, Provider<FirebaseAuth> authProvider,
+      Provider<GoogleApiAuthorizer> googleApiAuthorizerProvider) {
+    return new AppModule_ProvideScheduleRepositoryFactory(firestoreProvider, authProvider, googleApiAuthorizerProvider);
   }
 
   public static ScheduleRepository provideScheduleRepository(FirebaseFirestore firestore,
-      FirebaseAuth auth) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideScheduleRepository(firestore, auth));
+      FirebaseAuth auth, GoogleApiAuthorizer googleApiAuthorizer) {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideScheduleRepository(firestore, auth, googleApiAuthorizer));
   }
 }

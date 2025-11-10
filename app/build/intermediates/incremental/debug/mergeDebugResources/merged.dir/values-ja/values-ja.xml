@@ -31,9 +31,8 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"共有"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g>と共有"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"折りたたむ"</string>
-    <string name="add_module">モジュールを追加</string>
-    <string name="add_new_workflow">新しいワークフローを追加</string>
-    <string name="add_schedule">予約の追加</string>
+    <string name="add_a_new_tag">新しいタグを追加</string>
+    <string name="all_schedules_title">全スケジュール</string>
     <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"パスワード"</string>
     <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"パスキー"</string>
     <string name="app_name">GWS Auto for Android</string>
@@ -49,6 +48,7 @@
     <string msgid="6107532579223922871" name="call_notification_incoming_text">"着信"</string>
     <string msgid="8623827134497363134" name="call_notification_ongoing_text">"通話中"</string>
     <string msgid="59049573811482460" name="call_notification_screening_text">"着信をスクリーニング中"</string>
+    <string name="cancel">キャンセル</string>
     <string name="character_counter_content_description">入力済み文字数: %1$d/%2$d</string>
     <string name="character_counter_overflowed_content_description">文字数制限を超えています（%1$d/%2$d 文字）</string>
     <string name="clear_text_end_icon_content_description">テキストを消去</string>
@@ -75,14 +75,16 @@
     <string msgid="5912733858573823945" name="confirm_device_credential_password">"パスワードを使用"</string>
     <string msgid="6083905920877235314" name="copy">"コピー"</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"リンクをクリップボードにコピーしました"</string>
+    <string name="country_for_holidays">祝日カレンダーの国</string>
     <string msgid="8038256446254964252" name="default_error_message">"入力値が無効です"</string>
     <string msgid="4776854077120974966" name="default_error_msg">"不明なエラーです"</string>
     <string msgid="6312721426453364202" name="default_popup_window_title">"ポップアップウィンドウ"</string>
     <string msgid="1890207353314751437" name="dropdown_menu">"プルダウン メニュー"</string>
-    <string name="dummy_status_active">アクティブ</string>
-    <string name="dummy_trigger_daily">毎日 9:00</string>
     <string name="error_a11y_label">エラー: 無効</string>
     <string name="error_icon_content_description">エラー</string>
+    <string name="exit">終了</string>
+    <string name="exit_confirmation_message">アプリを終了しますか？</string>
+    <string name="exit_confirmation_title">終了確認</string>
     <string msgid="2427401033573778270" name="expand_button_title">"詳細設定"</string>
     <string name="exposed_dropdown_menu_content_description">プルダウン メニューを表示</string>
     <string msgid="4566929209979330987" name="fallback_menu_item_copy_link">"リンクをコピー"</string>
@@ -95,6 +97,7 @@
     <string msgid="7520712796891883488" name="fingerprint_error_no_fingerprints">"指紋が登録されていません。"</string>
     <string msgid="7627716295344353987" name="fingerprint_error_user_canceled">"指紋認証操作がユーザーによりキャンセルされました。"</string>
     <string msgid="3873359464293253009" name="fingerprint_not_recognized">"認識されませんでした"</string>
+    <string name="first_day_of_week">週の開始曜日</string>
     <string msgid="3791785319221634505" name="generic_error_no_device_credential">"PIN、パターン、パスワードが設定されていません。"</string>
     <string msgid="1807436368654974044" name="generic_error_no_keyguard">"このデバイスは PIN、パターン、パスワードをサポートしていません。"</string>
     <string msgid="7309881387583143581" name="generic_error_user_canceled">"認証はユーザーによりキャンセルされました。"</string>
@@ -102,6 +105,7 @@
     <string msgid="6827826412747255547" name="in_progress">"処理しています"</string>
     <string msgid="7933458017204019916" name="indeterminate">"一部 ON"</string>
     <string name="item_view_role_description">タブ</string>
+    <string name="language">言語</string>
     <string name="m3_loading_indicator_content_description">読み込んでいます</string>
     <string msgid="2988463736136100848" name="m3c_bottom_sheet_collapse_description">"ボトムシートを折りたたみます"</string>
     <string msgid="1555567894577437024" name="m3c_bottom_sheet_dismiss_description">"ボトムシートを閉じます"</string>
@@ -169,6 +173,7 @@
     <string msgid="5460405025248574620" name="m3c_tooltip_pane_description">"ツールチップ"</string>
     <string msgid="6564222473543418073" name="m3c_wide_navigation_rail_close_rail">"レールを閉じる"</string>
     <string msgid="8350283435461615411" name="m3c_wide_navigation_rail_pane_title">"ナビゲーション レール"</string>
+    <string name="manage_tags">タグの管理</string>
     <string name="material_clock_toggle_content_description">午前または午後を選択</string>
     <string name="material_hour_24h_suffix">%1$s時</string>
     <string name="material_hour_selection">時を選択</string>
@@ -239,11 +244,10 @@
     <string msgid="6610465462668679431" name="not_selected">"未選択"</string>
     <string msgid="6573031135582639649" name="not_set">"未設定"</string>
     <string name="password_toggle_content_description">パスワードを表示</string>
-    <string name="please_log_in">ワークフローを表示するにはログインしてください。</string>
+    <string name="please_log_in">ワークフローを見るにはログインしてください。</string>
     <string msgid="6685851473431805375" name="preference_copied">"「<ns1:g id="SUMMARY">%1$s</ns1:g>」をクリップボードにコピーしました。"</string>
     <string msgid="5941395253238309765" name="range_end">"範囲の末尾"</string>
     <string msgid="7097486360902471446" name="range_start">"範囲の先頭"</string>
-    <string name="save_workflow">ワークフローを保存</string>
     <string msgid="6264217191555673260" name="search_menu_title">"検索"</string>
     <string name="searchview_clear_text_content_description">テキストを消去</string>
     <string name="searchview_navigation_content_description">戻る</string>
@@ -251,7 +255,9 @@
     <string name="side_sheet_accessibility_pane_title">サイドシート</string>
     <string name="sign_in">サインイン</string>
     <string name="sign_in_with_google">Googleでサインイン</string>
+    <string name="sign_in_with_google_to_sync">Googleアカウントで同期</string>
     <string name="sign_out">サインアウト</string>
+    <string name="sign_out_and_disable_sync">サインアウトして同期を解除</string>
     <string msgid="2792228137354697160" name="snackbar_pane_title">"アラート"</string>
     <string msgid="4139871816613051306" name="state_empty">"なし"</string>
     <string msgid="5834637030682409883" name="state_off">"OFF"</string>
@@ -259,22 +265,23 @@
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string msgid="9167775378838880170" name="summary_collapsed_preference_list">"<ns1:g id="CURRENT_ITEMS">%1$s</ns1:g>、<ns1:g id="ADDED_ITEMS">%2$s</ns1:g>"</string>
     <string msgid="2561197295334830845" name="switch_role">"切り替える"</string>
+    <string name="sync_disabled">同期は現在無効です。</string>
+    <string name="sync_enabled_with">同期が有効です: %1$s</string>
     <string msgid="1672349317127674378" name="tab">"タブ"</string>
     <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g>パーセント。"</string>
+    <string name="theme">テーマ</string>
+    <string name="timeline_for_date">%1$s のタイムライン</string>
+    <string name="title_account_connections">アカウント連携</string>
+    <string name="title_announcement">お知らせ</string>
+    <string name="title_app_settings">アプリ設定</string>
     <string name="title_dashboard">ダッシュボード</string>
-    <string name="title_history">履歴</string>
+    <string name="title_history">実行履歴</string>
     <string name="title_schedule">スケジュール</string>
     <string name="title_settings">設定</string>
+    <string name="title_user_info">ユーザー情報</string>
     <string name="title_workflow">ワークフロー</string>
     <string msgid="3765533235322692011" name="tooltip_description">"ツールチップ"</string>
     <string msgid="3124740595719787496" name="tooltip_label">"ツールチップを表示"</string>
     <string msgid="3140233346420563315" name="v7_preference_off">"OFF"</string>
     <string msgid="89551595707643515" name="v7_preference_on">"ON"</string>
-    <string name="workflow_actions_menu">アクション</string>
-    <string name="workflow_description">ワークフローの説明</string>
-    <string name="workflow_fragment">ワークフローフラグメント</string>
-    <string name="workflow_list_title">ワークフロー</string>
-    <string name="workflow_name">ワークフロー名</string>
-    <string name="workflow_run_button">実行</string>
-    <string name="workflow_trigger_icon_desc">トリガーアイコン</string>
 </resources>

@@ -4,7 +4,7 @@
             "outputFile": "com.gws.auto.mobile.android.app-mergeDebugResources-5:/values-night-v33/values-night-v33.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\71abbba27cba1c3553a98b7aa4b394ab\\transformed\\jetified-core-splashscreen-1.2.0\\res\\values-night-v33\\values-night-v33.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\b9d9a9d31d5517723155269f8298c919\\transformed\\jetified-core-splashscreen-1.2.0\\res\\values-night-v33\\values-night-v33.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

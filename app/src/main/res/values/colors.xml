@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Commenting out old colors to avoid confusion. Theme is now controlled by themes.xml and Color.kt -->
+    <!--
     <color name="primary_200">#FFCCCCCC</color>
     <color name="primary_500">#FF757575</color>
     <color name="primary_700">#FF494949</color>
@@ -7,5 +9,29 @@
     <color name="accent_700">#FF6D6D6D</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="highlight_color">#FFE0E0E0</color> <!-- Light Gray for highlights -->
+    -->
+
+    <color name="highlight_color">#4D9CCAFF</color> <!-- Light Blue with transparency for day highlight -->
+    <color name="holiday_color">#FFD32F2F</color> <!-- Red for holidays -->
+
+    <!-- Light Theme Colors -->
+    <color name="md_theme_light_primary">#0061A4</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_background">#F8F9FF</color>
+    <color name="md_theme_light_onBackground">#191C20</color>
+    <color name="md_theme_light_surface">#F8F9FF</color>
+    <color name="md_theme_light_onSurface">#191C20</color>
+    <color name="md_theme_light_error">#BA1A1A</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="md_theme_dark_primary">#9CCAFF</color>
+    <color name="md_theme_dark_onPrimary">#003258</color>
+    <color name="md_theme_dark_background">#111418</color>
+    <color name="md_theme_dark_onBackground">#E1E2E8</color>
+    <color name="md_theme_dark_surface">#111418</color>
+    <color name="md_theme_dark_onSurface">#E1E2E8</color>
+    <color name="md_theme_dark_error">#FFB4AB</color>
+    <color name="md_theme_dark_onError">#690005</color>
+
 </resources>

@@ -4,81 +4,25 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
-import androidx.viewbinding.ViewBindings;
-import com.google.android.material.chip.ChipGroup;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
-import java.lang.String;
 
 public final class FragmentSettingsBinding implements ViewBinding {
   @NonNull
-  private final ScrollView rootView;
+  private final LinearLayout rootView;
 
-  @NonNull
-  public final Button addTagButton;
-
-  @NonNull
-  public final Button authButton;
-
-  @NonNull
-  public final Spinner countrySpinner;
-
-  @NonNull
-  public final Spinner firstDayOfWeekSpinner;
-
-  @NonNull
-  public final Spinner languageSpinner;
-
-  @NonNull
-  public final ImageView profileImage;
-
-  @NonNull
-  public final ChipGroup tagChipGroup;
-
-  @NonNull
-  public final EditText tagEditor;
-
-  @NonNull
-  public final Spinner themeSpinner;
-
-  @NonNull
-  public final TextView userEmail;
-
-  @NonNull
-  public final TextView userName;
-
-  private FragmentSettingsBinding(@NonNull ScrollView rootView, @NonNull Button addTagButton,
-      @NonNull Button authButton, @NonNull Spinner countrySpinner,
-      @NonNull Spinner firstDayOfWeekSpinner, @NonNull Spinner languageSpinner,
-      @NonNull ImageView profileImage, @NonNull ChipGroup tagChipGroup, @NonNull EditText tagEditor,
-      @NonNull Spinner themeSpinner, @NonNull TextView userEmail, @NonNull TextView userName) {
+  private FragmentSettingsBinding(@NonNull LinearLayout rootView) {
     this.rootView = rootView;
-    this.addTagButton = addTagButton;
-    this.authButton = authButton;
-    this.countrySpinner = countrySpinner;
-    this.firstDayOfWeekSpinner = firstDayOfWeekSpinner;
-    this.languageSpinner = languageSpinner;
-    this.profileImage = profileImage;
-    this.tagChipGroup = tagChipGroup;
-    this.tagEditor = tagEditor;
-    this.themeSpinner = themeSpinner;
-    this.userEmail = userEmail;
-    this.userName = userName;
   }
 
   @Override
   @NonNull
-  public ScrollView getRoot() {
+  public LinearLayout getRoot() {
     return rootView;
   }
 
@@ -99,81 +43,10 @@ public final class FragmentSettingsBinding implements ViewBinding {
 
   @NonNull
   public static FragmentSettingsBinding bind(@NonNull View rootView) {
-    // The body of this method is generated in a way you would not otherwise write.
-    // This is done to optimize the compiled bytecode for size and performance.
-    int id;
-    missingId: {
-      id = R.id.add_tag_button;
-      Button addTagButton = ViewBindings.findChildViewById(rootView, id);
-      if (addTagButton == null) {
-        break missingId;
-      }
-
-      id = R.id.auth_button;
-      Button authButton = ViewBindings.findChildViewById(rootView, id);
-      if (authButton == null) {
-        break missingId;
-      }
-
-      id = R.id.country_spinner;
-      Spinner countrySpinner = ViewBindings.findChildViewById(rootView, id);
-      if (countrySpinner == null) {
-        break missingId;
-      }
-
-      id = R.id.first_day_of_week_spinner;
-      Spinner firstDayOfWeekSpinner = ViewBindings.findChildViewById(rootView, id);
-      if (firstDayOfWeekSpinner == null) {
-        break missingId;
-      }
-
-      id = R.id.language_spinner;
-      Spinner languageSpinner = ViewBindings.findChildViewById(rootView, id);
-      if (languageSpinner == null) {
-        break missingId;
-      }
-
-      id = R.id.profile_image;
-      ImageView profileImage = ViewBindings.findChildViewById(rootView, id);
-      if (profileImage == null) {
-        break missingId;
-      }
-
-      id = R.id.tag_chip_group;
-      ChipGroup tagChipGroup = ViewBindings.findChildViewById(rootView, id);
-      if (tagChipGroup == null) {
-        break missingId;
-      }
-
-      id = R.id.tag_editor;
-      EditText tagEditor = ViewBindings.findChildViewById(rootView, id);
-      if (tagEditor == null) {
-        break missingId;
-      }
-
-      id = R.id.theme_spinner;
-      Spinner themeSpinner = ViewBindings.findChildViewById(rootView, id);
-      if (themeSpinner == null) {
-        break missingId;
-      }
-
-      id = R.id.user_email;
-      TextView userEmail = ViewBindings.findChildViewById(rootView, id);
-      if (userEmail == null) {
-        break missingId;
-      }
-
-      id = R.id.user_name;
-      TextView userName = ViewBindings.findChildViewById(rootView, id);
-      if (userName == null) {
-        break missingId;
-      }
-
-      return new FragmentSettingsBinding((ScrollView) rootView, addTagButton, authButton,
-          countrySpinner, firstDayOfWeekSpinner, languageSpinner, profileImage, tagChipGroup,
-          tagEditor, themeSpinner, userEmail, userName);
+    if (rootView == null) {
+      throw new NullPointerException("rootView");
     }
-    String missingId = rootView.getResources().getResourceName(id);
-    throw new NullPointerException("Missing required view with ID: ".concat(missingId));
+
+    return new FragmentSettingsBinding((LinearLayout) rootView);
   }
 }
