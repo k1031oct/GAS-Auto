@@ -32,6 +32,10 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_timeline.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/activity_settings.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_settings.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_account_connections.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_account_connections.xml"
     },

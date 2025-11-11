@@ -4364,6 +4364,7 @@ id selected
 id selection_type
 id settings_account_connections
 id settings_application
+id settings_fragment_container
 id settings_user_info
 id sharedValueSet
 id sharedValueUnset
@@ -4633,6 +4634,7 @@ layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
 layout activity_main
+layout activity_settings
 layout activity_sign_in
 layout activity_splash
 layout activity_workflow_editor
@@ -6615,6 +6617,8 @@ styleable ViewPager2 android_orientation
 styleable ViewStubCompat android_id android_layout android_inflatedId
 styleable ViewTransition android_id SharedValue SharedValueId clearsTag duration ifTagNotSet ifTagSet motionInterpolator motionTarget onStateTransition pathMotionArc setsTag transitionDisable upDuration viewTransitionMode
 styleable include constraintSet
+xml backup_rules
+xml data_extraction_rules
 xml ga_ad_services_config
 xml image_share_filepaths
 xml m3_button_group_child_size_change

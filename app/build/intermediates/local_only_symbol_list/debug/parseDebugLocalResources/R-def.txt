@@ -80,6 +80,7 @@ id schedule_workflow_name
 id search_view
 id settings_account_connections
 id settings_application
+id settings_fragment_container
 id settings_user_info
 id sign_in_button
 id status
@@ -103,6 +104,7 @@ id workflow_recycler_view
 id workflow_status
 id workflow_trigger
 layout activity_main
+layout activity_settings
 layout activity_sign_in
 layout activity_splash
 layout activity_workflow_editor
@@ -202,3 +204,5 @@ string workflow_trigger_icon_desc
 string yes
 style Theme.GWSAutoforAndroid
 style Theme.GWSAutoforAndroid.Splash
+xml backup_rules
+xml data_extraction_rules
