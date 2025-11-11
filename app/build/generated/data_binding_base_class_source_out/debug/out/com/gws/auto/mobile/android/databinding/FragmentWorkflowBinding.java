@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -31,17 +30,13 @@ public final class FragmentWorkflowBinding implements ViewBinding {
   @NonNull
   public final RecyclerView workflowRecyclerView;
 
-  @NonNull
-  public final SearchView workflowSearchView;
-
   private FragmentWorkflowBinding(@NonNull ConstraintLayout rootView,
       @NonNull FloatingActionButton fabAddWorkflow, @NonNull TextView loginPromptText,
-      @NonNull RecyclerView workflowRecyclerView, @NonNull SearchView workflowSearchView) {
+      @NonNull RecyclerView workflowRecyclerView) {
     this.rootView = rootView;
     this.fabAddWorkflow = fabAddWorkflow;
     this.loginPromptText = loginPromptText;
     this.workflowRecyclerView = workflowRecyclerView;
-    this.workflowSearchView = workflowSearchView;
   }
 
   @Override
@@ -89,14 +84,8 @@ public final class FragmentWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.workflow_search_view;
-      SearchView workflowSearchView = ViewBindings.findChildViewById(rootView, id);
-      if (workflowSearchView == null) {
-        break missingId;
-      }
-
       return new FragmentWorkflowBinding((ConstraintLayout) rootView, fabAddWorkflow,
-          loginPromptText, workflowRecyclerView, workflowSearchView);
+          loginPromptText, workflowRecyclerView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

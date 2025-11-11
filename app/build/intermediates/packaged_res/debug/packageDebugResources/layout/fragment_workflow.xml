@@ -6,25 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".ui.workflow.WorkflowFragment">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/workflow_search_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="Search workflows by name or tag" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/workflow_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/workflow_search_view" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/login_prompt_text"

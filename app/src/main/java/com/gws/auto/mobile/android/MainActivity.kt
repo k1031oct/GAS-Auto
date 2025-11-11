@@ -9,28 +9,23 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationBarView
-import com.google.firebase.analytics.FirebaseAnalytics
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
-import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
+import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
+import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var analytics: FirebaseAnalytics
+
     private lateinit var binding: ActivityMainBinding
-    private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var navController: NavController
-    private val announcementViewModel: AnnouncementViewModel by viewModels()
+    private val mainSharedViewModel: MainSharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,42 +35,72 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        analytics = FirebaseAnalytics.getInstance(this)
-
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayShowTitleEnabled(false) // Hide default title
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
+        setupViewPager()
+        setupBottomNavigation()
+        setupSearchView()
+        setupBackButtonHandler()
+        observeViewModel()
+    }
 
-        val topLevelDestinations = setOf(
-            R.id.navigation_workflow,
-            R.id.navigation_schedule,
-            R.id.navigation_history,
-            R.id.navigation_dashboard
-        )
-        appBarConfiguration = AppBarConfiguration(topLevelDestinations)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        binding.bottomNavView.setupWithNavController(navController)
-
-        // This listener handles the behavior of resetting the back stack when navigating from a non-top-level destination.
-        (binding.bottomNavView as NavigationBarView).setOnItemSelectedListener { item ->
-            // If we are in a settings screen, pop back to the start destination.
-            if (navController.currentDestination?.id !in topLevelDestinations) {
-                navController.popBackStack(R.id.navigation_workflow, false)
+    private fun setupViewPager() {
+        binding.viewPager.adapter = MainFragmentStateAdapter(this)
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                binding.bottomNavView.menu.getItem(position).isChecked = true
+                mainSharedViewModel.setCurrentPage(position)
             }
-            // Navigate to the selected destination.
-            navController.navigate(item.itemId)
+        })
+    }
+
+    private fun setupBottomNavigation() {
+        binding.bottomNavView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_workflow -> binding.viewPager.currentItem = 0
+                R.id.navigation_schedule -> binding.viewPager.currentItem = 1
+                R.id.navigation_history -> binding.viewPager.currentItem = 2
+                R.id.navigation_dashboard -> binding.viewPager.currentItem = 3
+            }
             true
         }
+    }
 
-        // Handle the back button press
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                mainSharedViewModel.setSearchQuery(newText.orEmpty())
+                return true
+            }
+        })
+    }
+
+    private fun observeViewModel() {
+        mainSharedViewModel.currentPage.onEach { page ->
+            val hint = when(page) {
+                0 -> getString(R.string.search_workflows_hint)
+                1 -> "Search schedules..." // TODO: Add to strings.xml
+                2 -> "Search history..."   // TODO: Add to strings.xml
+                3 -> "Search dashboard..." // TODO: Add to strings.xml
+                else -> ""
+            }
+            binding.searchView.queryHint = hint
+        }.launchIn(lifecycleScope)
+    }
+
+    private fun setupBackButtonHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // If we can't navigate up, we are at a top-level destination.
-                if (!navController.navigateUp(appBarConfiguration)) {
-                    // At a top-level destination, show exit confirmation dialog.
+                if (binding.viewPager.currentItem == 0) {
                     showExitConfirmationDialog()
+                } else {
+                    binding.viewPager.currentItem = 0
                 }
             }
         })
@@ -95,25 +120,14 @@ class MainActivity : AppCompatActivity() {
         popup.menuInflater.inflate(R.menu.settings_menu, popup.menu)
 
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            // Navigation to settings screens needs a new implementation
             when (menuItem.itemId) {
-                R.id.navigation_announcement -> {
-                    navController.navigate(R.id.navigation_announcement)
-                    true
-                }
-                R.id.settings_user_info -> {
-                    navController.navigate(R.id.navigation_user_info)
-                    true
-                }
-                R.id.settings_account_connections -> {
-                    navController.navigate(R.id.navigation_account_connections)
-                    true
-                }
-                R.id.settings_application -> {
-                    navController.navigate(R.id.navigation_app_settings)
-                    true
-                }
-                else -> false
+                R.id.navigation_announcement -> Timber.d("Navigate to Announcement")
+                R.id.settings_user_info -> Timber.d("Navigate to User Info")
+                R.id.settings_account_connections -> Timber.d("Navigate to Account Connections")
+                R.id.settings_application -> Timber.d("Navigate to Application Settings")
             }
+            true
         }
         popup.show()
     }
@@ -126,16 +140,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                findViewById<View>(R.id.action_settings)?.let {
-                    showSettingsMenu(it)
+                // Since the menu item is now part of the Toolbar, we need a reliable anchor.
+                val anchorView = findViewById<View>(R.id.action_settings)
+                if (anchorView != null) {
+                    showSettingsMenu(anchorView)
                 }
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

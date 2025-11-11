@@ -3971,6 +3971,7 @@ id announcement_recycler_view
 id announcement_title
 id antiClockwise
 id anticipate
+id app_bar_layout
 id arc
 id asConfigured
 id async
@@ -4003,7 +4004,6 @@ id browser_actions_menu_items
 id browser_actions_menu_view
 id buttonPanel
 id cache_measures
-id calendar_recycler_view
 id callMeasure
 id cancel_button
 id carryVelocity
@@ -4027,6 +4027,7 @@ id closest
 id coil_request_manager
 id collapseActionView
 id compose_prefetch_scheduler
+id compose_view
 id compose_view_saveable_id_tag
 id compress
 id confirm_button
@@ -4099,7 +4100,6 @@ id event_title
 id exitUntilCollapsed
 id expand_activities_button
 id expanded_menu
-id fab_add_schedule
 id fab_add_workflow
 id fade
 id fill
@@ -4173,7 +4173,6 @@ id line1
 id line3
 id linear
 id listMode
-id list_header_text
 id list_item
 id locale
 id login_prompt_text
@@ -4215,7 +4214,6 @@ id month_navigation_fragment_toggle
 id month_navigation_next
 id month_navigation_previous
 id month_title
-id month_year_text_view
 id motion_base
 id mtrl_calendar_day_selector_frame
 id mtrl_calendar_days_of_week
@@ -4242,7 +4240,6 @@ id mtrl_view_tag_bottom_padding
 id multiply
 id nav_controller_view_tag
 id nav_graph
-id nav_host_fragment
 id nav_host_fragment_container
 id navigation_account_connections
 id navigation_announcement
@@ -4265,7 +4262,6 @@ id navigation_workflow
 id never
 id neverCompleteToEnd
 id neverCompleteToStart
-id next_month_button
 id noScroll
 id noState
 id none
@@ -4316,7 +4312,6 @@ id preferences_detail
 id preferences_header
 id preferences_sliding_pane_layout
 id pressed
-id prev_month_button
 id profile_image
 id progressBar
 id progress_circular
@@ -4341,7 +4336,6 @@ id save_overlay_view
 id save_workflow_button
 id sawtooth
 id scale
-id schedule_list_recycler_view
 id schedule_status
 id schedule_title_text
 id schedule_type_and_time
@@ -4361,6 +4355,7 @@ id search_go_btn
 id search_mag_icon
 id search_plate
 id search_src_text
+id search_view
 id search_voice_btn
 id seekbar
 id seekbar_value
@@ -4454,7 +4449,6 @@ id textinput_suffix_text
 id theme_spinner
 id time
 id time_text
-id timeline_recycler_view
 id timestamp
 id title
 id titleDividerNoCustom
@@ -4488,6 +4482,7 @@ id user_name
 id vertical
 id vertical_only
 id view_offset_helper
+id view_pager
 id view_transition
 id view_tree_disjoint_parent
 id view_tree_lifecycle_owner
@@ -4506,7 +4501,6 @@ id workflow_description_editor
 id workflow_name
 id workflow_name_editor
 id workflow_recycler_view
-id workflow_search_view
 id workflow_status
 id workflow_trigger
 id wrap

@@ -4,14 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
 import com.gws.auto.mobile.android.domain.engine.WorkflowEngine
+import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,6 +27,7 @@ class WorkflowFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: WorkflowViewModel by viewModels()
+    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
 
     @Inject
     lateinit var workflowEngine: WorkflowEngine
@@ -46,7 +48,7 @@ class WorkflowFragment : Fragment() {
         Timber.d("onViewCreated called")
         setupRecyclerView()
         setupViews()
-        observeWorkflows()
+        observeViewModels()
     }
 
     private fun setupRecyclerView() {
@@ -72,25 +74,23 @@ class WorkflowFragment : Fragment() {
             Timber.d("fabAddWorkflow clicked")
             viewModel.saveNewWorkflow("New Workflow", "This is a test workflow.")
         }
-
-        binding.workflowSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.onQueryChanged(newText.orEmpty())
-                return true
-            }
-        })
     }
 
-    private fun observeWorkflows() {
+    private fun observeViewModels() {
+        // Observe workflows list from the feature ViewModel
         viewModel.filteredWorkflows
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { workflows ->
                 Timber.d("Updating UI with ${workflows.size} workflows.")
                 workflowAdapter.updateWorkflows(workflows)
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        // Observe search query from the shared ViewModel
+        mainSharedViewModel.searchQuery
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+            .onEach { query ->
+                viewModel.onQueryChanged(query)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
