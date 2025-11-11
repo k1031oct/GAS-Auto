@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -16,6 +17,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
+import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -36,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false) // Hide default title
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         setupViewPager()
         setupBottomNavigation()
@@ -120,12 +122,17 @@ class MainActivity : AppCompatActivity() {
         popup.menuInflater.inflate(R.menu.settings_menu, popup.menu)
 
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            // Navigation to settings screens needs a new implementation
-            when (menuItem.itemId) {
-                R.id.navigation_announcement -> Timber.d("Navigate to Announcement")
-                R.id.settings_user_info -> Timber.d("Navigate to User Info")
-                R.id.settings_account_connections -> Timber.d("Navigate to Account Connections")
-                R.id.settings_application -> Timber.d("Navigate to Application Settings")
+            val intent = Intent(this, SettingsActivity::class.java)
+            val fragmentKey = when (menuItem.itemId) {
+                R.id.navigation_announcement -> "announcement" // TODO: Create AnnouncementFragment
+                R.id.settings_user_info -> "user_info"
+                R.id.settings_account_connections -> "account_connections"
+                R.id.settings_application -> "app_settings"
+                else -> null
+            }
+            if (fragmentKey != null) {
+                intent.putExtra("fragment_to_load", fragmentKey)
+                startActivity(intent)
             }
             true
         }
@@ -140,7 +147,6 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                // Since the menu item is now part of the Toolbar, we need a reliable anchor.
                 val anchorView = findViewById<View>(R.id.action_settings)
                 if (anchorView != null) {
                     showSettingsMenu(anchorView)

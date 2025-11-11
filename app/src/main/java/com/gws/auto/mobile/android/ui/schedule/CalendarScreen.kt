@@ -1,5 +1,7 @@
 package com.gws.auto.mobile.android.ui.schedule
 
+import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -13,6 +15,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.preference.PreferenceManager
@@ -50,10 +55,10 @@ fun CalendarScreen(
     val schedules by viewModel.schedules.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    val context = LocalContext.current
 
     val currentVisibleMonth = YearMonth.now().plusMonths((pagerState.currentPage - (Int.MAX_VALUE / 2)).toLong())
 
-    // When the viewmodel's date changes (e.g. from button click), scroll the pager
     LaunchedEffect(viewModel.currentDate.collectAsState().value) {
         val targetPage = (Int.MAX_VALUE / 2) + (viewModel.currentDate.value.year * 12 + viewModel.currentDate.value.monthValue) - (YearMonth.now().year * 12 + YearMonth.now().monthValue)
         if (pagerState.currentPage != targetPage) {
@@ -65,64 +70,85 @@ fun CalendarScreen(
         selectedDate = null
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(onClick = { viewModel.moveToPreviousMonth() }) { Text("<") }
-            Text(
-                text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
-                style = MaterialTheme.typography.headlineSmall
-            )
-            Button(onClick = { viewModel.moveToNextMonth() }) { Text(">") }
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                context.startActivity(Intent(context, ScheduleSettingsActivity::class.java))
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_schedule))
+            }
         }
-
-        // Calendar
-        VerticalPager(
-            state = pagerState,
-            modifier = Modifier.height(350.dp) // Fixed height to ensure list is visible
-        ) { page ->
-            val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
-            MonthView(
-                yearMonth = month,
-                holidays = holidays,
-                schedules = schedules,
-                onDateClick = { date -> selectedDate = date }
-            )
-        }
-
-        // List Header
-        val listHeader = if (selectedDate != null) {
-            stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
-        } else {
-            stringResource(R.string.all_schedules_title)
-        }
-        Text(
-            text = listHeader,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        // List Area
-        Box(modifier = Modifier.weight(1f)) {
-            if (selectedDate == null) {
-                AllSchedulesList(schedules = schedules)
-            } else {
-                TimelineList(
-                    date = selectedDate!!,
-                    holidays = holidays,
-                    schedules = schedules
+    ) { paddingValues ->
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        selectedDate = null
+                    }
+                }) { Text("<") }
+                Text(
+                    text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                    style = MaterialTheme.typography.headlineSmall
                 )
+                Button(onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        selectedDate = null
+                    }
+                }) { Text(">") }
+            }
+
+            // Calendar
+            VerticalPager(
+                state = pagerState,
+                modifier = Modifier.height(350.dp)
+            ) { page ->
+                val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
+                MonthView(
+                    yearMonth = month,
+                    holidays = holidays,
+                    schedules = schedules,
+                    onDateClick = { date -> selectedDate = date }
+                )
+            }
+
+            val listHeader = if (selectedDate != null) {
+                stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
+            } else {
+                stringResource(R.string.all_schedules_title)
+            }
+            Text(
+                text = listHeader,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            Box(modifier = Modifier.weight(1f)) {
+                if (selectedDate == null) {
+                    AllSchedulesList(schedules = schedules)
+                } else {
+                    TimelineList(
+                        date = selectedDate!!,
+                        holidays = holidays,
+                        schedules = schedules
+                    )
+                }
             }
         }
     }
 }
 
+// ... (Other composables remain the same)
 @Composable
 fun MonthView(
     yearMonth: YearMonth,
@@ -211,9 +237,6 @@ fun DayCell(day: String, isToday: Boolean, isHoliday: Boolean, hasSchedule: Bool
     }
 }
 
-// ... (AllSchedulesList, ScheduleListItem, TimelineList, TimelineListItem implementations remain the same)
-
-// These need to be top-level or in a separate file to be used by the preview and the fragment.
 @Composable
 fun AllSchedulesList(schedules: List<Schedule>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -287,10 +310,4 @@ fun TimelineListItem(item: Any) {
         Text(text = time, modifier = Modifier.width(80.dp), style = MaterialTheme.typography.bodyMedium)
         Text(text = title, style = MaterialTheme.typography.bodyMedium)
     }
-}
-
-// Helper to get string resource in Composable
-@Composable
-fun stringResource(id: Int, vararg formatArgs: Any): String {
-    return LocalContext.current.resources.getString(id, *formatArgs)
 }
