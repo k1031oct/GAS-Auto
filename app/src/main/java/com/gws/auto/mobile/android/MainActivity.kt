@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
             }
             if (fragmentKey != null) {
                 if (fragmentKey == "announcement") {
-                    announcementViewModel.markAsRead()
+                    announcementViewModel.markAllAsRead()
                 }
                 intent.putExtra("fragment_to_load", fragmentKey)
                 startActivity(intent)

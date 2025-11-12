@@ -1,12 +1,11 @@
 package com.gws.auto.mobile.android.ui.history
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ListItemHistoryBinding
 import com.gws.auto.mobile.android.domain.model.WorkflowExecutionLog
@@ -33,24 +32,24 @@ class HistoryAdapter : ListAdapter<WorkflowExecutionLog, HistoryAdapter.HistoryV
             binding.timestampText.text = dateFormat.format(log.executionTime)
 
             val statusText: String
-            val chipColor: Int
+            val chipColorRes: Int
 
             when (log.status) {
                 "Success" -> {
                     statusText = context.getString(R.string.execution_status_success)
-                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, 0)
+                    chipColorRes = R.color.chip_success_color
                 }
                 "Failure" -> {
                     statusText = context.getString(R.string.execution_status_failure)
-                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorError, 0)
+                    chipColorRes = R.color.chip_failure_color
                 }
                 else -> {
                     statusText = log.status
-                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+                    chipColorRes = R.color.chip_default_color
                 }
             }
             binding.statusChip.text = statusText
-            binding.statusChip.chipBackgroundColor = ColorStateList.valueOf(chipColor)
+            binding.statusChip.chipBackgroundColor = ContextCompat.getColorStateList(context, chipColorRes)
         }
     }
 }

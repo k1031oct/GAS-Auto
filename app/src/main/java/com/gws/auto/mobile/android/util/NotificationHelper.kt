@@ -23,10 +23,10 @@ class NotificationHelper(private val context: Context) {
 
     fun showUnreadAnnouncementNotification() {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_announcement)
-            .setContentTitle(context.getString(R.string.title_announcement))
-            .setContentText(context.getString(R.string.new_announcement_notification))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        builder.setSmallIcon(R.drawable.ic_announcement)
+        builder.setContentTitle(context.getString(R.string.title_announcement))
+        builder.setContentText(context.getString(R.string.new_announcement_notification))
+        builder.priority = NotificationCompat.PRIORITY_DEFAULT
 
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }

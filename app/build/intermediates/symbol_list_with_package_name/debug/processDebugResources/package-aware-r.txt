@@ -1666,6 +1666,9 @@ color cardview_dark_background
 color cardview_light_background
 color cardview_shadow_end_color
 color cardview_shadow_start_color
+color chip_default_color
+color chip_failure_color
+color chip_success_color
 color common_google_signin_btn_text_dark
 color common_google_signin_btn_text_dark_default
 color common_google_signin_btn_text_dark_disabled
@@ -3765,6 +3768,7 @@ drawable fingerprint_dialog_fp_icon
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
 drawable ic_add
+drawable ic_announcement
 drawable ic_arrow_back_black_24
 drawable ic_arrow_down_24dp
 drawable ic_badge

@@ -59,7 +59,26 @@ class AnnouncementViewModel @Inject constructor(
         }
     }
 
-    fun markAsRead() {
+    fun markAsRead(announcementId: String) {
+        val updatedList = _announcements.value.map {
+            if (it.id == announcementId) {
+                it.copy(isRead = true)
+            } else {
+                it
+            }
+        }
+        _announcements.value = updatedList
+
+        val readIds = prefs.getStringSet(KEY_READ_ANNOUNCEMENTS, emptySet())?.toMutableSet() ?: mutableSetOf()
+        readIds.add(announcementId)
+        prefs.edit { putStringSet(KEY_READ_ANNOUNCEMENTS, readIds) }
+
+        if (updatedList.none { !it.isRead }) {
+            _hasUnread.value = false
+        }
+    }
+    
+    fun markAllAsRead() {
         val allIds = _announcements.value.map { it.id }.toSet()
         prefs.edit { putStringSet(KEY_READ_ANNOUNCEMENTS, allIds) }
         _announcements.value = _announcements.value.map { it.copy(isRead = true) }
