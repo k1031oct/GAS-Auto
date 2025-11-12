@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -39,7 +40,12 @@ class ScheduleSettingsActivity : ComponentActivity() {
         }
 
         setContent {
-            GWSAutoForAndroidTheme {
+            val darkTheme = when (prefs.getString("theme", "Default")) {
+                "Light" -> false
+                "Dark" -> true
+                else -> isSystemInDarkTheme()
+            }
+            GWSAutoForAndroidTheme(darkTheme = darkTheme) {
                 ScheduleSettingsScreen(viewModel)
             }
         }

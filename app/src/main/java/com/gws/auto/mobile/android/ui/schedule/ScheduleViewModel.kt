@@ -12,15 +12,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
-import java.time.YearMonth
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
     private val prefs: SharedPreferences
-) : ViewModel() {
+) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val _holidays = MutableStateFlow<List<Holiday>>(emptyList())
     val holidays: StateFlow<List<Holiday>> = _holidays.asStateFlow()
@@ -32,6 +30,7 @@ class ScheduleViewModel @Inject constructor(
     val currentDate: StateFlow<LocalDate> = _currentDate.asStateFlow()
 
     init {
+        prefs.registerOnSharedPreferenceChangeListener(this)
         loadHolidaysForCurrentMonth()
         observeSchedules()
     }
@@ -81,5 +80,16 @@ class ScheduleViewModel @Inject constructor(
             loadHolidaysForCurrentMonth()
         }
         _currentDate.value = prevMonth
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "country") {
+            loadHolidaysForCurrentMonth()
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
     }
 }

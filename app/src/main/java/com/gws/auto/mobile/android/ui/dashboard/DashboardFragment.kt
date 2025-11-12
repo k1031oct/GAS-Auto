@@ -62,11 +62,12 @@ class DashboardFragment : Fragment() {
             height = GridLayout.LayoutParams.WRAP_CONTENT
             columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f)
             rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f)
-            setMargins(0, 0, 0, 0)
+            setMargins(8, 8, 8, 8)
         }
         card.layoutParams = params
         card.elevation = 0f
-        card.setCardBackgroundColor(MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceVariant, Color.GRAY))
+        card.strokeWidth = 0
+        card.setCardBackgroundColor(MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainer, Color.GRAY))
 
         val linearLayout = android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.VERTICAL
