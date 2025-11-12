@@ -46,8 +46,8 @@ class ThemeFragment : Fragment() {
         // Temporarily disable the listener to prevent loops
         binding.themeGroup.setOnCheckedChangeListener(null)
         when (viewModel.getTheme()) {
-            "Light" -> binding.light_button.isChecked = true
-            "Dark" -> binding.dark_button.isChecked = true
+            "Light" -> binding.lightButton.isChecked = true
+            "Dark" -> binding.darkButton.isChecked = true
             else -> binding.systemButton.isChecked = true
         }
     }

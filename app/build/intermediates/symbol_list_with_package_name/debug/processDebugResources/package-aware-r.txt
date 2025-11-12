@@ -4878,6 +4878,8 @@ string bottomsheet_action_collapse
 string bottomsheet_action_expand
 string bottomsheet_action_expand_halfway
 string bottomsheet_drag_handle_content_description
+string calendar_next_month_button
+string calendar_previous_month_button
 string call_notification_answer_action
 string call_notification_answer_video_action
 string call_notification_decline_action
@@ -4954,6 +4956,10 @@ string google_api_key
 string google_app_id
 string google_crash_reporting_api_key
 string google_storage_bucket
+string header_date
+string header_status
+string header_trigger
+string header_workflow_name
 string hide_bottom_view_on_scroll_behavior
 string icon_content_description
 string in_progress
@@ -5153,6 +5159,10 @@ string path_password_eye
 string path_password_eye_mask_strike_through
 string path_password_eye_mask_visible
 string path_password_strike_through
+string placeholder_event_time
+string placeholder_event_title
+string placeholder_time
+string placeholder_workflow_name
 string please_log_in
 string preference_copied
 string preferences_license_summary
@@ -5162,6 +5172,8 @@ string project_id
 string range_end
 string range_start
 string save_workflow
+string schedule_list_item_type
+string schedule_list_item_workflow
 string search_menu_title
 string search_workflows_hint
 string searchbar_scrolling_view_behavior
@@ -5192,6 +5204,9 @@ string theme_dark
 string theme_light
 string theme_system
 string timeline_for_date
+string timeline_list_item_all_day
+string timeline_list_item_time_not_available
+string timeline_list_item_unknown_event
 string title_about_app
 string title_account_connections
 string title_announcement
@@ -5210,6 +5225,7 @@ string user_email_placeholder
 string user_name_placeholder
 string v7_preference_off
 string v7_preference_on
+string version_number_placeholder
 string wizard_back
 string wizard_finish
 string wizard_locale_subtitle
