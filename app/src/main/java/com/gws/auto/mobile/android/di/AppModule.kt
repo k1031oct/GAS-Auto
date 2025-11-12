@@ -7,11 +7,12 @@ import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.gws.auto.mobile.android.data.local.db.AppDatabase
+import com.gws.auto.mobile.android.data.local.db.TagDao
 import com.gws.auto.mobile.android.data.local.db.WorkflowDao
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
+import com.gws.auto.mobile.android.data.repository.TagRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
-import com.gws.auto.mobile.android.domain.engine.WorkflowEngine
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import dagger.Module
 import dagger.Provides
@@ -43,13 +44,19 @@ object AppModule {
             appContext,
             AppDatabase::class.java,
             "gws-auto.db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
     @Singleton
     fun provideWorkflowDao(appDatabase: AppDatabase): WorkflowDao {
         return appDatabase.workflowDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTagDao(appDatabase: AppDatabase): TagDao {
+        return appDatabase.tagDao()
     }
 
     @Provides
@@ -76,6 +83,12 @@ object AppModule {
         googleApiAuthorizer: GoogleApiAuthorizer
     ): ScheduleRepository {
         return ScheduleRepositoryImpl(firestore, auth, googleApiAuthorizer)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTagRepository(tagDao: TagDao): TagRepository {
+        return TagRepository(tagDao)
     }
 
     @Provides

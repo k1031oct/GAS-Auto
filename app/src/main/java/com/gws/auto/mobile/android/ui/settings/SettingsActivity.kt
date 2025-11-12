@@ -2,11 +2,15 @@ package com.gws.auto.mobile.android.ui.settings
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ActivitySettingsBinding
+import com.gws.auto.mobile.android.ui.announcement.AnnouncementFragment
+import com.gws.auto.mobile.android.ui.settings.about.AboutAppFragment
 import com.gws.auto.mobile.android.ui.settings.account.AccountConnectionsFragment
 import com.gws.auto.mobile.android.ui.settings.app.AppSettingsFragment
+import com.gws.auto.mobile.android.ui.settings.tag.TagManagementFragment
 import com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,11 +27,20 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, view.paddingBottom)
+            insets
+        }
+
         val fragmentKey = intent.getStringExtra("fragment_to_load")
         val fragment = when (fragmentKey) {
+            "announcement" -> AnnouncementFragment()
             "user_info" -> UserInfoFragment()
             "account_connections" -> AccountConnectionsFragment()
             "app_settings" -> AppSettingsFragment()
+            "about_app" -> AboutAppFragment()
+            "tag_management" -> TagManagementFragment()
             else -> AppSettingsFragment() // Default to app settings
         }
         supportActionBar?.title = getTitleForFragment(fragmentKey)
@@ -39,9 +52,12 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun getTitleForFragment(key: String?): String {
         return when (key) {
+            "announcement" -> getString(R.string.title_announcement)
             "user_info" -> getString(R.string.title_user_info)
             "account_connections" -> getString(R.string.title_account_connections)
             "app_settings" -> getString(R.string.title_app_settings)
+            "about_app" -> getString(R.string.title_about_app)
+            "tag_management" -> getString(R.string.manage_tags)
             else -> getString(R.string.title_settings)
         }
     }

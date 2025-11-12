@@ -19,3 +19,9 @@
 }
 -keep class io.grpc.internal.AbstractManagedChannelImplBuilder
 -keep class io.grpc.internal.AbstractManagedChannelImplBuilder$ChannelBuilderDefaultPortProvider
+
+# Rules from missing_rules.txt
+-dontwarn com.squareup.okhttp.CipherSuite
+-dontwarn com.squareup.okhttp.ConnectionSpec
+-dontwarn com.squareup.okhttp.TlsVersion
+-dontwarn io.grpc.InternalGlobalInterceptors

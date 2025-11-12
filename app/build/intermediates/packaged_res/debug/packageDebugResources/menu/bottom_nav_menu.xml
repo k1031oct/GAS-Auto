@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/navigation_dashboard"
-        android:icon="@android:drawable/ic_dialog_info"
+        android:icon="@drawable/ic_dashboard"
         android:title="@string/title_dashboard" />
 
 </menu>

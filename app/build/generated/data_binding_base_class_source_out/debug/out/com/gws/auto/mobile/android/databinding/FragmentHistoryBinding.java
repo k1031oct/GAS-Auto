@@ -4,9 +4,9 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
@@ -14,15 +14,20 @@ import java.lang.Override;
 
 public final class FragmentHistoryBinding implements ViewBinding {
   @NonNull
-  private final FrameLayout rootView;
+  private final RecyclerView rootView;
 
-  private FragmentHistoryBinding(@NonNull FrameLayout rootView) {
+  @NonNull
+  public final RecyclerView historyRecyclerView;
+
+  private FragmentHistoryBinding(@NonNull RecyclerView rootView,
+      @NonNull RecyclerView historyRecyclerView) {
     this.rootView = rootView;
+    this.historyRecyclerView = historyRecyclerView;
   }
 
   @Override
   @NonNull
-  public FrameLayout getRoot() {
+  public RecyclerView getRoot() {
     return rootView;
   }
 
@@ -47,6 +52,8 @@ public final class FragmentHistoryBinding implements ViewBinding {
       throw new NullPointerException("rootView");
     }
 
-    return new FragmentHistoryBinding((FrameLayout) rootView);
+    RecyclerView historyRecyclerView = (RecyclerView) rootView;
+
+    return new FragmentHistoryBinding((RecyclerView) rootView, historyRecyclerView);
   }
 }

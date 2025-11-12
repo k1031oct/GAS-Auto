@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android.ui.workflow
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
 import com.gws.auto.mobile.android.domain.engine.WorkflowEngine
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
+import com.gws.auto.mobile.android.ui.workflow.editor.WorkflowEditorActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -47,12 +49,11 @@ class WorkflowFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("onViewCreated called")
         setupRecyclerView()
-        setupViews()
         observeViewModels()
     }
 
     private fun setupRecyclerView() {
-        workflowAdapter = WorkflowAdapter(emptyList(),
+        workflowAdapter = WorkflowAdapter(
             onRunClicked = { workflow ->
                 lifecycleScope.launch {
                     try {
@@ -63,17 +64,14 @@ class WorkflowFragment : Fragment() {
                     }
                 }
             },
-            onDeleteClicked = { workflow -> viewModel.deleteWorkflow(workflow) }
+            onDeleteClicked = { workflow -> viewModel.deleteWorkflow(workflow) },
+            onAddClicked = {
+                Timber.d("Add new workflow clicked")
+                startActivity(Intent(activity, WorkflowEditorActivity::class.java))
+            }
         )
         binding.workflowRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.workflowRecyclerView.adapter = workflowAdapter
-    }
-
-    private fun setupViews() {
-        binding.fabAddWorkflow.setOnClickListener {
-            Timber.d("fabAddWorkflow clicked")
-            viewModel.saveNewWorkflow("New Workflow", "This is a test workflow.")
-        }
     }
 
     private fun observeViewModels() {
@@ -82,7 +80,7 @@ class WorkflowFragment : Fragment() {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { workflows ->
                 Timber.d("Updating UI with ${workflows.size} workflows.")
-                workflowAdapter.updateWorkflows(workflows)
+                workflowAdapter.submitList(workflows)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 

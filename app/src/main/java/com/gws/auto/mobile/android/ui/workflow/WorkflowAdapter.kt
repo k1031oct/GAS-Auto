@@ -3,52 +3,84 @@ package com.gws.auto.mobile.android.ui.workflow
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.gws.auto.mobile.android.databinding.ListItemAddWorkflowBinding
 import com.gws.auto.mobile.android.databinding.ListItemWorkflowBinding
 import com.gws.auto.mobile.android.domain.model.Workflow
 
 class WorkflowAdapter(
-    private var workflows: List<Workflow>,
     private val onRunClicked: (Workflow) -> Unit,
-    private val onDeleteClicked: (Workflow) -> Unit
-) : RecyclerView.Adapter<WorkflowAdapter.WorkflowViewHolder>() {
+    private val onDeleteClicked: (Workflow) -> Unit,
+    private val onAddClicked: () -> Unit
+) : ListAdapter<Workflow, RecyclerView.ViewHolder>(WorkflowDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkflowViewHolder {
-        val binding = ListItemWorkflowBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return WorkflowViewHolder(binding)
+    private val VIEW_TYPE_WORKFLOW = 1
+    private val VIEW_TYPE_ADD = 2
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerView.setHasFixedSize(true)
     }
 
-    override fun onBindViewHolder(holder: WorkflowViewHolder, position: Int) {
-        holder.bind(workflows[position])
+    override fun getItemViewType(position: Int): Int {
+        return if (position < super.getItemCount()) VIEW_TYPE_WORKFLOW else VIEW_TYPE_ADD
     }
 
-    override fun getItemCount() = workflows.size
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateWorkflows(newWorkflows: List<Workflow>) {
-        workflows = newWorkflows
-        notifyDataSetChanged() // A more efficient diffing mechanism can be used later.
+    override fun getItemCount(): Int {
+        return super.getItemCount() + 1 // Add 1 for the "Add New" button
     }
 
-    inner class WorkflowViewHolder(private val binding: ListItemWorkflowBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_WORKFLOW) {
+            val binding = ListItemWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            WorkflowViewHolder(binding, onRunClicked, onDeleteClicked)
+        } else {
+            val binding = ListItemAddWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            AddWorkflowViewHolder(binding, onAddClicked)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is WorkflowViewHolder) {
+            holder.bind(getItem(position))
+        }
+    }
+
+    class WorkflowViewHolder(
+        private val binding: ListItemWorkflowBinding,
+        private val onRunClicked: (Workflow) -> Unit,
+        private val onDeleteClicked: (Workflow) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(workflow: Workflow) {
             binding.workflowName.text = workflow.name
             binding.workflowDescription.text = workflow.description
             binding.workflowStatus.text = workflow.status
             binding.workflowTrigger.text = workflow.trigger
-
-            binding.runButton.setOnClickListener {
-                onRunClicked(workflow)
-            }
-
-            binding.deleteButton.setOnClickListener {
-                onDeleteClicked(workflow)
-            }
+            binding.runButton.setOnClickListener { onRunClicked(workflow) }
+            binding.deleteButton.setOnClickListener { onDeleteClicked(workflow) }
         }
+    }
+
+    class AddWorkflowViewHolder(
+        binding: ListItemAddWorkflowBinding,
+        private val onAddClicked: () -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            itemView.setOnClickListener { onAddClicked() }
+        }
+    }
+}
+
+class WorkflowDiffCallback : androidx.recyclerview.widget.DiffUtil.ItemCallback<Workflow>() {
+    override fun areItemsTheSame(oldItem: Workflow, newItem: Workflow): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Workflow, newItem: Workflow): Boolean {
+        return oldItem.name == newItem.name &&
+                oldItem.description == newItem.description &&
+                oldItem.status == newItem.status &&
+                oldItem.trigger == newItem.trigger
     }
 }

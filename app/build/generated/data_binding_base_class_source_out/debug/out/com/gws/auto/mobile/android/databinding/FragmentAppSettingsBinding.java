@@ -4,15 +4,13 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.chip.ChipGroup;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -23,7 +21,7 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final Button addTagButton;
+  public final TextView accountConnectionsButton;
 
   @NonNull
   public final Spinner countrySpinner;
@@ -35,26 +33,27 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
   public final Spinner languageSpinner;
 
   @NonNull
-  public final ChipGroup tagChipGroup;
-
-  @NonNull
-  public final EditText tagEditor;
+  public final TextView tagManagementButton;
 
   @NonNull
   public final Spinner themeSpinner;
 
-  private FragmentAppSettingsBinding(@NonNull ScrollView rootView, @NonNull Button addTagButton,
-      @NonNull Spinner countrySpinner, @NonNull Spinner firstDayOfWeekSpinner,
-      @NonNull Spinner languageSpinner, @NonNull ChipGroup tagChipGroup,
-      @NonNull EditText tagEditor, @NonNull Spinner themeSpinner) {
+  @NonNull
+  public final TextView userInfoButton;
+
+  private FragmentAppSettingsBinding(@NonNull ScrollView rootView,
+      @NonNull TextView accountConnectionsButton, @NonNull Spinner countrySpinner,
+      @NonNull Spinner firstDayOfWeekSpinner, @NonNull Spinner languageSpinner,
+      @NonNull TextView tagManagementButton, @NonNull Spinner themeSpinner,
+      @NonNull TextView userInfoButton) {
     this.rootView = rootView;
-    this.addTagButton = addTagButton;
+    this.accountConnectionsButton = accountConnectionsButton;
     this.countrySpinner = countrySpinner;
     this.firstDayOfWeekSpinner = firstDayOfWeekSpinner;
     this.languageSpinner = languageSpinner;
-    this.tagChipGroup = tagChipGroup;
-    this.tagEditor = tagEditor;
+    this.tagManagementButton = tagManagementButton;
     this.themeSpinner = themeSpinner;
+    this.userInfoButton = userInfoButton;
   }
 
   @Override
@@ -84,9 +83,9 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.add_tag_button;
-      Button addTagButton = ViewBindings.findChildViewById(rootView, id);
-      if (addTagButton == null) {
+      id = R.id.account_connections_button;
+      TextView accountConnectionsButton = ViewBindings.findChildViewById(rootView, id);
+      if (accountConnectionsButton == null) {
         break missingId;
       }
 
@@ -108,15 +107,9 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tag_chip_group;
-      ChipGroup tagChipGroup = ViewBindings.findChildViewById(rootView, id);
-      if (tagChipGroup == null) {
-        break missingId;
-      }
-
-      id = R.id.tag_editor;
-      EditText tagEditor = ViewBindings.findChildViewById(rootView, id);
-      if (tagEditor == null) {
+      id = R.id.tag_management_button;
+      TextView tagManagementButton = ViewBindings.findChildViewById(rootView, id);
+      if (tagManagementButton == null) {
         break missingId;
       }
 
@@ -126,8 +119,15 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentAppSettingsBinding((ScrollView) rootView, addTagButton, countrySpinner,
-          firstDayOfWeekSpinner, languageSpinner, tagChipGroup, tagEditor, themeSpinner);
+      id = R.id.user_info_button;
+      TextView userInfoButton = ViewBindings.findChildViewById(rootView, id);
+      if (userInfoButton == null) {
+        break missingId;
+      }
+
+      return new FragmentAppSettingsBinding((ScrollView) rootView, accountConnectionsButton,
+          countrySpinner, firstDayOfWeekSpinner, languageSpinner, tagManagementButton, themeSpinner,
+          userInfoButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -1,19 +1,27 @@
 [
     {
-        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_history.xml",
-        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_history.xml"
-    },
-    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_schedule.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_schedule.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_history.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_history.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_workflow.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_workflow.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_wizard_theme.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_theme.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_schedule.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_schedule.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_about_app.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_about_app.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/activity_sign_in.xml",
@@ -28,8 +36,16 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_settings.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/activity_wizard.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_wizard.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_timeline.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_timeline.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_history.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_history.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/activity_settings.xml",
@@ -52,8 +68,16 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_workflow.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_tag.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_tag.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_announcement.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_announcement.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_tag_management.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_tag_management.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_user_info.xml",
@@ -68,6 +92,14 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_workflow_editor.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_wizard_locale.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_locale.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_wizard_week_start.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_week_start.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_announcement.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_announcement.xml"
     },
@@ -80,8 +112,16 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_app_settings.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_add_workflow.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_add_workflow.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/item_module.xml",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_module.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/fragment_licenses.xml",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_licenses.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-mergeDebugResources-6:/layout/list_item_workflow.xml",

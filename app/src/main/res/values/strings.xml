@@ -2,6 +2,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">GWS Auto for Android</string>
 
+    <!-- Days of week -->
+    <string name="sunday">Sunday</string>
+    <string name="monday">Monday</string>
+    
+    <!-- Themes -->
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System Default</string>
+
     <!-- Titles -->
     <string name="title_workflow">Workflow</string>
     <string name="title_schedule">Schedule</string>
@@ -13,12 +22,35 @@
     <string name="title_user_info">User Information</string>
     <string name="title_account_connections">Account Connections</string>
     <string name="title_app_settings">Application Settings</string>
+    <string name="title_about_app">About this app</string>
 
     <!-- Dialogs -->
     <string name="exit_confirmation_title">Confirm Exit</string>
     <string name="exit_confirmation_message">Are you sure you want to exit?</string>
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Wizard -->
+    <string name="wizard_welcome_title">Welcome to GWS Automater</string>
+    <string name="wizard_welcome_subtitle">Let\'s get you set up!</string>
+    <string name="wizard_locale_title">Region &amp; Language</string>
+    <string name="wizard_locale_subtitle">This helps set up your language and holiday calendar.</string>
+    <string name="wizard_week_start_title">Week Start</string>
+    <string name="wizard_week_start_subtitle">Choose which day of the week to start your calendar on.</string>
+    <string name="wizard_theme_title">Choose Your Theme</string>
+    <string name="wizard_theme_subtitle">You can change this at any time in the settings.</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_finish">Finish</string>
+
+    <!-- About App Screen -->
+    <string name="about_manual">Operation Manual</string>
+    <string name="about_rate_app">Rate this application</string>
+    <string name="about_share_app">Share this application</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_licenses">Third-party licenses</string>
+    <string name="about_contact">Contact developer</string>
+    <string name="about_app_version">Application version</string>
 
     <!-- Fragments -->
     <string name="workflow_fragment">Workflow Fragment</string>
@@ -104,8 +136,21 @@
         <item>Korean</item>
     </string-array>
 
+    <string-array name="language_values">
+        <item>en</item>
+        <item>ja</item>
+        <item>zh</item>
+        <item>ko</item>
+    </string-array>
+
     <string-array name="theme_entries">
         <item>Default</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
+    <string-array name="theme_values">
+        <item>System</item>
         <item>Light</item>
         <item>Dark</item>
     </string-array>

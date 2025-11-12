@@ -1,10 +1,10 @@
 package com.gws.auto.mobile.android.ui.schedule
 
-import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +26,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
@@ -40,6 +42,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -57,12 +60,16 @@ fun CalendarScreen(
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val context = LocalContext.current
 
-    val currentVisibleMonth = YearMonth.now().plusMonths((pagerState.currentPage - (Int.MAX_VALUE / 2)).toLong())
+    val currentVisibleMonth by remember {
+        derivedStateOf {
+            YearMonth.now().plusMonths((pagerState.currentPage - (Int.MAX_VALUE / 2)).toLong())
+        }
+    }
 
     LaunchedEffect(viewModel.currentDate.collectAsState().value) {
-        val targetPage = (Int.MAX_VALUE / 2) + (viewModel.currentDate.value.year * 12 + viewModel.currentDate.value.monthValue) - (YearMonth.now().year * 12 + YearMonth.now().monthValue)
-        if (pagerState.currentPage != targetPage) {
-            pagerState.animateScrollToPage(targetPage)
+        val targetPage = (Int.MAX_VALUE / 2) + ChronoUnit.MONTHS.between(YearMonth.now(), viewModel.currentDate.value)
+        if (pagerState.currentPage != targetPage.toInt()) {
+            pagerState.animateScrollToPage(targetPage.toInt())
         }
     }
 
@@ -90,28 +97,18 @@ fun CalendarScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                        selectedDate = null
-                    }
-                }) { Text("<") }
+                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text("<") }
                 Text(
                     text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
                     style = MaterialTheme.typography.headlineSmall
                 )
-                Button(onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        selectedDate = null
-                    }
-                }) { Text(">") }
+                Button(onClick = { viewModel.moveToNextMonth() }) { Text(">") }
             }
 
             // Calendar
             VerticalPager(
                 state = pagerState,
-                modifier = Modifier.height(350.dp)
+                modifier = Modifier.weight(1f) // Let the pager take up available space
             ) { page ->
                 val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
                 MonthView(
@@ -122,33 +119,34 @@ fun CalendarScreen(
                 )
             }
 
-            val listHeader = if (selectedDate != null) {
-                stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
-            } else {
-                stringResource(R.string.all_schedules_title)
-            }
-            Text(
-                text = listHeader,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Box(modifier = Modifier.weight(1f)) {
-                if (selectedDate == null) {
-                    AllSchedulesList(schedules = schedules)
-                } else {
+            // List Header and Area
+            if (selectedDate != null) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
                     TimelineList(
                         date = selectedDate!!,
                         holidays = holidays,
                         schedules = schedules
                     )
                 }
+            } else {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.all_schedules_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    AllSchedulesList(schedules = schedules)
+                }
             }
         }
     }
 }
 
-// ... (Other composables remain the same)
 @Composable
 fun MonthView(
     yearMonth: YearMonth,
@@ -187,9 +185,7 @@ fun MonthView(
         items(yearMonth.lengthOfMonth()) { dayIndex ->
             val dayOfMonth = dayIndex + 1
             val date = yearMonth.atDay(dayOfMonth)
-            val isToday = date == LocalDate.now()
-            val isHoliday = holidays.any { it.date == date }
-            val hasSchedule = schedules.any {
+            val schedulesForDay = schedules.filter {
                 when (it.scheduleType) {
                     "daily" -> true
                     "weekly" -> it.weeklyDays?.contains(date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())) == true
@@ -197,12 +193,13 @@ fun MonthView(
                     else -> false
                 }
             }
+            val holidaysForDay = holidays.filter { it.date == date }
+
 
             DayCell(
-                day = dayOfMonth.toString(),
-                isToday = isToday,
-                isHoliday = isHoliday,
-                hasSchedule = hasSchedule,
+                date = date,
+                schedules = schedulesForDay,
+                holidays = holidaysForDay,
                 modifier = Modifier.clickable { onDateClick(date) }
             )
         }
@@ -210,31 +207,57 @@ fun MonthView(
 }
 
 @Composable
-fun DayCell(day: String, isToday: Boolean, isHoliday: Boolean, hasSchedule: Boolean, modifier: Modifier = Modifier) {
+fun DayCell(
+    date: LocalDate,
+    schedules: List<Schedule>,
+    holidays: List<Holiday>,
+    modifier: Modifier = Modifier
+) {
+    val isToday = date == LocalDate.now()
+
     Column(
         modifier = modifier
-            .aspectRatio(1f)
-            .padding(2.dp),
+            .fillMaxSize()
+            .border(0.5.dp, Color.Gray.copy(alpha = 0.5f))
+            .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .clip(CircleShape)
-                .background(if (isToday) MaterialTheme.colorScheme.primaryContainer else Color.Transparent),
-            contentAlignment = Alignment.Center
-        ) {
+        Text(
+            text = date.dayOfMonth.toString(),
+            textAlign = TextAlign.Center,
+            modifier = if (isToday) Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer) else Modifier,
+            color = if (holidays.isNotEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        holidays.take(2).forEach {
+            ScheduleItemText(it.name)
+        }
+
+        schedules.take(2 - holidays.size).forEach {
+            ScheduleItemText(it.workflowId)
+        }
+
+        val remainingCount = (holidays.size + schedules.size) - 2
+        if (remainingCount > 0) {
             Text(
-                text = day,
-                textAlign = TextAlign.Center,
-                color = if (isHoliday) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                text = "+$remainingCount more",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary
             )
         }
-        if (hasSchedule) {
-            Box(modifier = Modifier.size(4.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondary))
-        }
     }
+}
+
+@Composable
+fun ScheduleItemText(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable

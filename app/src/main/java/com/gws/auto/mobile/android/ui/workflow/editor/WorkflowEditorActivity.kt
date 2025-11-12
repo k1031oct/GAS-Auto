@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.gws.auto.mobile.android.databinding.ActivityWorkflowEditorBinding
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
@@ -23,6 +25,12 @@ class WorkflowEditorActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+            insets
+        }
 
         binding.saveWorkflowButton.setOnClickListener {
             saveWorkflow()

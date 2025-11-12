@@ -22,12 +22,23 @@
         <item>Chinese</item>
         <item>Korean</item>
     </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>ja</item>
+        <item>zh</item>
+        <item>ko</item>
+    </string-array>
     <string-array name="theme_entries">
         <item>Default</item>
         <item>Light</item>
         <item>Dark</item>
     </string-array>
-    <color name="highlight_color">#4D9CCAFF</color>
+    <string-array name="theme_values">
+        <item>System</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <attr format="color" name="highlightColor"/>
     <color name="holiday_color">#FFD32F2F</color>
     <color name="md_theme_dark_background">#111418</color>
     <color name="md_theme_dark_error">#FFB4AB</color>
@@ -45,6 +56,14 @@
     <color name="md_theme_light_onSurface">#191C20</color>
     <color name="md_theme_light_primary">#0061A4</color>
     <color name="md_theme_light_surface">#F8F9FF</color>
+    <color name="success_color">#4CAF50</color>
+    <string name="about_app_version">Application version</string>
+    <string name="about_contact">Contact developer</string>
+    <string name="about_licenses">Third-party licenses</string>
+    <string name="about_manual">Operation Manual</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_rate_app">Rate this application</string>
+    <string name="about_share_app">Share this application</string>
     <string name="add">Add</string>
     <string name="add_a_new_tag">Add a new tag</string>
     <string name="add_a_tag">Add a tag</string>
@@ -74,6 +93,7 @@
     <string name="google_storage_bucket" translatable="false">gws-auto-for-android-4db4a.firebasestorage.app</string>
     <string name="language">Language</string>
     <string name="manage_tags">Manage Tags</string>
+    <string name="monday">Monday</string>
     <string name="next_month">></string>
     <string name="no">No</string>
     <string name="please_log_in">Please log in to see your workflows.</string>
@@ -87,10 +107,15 @@
     <string name="sign_in_with_google_to_sync">Sign in with Google to Sync</string>
     <string name="sign_out">Sign Out</string>
     <string name="sign_out_and_disable_sync">Sign Out and Disable Sync</string>
+    <string name="sunday">Sunday</string>
     <string name="sync_disabled">Sync is currently disabled.</string>
     <string name="sync_enabled_with">Sync enabled with: %1$s</string>
     <string name="theme">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">System Default</string>
     <string name="timeline_for_date">Timeline for %1$s</string>
+    <string name="title_about_app">About this app</string>
     <string name="title_account_connections">Account Connections</string>
     <string name="title_announcement">Announcements</string>
     <string name="title_app_settings">Application Settings</string>
@@ -104,6 +129,17 @@
     <string name="unread_announcement_popup_title">Unread Announcements</string>
     <string name="user_email_placeholder">user@example.com</string>
     <string name="user_name_placeholder">User Name</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_finish">Finish</string>
+    <string name="wizard_locale_subtitle">This helps set up your language and holiday calendar.</string>
+    <string name="wizard_locale_title">Region &amp; Language</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_theme_subtitle">You can change this at any time in the settings.</string>
+    <string name="wizard_theme_title">Choose Your Theme</string>
+    <string name="wizard_week_start_subtitle">Choose which day of the week to start your calendar on.</string>
+    <string name="wizard_week_start_title">Week Start</string>
+    <string name="wizard_welcome_subtitle">Let\'s get you set up!</string>
+    <string name="wizard_welcome_title">Welcome to GWS Automater</string>
     <string name="workflow_actions_menu">Actions</string>
     <string name="workflow_description">Workflow Description</string>
     <string name="workflow_fragment">Workflow Fragment</string>
@@ -112,7 +148,24 @@
     <string name="workflow_run_button">実行</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
     <string name="yes">Yes</string>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
+    <style name="SettingsItem" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
+    </style>
     <style name="Theme.GWSAutoforAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="highlightColor">#4D0061A4</item>
+
         
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>

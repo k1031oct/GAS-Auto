@@ -4,24 +4,26 @@
             "outputFile": "com.gws.auto.mobile.android.app-mergeDebugResources-5:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\b9d9a9d31d5517723155269f8298c919\\transformed\\jetified-core-splashscreen-1.2.0\\res\\values-watch-v20\\values-watch-v20.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\c04a489bed347fde5c8701bed7616e01\\transformed\\appcompat-1.7.1\\res\\values-watch-v20\\values-watch-v20.xml",
                     "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,129,205,280,357,428,496,566",
-                        "endColumns": "73,75,74,76,70,67,69,67",
-                        "endOffsets": "124,200,275,352,423,491,561,629"
+                        "startLines": "2,5,8",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,214,385",
+                        "endLines": "4,7,10",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "209,380,553"
                     },
                     "to": {
-                        "startLines": "10,11,12,13,14,15,16,17",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "715,789,865,940,1017,1088,1156,1226",
-                        "endColumns": "73,75,74,76,70,67,69,67",
-                        "endOffsets": "784,860,935,1012,1083,1151,1221,1289"
+                        "startLines": "18,21,24",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "1294,1453,1624",
+                        "endLines": "20,23,26",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "1448,1619,1792"
                     }
                 },
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\c9c4d75d9c9a28ae1a97fb5f493dc917\\transformed\\jetified-play-services-auth-21.4.0\\res\\values-watch-v20\\values.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\4ea79b0df36597b7fe41233d9ac926ab\\transformed\\jetified-play-services-auth-21.4.0\\res\\values-watch-v20\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11",
                         "startColumns": "0,0,0,0,0,0,0,0",
@@ -38,22 +40,20 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\f0f7261d299d650d6e9e42e0961603e0\\transformed\\appcompat-1.7.1\\res\\values-watch-v20\\values-watch-v20.xml",
+                    "source": "C:\\Users\\k1031\\.gradle\\caches\\8.13\\transforms\\e0831f47aa5dfe063543dec3970f7ca1\\transformed\\jetified-core-splashscreen-1.2.0\\res\\values-watch-v20\\values-watch-v20.xml",
                     "from": {
-                        "startLines": "2,5,8",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,214,385",
-                        "endLines": "4,7,10",
-                        "endColumns": "12,12,12",
-                        "endOffsets": "209,380,553"
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,129,205,280,357,428,496,566",
+                        "endColumns": "73,75,74,76,70,67,69,67",
+                        "endOffsets": "124,200,275,352,423,491,561,629"
                     },
                     "to": {
-                        "startLines": "18,21,24",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "1294,1453,1624",
-                        "endLines": "20,23,26",
-                        "endColumns": "12,12,12",
-                        "endOffsets": "1448,1619,1792"
+                        "startLines": "10,11,12,13,14,15,16,17",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "715,789,865,940,1017,1088,1156,1226",
+                        "endColumns": "73,75,74,76,70,67,69,67",
+                        "endOffsets": "784,860,935,1012,1083,1151,1221,1289"
                     }
                 }
             ]

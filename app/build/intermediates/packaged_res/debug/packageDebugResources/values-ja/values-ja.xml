@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="about_app_version">アプリケーションバージョン</string>
+    <string name="about_contact">制作者へ問い合わせ</string>
+    <string name="about_licenses">サードパーティライセンス</string>
+    <string name="about_manual">操作マニュアル</string>
+    <string name="about_privacy_policy">プライバシーポリシー</string>
+    <string name="about_rate_app">このアプリを評価</string>
+    <string name="about_share_app">このアプリを共有</string>
     <string name="add_a_new_tag">新しいタグを追加</string>
     <string name="all_schedules_title">全スケジュール</string>
     <string name="app_name">GWS Auto for Android</string>
@@ -11,23 +18,40 @@
     <string name="first_day_of_week">週の開始曜日</string>
     <string name="language">言語</string>
     <string name="manage_tags">タグの管理</string>
+    <string name="monday">月曜日</string>
     <string name="please_log_in">ワークフローを見るにはログインしてください。</string>
     <string name="sign_in">サインイン</string>
     <string name="sign_in_with_google">Googleでサインイン</string>
     <string name="sign_in_with_google_to_sync">Googleアカウントで同期</string>
     <string name="sign_out">サインアウト</string>
     <string name="sign_out_and_disable_sync">サインアウトして同期を解除</string>
+    <string name="sunday">日曜日</string>
     <string name="sync_disabled">同期は現在無効です。</string>
     <string name="sync_enabled_with">同期が有効です: %1$s</string>
     <string name="theme">テーマ</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_system">システムのデフォルト</string>
     <string name="timeline_for_date">%1$s のタイムライン</string>
+    <string name="title_about_app">このアプリについて</string>
     <string name="title_account_connections">アカウント連携</string>
     <string name="title_announcement">お知らせ</string>
-    <string name="title_app_settings">アプリ設定</string>
+    <string name="title_app_settings">アプリケーションの設定</string>
     <string name="title_dashboard">ダッシュボード</string>
     <string name="title_history">実行履歴</string>
     <string name="title_schedule">スケジュール</string>
     <string name="title_settings">設定</string>
     <string name="title_user_info">ユーザー情報</string>
     <string name="title_workflow">ワークフロー</string>
+    <string name="wizard_back">戻る</string>
+    <string name="wizard_finish">完了</string>
+    <string name="wizard_locale_subtitle">言語と祝日カレンダーを設定します。</string>
+    <string name="wizard_locale_title">地域と言語</string>
+    <string name="wizard_next">次へ</string>
+    <string name="wizard_theme_subtitle">この設定は後からいつでも変更できます。</string>
+    <string name="wizard_theme_title">テーマを選択</string>
+    <string name="wizard_week_start_subtitle">カレンダーの開始曜日を選択してください。</string>
+    <string name="wizard_week_start_title">週の開始曜日</string>
+    <string name="wizard_welcome_subtitle">初期設定を始めましょう！</string>
+    <string name="wizard_welcome_title">GWS Automaterへようこそ</string>
 </resources>

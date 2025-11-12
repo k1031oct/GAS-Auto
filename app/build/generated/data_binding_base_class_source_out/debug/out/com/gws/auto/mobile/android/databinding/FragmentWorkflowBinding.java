@@ -11,7 +11,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -22,19 +21,14 @@ public final class FragmentWorkflowBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final FloatingActionButton fabAddWorkflow;
-
-  @NonNull
   public final TextView loginPromptText;
 
   @NonNull
   public final RecyclerView workflowRecyclerView;
 
   private FragmentWorkflowBinding(@NonNull ConstraintLayout rootView,
-      @NonNull FloatingActionButton fabAddWorkflow, @NonNull TextView loginPromptText,
-      @NonNull RecyclerView workflowRecyclerView) {
+      @NonNull TextView loginPromptText, @NonNull RecyclerView workflowRecyclerView) {
     this.rootView = rootView;
-    this.fabAddWorkflow = fabAddWorkflow;
     this.loginPromptText = loginPromptText;
     this.workflowRecyclerView = workflowRecyclerView;
   }
@@ -66,12 +60,6 @@ public final class FragmentWorkflowBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.fab_add_workflow;
-      FloatingActionButton fabAddWorkflow = ViewBindings.findChildViewById(rootView, id);
-      if (fabAddWorkflow == null) {
-        break missingId;
-      }
-
       id = R.id.login_prompt_text;
       TextView loginPromptText = ViewBindings.findChildViewById(rootView, id);
       if (loginPromptText == null) {
@@ -84,8 +72,8 @@ public final class FragmentWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentWorkflowBinding((ConstraintLayout) rootView, fabAddWorkflow,
-          loginPromptText, workflowRecyclerView);
+      return new FragmentWorkflowBinding((ConstraintLayout) rootView, loginPromptText,
+          workflowRecyclerView);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

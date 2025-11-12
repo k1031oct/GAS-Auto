@@ -31,6 +31,13 @@
     <string msgid="8875138169939072951" name="abc_shareactionprovider_share_with">"共有"</string>
     <string msgid="9055268688411532828" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g>と共有"</string>
     <string msgid="1656852541809559762" name="abc_toolbar_collapse_description">"折りたたむ"</string>
+    <string name="about_app_version">アプリケーションバージョン</string>
+    <string name="about_contact">制作者へ問い合わせ</string>
+    <string name="about_licenses">サードパーティライセンス</string>
+    <string name="about_manual">操作マニュアル</string>
+    <string name="about_privacy_policy">プライバシーポリシー</string>
+    <string name="about_rate_app">このアプリを評価</string>
+    <string name="about_share_app">このアプリを共有</string>
     <string name="add_a_new_tag">新しいタグを追加</string>
     <string name="all_schedules_title">全スケジュール</string>
     <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"パスワード"</string>
@@ -191,6 +198,7 @@
     <string name="material_timepicker_select_time">時刻を選択</string>
     <string name="material_timepicker_text_input_mode_description">時刻をテキストで入力するモードに切り替えます。</string>
     <string msgid="8471891128988107974" name="mc2_snackbar_pane_title">"警告"</string>
+    <string name="monday">月曜日</string>
     <string name="mtrl_badge_numberless_content_description">新しい通知</string>
     <string name="mtrl_checkbox_state_description_checked">オン</string>
     <string name="mtrl_checkbox_state_description_indeterminate">一部オン</string>
@@ -264,16 +272,21 @@
     <string msgid="1490883874751719580" name="state_on">"ON"</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
     <string msgid="9167775378838880170" name="summary_collapsed_preference_list">"<ns1:g id="CURRENT_ITEMS">%1$s</ns1:g>、<ns1:g id="ADDED_ITEMS">%2$s</ns1:g>"</string>
+    <string name="sunday">日曜日</string>
     <string msgid="2561197295334830845" name="switch_role">"切り替える"</string>
     <string name="sync_disabled">同期は現在無効です。</string>
     <string name="sync_enabled_with">同期が有効です: %1$s</string>
     <string msgid="1672349317127674378" name="tab">"タブ"</string>
     <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g>パーセント。"</string>
     <string name="theme">テーマ</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_system">システムのデフォルト</string>
     <string name="timeline_for_date">%1$s のタイムライン</string>
+    <string name="title_about_app">このアプリについて</string>
     <string name="title_account_connections">アカウント連携</string>
     <string name="title_announcement">お知らせ</string>
-    <string name="title_app_settings">アプリ設定</string>
+    <string name="title_app_settings">アプリケーションの設定</string>
     <string name="title_dashboard">ダッシュボード</string>
     <string name="title_history">実行履歴</string>
     <string name="title_schedule">スケジュール</string>
@@ -284,4 +297,15 @@
     <string msgid="3124740595719787496" name="tooltip_label">"ツールチップを表示"</string>
     <string msgid="3140233346420563315" name="v7_preference_off">"OFF"</string>
     <string msgid="89551595707643515" name="v7_preference_on">"ON"</string>
+    <string name="wizard_back">戻る</string>
+    <string name="wizard_finish">完了</string>
+    <string name="wizard_locale_subtitle">言語と祝日カレンダーを設定します。</string>
+    <string name="wizard_locale_title">地域と言語</string>
+    <string name="wizard_next">次へ</string>
+    <string name="wizard_theme_subtitle">この設定は後からいつでも変更できます。</string>
+    <string name="wizard_theme_title">テーマを選択</string>
+    <string name="wizard_week_start_subtitle">カレンダーの開始曜日を選択してください。</string>
+    <string name="wizard_week_start_title">週の開始曜日</string>
+    <string name="wizard_welcome_subtitle">初期設定を始めましょう！</string>
+    <string name="wizard_welcome_title">GWS Automaterへようこそ</string>
 </resources>

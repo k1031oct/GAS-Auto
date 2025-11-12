@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.preference.PreferenceManager
+import com.gws.auto.mobile.android.ui.wizard.WizardActivity
 
 class SplashActivity : AppCompatActivity() {
 
@@ -11,8 +13,14 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
-        // Always navigate to MainActivity, login is no longer mandatory at startup.
-        startActivity(Intent(this, MainActivity::class.java))
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val isFirstRun = prefs.getBoolean("is_first_run", true)
+
+        if (isFirstRun) {
+            startActivity(Intent(this, WizardActivity::class.java))
+        } else {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
         finish()
     }
 }

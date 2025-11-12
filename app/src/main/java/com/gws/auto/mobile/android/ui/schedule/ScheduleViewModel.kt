@@ -3,17 +3,17 @@ package com.gws.auto.mobile.android.ui.schedule
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gws.auto.mobile.android.BuildConfig
 import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.domain.model.Holiday
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,9 +41,22 @@ class ScheduleViewModel @Inject constructor(
             scheduleRepository.getSchedulesFlow()
                 .catch { e -> Timber.e(e, "Error collecting schedules.") }
                 .collect { scheduleList ->
-                    _schedules.value = scheduleList
+                    val combinedList = if (BuildConfig.DEBUG) {
+                        scheduleList + createDummySchedules()
+                    } else {
+                        scheduleList
+                    }
+                    _schedules.value = combinedList
                 }
         }
+    }
+
+    private fun createDummySchedules(): List<Schedule> {
+        return listOf(
+            Schedule(workflowId = "Dummy Event 1", scheduleType = "daily", time = "10:00"),
+            Schedule(workflowId = "Dummy Event 2", scheduleType = "monthly", monthlyDays = listOf(15), time = "14:30"),
+            Schedule(workflowId = "Long Name Workflow To Test Ellipsis", scheduleType = "monthly", monthlyDays = listOf(15), time = "15:00")
+        )
     }
 
     private fun loadHolidaysForCurrentMonth() {
@@ -55,16 +68,18 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun moveToNextMonth() {
-        _currentDate.value = _currentDate.value.plusMonths(1)
-        if (_currentDate.value.year != _currentDate.value.minusMonths(1).year) {
-            loadHolidaysForCurrentMonth() // Year changed
+        val nextMonth = _currentDate.value.plusMonths(1)
+        if (_currentDate.value.year != nextMonth.year) {
+            loadHolidaysForCurrentMonth()
         }
+        _currentDate.value = nextMonth
     }
 
     fun moveToPreviousMonth() {
-        _currentDate.value = _currentDate.value.minusMonths(1)
-        if (_currentDate.value.year != _currentDate.value.plusMonths(1).year) {
-            loadHolidaysForCurrentMonth() // Year changed
+        val prevMonth = _currentDate.value.minusMonths(1)
+        if (_currentDate.value.year != prevMonth.year) {
+            loadHolidaysForCurrentMonth()
         }
+        _currentDate.value = prevMonth
     }
 }

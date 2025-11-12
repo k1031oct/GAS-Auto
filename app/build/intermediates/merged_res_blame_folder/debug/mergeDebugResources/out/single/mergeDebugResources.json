@@ -20,6 +20,10 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/mipmap-mdpi/ic_launcher.webp"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_wizard_locale.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_locale.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
@@ -72,12 +76,20 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/mipmap-xxhdpi/ic_launcher_foreground.webp"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_tag_management.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_tag_management.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/drawable_ic_workflow.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/drawable/ic_workflow.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_item_history_table.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_history_table.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_licenses.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_licenses.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/mipmap-xhdpi_ic_launcher_round.webp.flat",
@@ -100,6 +112,10 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/drawable/ic_add.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_list_item_add_workflow.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_add_workflow.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/drawable_ic_dashboard.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/drawable/ic_dashboard.xml"
     },
@@ -116,8 +132,16 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_workflow_editor.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_list_item_tag.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_tag.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_list_item_timeline.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_timeline.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_list_item_history.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/list_item_history.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_history.xml.flat",
@@ -144,12 +168,20 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/item_workflow_table.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_activity_wizard.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/activity_wizard.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_announcement.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_announcement.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_wizard_week_start.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_week_start.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/mipmap-xhdpi_ic_launcher.webp.flat",
@@ -180,12 +212,20 @@
         "source": "com.gws.auto.mobile.android.app-main-9:/menu/settings_menu.xml"
     },
     {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_wizard_theme.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_wizard_theme.xml"
+    },
+    {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_workflow.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_workflow.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/drawable_bg_today.xml.flat",
         "source": "com.gws.auto.mobile.android.app-main-9:/drawable/bg_today.xml"
+    },
+    {
+        "merged": "com.gws.auto.mobile.android.app-debug-7:/layout_fragment_about_app.xml.flat",
+        "source": "com.gws.auto.mobile.android.app-main-9:/layout/fragment_about_app.xml"
     },
     {
         "merged": "com.gws.auto.mobile.android.app-debug-7:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",

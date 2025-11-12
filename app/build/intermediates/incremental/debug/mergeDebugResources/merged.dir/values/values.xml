@@ -54,8 +54,19 @@
         <item>Chinese</item>
         <item>Korean</item>
     </string-array>
+    <string-array name="language_values">
+        <item>en</item>
+        <item>ja</item>
+        <item>zh</item>
+        <item>ko</item>
+    </string-array>
     <string-array name="theme_entries">
         <item>Default</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>System</item>
         <item>Light</item>
         <item>Dark</item>
     </string-array>
@@ -315,6 +326,7 @@
     <attr format="dimension" name="height"/>
     <attr format="reference" name="hideMotionSpec"/>
     <attr format="boolean" name="hideNavigationIcon"/>
+    <attr format="color" name="highlightColor"/>
     <attr format="color|reference" name="indicatorColor"/>
     <attr format="dimension" name="indicatorSize"/>
     <attr format="boolean" name="isLightTheme"/>
@@ -862,7 +874,6 @@
     <color name="error_color_material_light">#ff5722</color>
     <color name="foreground_material_dark">@android:color/white</color>
     <color name="foreground_material_light">@android:color/black</color>
-    <color name="highlight_color">#4D9CCAFF</color>
     <color name="highlighted_text_material_dark">#6680cbc4</color>
     <color name="highlighted_text_material_light">#66009688</color>
     <color name="holiday_color">#FFD32F2F</color>
@@ -1284,6 +1295,7 @@
     <color name="secondary_text_default_material_light">#8a000000</color>
     <color name="secondary_text_disabled_material_dark">#36ffffff</color>
     <color name="secondary_text_disabled_material_light">#24000000</color>
+    <color name="success_color">#4CAF50</color>
     <color name="switch_thumb_disabled_material_dark">#ff616161</color>
     <color name="switch_thumb_disabled_material_light">#ffbdbdbd</color>
     <color name="switch_thumb_normal_material_dark">#ffbdbdbd</color>
@@ -2586,6 +2598,13 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application">Share with <ns2:g example="Mail" id="application_name">%s</ns2:g></string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
+    <string name="about_app_version">Application version</string>
+    <string name="about_contact">Contact developer</string>
+    <string name="about_licenses">Third-party licenses</string>
+    <string name="about_manual">Operation Manual</string>
+    <string name="about_privacy_policy">Privacy Policy</string>
+    <string name="about_rate_app">Rate this application</string>
+    <string name="about_share_app">Share this application</string>
     <string name="add">Add</string>
     <string name="add_a_new_tag">Add a new tag</string>
     <string name="add_a_tag">Add a tag</string>
@@ -2802,6 +2821,7 @@
     <string description="Title for the dialog with a time picker. [CHAR_LIMIT=32]" name="material_timepicker_select_time">Select time</string>
     <string name="material_timepicker_text_input_mode_description">Switch to text input mode for the time input.</string>
     <string name="mc2_snackbar_pane_title">Alert</string>
+    <string name="monday">Monday</string>
     <string description="Content description for new notification (no number count) [CHAR_LIMIT=NONE]" name="mtrl_badge_numberless_content_description">New notification</string>
     <string description="An announcement for the collapsed menu state of the trailing button in split button [CHAR LIMIT=NONE]" name="mtrl_button_collapsed_content_description">Collapsed</string>
     <string description="An announcement for the expanded menu state of the trailing button in split button [CHAR LIMIT=NONE]" name="mtrl_button_expanded_content_description">Expanded</string>
@@ -2923,13 +2943,18 @@
     <string name="state_on">On</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="summary_collapsed_preference_list"><ns2:g id="current_items">%1$s</ns2:g>, <ns2:g id="added_items">%2$s</ns2:g></string>
+    <string name="sunday">Sunday</string>
     <string name="switch_role">Switch</string>
     <string name="sync_disabled">Sync is currently disabled.</string>
     <string name="sync_enabled_with">Sync enabled with: %1$s</string>
     <string name="tab">Tab</string>
     <string name="template_percent"><ns2:g id="percentage">%1$d</ns2:g> percent.</string>
     <string name="theme">Theme</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_system">System Default</string>
     <string name="timeline_for_date">Timeline for %1$s</string>
+    <string name="title_about_app">About this app</string>
     <string name="title_account_connections">Account Connections</string>
     <string name="title_announcement">Announcements</string>
     <string name="title_app_settings">Application Settings</string>
@@ -2947,6 +2972,17 @@
     <string name="user_name_placeholder">User Name</string>
     <string name="v7_preference_off">OFF</string>
     <string name="v7_preference_on">ON</string>
+    <string name="wizard_back">Back</string>
+    <string name="wizard_finish">Finish</string>
+    <string name="wizard_locale_subtitle">This helps set up your language and holiday calendar.</string>
+    <string name="wizard_locale_title">Region &amp; Language</string>
+    <string name="wizard_next">Next</string>
+    <string name="wizard_theme_subtitle">You can change this at any time in the settings.</string>
+    <string name="wizard_theme_title">Choose Your Theme</string>
+    <string name="wizard_week_start_subtitle">Choose which day of the week to start your calendar on.</string>
+    <string name="wizard_week_start_title">Week Start</string>
+    <string name="wizard_welcome_subtitle">Let\'s get you set up!</string>
+    <string name="wizard_welcome_title">Welcome to GWS Automater</string>
     <string name="workflow_actions_menu">Actions</string>
     <string name="workflow_description">Workflow Description</string>
     <string name="workflow_fragment">Workflow Fragment</string>
@@ -6660,6 +6696,11 @@
     <style name="DialogWindowTheme">
         <item name="android:windowClipToOutline">false</item>
     </style>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+    </style>
     <style name="EdgeToEdgeFloatingDialogTheme" parent="android:Theme.DeviceDefault.Dialog">
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowLayoutInDisplayCutoutMode" ns1:targetApi="27">@integer/m3c_window_layout_in_display_cutout_mode</item>
@@ -7172,6 +7213,15 @@
     <style name="RtlUnderlay.Widget.AppCompat.ActionButton.Overflow" parent="Base.Widget.AppCompat.ActionButton">
         <item name="android:paddingLeft">@dimen/abc_action_bar_overflow_padding_start_material</item>
         <item name="android:paddingRight">@dimen/abc_action_bar_overflow_padding_end_material</item>
+    </style>
+    <style name="SettingsItem" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
     </style>
     <style name="ShapeAppearance.M3.Comp.Badge.Large.Shape" parent="ShapeAppearance.M3.Sys.Shape.Corner.Full"/>
     <style name="ShapeAppearance.M3.Comp.Badge.Shape" parent="ShapeAppearance.M3.Sys.Shape.Corner.Full"/>
@@ -7964,6 +8014,9 @@
     <item name="windowNoTitle">true</item>
   </style>
     <style name="Theme.GWSAutoforAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="highlightColor">#4D0061A4</item>
+
         
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>

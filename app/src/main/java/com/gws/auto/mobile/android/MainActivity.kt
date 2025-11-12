@@ -124,10 +124,9 @@ class MainActivity : AppCompatActivity() {
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             val intent = Intent(this, SettingsActivity::class.java)
             val fragmentKey = when (menuItem.itemId) {
-                R.id.navigation_announcement -> "announcement" // TODO: Create AnnouncementFragment
-                R.id.settings_user_info -> "user_info"
-                R.id.settings_account_connections -> "account_connections"
+                R.id.navigation_announcement -> "announcement"
                 R.id.settings_application -> "app_settings"
+                R.id.about_app -> "about_app"
                 else -> null
             }
             if (fragmentKey != null) {

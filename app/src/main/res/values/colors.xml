@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Commenting out old colors to avoid confusion. Theme is now controlled by themes.xml and Color.kt -->
+    <!-- Old colors are commented out as the theme is now controlled by themes.xml and Color.kt -->
     <!--
     <color name="primary_200">#FFCCCCCC</color>
     <color name="primary_500">#FF757575</color>
@@ -11,8 +11,8 @@
     <color name="white">#FFFFFFFF</color>
     -->
 
-    <color name="highlight_color">#4D9CCAFF</color> <!-- Light Blue with transparency for day highlight -->
     <color name="holiday_color">#FFD32F2F</color> <!-- Red for holidays -->
+    <color name="success_color">#4CAF50</color>
 
     <!-- Light Theme Colors -->
     <color name="md_theme_light_primary">#0061A4</color>

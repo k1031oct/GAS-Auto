@@ -49,6 +49,11 @@
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
             android:theme="@style/Theme.GWSAutoforAndroid" />
+            
+        <activity
+            android:name=".ui.wizard.WizardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.GWSAutoforAndroid" />
 
     </application>
 

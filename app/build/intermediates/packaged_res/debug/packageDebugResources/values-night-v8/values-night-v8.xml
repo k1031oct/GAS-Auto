@@ -2,6 +2,9 @@
 <resources>
     <style name="Theme.GWSAutoforAndroid" parent="Theme.Material3.DayNight.NoActionBar">
         
+        <item name="highlightColor">#4D9CCAFF</item>
+
+        
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
         
