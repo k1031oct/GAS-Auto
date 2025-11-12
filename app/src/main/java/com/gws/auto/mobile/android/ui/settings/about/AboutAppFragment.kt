@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.gws.auto.mobile.android.BuildConfig
-import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentAboutAppBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -52,10 +52,7 @@ class AboutAppFragment : Fragment() {
             openUrl("https://github.com/k1031oct/GWS-Auto-for-Android") // Placeholder URL
         }
         binding.licensesButton.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.settings_fragment_container, LicensesFragment())
-                .addToBackStack(null)
-                .commit()
+            startActivity(Intent(requireContext(), OssLicensesMenuActivity::class.java))
         }
         binding.contactButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO).apply {

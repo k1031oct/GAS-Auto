@@ -46,6 +46,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.hilt)
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -139,6 +140,7 @@ dependencies {
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
     implementation(libs.playServicesAuth)
+    implementation(libs.googleOssLicenses)
     implementation(libs.google.api.client.android)
     implementation(libs.google.http.client.gson)
     implementation(libs.google.api.services.drive)

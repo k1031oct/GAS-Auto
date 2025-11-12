@@ -7,6 +7,7 @@ googleServices = "4.4.4"
 firebaseCrashlytics = "3.0.6"
 firebaseAppDistribution = "5.2.0"
 hilt = "2.57.2"
+googleOssLicensesPlugin = "0.10.6"
 androidDesugarJdkLibs = "2.0.4"
 firebaseBom = "33.1.1"
 playServicesOssLicenses = "17.0.1"
@@ -83,6 +84,7 @@ firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashly
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 playServicesAuth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
+googleOssLicenses = { group = "com.google.android.gms", name = "play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
@@ -108,6 +110,7 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-oss-licenses = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "googleOssLicensesPlugin" }
 
 [bundles]
 navigation = ["androidx-navigation-fragment-ktx", "androidx-navigation-ui-ktx"]
