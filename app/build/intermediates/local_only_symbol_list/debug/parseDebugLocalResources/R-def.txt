@@ -67,8 +67,8 @@ id event_title
 id first_day_of_week_spinner
 id history_recycler_view
 id language_spinner
+id licensesRecyclerView
 id licenses_button
-id licenses_text
 id light_button
 id login_prompt_text
 id manual_button

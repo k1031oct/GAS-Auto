@@ -2708,6 +2708,9 @@
     <string name="indeterminate">Partially checked</string>
     <string name="item_view_role_description">Tab</string>
     <string name="language">Language</string>
+    <string name="license_content_error">An error has occurred when fetching the license.</string>
+    <string name="license_is_loading">License info is loading.</string>
+    <string name="license_list_is_loading">License list is loading.</string>
     <string name="m3_exceed_max_badge_text_suffix" translatable="false"><ns2:g example="Some te" id="part of a long text">%1$s</ns2:g><ns2:g example="…" id="suffix">%2$s</ns2:g></string>
     <string description="Content description for a loading indicator [CHAR LIMIT=NONE]" name="m3_loading_indicator_content_description">
     Loading
@@ -2905,8 +2908,10 @@
     <string name="navigation_menu">"Navigation menu"</string>
     <string name="next_month">></string>
     <string name="no">No</string>
+    <string name="no_licenses_available">This app does not have any open source licenses.</string>
     <string name="not_selected">Not selected</string>
     <string name="not_set">Not set</string>
+    <string name="oss_license_title">Open source licenses</string>
     <string name="password_toggle_content_description">Show password</string>
     <string name="path_password_eye" translatable="false">M12,4.5C7,4.5 2.73,7.61 1,12c1.73,4.39 6,7.5 11,7.5s9.27,-3.11 11,-7.5c-1.73,-4.39 -6,-7.5 -11,-7.5zM12,17c-2.76,0 -5,-2.24 -5,-5s2.24,-5 5,-5 5,2.24 5,5 -2.24,5 -5,5zM12,9c-1.66,0 -3,1.34 -3,3s1.34,3 3,3 3,-1.34 3,-3 -1.34,-3 -3,-3z</string>
     <string name="path_password_eye_mask_strike_through" translatable="false">M2,4.27 L19.73,22 L22.27,19.46 L4.54,1.73 L4.54,1 L23,1 L23,23 L1,23 L1,4.27 Z</string>
@@ -2916,6 +2921,7 @@
     <string name="preference_copied">
         \"<ns2:g example="Version 1.1" id="summary">%1$s</ns2:g>\" copied to clipboard.
     </string>
+    <string name="preferences_license_summary">License details for open source software</string>
     <string name="previous_month">&lt;</string>
     <string name="profile_image_description">Profile Image</string>
     <string name="project_id" translatable="false">gws-auto-for-android-4db4a</string>

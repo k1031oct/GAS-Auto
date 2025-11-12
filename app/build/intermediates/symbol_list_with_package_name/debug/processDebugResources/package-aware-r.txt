@@ -4178,8 +4178,12 @@ id layout
 id left
 id leftToRight
 id legacy
+id license
+id license_activity_scrollview
+id license_activity_textview
+id license_list
+id licensesRecyclerView
 id licenses_button
-id licenses_text
 id light
 id light_button
 id line1
@@ -4281,6 +4285,7 @@ id neverCompleteToStart
 id next_button
 id noScroll
 id noState
+id no_licenses_text
 id none
 id normal
 id north
@@ -4714,6 +4719,12 @@ layout item_history_table
 layout item_module
 layout item_workflow
 layout item_workflow_table
+layout libraries_social_licenses_license
+layout libraries_social_licenses_license_activity
+layout libraries_social_licenses_license_loading
+layout libraries_social_licenses_license_menu_activity
+layout license_menu_activity_loading
+layout license_menu_activity_no_licenses
 layout list_item_add_workflow
 layout list_item_announcement
 layout list_item_calendar_day
@@ -4813,6 +4824,7 @@ navigation nav_graph
 plurals mtrl_badge_content_description
 raw firebase_common_keep
 raw firebase_crashlytics_keep
+raw keep_third_party_licenses
 string abc_action_bar_home_description
 string abc_action_bar_up_description
 string abc_action_menu_overflow_description
@@ -4948,6 +4960,9 @@ string in_progress
 string indeterminate
 string item_view_role_description
 string language
+string license_content_error
+string license_is_loading
+string license_list_is_loading
 string m3_exceed_max_badge_text_suffix
 string m3_loading_indicator_content_description
 string m3_ref_typeface_brand_medium
@@ -5129,8 +5144,10 @@ string nav_rail_expanded_a11y_label
 string navigation_menu
 string next_month
 string no
+string no_licenses_available
 string not_selected
 string not_set
+string oss_license_title
 string password_toggle_content_description
 string path_password_eye
 string path_password_eye_mask_strike_through
@@ -5138,6 +5155,7 @@ string path_password_eye_mask_visible
 string path_password_strike_through
 string please_log_in
 string preference_copied
+string preferences_license_summary
 string previous_month
 string profile_image_description
 string project_id

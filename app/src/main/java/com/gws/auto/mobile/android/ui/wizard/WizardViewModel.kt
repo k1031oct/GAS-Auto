@@ -42,6 +42,10 @@ class WizardViewModel @Inject constructor(
         }
     }
 
+    fun getTheme(): String {
+        return prefs.getString("theme", "Default") ?: "Default"
+    }
+
     fun finishWizard() {
         prefs.edit { putBoolean("is_first_run", false) }
     }

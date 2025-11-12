@@ -46,7 +46,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.hilt)
-    id("com.google.android.gms.oss-licenses-plugin")
+    alias(libs.plugins.google.oss.licenses)
 }
 
 android {
@@ -171,4 +171,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.ext.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+}
+
+afterEvaluate {
+    tasks.named("debugOssLicensesCleanUp") {
+        dependsOn(tasks.named("debugOssDependencyTask"))
+    }
+
+    tasks.named("releaseOssLicensesCleanUp") {
+        dependsOn(tasks.named("releaseOssDependencyTask"))
+    }
 }

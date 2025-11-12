@@ -27,6 +27,11 @@ class ThemeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 1. Set initial state without triggering listener
+        updateInitialThemeSelection()
+
+        // 2. Set listener for user interaction
         binding.themeGroup.setOnCheckedChangeListener { _, checkedId ->
             val selection = when (checkedId) {
                 R.id.light_button -> "Light"
@@ -35,8 +40,16 @@ class ThemeFragment : Fragment() {
             }
             viewModel.setTheme(selection)
         }
-        // Set a default value
-        binding.systemButton.isChecked = true
+    }
+
+    private fun updateInitialThemeSelection() {
+        // Temporarily disable the listener to prevent loops
+        binding.themeGroup.setOnCheckedChangeListener(null)
+        when (viewModel.getTheme()) {
+            "Light" -> binding.light_button.isChecked = true
+            "Dark" -> binding.dark_button.isChecked = true
+            else -> binding.systemButton.isChecked = true
+        }
     }
 
     override fun onDestroyView() {
