@@ -90,12 +90,12 @@ fun CalendarScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text("<") }
+                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
                 Text(
                     text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
                     style = MaterialTheme.typography.headlineSmall
                 )
-                Button(onClick = { viewModel.moveToNextMonth() }) { Text(">") }
+                Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
             }
 
             // Calendar
@@ -242,8 +242,8 @@ fun ScheduleListItem(schedule: Schedule) {
     Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = "Workflow: ${schedule.workflowId}", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Type: ${schedule.scheduleType}", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.schedule_list_item_workflow, schedule.workflowId), style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(id = R.string.schedule_list_item_type, schedule.scheduleType), style = MaterialTheme.typography.bodyMedium)
             }
             Text(text = schedule.time ?: "", style = MaterialTheme.typography.bodyLarge)
         }
@@ -284,16 +284,16 @@ fun TimelineListItem(item: Any) {
 
     when (item) {
         is Schedule -> {
-            time = item.time ?: "N/A"
-            title = "Workflow: ${item.workflowId}"
+            time = item.time ?: stringResource(id = R.string.timeline_list_item_time_not_available)
+            title = stringResource(id = R.string.schedule_list_item_workflow, item.workflowId)
         }
         is Holiday -> {
-            time = "All Day"
+            time = stringResource(id = R.string.timeline_list_item_all_day)
             title = item.name
         }
         else -> {
             time = ""
-            title = "Unknown event"
+            title = stringResource(id = R.string.timeline_list_item_unknown_event)
         }
     }
 

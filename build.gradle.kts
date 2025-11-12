@@ -9,13 +9,3 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.google.oss.licenses) apply false
 }
-
-// Ensure that any task that is not 'clean' runs after 'clean'.
-// This prevents conflicts when running 'clean' and build tasks together.
-subprojects {
-    tasks.configureEach {
-        if (name != "clean") {
-            mustRunAfter("clean")
-        }
-    }
-}

@@ -5,7 +5,7 @@
     <!-- Days of week -->
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>
-    
+
     <!-- Themes -->
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
@@ -51,6 +51,7 @@
     <string name="about_licenses">Third-party licenses</string>
     <string name="about_contact">Contact developer</string>
     <string name="about_app_version">Application version</string>
+    <string name="version_number_placeholder">1.0.0</string>
 
     <!-- Fragments -->
     <string name="workflow_fragment">Workflow Fragment</string>
@@ -71,9 +72,9 @@
     <string name="add_module">Add Module</string>
     <string name="save_workflow">Save Workflow</string>
     <string name="add_new_workflow">Add new workflow</string>
-    <string name="workflow_list_title">ワークフロー</string>
+    <string name="workflow_list_title">Workflows</string>
     <string name="workflow_actions_menu">Actions</string>
-    <string name="workflow_run_button">実行</string>
+    <string name="workflow_run_button">Run</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
     <string name="add_schedule">Add schedule</string>
     <string name="add_a_tag">Add a tag</string>
@@ -90,13 +91,32 @@
     <string name="add_a_new_tag">Add a new tag</string>
     <string name="profile_image_description">Profile Image</string>
 
-    <!-- Schedule -->
+    <!-- Schedule & Calendar -->
     <string name="previous_month">&lt;</string>
     <string name="next_month">&gt;</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
     <string name="event_time_placeholder">10:00 AM</string>
     <string name="event_title_placeholder">Google Calendar Event</string>
     <string name="timeline_for_date">Timeline for %1$s</string>
+    <string name="calendar_previous_month_button">&lt;</string>
+    <string name="calendar_next_month_button">&gt;</string>
+    <string name="schedule_list_item_workflow">Workflow: %1$s</string>
+    <string name="schedule_list_item_type">Type: %1$s</string>
+    <string name="timeline_list_item_time_not_available">N/A</string>
+    <string name="timeline_list_item_all_day">All Day</string>
+    <string name="timeline_list_item_unknown_event">Unknown event</string>
+
+    <!-- Table Headers (for XML Layouts) -->
+    <string name="header_workflow_name">Workflow Name</string>
+    <string name="header_status">Status</string>
+    <string name="header_trigger">Trigger</string>
+    <string name="header_date">Date</string>
+
+    <!-- Placeholders (for XML Layouts) -->
+    <string name="placeholder_workflow_name">Workflow Name</string>
+    <string name="placeholder_time">10:00</string>
+    <string name="placeholder_event_time">10:00 AM</string>
+    <string name="placeholder_event_title">Workflow: Generate Report</string>
 
     <!-- Announcements -->
     <string name="announcement_unread_indicator">Unread indicator</string>
@@ -105,10 +125,9 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
-
     <!-- Dummy Data -->
-    <string name="dummy_status_active">アクティブ</string>
-    <string name="dummy_trigger_daily">毎日 9:00</string>
+    <string name="dummy_status_active">Active</string>
+    <string name="dummy_trigger_daily">Daily at 9:00</string>
 
     <string-array name="first_day_of_week_entries">
         <item>Sunday</item>
