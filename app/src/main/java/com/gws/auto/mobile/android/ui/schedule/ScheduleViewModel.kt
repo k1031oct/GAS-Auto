@@ -59,7 +59,7 @@ class ScheduleViewModel @Inject constructor(
         )
     }
 
-    private fun loadHolidaysForCurrentMonth() {
+    fun loadHolidaysForCurrentMonth() {
         viewModelScope.launch {
             val countryCode = prefs.getString("country", "US") ?: "US"
             val year = _currentDate.value.year

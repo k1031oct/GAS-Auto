@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,6 +29,15 @@ class ScheduleSettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val theme = prefs.getString("theme", "Default")
+        when (theme) {
+            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
+
         setContent {
             GWSAutoForAndroidTheme {
                 ScheduleSettingsScreen(viewModel)
@@ -216,7 +226,7 @@ fun WeeklySettings(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthlySettings(
-    selectedDays: Set<Int>,
+    selectedDays: Set<int>,
     onDayToggle: (Int) -> Unit,
     time: java.time.LocalTime,
     onTimeChange: (java.time.LocalTime) -> Unit

@@ -28,4 +28,9 @@ class ScheduleFragment : Fragment() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadHolidaysForCurrentMonth()
+    }
 }
