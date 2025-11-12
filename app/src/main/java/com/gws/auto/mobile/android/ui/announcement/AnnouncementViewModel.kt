@@ -5,6 +5,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import com.gws.auto.mobile.android.data.model.Announcement
+import com.gws.auto.mobile.android.util.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,18 +14,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnnouncementViewModel @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+    private val notificationHelper = NotificationHelper(context)
+
     private val _announcements = MutableStateFlow<List<Announcement>>(emptyList())
     val announcements: StateFlow<List<Announcement>> = _announcements
+
+    private val _hasUnread = MutableStateFlow(false)
+    val hasUnread: StateFlow<Boolean> = _hasUnread
 
     companion object {
         private const val KEY_READ_ANNOUNCEMENTS = "read_announcement_ids"
     }
 
     init {
+        notificationHelper.createNotificationChannel()
         loadAnnouncements()
     }
 
@@ -36,31 +43,26 @@ class AnnouncementViewModel @Inject constructor(
 
         val readIds = prefs.getStringSet(KEY_READ_ANNOUNCEMENTS, emptySet()) ?: emptySet()
 
-        _announcements.value = dummyData.map { announcement ->
+        val loadedAnnouncements = dummyData.map { announcement ->
             if (announcement.id in readIds) {
                 announcement.copy(isRead = true)
             } else {
                 announcement
             }
         }
+        _announcements.value = loadedAnnouncements
+
+        val hasUnreadNow = loadedAnnouncements.any { !it.isRead }
+        if (hasUnreadNow) {
+            _hasUnread.value = true
+            notificationHelper.showUnreadAnnouncementNotification()
+        }
     }
 
-    fun markAsRead(announcementId: String) {
-        // Update in-memory list
-        val updatedList = _announcements.value.map {
-            if (it.id == announcementId) {
-                it.copy(isRead = true)
-            } else {
-                it
-            }
-        }
-        _announcements.value = updatedList
-
-        // Persist the new read ID
-        val readIds = prefs.getStringSet(KEY_READ_ANNOUNCEMENTS, emptySet())?.toMutableSet() ?: mutableSetOf()
-        readIds.add(announcementId)
-        prefs.edit {
-            putStringSet(KEY_READ_ANNOUNCEMENTS, readIds)
-        }
+    fun markAsRead() {
+        val allIds = _announcements.value.map { it.id }.toSet()
+        prefs.edit { putStringSet(KEY_READ_ANNOUNCEMENTS, allIds) }
+        _announcements.value = _announcements.value.map { it.copy(isRead = true) }
+        _hasUnread.value = false
     }
 }

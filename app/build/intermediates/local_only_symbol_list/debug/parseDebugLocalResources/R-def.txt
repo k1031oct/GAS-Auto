@@ -28,6 +28,7 @@ color md_theme_light_surface
 color success_color
 drawable bg_today
 drawable ic_add
+drawable ic_badge
 drawable ic_dashboard
 drawable ic_delete
 drawable ic_history
@@ -98,7 +99,9 @@ id schedule_type_and_time
 id schedule_workflow_name
 id search_view
 id settings_application
+id settings_badge
 id settings_fragment_container
+id settings_icon
 id share_button
 id sign_in_button
 id status
@@ -170,6 +173,7 @@ layout list_item_tag
 layout list_item_timeline
 layout list_item_timeline_event
 layout list_item_workflow
+layout menu_item_settings_with_badge
 menu bottom_nav_menu
 menu main_menu
 menu settings_menu
@@ -204,6 +208,8 @@ string dummy_status_active
 string dummy_trigger_daily
 string event_time_placeholder
 string event_title_placeholder
+string execution_status_failure
+string execution_status_success
 string exit
 string exit_confirmation_message
 string exit_confirmation_title
@@ -220,6 +226,7 @@ string header_workflow_name
 string language
 string manage_tags
 string monday
+string new_announcement_notification
 string next_month
 string no
 string placeholder_event_time

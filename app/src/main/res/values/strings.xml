@@ -122,12 +122,16 @@
     <string name="announcement_unread_indicator">Unread indicator</string>
     <string name="unread_announcement_popup_title">Unread Announcements</string>
     <string name="unread_announcement_popup_message">You have new announcements. Would you like to view them?</string>
+    <string name="new_announcement_notification">You have new announcements.</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
 
     <!-- Dummy Data -->
     <string name="dummy_status_active">Active</string>
     <string name="dummy_trigger_daily">Daily at 9:00</string>
+
+    <string name="execution_status_success">Success</string>
+    <string name="execution_status_failure">Failure</string>
 
     <string-array name="first_day_of_week_entries">
         <item>Sunday</item>

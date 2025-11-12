@@ -3767,6 +3767,7 @@ drawable googleg_standard_color_18
 drawable ic_add
 drawable ic_arrow_back_black_24
 drawable ic_arrow_down_24dp
+drawable ic_badge
 drawable ic_call_answer
 drawable ic_call_answer_low
 drawable ic_call_answer_video
@@ -4387,7 +4388,9 @@ id select_dialog_listview
 id selected
 id selection_type
 id settings_application
+id settings_badge
 id settings_fragment_container
+id settings_icon
 id share_button
 id sharedValueSet
 id sharedValueUnset
@@ -4755,6 +4758,7 @@ layout material_time_input
 layout material_timepicker
 layout material_timepicker_dialog
 layout material_timepicker_textinput_display
+layout menu_item_settings_with_badge
 layout mtrl_alert_dialog
 layout mtrl_alert_dialog_actions
 layout mtrl_alert_dialog_title
@@ -4930,6 +4934,8 @@ string error_a11y_label
 string error_icon_content_description
 string event_time_placeholder
 string event_title_placeholder
+string execution_status_failure
+string execution_status_success
 string exit
 string exit_confirmation_message
 string exit_confirmation_title
@@ -5148,6 +5154,7 @@ string nav_app_bar_open_drawer_description
 string nav_rail_collapsed_a11y_label
 string nav_rail_expanded_a11y_label
 string navigation_menu
+string new_announcement_notification
 string next_month
 string no
 string no_licenses_available

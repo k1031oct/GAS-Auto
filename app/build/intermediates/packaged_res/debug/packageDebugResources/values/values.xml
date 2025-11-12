@@ -84,6 +84,8 @@
     <string name="dummy_trigger_daily">Daily at 9:00</string>
     <string name="event_time_placeholder">10:00 AM</string>
     <string name="event_title_placeholder">Google Calendar Event</string>
+    <string name="execution_status_failure">Failure</string>
+    <string name="execution_status_success">Success</string>
     <string name="exit">Exit</string>
     <string name="exit_confirmation_message">Are you sure you want to exit?</string>
     <string name="exit_confirmation_title">Confirm Exit</string>
@@ -100,6 +102,7 @@
     <string name="language">Language</string>
     <string name="manage_tags">Manage Tags</string>
     <string name="monday">Monday</string>
+    <string name="new_announcement_notification">You have new announcements.</string>
     <string name="next_month">></string>
     <string name="no">No</string>
     <string name="placeholder_event_time">10:00 AM</string>

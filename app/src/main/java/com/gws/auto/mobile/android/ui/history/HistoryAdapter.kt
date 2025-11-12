@@ -1,11 +1,12 @@
 package com.gws.auto.mobile.android.ui.history
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ListItemHistoryBinding
 import com.gws.auto.mobile.android.domain.model.WorkflowExecutionLog
@@ -27,16 +28,29 @@ class HistoryAdapter : ListAdapter<WorkflowExecutionLog, HistoryAdapter.HistoryV
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         fun bind(log: WorkflowExecutionLog) {
+            val context = binding.root.context
             binding.workflowNameText.text = log.workflowName
             binding.timestampText.text = dateFormat.format(log.executionTime)
-            binding.statusChip.text = log.status
 
-            val color = when (log.status) {
-                "Success" -> R.color.success_color
-                "Failure" -> R.color.md_theme_dark_error
-                else -> android.R.color.darker_gray
+            val statusText: String
+            val chipColor: Int
+
+            when (log.status) {
+                "Success" -> {
+                    statusText = context.getString(R.string.execution_status_success)
+                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, 0)
+                }
+                "Failure" -> {
+                    statusText = context.getString(R.string.execution_status_failure)
+                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorError, 0)
+                }
+                else -> {
+                    statusText = log.status
+                    chipColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+                }
             }
-            binding.statusChip.setChipBackgroundColorResource(color)
+            binding.statusChip.text = statusText
+            binding.statusChip.chipBackgroundColor = ColorStateList.valueOf(chipColor)
         }
     }
 }

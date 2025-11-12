@@ -88,14 +88,14 @@ class AppSettingsFragment : Fragment() {
         }
 
         val countryValues = resources.getStringArray(R.array.country_values)
-        val currentCountry = prefs.getString("country_for_holidays", "US")
+        val currentCountry = prefs.getString("country", "US")
         val countryPosition = countryValues.indexOf(currentCountry)
         binding.countrySpinner.setSelection(if (countryPosition != -1) countryPosition else 0)
 
         binding.countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selection = countryValues[position]
-                prefs.edit { putString("country_for_holidays", selection) }
+                prefs.edit { putString("country", selection) }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }

@@ -12,11 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
+import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val mainSharedViewModel: MainSharedViewModel by viewModels()
+    private lateinit var announcementViewModel: AnnouncementViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        announcementViewModel = ViewModelProvider(this)[AnnouncementViewModel::class.java]
 
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -94,6 +99,10 @@ class MainActivity : AppCompatActivity() {
             }
             binding.searchView.queryHint = hint
         }.launchIn(lifecycleScope)
+
+        announcementViewModel.hasUnread.onEach { hasUnread ->
+            invalidateOptionsMenu()
+        }.launchIn(lifecycleScope)
     }
 
     private fun setupBackButtonHandler() {
@@ -130,6 +139,9 @@ class MainActivity : AppCompatActivity() {
                 else -> null
             }
             if (fragmentKey != null) {
+                if (fragmentKey == "announcement") {
+                    announcementViewModel.markAsRead()
+                }
                 intent.putExtra("fragment_to_load", fragmentKey)
                 startActivity(intent)
             }
@@ -141,6 +153,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val settingsItem = menu.findItem(R.id.action_settings)
+        val badge = settingsItem.actionView?.findViewById<View>(R.id.settings_badge)
+        badge?.visibility = if (announcementViewModel.hasUnread.value) View.VISIBLE else View.GONE
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
