@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,19 +21,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.preference.PreferenceManager
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.domain.model.Holiday
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -56,7 +50,6 @@ fun CalendarScreen(
     )
     val holidays by viewModel.holidays.collectAsState()
     val schedules by viewModel.schedules.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val context = LocalContext.current
 
@@ -108,7 +101,7 @@ fun CalendarScreen(
             // Calendar
             VerticalPager(
                 state = pagerState,
-                modifier = Modifier.weight(1f) // Let the pager take up available space
+                modifier = Modifier.weight(1f)
             ) { page ->
                 val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
                 MonthView(
@@ -119,7 +112,6 @@ fun CalendarScreen(
                 )
             }
 
-            // List Header and Area
             if (selectedDate != null) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -154,23 +146,9 @@ fun MonthView(
     schedules: List<Schedule>,
     onDateClick: (LocalDate) -> Unit
 ) {
-    val context = LocalContext.current
-    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-    val startDayPref = prefs.getString("first_day_of_week", "Sunday")
-    val isSundayFirst = startDayPref == "Sunday"
-
-    val daysOfWeek = if (isSundayFirst) {
-        listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
-    } else {
-        listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
-    }
-
+    val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
     val firstDayOfMonth = yearMonth.atDay(1)
-    val startOffset = if (isSundayFirst) {
-        firstDayOfMonth.dayOfWeek.value % 7
-    } else {
-        if (firstDayOfMonth.dayOfWeek == DayOfWeek.SUNDAY) 6 else firstDayOfMonth.dayOfWeek.value - 1
-    }
+    val startOffset = firstDayOfMonth.dayOfWeek.value % 7
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
@@ -180,7 +158,7 @@ fun MonthView(
             Text(text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()), textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall)
         }
 
-        items(startOffset) { /* Empty cells */ }
+        items(startOffset) {}
 
         items(yearMonth.lengthOfMonth()) { dayIndex ->
             val dayOfMonth = dayIndex + 1
@@ -194,7 +172,6 @@ fun MonthView(
                 }
             }
             val holidaysForDay = holidays.filter { it.date == date }
-
 
             DayCell(
                 date = date,
@@ -217,8 +194,7 @@ fun DayCell(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .border(0.5.dp, Color.Gray.copy(alpha = 0.5f))
+            .height(120.dp) // <-- Expanded height
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -231,21 +207,13 @@ fun DayCell(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        holidays.take(2).forEach {
+        // Display more items
+        holidays.forEach {
             ScheduleItemText(it.name)
         }
 
-        schedules.take(2 - holidays.size).forEach {
+        schedules.forEach {
             ScheduleItemText(it.workflowId)
-        }
-
-        val remainingCount = (holidays.size + schedules.size) - 2
-        if (remainingCount > 0) {
-            Text(
-                text = "+$remainingCount more",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
         }
     }
 }
