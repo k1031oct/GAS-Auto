@@ -157,18 +157,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val settingsItem = menu.findItem(R.id.action_settings)
-        val badge = settingsItem.actionView?.findViewById<View>(R.id.settings_badge)
+        val actionView = settingsItem.actionView
+        val badge = actionView?.findViewById<View>(R.id.settings_badge)
         badge?.visibility = if (announcementViewModel.hasUnread.value) View.VISIBLE else View.GONE
+        actionView?.setOnClickListener {
+            showSettingsMenu(it)
+        }
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // This is not called for action views, but we keep it for other menu items if any
         return when (item.itemId) {
             R.id.action_settings -> {
-                val anchorView = findViewById<View>(R.id.action_settings)
-                if (anchorView != null) {
-                    showSettingsMenu(anchorView)
-                }
+                // This part is now handled by the OnClickListener in onPrepareOptionsMenu
                 true
             }
             else -> super.onOptionsItemSelected(item)

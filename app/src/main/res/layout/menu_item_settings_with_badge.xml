@@ -2,13 +2,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    style="@style/Widget.AppCompat.ActionButton">
+    style="@style/Widget.AppCompat.ActionButton"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackgroundBorderless">
 
     <ImageView
         android:id="@+id/settings_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_manage" />
+        android:src="@drawable/ic_more_vert" />
 
     <ImageView
         android:id="@+id/settings_badge"
