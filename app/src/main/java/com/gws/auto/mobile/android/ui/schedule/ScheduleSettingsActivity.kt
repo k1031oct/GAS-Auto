@@ -226,7 +226,7 @@ fun WeeklySettings(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthlySettings(
-    selectedDays: Set<int>,
+    selectedDays: Set<Int>,
     onDayToggle: (Int) -> Unit,
     time: java.time.LocalTime,
     onTimeChange: (java.time.LocalTime) -> Unit
