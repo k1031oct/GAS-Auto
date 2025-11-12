@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android.ui.dashboard
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors
 import com.gws.auto.mobile.android.databinding.FragmentDashboardBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -64,7 +66,7 @@ class DashboardFragment : Fragment() {
         }
         card.layoutParams = params
         card.elevation = 0f
-        card.setCardBackgroundColor(requireContext().getColor(com.google.android.material.R.color.design_default_color_surface_variant))
+        card.setCardBackgroundColor(MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceVariant, Color.GRAY))
 
         val linearLayout = android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.VERTICAL
