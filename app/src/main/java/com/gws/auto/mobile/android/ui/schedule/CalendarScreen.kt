@@ -79,60 +79,68 @@ fun CalendarScreen(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier
+        LazyColumn(modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)) {
-            // Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
-                Text(
-                    text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+            item {
+                // Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
+                    Text(
+                        text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+                }
             }
 
-            // Calendar
-            VerticalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f)
-            ) { page ->
-                val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
-                MonthView(
-                    yearMonth = month,
-                    holidays = holidays,
-                    schedules = schedules,
-                    onDateClick = { date -> selectedDate = date }
-                )
+            item {
+                // Calendar
+                VerticalPager(
+                    state = pagerState,
+                    modifier = Modifier.height(800.dp) // Fixed height for the pager
+                ) { page ->
+                    val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
+                    MonthView(
+                        yearMonth = month,
+                        holidays = holidays,
+                        schedules = schedules,
+                        onDateClick = { date -> selectedDate = date }
+                    )
+                }
             }
 
             if (selectedDate != null) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    TimelineList(
-                        date = selectedDate!!,
-                        holidays = holidays,
-                        schedules = schedules
-                    )
+                item {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        TimelineList(
+                            date = selectedDate!!,
+                            holidays = holidays,
+                            schedules = schedules
+                        )
+                    }
                 }
             } else {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.all_schedules_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    AllSchedulesList(schedules = schedules)
+                item {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.all_schedules_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        AllSchedulesList(schedules = schedules)
+                    }
                 }
             }
         }
