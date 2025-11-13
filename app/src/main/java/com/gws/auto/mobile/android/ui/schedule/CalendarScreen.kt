@@ -1,7 +1,7 @@
 package com.gws.auto.mobile.android.ui.schedule
 
 import android.content.Intent
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,14 +21,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.domain.model.Holiday
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,7 +44,7 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
     viewModel: ScheduleViewModel
@@ -52,6 +57,8 @@ fun CalendarScreen(
     val schedules by viewModel.schedules.collectAsState()
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val currentVisibleMonth by remember {
         derivedStateOf {
@@ -66,10 +73,6 @@ fun CalendarScreen(
         }
     }
 
-    BackHandler(enabled = selectedDate != null) {
-        selectedDate = null
-    }
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -79,69 +82,148 @@ fun CalendarScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)) {
-            item {
-                // Header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
+                Text(
+                    text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+            }
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)) {
+                val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
+                daysOfWeek.forEach { day ->
                     Text(
-                        text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
-                        style = MaterialTheme.typography.headlineSmall
+                        text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
                     )
-                    Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
                 }
+            }
+
+            VerticalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize() // Fills remaining space
+            ) { page ->
+                val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
+                MonthView(
+                    yearMonth = month,
+                    holidays = holidays,
+                    schedules = schedules,
+                    onDateClick = {
+                        selectedDate = it
+                        scope.launch { sheetState.show() }
+                    }
+                )
+            }
+        }
+    }
+
+    if (sheetState.isVisible && selectedDate != null) {
+        ModalBottomSheet(
+            onDismissRequest = { scope.launch { selectedDate = null; sheetState.hide() } },
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxHeight(0.9f) // Allow sheet to take up most of the screen
+        ) {
+            DayTimelineSheet(date = selectedDate!!, holidays = holidays, schedules = schedules)
+        }
+    }
+}
+
+@Composable
+fun DayTimelineSheet(date: LocalDate, holidays: List<Holiday>, schedules: List<Schedule>) {
+    val timelineHourHeight = 64.dp
+    val hourTextWidth = 60.dp
+    val eventColor = MaterialTheme.colorScheme.primary
+
+    val schedulesForDay = remember(date, schedules) {
+        schedules.mapNotNull { schedule ->
+            val scheduledDate = when (schedule.scheduleType) {
+                "daily" -> true
+                "weekly" -> schedule.weeklyDays?.any { it.equals(date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH), ignoreCase = true) } ?: false
+                "monthly" -> schedule.monthlyDays?.contains(date.dayOfMonth) ?: false
+                else -> false
+            }
+            if (scheduledDate) {
+                schedule.time?.let { LocalTime.parse(it) to schedule.workflowId }
+            } else {
+                null
+            }
+        }.sortedBy { it.first }
+    }
+
+    val holidaysForDay = remember(date, holidays) {
+        holidays.filter { it.date == date }
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(
+            text = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+        )
+
+        LazyColumn {
+            items(holidaysForDay) { holiday ->
+                Text(holiday.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
             }
 
             item {
-                // Calendar
-                VerticalPager(
-                    state = pagerState,
-                    modifier = Modifier.height(800.dp) // Fixed height for the pager
-                ) { page ->
-                    val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
-                    MonthView(
-                        yearMonth = month,
-                        holidays = holidays,
-                        schedules = schedules,
-                        onDateClick = { date -> selectedDate = date }
-                    )
-                }
+                HourTimeline(schedules = schedulesForDay, timelineHourHeight = timelineHourHeight, hourTextWidth = hourTextWidth, eventColor = eventColor)
             }
+        }
+    }
+}
 
-            if (selectedDate != null) {
-                item {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.timeline_for_date, selectedDate!!.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        TimelineList(
-                            date = selectedDate!!,
-                            holidays = holidays,
-                            schedules = schedules
-                        )
-                    }
-                }
-            } else {
-                item {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.all_schedules_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        AllSchedulesList(schedules = schedules)
-                    }
-                }
+@Composable
+private fun HourTimeline(schedules: List<Pair<LocalTime, String>>, timelineHourHeight: androidx.compose.ui.unit.Dp, hourTextWidth: androidx.compose.ui.unit.Dp, eventColor: Color) {
+    val timelineColor = MaterialTheme.colorScheme.outlineVariant
+
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(timelineHourHeight * 24)) {
+        val hourTextWidthPx = with(LocalDensity.current) { hourTextWidth.toPx() }
+
+        // Draw hour lines and labels
+        for (hour in 0..23) {
+            Row(modifier = Modifier.height(timelineHourHeight).offset(y = (hour * timelineHourHeight.value).dp)) {
+                Text(
+                    text = String.format("%02d:00", hour),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.width(hourTextWidth).padding(end = 8.dp),
+                    textAlign = TextAlign.End
+                )
+                Box(modifier = Modifier.fillMaxHeight().width(1.dp).background(timelineColor))
+            }
+        }
+
+        // Draw events
+        schedules.forEach { (time, name) ->
+            val yOffset = with(LocalDensity.current) {
+                (time.hour * timelineHourHeight.toPx()) + (time.minute / 60f * timelineHourHeight.toPx())
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = yOffset.dp, x = hourTextWidth),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(eventColor))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(name, style = MaterialTheme.typography.bodyMedium, fontSize = 14.sp)
             }
         }
     }
@@ -154,19 +236,15 @@ fun MonthView(
     schedules: List<Schedule>,
     onDateClick: (LocalDate) -> Unit
 ) {
-    val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
     val firstDayOfMonth = yearMonth.atDay(1)
-    val startOffset = firstDayOfMonth.dayOfWeek.value % 7
+    val startOffset = (firstDayOfMonth.dayOfWeek.value % 7).let { if (it == 0) 7 else it } - 1
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
-        modifier = Modifier.padding(horizontal = 8.dp)
+        modifier = Modifier.padding(horizontal = 8.dp).fillMaxHeight(),
+        userScrollEnabled = false
     ) {
-        items(daysOfWeek) { day ->
-            Text(text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()), textAlign = TextAlign.Center, style = MaterialTheme.typography.bodySmall)
-        }
-
-        items(startOffset) {}
+        items(startOffset) { }
 
         items(yearMonth.lengthOfMonth()) { dayIndex ->
             val dayOfMonth = dayIndex + 1
@@ -202,7 +280,7 @@ fun DayCell(
 
     Column(
         modifier = modifier
-            .height(120.dp) // <-- Expanded height
+            .height(120.dp)
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -215,14 +293,8 @@ fun DayCell(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Display more items
-        holidays.forEach {
-            ScheduleItemText(it.name)
-        }
-
-        schedules.forEach {
-            ScheduleItemText(it.workflowId)
-        }
+        holidays.forEach { ScheduleItemText(it.name) }
+        schedules.forEach { ScheduleItemText(it.workflowId) }
     }
 }
 
@@ -234,79 +306,4 @@ fun ScheduleItemText(text: String) {
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-}
-
-@Composable
-fun AllSchedulesList(schedules: List<Schedule>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(schedules) { schedule ->
-            ScheduleListItem(schedule = schedule)
-        }
-    }
-}
-
-@Composable
-fun ScheduleListItem(schedule: Schedule) {
-    Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(id = R.string.schedule_list_item_workflow, schedule.workflowId), style = MaterialTheme.typography.titleMedium)
-                Text(text = stringResource(id = R.string.schedule_list_item_type, schedule.scheduleType), style = MaterialTheme.typography.bodyMedium)
-            }
-            Text(text = schedule.time ?: "", style = MaterialTheme.typography.bodyLarge)
-        }
-    }
-}
-
-@Composable
-fun TimelineList(date: LocalDate, holidays: List<Holiday>, schedules: List<Schedule>) {
-    val holidaysForDay = holidays.filter { it.date == date }
-    val schedulesForDay = schedules.filter {
-        when (it.scheduleType) {
-            "daily" -> true
-            "weekly" -> it.weeklyDays?.contains(date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())) == true
-            "monthly" -> it.monthlyDays?.contains(date.dayOfMonth) == true
-            else -> false
-        }
-    }
-
-    val timelineItems = (holidaysForDay + schedulesForDay).sortedBy {
-        when (it) {
-            is Schedule -> LocalTime.parse(it.time ?: "00:00")
-            is Holiday -> LocalTime.MIN
-            else -> LocalTime.MAX
-        }
-    }
-
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(timelineItems) { item ->
-            TimelineListItem(item = item)
-        }
-    }
-}
-
-@Composable
-fun TimelineListItem(item: Any) {
-    val time: String
-    val title: String
-
-    when (item) {
-        is Schedule -> {
-            time = item.time ?: stringResource(id = R.string.timeline_list_item_time_not_available)
-            title = stringResource(id = R.string.schedule_list_item_workflow, item.workflowId)
-        }
-        is Holiday -> {
-            time = stringResource(id = R.string.timeline_list_item_all_day)
-            title = item.name
-        }
-        else -> {
-            time = ""
-            title = stringResource(id = R.string.timeline_list_item_unknown_event)
-        }
-    }
-
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(text = time, modifier = Modifier.width(80.dp), style = MaterialTheme.typography.bodyMedium)
-        Text(text = title, style = MaterialTheme.typography.bodyMedium)
-    }
 }
