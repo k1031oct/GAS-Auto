@@ -9,6 +9,9 @@ interface WorkflowDao {
     @Query("SELECT * FROM workflows")
     fun getAllWorkflows(): Flow<List<Workflow>>
 
+    @Query("SELECT * FROM workflows WHERE id = :id")
+    suspend fun getWorkflowById(id: String): Workflow?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkflow(workflow: Workflow)
 

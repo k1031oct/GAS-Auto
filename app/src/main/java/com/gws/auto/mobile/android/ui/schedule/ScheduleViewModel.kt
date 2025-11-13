@@ -36,6 +36,10 @@ class ScheduleViewModel @Inject constructor(
         observeSchedules()
     }
 
+    fun setCurrentDate(date: LocalDate) {
+        _currentDate.value = date
+    }
+
     private fun observeSchedules() {
         viewModelScope.launch {
             scheduleRepository.getSchedulesFlow()

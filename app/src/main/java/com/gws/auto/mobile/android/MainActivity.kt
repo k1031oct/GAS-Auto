@@ -156,13 +156,13 @@ class MainActivity : AppCompatActivity() {
         }
         popup.show()
     }
-    
-    // The original menu handling is now simplified as the search view is part of the main layout.
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // We still inflate a menu to show a placeholder for the settings icon, 
-        // even though it's handled manually now. This can be cleaned up in the future.
-        menuInflater.inflate(R.menu.main_menu, menu)
-        menu.findItem(R.id.action_settings)?.isVisible = false
+        // We are using a custom layout in the toolbar, so we don't inflate a menu here.
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
     }
 }

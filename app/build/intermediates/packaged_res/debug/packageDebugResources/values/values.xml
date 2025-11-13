@@ -16,6 +16,16 @@
         <item>Sunday</item>
         <item>Monday</item>
     </string-array>
+    <string-array name="highlight_color_entries">
+        <item>Default</item>
+        <item>Forest</item>
+        <item>Ocean</item>
+    </string-array>
+    <string-array name="highlight_color_values">
+        <item>default</item>
+        <item>forest</item>
+        <item>ocean</item>
+    </string-array>
     <string-array name="language_entries">
         <item>English</item>
         <item>Japanese</item>
@@ -146,6 +156,7 @@
     <string name="header_status">Status</string>
     <string name="header_trigger">Trigger</string>
     <string name="header_workflow_name">Workflow Name</string>
+    <string name="highlight_color">Highlight Color</string>
     <string name="language">Language</string>
     <string name="manage_tags">Manage Tags</string>
     <string name="monday">Monday</string>
@@ -165,6 +176,9 @@
     <string name="schedule_list_item_type">Type: %1$s</string>
     <string name="schedule_list_item_workflow">Workflow: %1$s</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
+    <string name="settings_category_account">アカウント設定</string>
+    <string name="settings_category_app">アプリ設定</string>
+    <string name="settings_category_other">その他</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_google_to_sync">Sign in with Google to Sync</string>
@@ -216,40 +230,83 @@
     <string name="workflow_run_button">Run</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
     <string name="yes">Yes</string>
-    <style name="Divider">
+    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+    </style>
+    <style name="SettingsHeader">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:textAppearance">?attr/textAppearanceTitleSmall</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textStyle">bold</item>
     </style>
     <style name="SettingsItem" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">16dp</item>
         <item name="android:background">?attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
-        <item name="android:padding">16dp</item>
         <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
     </style>
-    <style name="Theme.GWSAutoforAndroid" parent="Theme.Material3.DayNight.NoActionBar">
-        
-        <item name="highlightColor">#4D0061A4</item>
-
-        
-        <item name="colorPrimary">@color/md_theme_light_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
-        
-        <item name="android:colorBackground">@color/md_theme_light_background</item>
-        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
-        
-        <item name="colorSurface">@color/md_theme_light_surface</item>
-        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
-        
-        <item name="colorError">@color/md_theme_light_error</item>
-        <item name="colorOnError">@color/md_theme_light_onError</item>
+    <style name="SettingsItemContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
-    <style name="Theme.GWSAutoforAndroid.Splash" parent="Theme.SplashScreen">
+    <style name="Theme.GWSAutoForAndroid" parent="Base.Theme.GWSAutoForAndroid"/>
+    <style name="Theme.GWSAutoForAndroid.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/md_theme_light_surface</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
-        <item name="postSplashScreenTheme">@style/Theme.GWSAutoforAndroid</item>
+        <item name="postSplashScreenTheme">@style/Theme.GWSAutoForAndroid</item>
+    </style>
+    <style name="Widget.App" parent=""/>
+    <style name="Widget.App.StatCard" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_gravity">fill_horizontal</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+    <style name="Widget.App.StatCardChange" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+    </style>
+    <style name="Widget.App.StatCardContent">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">16dp</item>
+    </style>
+    <style name="Widget.App.StatCardTitle" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?attr/textAppearanceCaption</item>
+    </style>
+    <style name="Widget.App.StatCardValue" parent="Widget.MaterialComponents.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?attr/textAppearanceHeadline5</item>
     </style>
 </resources>

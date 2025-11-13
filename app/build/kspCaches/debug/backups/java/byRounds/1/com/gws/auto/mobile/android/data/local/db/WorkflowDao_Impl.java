@@ -1,7 +1,9 @@
 package com.gws.auto.mobile.android.data.local.db;
 
 import android.database.Cursor;
+import android.os.CancellationSignal;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.CoroutinesRoom;
 import androidx.room.EntityDeletionOrUpdateAdapter;
 import androidx.room.EntityInsertionAdapter;
@@ -211,6 +213,59 @@ public final class WorkflowDao_Impl implements WorkflowDao {
         _statement.release();
       }
     });
+  }
+
+  @Override
+  public Object getWorkflowById(final String id, final Continuation<? super Workflow> $completion) {
+    final String _sql = "SELECT * FROM workflows WHERE id = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindString(_argIndex, id);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Workflow>() {
+      @Override
+      @Nullable
+      public Workflow call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfName = CursorUtil.getColumnIndexOrThrow(_cursor, "name");
+          final int _cursorIndexOfDescription = CursorUtil.getColumnIndexOrThrow(_cursor, "description");
+          final int _cursorIndexOfModules = CursorUtil.getColumnIndexOrThrow(_cursor, "modules");
+          final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
+          final int _cursorIndexOfTrigger = CursorUtil.getColumnIndexOrThrow(_cursor, "trigger");
+          final int _cursorIndexOfTags = CursorUtil.getColumnIndexOrThrow(_cursor, "tags");
+          final Workflow _result;
+          if (_cursor.moveToFirst()) {
+            final String _tmpId;
+            _tmpId = _cursor.getString(_cursorIndexOfId);
+            final String _tmpName;
+            _tmpName = _cursor.getString(_cursorIndexOfName);
+            final String _tmpDescription;
+            _tmpDescription = _cursor.getString(_cursorIndexOfDescription);
+            final List<Module> _tmpModules;
+            final String _tmp;
+            _tmp = _cursor.getString(_cursorIndexOfModules);
+            _tmpModules = __moduleListConverter.fromString(_tmp);
+            final String _tmpStatus;
+            _tmpStatus = _cursor.getString(_cursorIndexOfStatus);
+            final String _tmpTrigger;
+            _tmpTrigger = _cursor.getString(_cursorIndexOfTrigger);
+            final List<String> _tmpTags;
+            final String _tmp_1;
+            _tmp_1 = _cursor.getString(_cursorIndexOfTags);
+            _tmpTags = __listConverter.fromString(_tmp_1);
+            _result = new Workflow(_tmpId,_tmpName,_tmpDescription,_tmpModules,_tmpStatus,_tmpTrigger,_tmpTags);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
   }
 
   @NonNull

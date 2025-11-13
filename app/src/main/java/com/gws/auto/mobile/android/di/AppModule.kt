@@ -15,6 +15,7 @@ import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
 import com.gws.auto.mobile.android.data.repository.TagRepository
+import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import dagger.Module
@@ -30,7 +31,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth {
+    fun provideFirebaseAuth(): FirebaseAuth? {
         return FirebaseAuth.getInstance()
     }
 
@@ -83,22 +84,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideWorkflowRepository(
-        workflowDao: WorkflowDao,
-        firestore: FirebaseFirestore,
-        auth: FirebaseAuth
+        workflowDao: WorkflowDao
     ): WorkflowRepository {
-        return WorkflowRepository(workflowDao, firestore, auth)
+        return WorkflowRepository(workflowDao)
     }
 
     @Provides
     @Singleton
     fun provideScheduleRepository(
         scheduleDao: ScheduleDao,
-        firestore: FirebaseFirestore,
-        auth: FirebaseAuth,
         googleApiAuthorizer: GoogleApiAuthorizer
     ): ScheduleRepository {
-        return ScheduleRepositoryImpl(scheduleDao, firestore, auth, googleApiAuthorizer)
+        return ScheduleRepositoryImpl(scheduleDao, googleApiAuthorizer)
     }
 
     @Provides
@@ -117,5 +114,11 @@ object AppModule {
     @Singleton
     fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(appContext)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserPreferencesRepository(prefs: SharedPreferences): UserPreferencesRepository {
+        return UserPreferencesRepository(prefs)
     }
 }

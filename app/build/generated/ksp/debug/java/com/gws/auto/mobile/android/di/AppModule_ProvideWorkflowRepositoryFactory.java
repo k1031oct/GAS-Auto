@@ -1,7 +1,5 @@
 package com.gws.auto.mobile.android.di;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.gws.auto.mobile.android.data.local.db.WorkflowDao;
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository;
 import dagger.internal.DaggerGenerated;
@@ -31,30 +29,21 @@ import javax.annotation.processing.Generated;
 public final class AppModule_ProvideWorkflowRepositoryFactory implements Factory<WorkflowRepository> {
   private final Provider<WorkflowDao> workflowDaoProvider;
 
-  private final Provider<FirebaseFirestore> firestoreProvider;
-
-  private final Provider<FirebaseAuth> authProvider;
-
-  private AppModule_ProvideWorkflowRepositoryFactory(Provider<WorkflowDao> workflowDaoProvider,
-      Provider<FirebaseFirestore> firestoreProvider, Provider<FirebaseAuth> authProvider) {
+  private AppModule_ProvideWorkflowRepositoryFactory(Provider<WorkflowDao> workflowDaoProvider) {
     this.workflowDaoProvider = workflowDaoProvider;
-    this.firestoreProvider = firestoreProvider;
-    this.authProvider = authProvider;
   }
 
   @Override
   public WorkflowRepository get() {
-    return provideWorkflowRepository(workflowDaoProvider.get(), firestoreProvider.get(), authProvider.get());
+    return provideWorkflowRepository(workflowDaoProvider.get());
   }
 
   public static AppModule_ProvideWorkflowRepositoryFactory create(
-      Provider<WorkflowDao> workflowDaoProvider, Provider<FirebaseFirestore> firestoreProvider,
-      Provider<FirebaseAuth> authProvider) {
-    return new AppModule_ProvideWorkflowRepositoryFactory(workflowDaoProvider, firestoreProvider, authProvider);
+      Provider<WorkflowDao> workflowDaoProvider) {
+    return new AppModule_ProvideWorkflowRepositoryFactory(workflowDaoProvider);
   }
 
-  public static WorkflowRepository provideWorkflowRepository(WorkflowDao workflowDao,
-      FirebaseFirestore firestore, FirebaseAuth auth) {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideWorkflowRepository(workflowDao, firestore, auth));
+  public static WorkflowRepository provideWorkflowRepository(WorkflowDao workflowDao) {
+    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideWorkflowRepository(workflowDao));
   }
 }

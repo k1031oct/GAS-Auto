@@ -1,6 +1,5 @@
 package com.gws.auto.mobile.android.ui.settings.app
 
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,8 +12,10 @@ import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import com.gws.auto.mobile.android.R
+import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.databinding.FragmentAppSettingsBinding
-import com.gws.auto.mobile.android.ui.settings.SettingsActivity
+import com.gws.auto.mobile.android.ui.settings.tag.TagManagementFragment
+import com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -37,21 +38,23 @@ class AppSettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupNavigation()
+        setupListeners()
         setupSpinners()
     }
 
-    private fun setupNavigation() {
-        binding.userInfoButton.setOnClickListener { startSettingsActivity("user_info") }
-        binding.accountConnectionsButton.setOnClickListener { startSettingsActivity("account_connections") }
-        binding.tagManagementButton.setOnClickListener { startSettingsActivity("tag_management") }
-    }
-
-    private fun startSettingsActivity(fragmentKey: String) {
-        val intent = Intent(activity, SettingsActivity::class.java).apply {
-            putExtra("fragment_to_load", fragmentKey)
+    private fun setupListeners() {
+        binding.userInfoButton.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.settings_fragment_container, UserInfoFragment())
+                .addToBackStack(null)
+                .commit()
         }
-        startActivity(intent)
+        binding.tagManagementButton.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.settings_fragment_container, TagManagementFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun setupSpinners() {
@@ -152,6 +155,29 @@ class AppSettingsFragment : Fragment() {
                     }
                     AppCompatDelegate.setDefaultNightMode(mode)
                 }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+
+        // Highlight Color
+        val highlightColorAdapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.highlight_color_entries,
+            android.R.layout.simple_spinner_item
+        ).also {
+            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.highlightColorSpinner.adapter = it
+        }
+
+        val highlightColorValues = resources.getStringArray(R.array.highlight_color_values)
+        val currentHighlightColor = prefs.getString(UserPreferencesRepository.PREF_HIGHLIGHT_COLOR, "default")
+        val highlightColorPosition = highlightColorValues.indexOf(currentHighlightColor)
+        binding.highlightColorSpinner.setSelection(if (highlightColorPosition != -1) highlightColorPosition else 0)
+
+        binding.highlightColorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selection = highlightColorValues[position]
+                prefs.edit { putString(UserPreferencesRepository.PREF_HIGHLIGHT_COLOR, selection) }
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }

@@ -6,13 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.chip.ChipGroup;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -20,13 +20,13 @@ import java.lang.String;
 
 public final class ActivityWorkflowEditorBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final ConstraintLayout rootView;
 
   @NonNull
-  public final Button addModuleButton;
+  public final RecyclerView libraryRecyclerView;
 
   @NonNull
-  public final Button addTagButton;
+  public final TextView moduleLibraryLabel;
 
   @NonNull
   public final RecyclerView moduleRecyclerView;
@@ -35,36 +35,27 @@ public final class ActivityWorkflowEditorBinding implements ViewBinding {
   public final Button saveWorkflowButton;
 
   @NonNull
-  public final ChipGroup tagChipGroup;
-
-  @NonNull
-  public final EditText tagEditor;
-
-  @NonNull
   public final EditText workflowDescriptionEditor;
 
   @NonNull
   public final EditText workflowNameEditor;
 
-  private ActivityWorkflowEditorBinding(@NonNull LinearLayout rootView,
-      @NonNull Button addModuleButton, @NonNull Button addTagButton,
+  private ActivityWorkflowEditorBinding(@NonNull ConstraintLayout rootView,
+      @NonNull RecyclerView libraryRecyclerView, @NonNull TextView moduleLibraryLabel,
       @NonNull RecyclerView moduleRecyclerView, @NonNull Button saveWorkflowButton,
-      @NonNull ChipGroup tagChipGroup, @NonNull EditText tagEditor,
       @NonNull EditText workflowDescriptionEditor, @NonNull EditText workflowNameEditor) {
     this.rootView = rootView;
-    this.addModuleButton = addModuleButton;
-    this.addTagButton = addTagButton;
+    this.libraryRecyclerView = libraryRecyclerView;
+    this.moduleLibraryLabel = moduleLibraryLabel;
     this.moduleRecyclerView = moduleRecyclerView;
     this.saveWorkflowButton = saveWorkflowButton;
-    this.tagChipGroup = tagChipGroup;
-    this.tagEditor = tagEditor;
     this.workflowDescriptionEditor = workflowDescriptionEditor;
     this.workflowNameEditor = workflowNameEditor;
   }
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public ConstraintLayout getRoot() {
     return rootView;
   }
 
@@ -89,15 +80,15 @@ public final class ActivityWorkflowEditorBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.add_module_button;
-      Button addModuleButton = ViewBindings.findChildViewById(rootView, id);
-      if (addModuleButton == null) {
+      id = R.id.library_recycler_view;
+      RecyclerView libraryRecyclerView = ViewBindings.findChildViewById(rootView, id);
+      if (libraryRecyclerView == null) {
         break missingId;
       }
 
-      id = R.id.add_tag_button;
-      Button addTagButton = ViewBindings.findChildViewById(rootView, id);
-      if (addTagButton == null) {
+      id = R.id.module_library_label;
+      TextView moduleLibraryLabel = ViewBindings.findChildViewById(rootView, id);
+      if (moduleLibraryLabel == null) {
         break missingId;
       }
 
@@ -113,18 +104,6 @@ public final class ActivityWorkflowEditorBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tag_chip_group;
-      ChipGroup tagChipGroup = ViewBindings.findChildViewById(rootView, id);
-      if (tagChipGroup == null) {
-        break missingId;
-      }
-
-      id = R.id.tag_editor;
-      EditText tagEditor = ViewBindings.findChildViewById(rootView, id);
-      if (tagEditor == null) {
-        break missingId;
-      }
-
       id = R.id.workflow_description_editor;
       EditText workflowDescriptionEditor = ViewBindings.findChildViewById(rootView, id);
       if (workflowDescriptionEditor == null) {
@@ -137,9 +116,9 @@ public final class ActivityWorkflowEditorBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityWorkflowEditorBinding((LinearLayout) rootView, addModuleButton,
-          addTagButton, moduleRecyclerView, saveWorkflowButton, tagChipGroup, tagEditor,
-          workflowDescriptionEditor, workflowNameEditor);
+      return new ActivityWorkflowEditorBinding((ConstraintLayout) rootView, libraryRecyclerView,
+          moduleLibraryLabel, moduleRecyclerView, saveWorkflowButton, workflowDescriptionEditor,
+          workflowNameEditor);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentMainSettingsBinding
+import com.gws.auto.mobile.android.ui.settings.about.AboutAppFragment
 import com.gws.auto.mobile.android.ui.settings.account.AccountConnectionsFragment
 import com.gws.auto.mobile.android.ui.settings.app.AppSettingsFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,7 +23,8 @@ class MainSettingsFragment : Fragment() {
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var auth: FirebaseAuth
+    @JvmField
+    var auth: FirebaseAuth? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +43,7 @@ class MainSettingsFragment : Fragment() {
     }
 
     private fun populateUserInfo() {
-        val user = auth.currentUser
+        val user = auth?.currentUser
         if (user != null) {
             binding.userName.text = user.displayName
             binding.userEmail.text = user.email
@@ -54,26 +56,23 @@ class MainSettingsFragment : Fragment() {
 
     private fun setupSettingsList() {
         val settingsItems = listOf(
-            SettingsItem("Account Connections") {
+            SettingsItem(getString(R.string.settings_category_account)) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.settings_fragment_container, AccountConnectionsFragment())
                     .addToBackStack(null)
                     .commit()
             },
-            SettingsItem("Application Settings") {
+            SettingsItem(getString(R.string.settings_category_app)) {
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.settings_fragment_container, AppSettingsFragment())
                     .addToBackStack(null)
                     .commit()
             },
-            SettingsItem("Theme") {
+            SettingsItem(getString(R.string.settings_category_other)) {
                 parentFragmentManager.beginTransaction()
-                    .replace(R.id.settings_fragment_container, ThemeSettingsFragment())
+                    .replace(R.id.settings_fragment_container, AboutAppFragment())
                     .addToBackStack(null)
                     .commit()
-            },
-            SettingsItem("About this App") {
-                // Create and navigate to an AboutAppFragment
             }
         )
 

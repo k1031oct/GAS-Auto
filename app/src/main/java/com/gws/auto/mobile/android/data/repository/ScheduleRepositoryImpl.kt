@@ -1,8 +1,6 @@
 package com.gws.auto.mobile.android.data.repository
 
 import com.google.api.client.util.DateTime
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.gws.auto.mobile.android.data.local.db.ScheduleDao
 import com.gws.auto.mobile.android.domain.model.Holiday
 import com.gws.auto.mobile.android.domain.model.Schedule
@@ -18,8 +16,6 @@ import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(
     private val scheduleDao: ScheduleDao,
-    private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth,
     private val googleApiAuthorizer: GoogleApiAuthorizer
 ) : ScheduleRepository {
 

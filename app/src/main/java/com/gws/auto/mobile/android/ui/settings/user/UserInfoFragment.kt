@@ -19,7 +19,8 @@ class UserInfoFragment : Fragment() {
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var auth: FirebaseAuth
+    @JvmField
+    var auth: FirebaseAuth? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +41,7 @@ class UserInfoFragment : Fragment() {
     }
 
     private fun updateUI() {
-        val user = auth.currentUser
+        val user = auth?.currentUser
         if (user != null) {
             binding.userName.text = user.displayName
             binding.userEmail.text = user.email

@@ -21,13 +21,13 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final TextView accountConnectionsButton;
-
-  @NonNull
   public final Spinner countrySpinner;
 
   @NonNull
   public final Spinner firstDayOfWeekSpinner;
+
+  @NonNull
+  public final Spinner highlightColorSpinner;
 
   @NonNull
   public final Spinner languageSpinner;
@@ -41,15 +41,14 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
   @NonNull
   public final TextView userInfoButton;
 
-  private FragmentAppSettingsBinding(@NonNull ScrollView rootView,
-      @NonNull TextView accountConnectionsButton, @NonNull Spinner countrySpinner,
-      @NonNull Spinner firstDayOfWeekSpinner, @NonNull Spinner languageSpinner,
-      @NonNull TextView tagManagementButton, @NonNull Spinner themeSpinner,
-      @NonNull TextView userInfoButton) {
+  private FragmentAppSettingsBinding(@NonNull ScrollView rootView, @NonNull Spinner countrySpinner,
+      @NonNull Spinner firstDayOfWeekSpinner, @NonNull Spinner highlightColorSpinner,
+      @NonNull Spinner languageSpinner, @NonNull TextView tagManagementButton,
+      @NonNull Spinner themeSpinner, @NonNull TextView userInfoButton) {
     this.rootView = rootView;
-    this.accountConnectionsButton = accountConnectionsButton;
     this.countrySpinner = countrySpinner;
     this.firstDayOfWeekSpinner = firstDayOfWeekSpinner;
+    this.highlightColorSpinner = highlightColorSpinner;
     this.languageSpinner = languageSpinner;
     this.tagManagementButton = tagManagementButton;
     this.themeSpinner = themeSpinner;
@@ -83,12 +82,6 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.account_connections_button;
-      TextView accountConnectionsButton = ViewBindings.findChildViewById(rootView, id);
-      if (accountConnectionsButton == null) {
-        break missingId;
-      }
-
       id = R.id.country_spinner;
       Spinner countrySpinner = ViewBindings.findChildViewById(rootView, id);
       if (countrySpinner == null) {
@@ -98,6 +91,12 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
       id = R.id.first_day_of_week_spinner;
       Spinner firstDayOfWeekSpinner = ViewBindings.findChildViewById(rootView, id);
       if (firstDayOfWeekSpinner == null) {
+        break missingId;
+      }
+
+      id = R.id.highlight_color_spinner;
+      Spinner highlightColorSpinner = ViewBindings.findChildViewById(rootView, id);
+      if (highlightColorSpinner == null) {
         break missingId;
       }
 
@@ -125,9 +124,9 @@ public final class FragmentAppSettingsBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentAppSettingsBinding((ScrollView) rootView, accountConnectionsButton,
-          countrySpinner, firstDayOfWeekSpinner, languageSpinner, tagManagementButton, themeSpinner,
-          userInfoButton);
+      return new FragmentAppSettingsBinding((ScrollView) rootView, countrySpinner,
+          firstDayOfWeekSpinner, highlightColorSpinner, languageSpinner, tagManagementButton,
+          themeSpinner, userInfoButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

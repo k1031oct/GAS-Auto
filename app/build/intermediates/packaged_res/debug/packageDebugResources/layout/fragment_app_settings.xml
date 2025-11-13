@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,98 +9,110 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- General Section -->
+        <TextView
+            style="@style/SettingsHeader"
+            android:text="General" />
+
+        <TextView
+            android:id="@+id/user_info_button"
+            style="@style/SettingsItem"
+            android:text="@string/title_user_info" />
+
+        <TextView
+            android:id="@+id/tag_management_button"
+            style="@style/SettingsItem"
+            android:text="@string/manage_tags" />
+        
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardUseCompatPadding="true">
+            android:layout_marginTop="16dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <!-- Appearance Section -->
+        <TextView
+            style="@style/SettingsHeader"
+            android:layout_marginTop="16dp"
+            android:text="Appearance" />
+
+        <LinearLayout style="@style/SettingsItemContainer">
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_weight="1"
+                android:text="@string/theme"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <Spinner
+                android:id="@+id/theme_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-                <TextView
-                    android:id="@+id/user_info_button"
-                    style="@style/SettingsItem"
-                    android:text="@string/title_user_info" />
-
-                <TextView
-                    android:id="@+id/account_connections_button"
-                    style="@style/SettingsItem"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/title_account_connections" />
-
-                <TextView
-                    android:id="@+id/tag_management_button"
-                    style="@style/SettingsItem"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/manage_tags" />
-
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout style="@style/SettingsItemContainer">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/highlight_color"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <Spinner
+                android:id="@+id/highlight_color_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        
+        <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardUseCompatPadding="true">
+            android:layout_marginTop="16dp"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <!-- Regional Section -->
+        <TextView
+            style="@style/SettingsHeader"
+            android:layout_marginTop="16dp"
+            android:text="Regional" />
+
+        <LinearLayout style="@style/SettingsItemContainer">
+            <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_weight="1"
+                android:text="@string/language"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <Spinner
+                android:id="@+id/language_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/first_day_of_week"
-                    android:textAppearance="?attr/textAppearanceLabelLarge" />
+        <LinearLayout style="@style/SettingsItemContainer">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/first_day_of_week"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <Spinner
+                android:id="@+id/first_day_of_week_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-                <Spinner
-                    android:id="@+id/first_day_of_week_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/country_for_holidays"
-                    android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-                <Spinner
-                    android:id="@+id/country_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/language"
-                    android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-                <Spinner
-                    android:id="@+id/language_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/theme"
-                    android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-                <Spinner
-                    android:id="@+id/theme_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        <LinearLayout style="@style/SettingsItemContainer">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/country_for_holidays"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <Spinner
+                android:id="@+id/country_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

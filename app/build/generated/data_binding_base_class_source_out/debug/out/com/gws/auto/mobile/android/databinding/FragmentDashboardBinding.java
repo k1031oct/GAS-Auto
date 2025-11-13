@@ -4,7 +4,7 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.GridLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -25,16 +25,22 @@ public final class FragmentDashboardBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final TextView errorCountChangeText;
+  public final TextView errorCountDayChangeText;
+
+  @NonNull
+  public final TextView errorCountMonthChangeText;
 
   @NonNull
   public final TextView errorCountText;
 
   @NonNull
-  public final PieChart errorRateChart;
+  public final PieChart moduleErrorRateChart;
 
   @NonNull
-  public final RecyclerView moduleStatsRecyclerView;
+  public final BarChart moduleRankingChart;
+
+  @NonNull
+  public final RecyclerView moduleStatsTable;
 
   @NonNull
   public final TextView moduleStatsTitle;
@@ -43,43 +49,73 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final MaterialButton refreshButton;
 
   @NonNull
-  public final LinearLayout summaryLayout;
+  public final GridLayout summaryGrid;
 
   @NonNull
-  public final TextView totalDurationChangeText;
+  public final TextView summaryTitle;
+
+  @NonNull
+  public final TextView totalDurationDayChangeText;
+
+  @NonNull
+  public final TextView totalDurationMonthChangeText;
 
   @NonNull
   public final TextView totalDurationText;
 
   @NonNull
-  public final TextView totalExecutionsChangeText;
+  public final TextView totalExecutionsDayChangeText;
+
+  @NonNull
+  public final TextView totalExecutionsMonthChangeText;
 
   @NonNull
   public final TextView totalExecutionsText;
 
   @NonNull
+  public final PieChart workflowErrorRateChart;
+
+  @NonNull
   public final BarChart workflowRankingChart;
 
+  @NonNull
+  public final RecyclerView workflowStatsTable;
+
+  @NonNull
+  public final TextView workflowStatsTitle;
+
   private FragmentDashboardBinding(@NonNull ScrollView rootView,
-      @NonNull TextView errorCountChangeText, @NonNull TextView errorCountText,
-      @NonNull PieChart errorRateChart, @NonNull RecyclerView moduleStatsRecyclerView,
+      @NonNull TextView errorCountDayChangeText, @NonNull TextView errorCountMonthChangeText,
+      @NonNull TextView errorCountText, @NonNull PieChart moduleErrorRateChart,
+      @NonNull BarChart moduleRankingChart, @NonNull RecyclerView moduleStatsTable,
       @NonNull TextView moduleStatsTitle, @NonNull MaterialButton refreshButton,
-      @NonNull LinearLayout summaryLayout, @NonNull TextView totalDurationChangeText,
-      @NonNull TextView totalDurationText, @NonNull TextView totalExecutionsChangeText,
-      @NonNull TextView totalExecutionsText, @NonNull BarChart workflowRankingChart) {
+      @NonNull GridLayout summaryGrid, @NonNull TextView summaryTitle,
+      @NonNull TextView totalDurationDayChangeText, @NonNull TextView totalDurationMonthChangeText,
+      @NonNull TextView totalDurationText, @NonNull TextView totalExecutionsDayChangeText,
+      @NonNull TextView totalExecutionsMonthChangeText, @NonNull TextView totalExecutionsText,
+      @NonNull PieChart workflowErrorRateChart, @NonNull BarChart workflowRankingChart,
+      @NonNull RecyclerView workflowStatsTable, @NonNull TextView workflowStatsTitle) {
     this.rootView = rootView;
-    this.errorCountChangeText = errorCountChangeText;
+    this.errorCountDayChangeText = errorCountDayChangeText;
+    this.errorCountMonthChangeText = errorCountMonthChangeText;
     this.errorCountText = errorCountText;
-    this.errorRateChart = errorRateChart;
-    this.moduleStatsRecyclerView = moduleStatsRecyclerView;
+    this.moduleErrorRateChart = moduleErrorRateChart;
+    this.moduleRankingChart = moduleRankingChart;
+    this.moduleStatsTable = moduleStatsTable;
     this.moduleStatsTitle = moduleStatsTitle;
     this.refreshButton = refreshButton;
-    this.summaryLayout = summaryLayout;
-    this.totalDurationChangeText = totalDurationChangeText;
+    this.summaryGrid = summaryGrid;
+    this.summaryTitle = summaryTitle;
+    this.totalDurationDayChangeText = totalDurationDayChangeText;
+    this.totalDurationMonthChangeText = totalDurationMonthChangeText;
     this.totalDurationText = totalDurationText;
-    this.totalExecutionsChangeText = totalExecutionsChangeText;
+    this.totalExecutionsDayChangeText = totalExecutionsDayChangeText;
+    this.totalExecutionsMonthChangeText = totalExecutionsMonthChangeText;
     this.totalExecutionsText = totalExecutionsText;
+    this.workflowErrorRateChart = workflowErrorRateChart;
     this.workflowRankingChart = workflowRankingChart;
+    this.workflowStatsTable = workflowStatsTable;
+    this.workflowStatsTitle = workflowStatsTitle;
   }
 
   @Override
@@ -109,9 +145,15 @@ public final class FragmentDashboardBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.error_count_change_text;
-      TextView errorCountChangeText = ViewBindings.findChildViewById(rootView, id);
-      if (errorCountChangeText == null) {
+      id = R.id.error_count_day_change_text;
+      TextView errorCountDayChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (errorCountDayChangeText == null) {
+        break missingId;
+      }
+
+      id = R.id.error_count_month_change_text;
+      TextView errorCountMonthChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (errorCountMonthChangeText == null) {
         break missingId;
       }
 
@@ -121,15 +163,21 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.error_rate_chart;
-      PieChart errorRateChart = ViewBindings.findChildViewById(rootView, id);
-      if (errorRateChart == null) {
+      id = R.id.module_error_rate_chart;
+      PieChart moduleErrorRateChart = ViewBindings.findChildViewById(rootView, id);
+      if (moduleErrorRateChart == null) {
         break missingId;
       }
 
-      id = R.id.module_stats_recycler_view;
-      RecyclerView moduleStatsRecyclerView = ViewBindings.findChildViewById(rootView, id);
-      if (moduleStatsRecyclerView == null) {
+      id = R.id.module_ranking_chart;
+      BarChart moduleRankingChart = ViewBindings.findChildViewById(rootView, id);
+      if (moduleRankingChart == null) {
+        break missingId;
+      }
+
+      id = R.id.module_stats_table;
+      RecyclerView moduleStatsTable = ViewBindings.findChildViewById(rootView, id);
+      if (moduleStatsTable == null) {
         break missingId;
       }
 
@@ -145,15 +193,27 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.summary_layout;
-      LinearLayout summaryLayout = ViewBindings.findChildViewById(rootView, id);
-      if (summaryLayout == null) {
+      id = R.id.summary_grid;
+      GridLayout summaryGrid = ViewBindings.findChildViewById(rootView, id);
+      if (summaryGrid == null) {
         break missingId;
       }
 
-      id = R.id.total_duration_change_text;
-      TextView totalDurationChangeText = ViewBindings.findChildViewById(rootView, id);
-      if (totalDurationChangeText == null) {
+      id = R.id.summary_title;
+      TextView summaryTitle = ViewBindings.findChildViewById(rootView, id);
+      if (summaryTitle == null) {
+        break missingId;
+      }
+
+      id = R.id.total_duration_day_change_text;
+      TextView totalDurationDayChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalDurationDayChangeText == null) {
+        break missingId;
+      }
+
+      id = R.id.total_duration_month_change_text;
+      TextView totalDurationMonthChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalDurationMonthChangeText == null) {
         break missingId;
       }
 
@@ -163,9 +223,15 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.total_executions_change_text;
-      TextView totalExecutionsChangeText = ViewBindings.findChildViewById(rootView, id);
-      if (totalExecutionsChangeText == null) {
+      id = R.id.total_executions_day_change_text;
+      TextView totalExecutionsDayChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalExecutionsDayChangeText == null) {
+        break missingId;
+      }
+
+      id = R.id.total_executions_month_change_text;
+      TextView totalExecutionsMonthChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalExecutionsMonthChangeText == null) {
         break missingId;
       }
 
@@ -175,16 +241,36 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.workflow_error_rate_chart;
+      PieChart workflowErrorRateChart = ViewBindings.findChildViewById(rootView, id);
+      if (workflowErrorRateChart == null) {
+        break missingId;
+      }
+
       id = R.id.workflow_ranking_chart;
       BarChart workflowRankingChart = ViewBindings.findChildViewById(rootView, id);
       if (workflowRankingChart == null) {
         break missingId;
       }
 
-      return new FragmentDashboardBinding((ScrollView) rootView, errorCountChangeText,
-          errorCountText, errorRateChart, moduleStatsRecyclerView, moduleStatsTitle, refreshButton,
-          summaryLayout, totalDurationChangeText, totalDurationText, totalExecutionsChangeText,
-          totalExecutionsText, workflowRankingChart);
+      id = R.id.workflow_stats_table;
+      RecyclerView workflowStatsTable = ViewBindings.findChildViewById(rootView, id);
+      if (workflowStatsTable == null) {
+        break missingId;
+      }
+
+      id = R.id.workflow_stats_title;
+      TextView workflowStatsTitle = ViewBindings.findChildViewById(rootView, id);
+      if (workflowStatsTitle == null) {
+        break missingId;
+      }
+
+      return new FragmentDashboardBinding((ScrollView) rootView, errorCountDayChangeText,
+          errorCountMonthChangeText, errorCountText, moduleErrorRateChart, moduleRankingChart,
+          moduleStatsTable, moduleStatsTitle, refreshButton, summaryGrid, summaryTitle,
+          totalDurationDayChangeText, totalDurationMonthChangeText, totalDurationText,
+          totalExecutionsDayChangeText, totalExecutionsMonthChangeText, totalExecutionsText,
+          workflowErrorRateChart, workflowRankingChart, workflowStatsTable, workflowStatsTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

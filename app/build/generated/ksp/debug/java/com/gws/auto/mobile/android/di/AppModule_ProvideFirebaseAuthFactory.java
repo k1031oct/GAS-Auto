@@ -3,7 +3,6 @@ package com.gws.auto.mobile.android.di;
 import com.google.firebase.auth.FirebaseAuth;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
-import dagger.internal.Preconditions;
 import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
@@ -35,7 +34,7 @@ public final class AppModule_ProvideFirebaseAuthFactory implements Factory<Fireb
   }
 
   public static FirebaseAuth provideFirebaseAuth() {
-    return Preconditions.checkNotNullFromProvides(AppModule.INSTANCE.provideFirebaseAuth());
+    return AppModule.INSTANCE.provideFirebaseAuth();
   }
 
   private static final class InstanceHolder {

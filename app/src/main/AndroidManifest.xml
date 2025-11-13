@@ -11,19 +11,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.GWSAutoforAndroid"
+        android:theme="@style/Theme.GWSAutoForAndroid"
         tools:targetApi="31">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.GWSAutoforAndroid">
+            android:theme="@style/Theme.GWSAutoForAndroid">
         </activity>
 
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.GWSAutoforAndroid.Splash">
+            android:theme="@style/Theme.GWSAutoForAndroid.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -33,27 +33,27 @@
         <activity
             android:name=".SignInActivity"
             android:exported="false"
-            android:theme="@style/Theme.GWSAutoforAndroid" />
+            android:theme="@style/Theme.GWSAutoForAndroid" />
 
         <activity
             android:name=".ui.workflow.editor.WorkflowEditorActivity"
             android:exported="false"
-            android:theme="@style/Theme.GWSAutoforAndroid" />
+            android:theme="@style/Theme.GWSAutoForAndroid" />
 
         <activity
             android:name=".ui.schedule.ScheduleSettingsActivity"
             android:exported="false"
-            android:theme="@style/Theme.GWSAutoforAndroid" />
+            android:theme="@style/Theme.GWSAutoForAndroid" />
             
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
-            android:theme="@style/Theme.GWSAutoforAndroid" />
+            android:theme="@style/Theme.GWSAutoForAndroid" />
             
         <activity
             android:name=".ui.wizard.WizardActivity"
             android:exported="false"
-            android:theme="@style/Theme.GWSAutoforAndroid" />
+            android:theme="@style/Theme.GWSAutoForAndroid" />
 
     </application>
 

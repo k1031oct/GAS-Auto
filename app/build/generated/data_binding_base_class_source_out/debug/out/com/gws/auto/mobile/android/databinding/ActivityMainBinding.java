@@ -4,8 +4,10 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
@@ -23,10 +25,19 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
+  public final ImageView actionSettingsIcon;
+
+  @NonNull
   public final AppBarLayout appBarLayout;
 
   @NonNull
   public final BottomNavigationView bottomNavView;
+
+  @NonNull
+  public final SearchView searchView;
+
+  @NonNull
+  public final ImageView settingsBadge;
 
   @NonNull
   public final Toolbar toolbar;
@@ -35,11 +46,15 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
-      @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+      @NonNull ImageView actionSettingsIcon, @NonNull AppBarLayout appBarLayout,
+      @NonNull BottomNavigationView bottomNavView, @NonNull SearchView searchView,
+      @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
+    this.actionSettingsIcon = actionSettingsIcon;
     this.appBarLayout = appBarLayout;
     this.bottomNavView = bottomNavView;
+    this.searchView = searchView;
+    this.settingsBadge = settingsBadge;
     this.toolbar = toolbar;
     this.viewPager = viewPager;
   }
@@ -71,6 +86,12 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.action_settings_icon;
+      ImageView actionSettingsIcon = ViewBindings.findChildViewById(rootView, id);
+      if (actionSettingsIcon == null) {
+        break missingId;
+      }
+
       id = R.id.app_bar_layout;
       AppBarLayout appBarLayout = ViewBindings.findChildViewById(rootView, id);
       if (appBarLayout == null) {
@@ -80,6 +101,18 @@ public final class ActivityMainBinding implements ViewBinding {
       id = R.id.bottom_nav_view;
       BottomNavigationView bottomNavView = ViewBindings.findChildViewById(rootView, id);
       if (bottomNavView == null) {
+        break missingId;
+      }
+
+      id = R.id.search_view;
+      SearchView searchView = ViewBindings.findChildViewById(rootView, id);
+      if (searchView == null) {
+        break missingId;
+      }
+
+      id = R.id.settings_badge;
+      ImageView settingsBadge = ViewBindings.findChildViewById(rootView, id);
+      if (settingsBadge == null) {
         break missingId;
       }
 
@@ -95,8 +128,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, appBarLayout, bottomNavView,
-          toolbar, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, actionSettingsIcon, appBarLayout,
+          bottomNavView, searchView, settingsBadge, toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

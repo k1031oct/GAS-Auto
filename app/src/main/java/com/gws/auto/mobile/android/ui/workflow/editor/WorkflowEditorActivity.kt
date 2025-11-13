@@ -1,16 +1,18 @@
 package com.gws.auto.mobile.android.ui.workflow.editor
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.os.Bundle
+import android.view.DragEvent
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ActivityWorkflowEditorBinding
 import com.gws.auto.mobile.android.domain.model.Module
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
@@ -26,6 +28,7 @@ class WorkflowEditorActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWorkflowEditorBinding
     private val viewModel: WorkflowViewModel by viewModels()
     private lateinit var moduleAdapter: ModuleAdapter
+    private lateinit var libraryAdapter: ModuleLibraryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +44,9 @@ class WorkflowEditorActivity : AppCompatActivity() {
         }
 
         setupRecyclerView()
+        setupLibraryRecyclerView()
+        setupDragAndDrop()
         observeViewModel()
-
-        binding.addModuleButton.setOnClickListener {
-            showAddModuleDialog()
-        }
 
         binding.saveWorkflowButton.setOnClickListener {
             saveWorkflow()
@@ -67,23 +68,51 @@ class WorkflowEditorActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(binding.moduleRecyclerView)
     }
 
+    private fun setupLibraryRecyclerView() {
+        val libraryModules = listOf(
+            Module(id = "", type = "Delay", parameters = emptyMap()),
+            Module(id = "", type = "IfElse", parameters = emptyMap()),
+            Module(id = "", type = "Toast", parameters = emptyMap()),
+            Module(id = "", type = "Log", parameters = emptyMap())
+        )
+
+        libraryAdapter = ModuleLibraryAdapter(libraryModules) { module, view ->
+            val item = ClipData.Item(module.type)
+            val dragData = ClipData(
+                module.type,
+                arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN),
+                item
+            )
+            val myShadow = View.DragShadowBuilder(view)
+            view.startDragAndDrop(dragData, myShadow, null, 0)
+            true
+        }
+        binding.libraryRecyclerView.apply {
+            adapter = libraryAdapter
+            layoutManager = LinearLayoutManager(this@WorkflowEditorActivity, LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
+
+    private fun setupDragAndDrop() {
+        binding.moduleRecyclerView.setOnDragListener { _, event ->
+            when (event.action) {
+                DragEvent.ACTION_DROP -> {
+                    val item: ClipData.Item = event.clipData.getItemAt(0)
+                    val moduleType = item.text.toString()
+                    viewModel.addModule(Module(id = UUID.randomUUID().toString(), type = moduleType, parameters = emptyMap()))
+                    true
+                }
+                else -> true
+            }
+        }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.modules.collectLatest { modules ->
                 moduleAdapter.updateModules(modules)
             }
         }
-    }
-
-    private fun showAddModuleDialog() {
-        val moduleTypes = arrayOf("Delay", "IfElse", "Toast", "Log") // From the guide
-        AlertDialog.Builder(this)
-            .setTitle("Select Module")
-            .setItems(moduleTypes) { _, which ->
-                val selectedType = moduleTypes[which]
-                viewModel.addModule(Module(id = UUID.randomUUID().toString(), type = selectedType, parameters = emptyMap()))
-            }
-            .show()
     }
 
     private fun saveWorkflow() {

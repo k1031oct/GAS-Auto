@@ -7,7 +7,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/refresh_button"
@@ -21,116 +22,104 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:id="@+id/summary_layout"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/summary_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal"
+            android:text="Summary"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/refresh_button" />
+
+        <!-- Summary Cards -->
+        <GridLayout
+            android:id="@+id/summary_grid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:columnCount="3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/refresh_button">
+            app:layout_constraintTop_toBottomOf="@+id/summary_title">
 
-            <LinearLayout
+            <!-- Total Executions -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_columnWeight="1"
+                style="@style/Widget.App.StatCard">
+                <LinearLayout style="@style/Widget.App.StatCardContent">
+                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Total Runs" />
+                    <TextView android:id="@+id/total_executions_text" style="@style/Widget.App.StatCardValue" tools:text="1,234" />
+                    <TextView android:id="@+id/total_executions_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="+5% vs Yesterday" />
+                    <TextView android:id="@+id/total_executions_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+20% vs Last Month" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/total_executions_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    tools:text="Total: 123" />
-
-                <TextView
-                    android:id="@+id/total_executions_change_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                    tools:text="+10%" />
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Error Count -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_columnWeight="1"
+                style="@style/Widget.App.StatCard">
+                <LinearLayout style="@style/Widget.App.StatCardContent">
+                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Errors" />
+                    <TextView android:id="@+id/error_count_text" style="@style/Widget.App.StatCardValue" tools:text="56" />
+                    <TextView android:id="@+id/error_count_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="-2% vs Yesterday" />
+                    <TextView android:id="@+id/error_count_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+10% vs Last Month" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/error_count_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    tools:text="Errors: 10" />
-
-                <TextView
-                    android:id="@+id/error_count_change_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                    tools:text="-5%" />
-            </LinearLayout>
-
-            <LinearLayout
+            <!-- Total Duration -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_columnWeight="1"
+                style="@style/Widget.App.StatCard">
+                <LinearLayout style="@style/Widget.App.StatCardContent">
+                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Total Time" />
+                    <TextView android:id="@+id/total_duration_text" style="@style/Widget.App.StatCardValue" tools:text="12h 34m" />
+                    <TextView android:id="@+id/total_duration_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="+15% vs Yesterday" />
+                    <TextView android:id="@+id/total_duration_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+30% vs Last Month" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/total_duration_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                    tools:text="Time: 5h" />
+        </GridLayout>
 
-                <TextView
-                    android:id="@+id/total_duration_change_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-                    tools:text="+15%" />
-            </LinearLayout>
-        </LinearLayout>
+        <!-- Workflow Statistics -->
+        <TextView
+            android:id="@+id/workflow_stats_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="Workflow Statistics"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/summary_grid" />
 
         <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/error_rate_chart"
+            android:id="@+id/workflow_error_rate_chart"
             android:layout_width="0dp"
             android:layout_height="200dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/summary_layout" />
+            app:layout_constraintTop_toBottomOf="@+id/workflow_stats_title" />
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/workflow_ranking_chart"
             android:layout_width="0dp"
             android:layout_height="250dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/error_rate_chart" />
-
-        <TextView
-            android:id="@+id/module_stats_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
-            android:text="Module Statistics"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/workflow_ranking_chart" />
+            app:layout_constraintTop_toBottomOf="@+id/workflow_error_rate_chart" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/module_stats_recycler_view"
+            android:id="@+id/workflow_stats_table"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -138,8 +127,48 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/module_stats_title"
-            tools:listitem="@layout/list_item_module_stat" />
+            app:layout_constraintTop_toBottomOf="@+id/workflow_ranking_chart" />
+
+        <!-- Module Statistics -->
+        <TextView
+            android:id="@+id/module_stats_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="Module Statistics"
+            android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/workflow_stats_table" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/module_error_rate_chart"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/module_stats_title" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/module_ranking_chart"
+            android:layout_width="0dp"
+            android:layout_height="250dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/module_error_rate_chart" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/module_stats_table"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/module_ranking_chart" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

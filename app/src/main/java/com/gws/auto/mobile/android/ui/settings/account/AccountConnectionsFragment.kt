@@ -6,16 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.SignInActivity
 import com.gws.auto.mobile.android.databinding.FragmentAccountConnectionsBinding
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
-import com.gws.auto.mobile.android.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,10 +21,9 @@ class AccountConnectionsFragment : Fragment() {
     private var _binding: FragmentAccountConnectionsBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: SettingsViewModel by viewModels()
-
     @Inject
-    lateinit var auth: FirebaseAuth
+    @JvmField
+    var auth: FirebaseAuth? = null
 
     @Inject
     lateinit var authorizer: GoogleApiAuthorizer
@@ -47,7 +42,7 @@ class AccountConnectionsFragment : Fragment() {
     }
 
     private fun updateUI() {
-        val user = auth.currentUser
+        val user = auth?.currentUser
         if (user != null) {
             binding.syncStatusText.text = getString(R.string.sync_enabled_with, user.email)
             binding.authButton.text = getString(R.string.sign_out_and_disable_sync)
@@ -65,7 +60,7 @@ class AccountConnectionsFragment : Fragment() {
 
     private fun signOut() {
         authorizer.signOut {
-            auth.signOut()
+            auth?.signOut()
             Timber.i("User signed out successfully. Sync disabled.")
             activity?.runOnUiThread {
                 updateUI()
@@ -75,11 +70,6 @@ class AccountConnectionsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (auth.currentUser != null) {
-            lifecycleScope.launch {
-                viewModel.syncWorkflows()
-            }
-        }
         updateUI()
     }
 

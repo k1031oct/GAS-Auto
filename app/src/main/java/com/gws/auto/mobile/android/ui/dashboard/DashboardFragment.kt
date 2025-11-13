@@ -33,6 +33,7 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
     private val viewModel: DashboardViewModel by viewModels()
+    private lateinit var workflowStatAdapter: WorkflowStatAdapter
     private lateinit var moduleStatAdapter: ModuleStatAdapter
 
     override fun onCreateView(
@@ -46,19 +47,30 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupCharts()
-        setupRecyclerView()
+        setupRecyclerViews()
         observeViewModel()
+
+        binding.refreshButton.setOnClickListener {
+            viewModel.refresh()
+        }
     }
 
     private fun setupCharts() {
-        // Common chart setup
-        binding.errorRateChart.description.isEnabled = false
+        binding.workflowErrorRateChart.description.isEnabled = false
         binding.workflowRankingChart.description.isEnabled = false
+        binding.moduleErrorRateChart.description.isEnabled = false
+        binding.moduleRankingChart.description.isEnabled = false
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerViews() {
+        workflowStatAdapter = WorkflowStatAdapter()
+        binding.workflowStatsTable.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = workflowStatAdapter
+        }
+
         moduleStatAdapter = ModuleStatAdapter()
-        binding.moduleStatsRecyclerView.apply {
+        binding.moduleStatsTable.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = moduleStatAdapter
         }
@@ -69,52 +81,67 @@ class DashboardFragment : Fragment() {
             .flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .onEach { uiState ->
                 updateSummary(uiState)
-                updateErrorRateChart(uiState)
-                updateWorkflowRankingChart(uiState)
+                updateWorkflowCharts(uiState)
+                updateModuleCharts(uiState)
+                workflowStatAdapter.submitList(uiState.workflowExecutionCounts)
                 moduleStatAdapter.submitList(uiState.moduleStats)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun updateSummary(uiState: DashboardUiState) {
-        binding.totalExecutionsText.text = getString(R.string.dashboard_total_executions, uiState.totalCount)
-        binding.errorCountText.text = getString(R.string.dashboard_error_count, uiState.errorCount)
-        binding.totalDurationText.text = formatDuration(uiState.totalDuration)
+        // Total Executions
+        binding.totalExecutionsText.text = uiState.totalCountMonth.toString()
+        binding.totalExecutionsDayChangeText.text = formatChange(uiState.totalCountDayChange, "vs Yesterday")
+        binding.totalExecutionsMonthChangeText.text = formatChange(uiState.totalCountMonthChange, "vs Last Month")
 
-        binding.totalExecutionsChangeText.text = formatChange(uiState.totalCountChange)
-        binding.errorCountChangeText.text = formatChange(uiState.errorCountChange)
-        binding.totalDurationChangeText.text = formatChange(uiState.totalDurationChange)
+        // Error Count
+        binding.errorCountText.text = uiState.errorCountMonth.toString()
+        binding.errorCountDayChangeText.text = formatChange(uiState.errorCountDayChange, "vs Yesterday")
+        binding.errorCountMonthChangeText.text = formatChange(uiState.errorCountMonthChange, "vs Last Month")
+
+        // Total Duration
+        binding.totalDurationText.text = formatDuration(uiState.totalDurationMonth)
+        binding.totalDurationDayChangeText.text = formatChange(uiState.totalDurationDayChange, "vs Yesterday")
+        binding.totalDurationMonthChangeText.text = formatChange(uiState.totalDurationMonthChange, "vs Last Month")
     }
 
-    private fun updateErrorRateChart(uiState: DashboardUiState) {
-        if (uiState.totalCount == 0) {
-            binding.errorRateChart.visibility = View.GONE
+    private fun updateWorkflowCharts(uiState: DashboardUiState) {
+        updateErrorRateChart(binding.workflowErrorRateChart, uiState.totalCountMonth, uiState.errorCountMonth, "Workflow Error Rate")
+        updateRankingChart(binding.workflowRankingChart, uiState.workflowExecutionCounts.map { BarEntry(it.workflowName.hashCode().toFloat(), it.executionCount.toFloat()) }, uiState.workflowExecutionCounts.map { it.workflowName })
+    }
+
+    private fun updateModuleCharts(uiState: DashboardUiState) {
+        updateErrorRateChart(binding.moduleErrorRateChart, uiState.moduleUsageCount, uiState.moduleErrorCount, "Module Error Rate")
+        updateRankingChart(binding.moduleRankingChart, uiState.moduleStats.map { BarEntry(it.moduleName.hashCode().toFloat(), it.usageCount.toFloat()) }, uiState.moduleStats.map { it.moduleName })
+    }
+
+    private fun updateErrorRateChart(chart: com.github.mikephil.charting.charts.PieChart, total: Int, errors: Int, centerText: String) {
+        if (total == 0) {
+            chart.visibility = View.GONE
             return
         }
-        binding.errorRateChart.visibility = View.VISIBLE
+        chart.visibility = View.VISIBLE
 
-        val successCount = uiState.totalCount - uiState.errorCount
+        val success = total - errors
         val entries = listOf(
-            PieEntry(successCount.toFloat(), getString(R.string.execution_status_success)),
-            PieEntry(uiState.errorCount.toFloat(), getString(R.string.execution_status_failure))
+            PieEntry(success.toFloat(), getString(R.string.execution_status_success)),
+            PieEntry(errors.toFloat(), getString(R.string.execution_status_failure))
         )
 
         val dataSet = PieDataSet(entries, "").apply {
-            colors = listOf(
-                ContextCompat.getColor(requireContext(), R.color.chart_green),
-                ContextCompat.getColor(requireContext(), R.color.chart_red)
-            )
+            colors = listOf(ContextCompat.getColor(requireContext(), R.color.chart_green), ContextCompat.getColor(requireContext(), R.color.chart_red))
             setDrawValues(true)
             valueTextColor = Color.WHITE
             valueTextSize = 12f
         }
 
-        binding.errorRateChart.apply {
+        chart.apply {
             data = PieData(dataSet)
             isDrawHoleEnabled = true
             holeRadius = 58f
             transparentCircleRadius = 61f
-            centerText = "Error Rate"
+            this.centerText = centerText
             setCenterTextSize(16f)
             legend.isEnabled = false
             animateY(1400)
@@ -122,17 +149,12 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun updateWorkflowRankingChart(uiState: DashboardUiState) {
-        if (uiState.workflowExecutionCounts.isEmpty()) {
-            binding.workflowRankingChart.visibility = View.GONE
+    private fun updateRankingChart(chart: com.github.mikephil.charting.charts.BarChart, entries: List<BarEntry>, labels: List<String>) {
+        if (entries.isEmpty()) {
+            chart.visibility = View.GONE
             return
         }
-        binding.workflowRankingChart.visibility = View.VISIBLE
-
-        val entries = uiState.workflowExecutionCounts.mapIndexed { index, count ->
-            BarEntry(index.toFloat(), count.executionCount.toFloat())
-        }
-        val labels = uiState.workflowExecutionCounts.map { it.workflowName }
+        chart.visibility = View.VISIBLE
 
         val dataSet = BarDataSet(entries, "Executions").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
@@ -140,7 +162,7 @@ class DashboardFragment : Fragment() {
             valueTextSize = 10f
         }
 
-        binding.workflowRankingChart.apply {
+        chart.apply {
             data = BarData(dataSet)
             setFitBars(true)
             xAxis.apply {
@@ -163,12 +185,13 @@ class DashboardFragment : Fragment() {
 
     private fun formatDuration(millis: Long): String {
         val hours = TimeUnit.MILLISECONDS.toHours(millis)
-        return "Time: ${hours}h"
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
+        return "${hours}h ${minutes}m"
     }
 
-    private fun formatChange(change: Float): String {
+    private fun formatChange(change: Float, context: String): String {
         val sign = if (change >= 0) "+" else ""
-        return String.format("$sign%.1f%%", change)
+        return String.format("$sign%.1f%% %s", change, context)
     }
 
     override fun onDestroyView() {

@@ -34,6 +34,7 @@ navigation = "2.9.6"
 workRuntimeKtx = "2.11.0"
 playServicesAuth = "21.4.0"
 room = "2.6.1"
+hiltNavigationCompose = "1.2.0"
 
 # Third Party
 coil = "2.7.0"
@@ -89,6 +90,7 @@ googleOssLicenses = { group = "com.google.android.gms", name = "play-services-os
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 # Third Party
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
