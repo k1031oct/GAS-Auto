@@ -4160,6 +4160,7 @@ id endToStart
 id enterAlways
 id enterAlwaysCollapsed
 id entireSpace
+id error_count_change_text
 id error_count_text
 id error_rate_chart
 id escape
@@ -4283,7 +4284,10 @@ id matrix
 id message
 id middle
 id mini
+id module_name_text
 id module_recycler_view
+id module_stats_recycler_view
+id module_stats_title
 id module_type
 id monday_button
 id month_grid
@@ -4445,6 +4449,7 @@ id seekbar_value
 id select_dialog_listview
 id selected
 id selection_type
+id setting_title
 id settings_application
 id settings_badge
 id settings_fragment_container
@@ -4541,8 +4546,12 @@ id textinput_helper_text
 id textinput_placeholder
 id textinput_prefix_text
 id textinput_suffix_text
+id theme_dark_radio
 id theme_group
+id theme_light_radio
+id theme_radio_group
 id theme_spinner
+id theme_system_radio
 id time
 id time_text
 id timestamp
@@ -4555,6 +4564,9 @@ id toolbar
 id top
 id topPanel
 id top_center
+id total_duration_change_text
+id total_duration_text
+id total_executions_change_text
 id total_executions_text
 id touch_outside
 id transitionToEnd
@@ -4574,6 +4586,7 @@ id uniform
 id unlabeled
 id unread_indicator
 id up
+id usage_count_text
 id useLogo
 id user_avatar
 id user_email
@@ -4774,6 +4787,7 @@ layout fragment_main_settings
 layout fragment_schedule
 layout fragment_settings
 layout fragment_tag_management
+layout fragment_theme_settings
 layout fragment_user_info
 layout fragment_wizard_locale
 layout fragment_wizard_theme
@@ -4798,7 +4812,9 @@ layout list_item_announcement
 layout list_item_calendar_day
 layout list_item_history
 layout list_item_history_log
+layout list_item_module_stat
 layout list_item_schedule
+layout list_item_setting
 layout list_item_tag
 layout list_item_timeline
 layout list_item_timeline_event

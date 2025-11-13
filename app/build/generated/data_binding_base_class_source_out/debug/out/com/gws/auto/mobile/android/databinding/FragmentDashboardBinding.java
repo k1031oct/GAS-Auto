@@ -5,10 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.github.mikephil.charting.charts.BarChart;
@@ -21,7 +22,10 @@ import java.lang.String;
 
 public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final ScrollView rootView;
+
+  @NonNull
+  public final TextView errorCountChangeText;
 
   @NonNull
   public final TextView errorCountText;
@@ -30,10 +34,25 @@ public final class FragmentDashboardBinding implements ViewBinding {
   public final PieChart errorRateChart;
 
   @NonNull
+  public final RecyclerView moduleStatsRecyclerView;
+
+  @NonNull
+  public final TextView moduleStatsTitle;
+
+  @NonNull
   public final MaterialButton refreshButton;
 
   @NonNull
   public final LinearLayout summaryLayout;
+
+  @NonNull
+  public final TextView totalDurationChangeText;
+
+  @NonNull
+  public final TextView totalDurationText;
+
+  @NonNull
+  public final TextView totalExecutionsChangeText;
 
   @NonNull
   public final TextView totalExecutionsText;
@@ -41,22 +60,31 @@ public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
   public final BarChart workflowRankingChart;
 
-  private FragmentDashboardBinding(@NonNull ConstraintLayout rootView,
-      @NonNull TextView errorCountText, @NonNull PieChart errorRateChart,
-      @NonNull MaterialButton refreshButton, @NonNull LinearLayout summaryLayout,
+  private FragmentDashboardBinding(@NonNull ScrollView rootView,
+      @NonNull TextView errorCountChangeText, @NonNull TextView errorCountText,
+      @NonNull PieChart errorRateChart, @NonNull RecyclerView moduleStatsRecyclerView,
+      @NonNull TextView moduleStatsTitle, @NonNull MaterialButton refreshButton,
+      @NonNull LinearLayout summaryLayout, @NonNull TextView totalDurationChangeText,
+      @NonNull TextView totalDurationText, @NonNull TextView totalExecutionsChangeText,
       @NonNull TextView totalExecutionsText, @NonNull BarChart workflowRankingChart) {
     this.rootView = rootView;
+    this.errorCountChangeText = errorCountChangeText;
     this.errorCountText = errorCountText;
     this.errorRateChart = errorRateChart;
+    this.moduleStatsRecyclerView = moduleStatsRecyclerView;
+    this.moduleStatsTitle = moduleStatsTitle;
     this.refreshButton = refreshButton;
     this.summaryLayout = summaryLayout;
+    this.totalDurationChangeText = totalDurationChangeText;
+    this.totalDurationText = totalDurationText;
+    this.totalExecutionsChangeText = totalExecutionsChangeText;
     this.totalExecutionsText = totalExecutionsText;
     this.workflowRankingChart = workflowRankingChart;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public ScrollView getRoot() {
     return rootView;
   }
 
@@ -81,6 +109,12 @@ public final class FragmentDashboardBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.error_count_change_text;
+      TextView errorCountChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (errorCountChangeText == null) {
+        break missingId;
+      }
+
       id = R.id.error_count_text;
       TextView errorCountText = ViewBindings.findChildViewById(rootView, id);
       if (errorCountText == null) {
@@ -90,6 +124,18 @@ public final class FragmentDashboardBinding implements ViewBinding {
       id = R.id.error_rate_chart;
       PieChart errorRateChart = ViewBindings.findChildViewById(rootView, id);
       if (errorRateChart == null) {
+        break missingId;
+      }
+
+      id = R.id.module_stats_recycler_view;
+      RecyclerView moduleStatsRecyclerView = ViewBindings.findChildViewById(rootView, id);
+      if (moduleStatsRecyclerView == null) {
+        break missingId;
+      }
+
+      id = R.id.module_stats_title;
+      TextView moduleStatsTitle = ViewBindings.findChildViewById(rootView, id);
+      if (moduleStatsTitle == null) {
         break missingId;
       }
 
@@ -105,6 +151,24 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.total_duration_change_text;
+      TextView totalDurationChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalDurationChangeText == null) {
+        break missingId;
+      }
+
+      id = R.id.total_duration_text;
+      TextView totalDurationText = ViewBindings.findChildViewById(rootView, id);
+      if (totalDurationText == null) {
+        break missingId;
+      }
+
+      id = R.id.total_executions_change_text;
+      TextView totalExecutionsChangeText = ViewBindings.findChildViewById(rootView, id);
+      if (totalExecutionsChangeText == null) {
+        break missingId;
+      }
+
       id = R.id.total_executions_text;
       TextView totalExecutionsText = ViewBindings.findChildViewById(rootView, id);
       if (totalExecutionsText == null) {
@@ -117,8 +181,10 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentDashboardBinding((ConstraintLayout) rootView, errorCountText,
-          errorRateChart, refreshButton, summaryLayout, totalExecutionsText, workflowRankingChart);
+      return new FragmentDashboardBinding((ScrollView) rootView, errorCountChangeText,
+          errorCountText, errorRateChart, moduleStatsRecyclerView, moduleStatsTitle, refreshButton,
+          summaryLayout, totalDurationChangeText, totalDurationText, totalExecutionsChangeText,
+          totalExecutionsText, workflowRankingChart);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

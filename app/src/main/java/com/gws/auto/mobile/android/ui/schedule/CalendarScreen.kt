@@ -1,7 +1,6 @@
 package com.gws.auto.mobile.android.ui.schedule
 
 import android.content.Intent
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -34,7 +33,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -51,7 +49,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -112,66 +109,63 @@ fun CalendarScreen(
         sheetContent = {
             DayTimelineSheet(date = selectedDate, holidays = holidays, schedules = schedules)
         },
-        sheetPeekHeight = 64.dp // Show handle
-    ) {
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    context.startActivity(Intent(context, ScheduleSettingsActivity::class.java))
-                }) {
-                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_schedule))
+        sheetPeekHeight = 32.dp, // Reduced peek height
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                context.startActivity(Intent(context, ScheduleSettingsActivity::class.java))
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_schedule))
+            }
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
+                Text(
+                    text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+            }
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)) {
+                val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
+                daysOfWeek.forEach { day ->
+                    Text(
+                        text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
-                    Text(
-                        text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
-                }
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)) {
-                    val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
-                    daysOfWeek.forEach { day ->
-                        Text(
-                            text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.weight(1f)
-                        )
+            VerticalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize() // Fills remaining space
+            ) { page ->
+                val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
+                MonthView(
+                    yearMonth = month,
+                    holidays = holidays,
+                    schedules = schedules,
+                    onDateClick = {
+                        selectedDate = it
+                        scope.launch { scaffoldState.bottomSheetState.expand() }
                     }
-                }
-
-                VerticalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize() // Fills remaining space
-                ) { page ->
-                    val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
-                    MonthView(
-                        yearMonth = month,
-                        holidays = holidays,
-                        schedules = schedules,
-                        onDateClick = {
-                            selectedDate = it
-                            scope.launch { scaffoldState.bottomSheetState.expand() }
-                        }
-                    )
-                }
+                )
             }
         }
     }
@@ -227,8 +221,6 @@ private fun HourTimeline(schedules: List<Pair<LocalTime, String>>, timelineHourH
     val timelineColor = MaterialTheme.colorScheme.outlineVariant
 
     BoxWithConstraints(modifier = Modifier.fillMaxWidth().height(timelineHourHeight * 24)) {
-        val hourTextWidthPx = with(LocalDensity.current) { hourTextWidth.toPx() }
-
         // Draw hour lines and labels
         for (hour in 0..23) {
             Row(modifier = Modifier.height(timelineHourHeight).offset(y = (hour * timelineHourHeight.value).dp)) {

@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
 
         setupViewPager()
         setupBottomNavigation()
+        setupSearchView()
+        setupSettingsIcon()
         setupBackButtonHandler()
         observeViewModel()
     }
@@ -74,8 +76,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSearchView(searchView: SearchView) {
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -87,13 +89,26 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun setupSettingsIcon() {
+        binding.actionSettingsIcon.setOnClickListener {
+            showSettingsMenu(it)
+        }
+    }
+
     private fun observeViewModel() {
         mainSharedViewModel.currentPage.onEach { page ->
-            // This part might need adjustment depending on how you handle the search view hint
+            val hint = when(page) {
+                0 -> getString(R.string.search_workflows_hint)
+                1 -> "Search schedules..." // TODO: Add to strings.xml
+                2 -> "Search history..."   // TODO: Add to strings.xml
+                3 -> "Search dashboard..." // TODO: Add to strings.xml
+                else -> ""
+            }
+            binding.searchView.queryHint = hint
         }.launchIn(lifecycleScope)
 
         announcementViewModel.hasUnread.onEach { hasUnread ->
-            invalidateOptionsMenu()
+            binding.settingsBadge.visibility = if (hasUnread) View.VISIBLE else View.GONE
         }.launchIn(lifecycleScope)
     }
 
@@ -141,34 +156,13 @@ class MainActivity : AppCompatActivity() {
         }
         popup.show()
     }
-
+    
+    // The original menu handling is now simplified as the search view is part of the main layout.
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // We still inflate a menu to show a placeholder for the settings icon, 
+        // even though it's handled manually now. This can be cleaned up in the future.
         menuInflater.inflate(R.menu.main_menu, menu)
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-        setupSearchView(searchView)
+        menu.findItem(R.id.action_settings)?.isVisible = false
         return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val settingsItem = menu.findItem(R.id.action_settings)
-        val actionView = settingsItem.actionView
-        val badge = actionView?.findViewById<View>(R.id.settings_badge)
-        badge?.visibility = if (announcementViewModel.hasUnread.value) View.VISIBLE else View.GONE
-        actionView?.setOnClickListener {
-            showSettingsMenu(it)
-        }
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // This is not called for action views, but we keep it for other menu items if any
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                // This part is now handled by the OnClickListener in onPrepareOptionsMenu
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
     }
 }
