@@ -3,14 +3,12 @@ package com.gws.auto.mobile.android.data.repository
 import com.google.api.client.util.DateTime
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.gws.auto.mobile.android.data.model.Schedule
+import com.gws.auto.mobile.android.data.local.db.ScheduleDao
 import com.gws.auto.mobile.android.domain.model.Holiday
+import com.gws.auto.mobile.android.domain.model.Schedule
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.time.LocalDate
@@ -19,38 +17,26 @@ import java.util.*
 import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(
+    private val scheduleDao: ScheduleDao,
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth,
     private val googleApiAuthorizer: GoogleApiAuthorizer
 ) : ScheduleRepository {
 
-    private val userId: String?
-        get() = auth.currentUser?.uid
-
-    private fun schedulesCollection() = userId?.let { firestore.collection("users/$it/schedules") }
-
-    override fun getSchedulesFlow(): Flow<List<Schedule>> = callbackFlow {
-        val listenerRegistration = schedulesCollection()?.addSnapshotListener { snapshot, e ->
-            if (e != null) {
-                close(e)
-                return@addSnapshotListener
-            }
-            val schedules = snapshot?.documents?.mapNotNull { it.toObject(Schedule::class.java) } ?: emptyList()
-            trySend(schedules)
-        }
-        awaitClose { listenerRegistration?.remove() }
+    override fun getSchedulesFlow(): Flow<List<Schedule>> {
+        return scheduleDao.getAllSchedules()
     }
 
     override suspend fun addSchedule(schedule: Schedule) {
-        schedulesCollection()?.add(schedule)?.await()
+        scheduleDao.insertSchedule(schedule)
     }
 
     override suspend fun updateSchedule(schedule: Schedule) {
-        schedulesCollection()?.document(schedule.id)?.set(schedule)?.await()
+        scheduleDao.updateSchedule(schedule)
     }
 
     override suspend fun deleteSchedule(scheduleId: String) {
-        schedulesCollection()?.document(scheduleId)?.delete()?.await()
+        scheduleDao.deleteScheduleById(scheduleId)
     }
 
     override suspend fun getHolidays(countryCode: String, year: Int): List<Holiday> = withContext(Dispatchers.IO) {

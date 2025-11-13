@@ -30,22 +30,30 @@ public final class AppDatabase_Impl extends AppDatabase {
 
   private volatile TagDao _tagDao;
 
+  private volatile HistoryDao _historyDao;
+
+  private volatile ScheduleDao _scheduleDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(4) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `workflows` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `modules` TEXT NOT NULL, `status` TEXT NOT NULL, `trigger` TEXT NOT NULL, `tags` TEXT NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `tags` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `execution_history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workflowId` TEXT NOT NULL, `workflowName` TEXT NOT NULL, `executedAt` INTEGER NOT NULL, `status` TEXT NOT NULL, `logs` TEXT NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `schedules` (`id` TEXT NOT NULL, `workflowId` TEXT NOT NULL, `scheduleType` TEXT NOT NULL, `hourlyInterval` INTEGER, `time` TEXT, `weeklyDays` TEXT, `monthlyDays` TEXT, `yearlyMonth` INTEGER, `yearlyDayOfMonth` INTEGER, `lastRun` INTEGER, `nextRun` INTEGER, `isEnabled` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aa6dd77722d00a489400370cca6aafde')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '69870f17eed6332b16c2dfe421b88d18')");
       }
 
       @Override
       public void dropAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS `workflows`");
         db.execSQL("DROP TABLE IF EXISTS `tags`");
+        db.execSQL("DROP TABLE IF EXISTS `execution_history`");
+        db.execSQL("DROP TABLE IF EXISTS `schedules`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -117,9 +125,47 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoTags + "\n"
                   + " Found:\n" + _existingTags);
         }
+        final HashMap<String, TableInfo.Column> _columnsExecutionHistory = new HashMap<String, TableInfo.Column>(6);
+        _columnsExecutionHistory.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("workflowId", new TableInfo.Column("workflowId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("workflowName", new TableInfo.Column("workflowName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("executedAt", new TableInfo.Column("executedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("status", new TableInfo.Column("status", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("logs", new TableInfo.Column("logs", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysExecutionHistory = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesExecutionHistory = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoExecutionHistory = new TableInfo("execution_history", _columnsExecutionHistory, _foreignKeysExecutionHistory, _indicesExecutionHistory);
+        final TableInfo _existingExecutionHistory = TableInfo.read(db, "execution_history");
+        if (!_infoExecutionHistory.equals(_existingExecutionHistory)) {
+          return new RoomOpenHelper.ValidationResult(false, "execution_history(com.gws.auto.mobile.android.domain.model.History).\n"
+                  + " Expected:\n" + _infoExecutionHistory + "\n"
+                  + " Found:\n" + _existingExecutionHistory);
+        }
+        final HashMap<String, TableInfo.Column> _columnsSchedules = new HashMap<String, TableInfo.Column>(12);
+        _columnsSchedules.put("id", new TableInfo.Column("id", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("workflowId", new TableInfo.Column("workflowId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("scheduleType", new TableInfo.Column("scheduleType", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("hourlyInterval", new TableInfo.Column("hourlyInterval", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("time", new TableInfo.Column("time", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("weeklyDays", new TableInfo.Column("weeklyDays", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("monthlyDays", new TableInfo.Column("monthlyDays", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("yearlyMonth", new TableInfo.Column("yearlyMonth", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("yearlyDayOfMonth", new TableInfo.Column("yearlyDayOfMonth", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("lastRun", new TableInfo.Column("lastRun", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("nextRun", new TableInfo.Column("nextRun", "INTEGER", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsSchedules.put("isEnabled", new TableInfo.Column("isEnabled", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysSchedules = new HashSet<TableInfo.ForeignKey>(0);
+        final HashSet<TableInfo.Index> _indicesSchedules = new HashSet<TableInfo.Index>(0);
+        final TableInfo _infoSchedules = new TableInfo("schedules", _columnsSchedules, _foreignKeysSchedules, _indicesSchedules);
+        final TableInfo _existingSchedules = TableInfo.read(db, "schedules");
+        if (!_infoSchedules.equals(_existingSchedules)) {
+          return new RoomOpenHelper.ValidationResult(false, "schedules(com.gws.auto.mobile.android.domain.model.Schedule).\n"
+                  + " Expected:\n" + _infoSchedules + "\n"
+                  + " Found:\n" + _existingSchedules);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "aa6dd77722d00a489400370cca6aafde", "022842181019231a62f6871e6f3bc25b");
+    }, "69870f17eed6332b16c2dfe421b88d18", "63bf6bd850881a6eed72c1b04435c55d");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -130,7 +176,7 @@ public final class AppDatabase_Impl extends AppDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "workflows","tags");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "workflows","tags","execution_history","schedules");
   }
 
   @Override
@@ -141,6 +187,8 @@ public final class AppDatabase_Impl extends AppDatabase {
       super.beginTransaction();
       _db.execSQL("DELETE FROM `workflows`");
       _db.execSQL("DELETE FROM `tags`");
+      _db.execSQL("DELETE FROM `execution_history`");
+      _db.execSQL("DELETE FROM `schedules`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -157,6 +205,8 @@ public final class AppDatabase_Impl extends AppDatabase {
     final HashMap<Class<?>, List<Class<?>>> _typeConvertersMap = new HashMap<Class<?>, List<Class<?>>>();
     _typeConvertersMap.put(WorkflowDao.class, WorkflowDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(TagDao.class, TagDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(HistoryDao.class, HistoryDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(ScheduleDao.class, ScheduleDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -199,6 +249,34 @@ public final class AppDatabase_Impl extends AppDatabase {
           _tagDao = new TagDao_Impl(this);
         }
         return _tagDao;
+      }
+    }
+  }
+
+  @Override
+  public HistoryDao historyDao() {
+    if (_historyDao != null) {
+      return _historyDao;
+    } else {
+      synchronized(this) {
+        if(_historyDao == null) {
+          _historyDao = new HistoryDao_Impl(this);
+        }
+        return _historyDao;
+      }
+    }
+  }
+
+  @Override
+  public ScheduleDao scheduleDao() {
+    if (_scheduleDao != null) {
+      return _scheduleDao;
+    } else {
+      synchronized(this) {
+        if(_scheduleDao == null) {
+          _scheduleDao = new ScheduleDao_Impl(this);
+        }
+        return _scheduleDao;
       }
     }
   }

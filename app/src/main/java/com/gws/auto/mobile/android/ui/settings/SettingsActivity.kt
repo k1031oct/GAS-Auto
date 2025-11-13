@@ -11,7 +11,6 @@ import com.gws.auto.mobile.android.ui.settings.about.AboutAppFragment
 import com.gws.auto.mobile.android.ui.settings.account.AccountConnectionsFragment
 import com.gws.auto.mobile.android.ui.settings.app.AppSettingsFragment
 import com.gws.auto.mobile.android.ui.settings.tag.TagManagementFragment
-import com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -33,27 +32,34 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val fragmentKey = intent.getStringExtra("fragment_to_load")
-        val fragment = when (fragmentKey) {
-            "announcement" -> AnnouncementFragment()
-            "user_info" -> UserInfoFragment()
-            "account_connections" -> AccountConnectionsFragment()
-            "app_settings" -> AppSettingsFragment()
-            "about_app" -> AboutAppFragment()
-            "tag_management" -> TagManagementFragment()
-            else -> AppSettingsFragment() // Default to app settings
-        }
-        supportActionBar?.title = getTitleForFragment(fragmentKey)
+        if (savedInstanceState == null) {
+            val fragmentKey = intent.getStringExtra("fragment_to_load")
+            if (fragmentKey != null) {
+                val fragment = when (fragmentKey) {
+                    "announcement" -> AnnouncementFragment()
+                    "account_connections" -> AccountConnectionsFragment()
+                    "app_settings" -> AppSettingsFragment()
+                    "about_app" -> AboutAppFragment()
+                    "tag_management" -> TagManagementFragment()
+                    else -> MainSettingsFragment()
+                }
+                supportActionBar?.title = getTitleForFragment(fragmentKey)
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.settings_fragment_container, fragment)
-            .commit()
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.settings_fragment_container, fragment)
+                    .commit()
+            } else {
+                supportActionBar?.title = getString(R.string.title_settings)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.settings_fragment_container, MainSettingsFragment())
+                    .commit()
+            }
+        }
     }
 
     private fun getTitleForFragment(key: String?): String {
         return when (key) {
             "announcement" -> getString(R.string.title_announcement)
-            "user_info" -> getString(R.string.title_user_info)
             "account_connections" -> getString(R.string.title_account_connections)
             "app_settings" -> getString(R.string.title_app_settings)
             "about_app" -> getString(R.string.title_about_app)
@@ -63,7 +69,11 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            onBackPressedDispatcher.onBackPressed()
+        }
         return true
     }
 }

@@ -1,46 +1,37 @@
 package com.gws.auto.mobile.android.ui.history
 
 import androidx.lifecycle.ViewModel
-import com.gws.auto.mobile.android.BuildConfig
-import com.gws.auto.mobile.android.domain.model.WorkflowExecutionLog
+import androidx.lifecycle.viewModelScope
+import com.gws.auto.mobile.android.data.repository.HistoryRepository
+import com.gws.auto.mobile.android.domain.model.History
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.util.Date
-import java.util.UUID
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
-class HistoryViewModel @Inject constructor() : ViewModel() {
+class HistoryViewModel @Inject constructor(
+    private val historyRepository: HistoryRepository
+) : ViewModel() {
 
-    private val _executionLogs = MutableStateFlow<List<WorkflowExecutionLog>>(emptyList())
-    val executionLogs: StateFlow<List<WorkflowExecutionLog>> = _executionLogs.asStateFlow()
+    val executionLogs: StateFlow<List<History>> = historyRepository.getAllHistory()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = emptyList()
+        )
 
-    init {
-        loadExecutionLogs()
-    }
-
-    private fun loadExecutionLogs() {
-        if (BuildConfig.DEBUG) {
-            _executionLogs.value = createDummyLogs()
-        } else {
-            // TODO: Load real logs from a repository
+    fun deleteHistory(history: History) {
+        viewModelScope.launch {
+            historyRepository.deleteHistoryById(history.id)
         }
     }
 
-    private fun createDummyLogs(): List<WorkflowExecutionLog> {
-        val names = listOf("Generate Report", "Send Daily Summary", "Archive Files")
-        val statuses = listOf("Success", "Success", "Failure", "Success")
-        return List(20) {
-            WorkflowExecutionLog(
-                id = UUID.randomUUID().toString(),
-                workflowName = names.random(),
-                executionTime = Date(System.currentTimeMillis() - Random.nextLong(1000 * 60 * 60 * 24 * 7)), // within last week
-                status = statuses.random(),
-                durationMs = Random.nextLong(100, 5000)
-            )
-        }.sortedByDescending { it.executionTime }
+    fun deleteAllHistory() {
+        viewModelScope.launch {
+            historyRepository.deleteAllHistory()
+        }
     }
 }

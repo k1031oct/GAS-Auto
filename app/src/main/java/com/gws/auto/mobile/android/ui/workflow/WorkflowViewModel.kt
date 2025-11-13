@@ -3,6 +3,7 @@ package com.gws.auto.mobile.android.ui.workflow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
+import com.gws.auto.mobile.android.domain.model.Module
 import com.gws.auto.mobile.android.domain.model.Workflow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -18,6 +19,9 @@ class WorkflowViewModel @Inject constructor(
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
+
+    private val _modules = MutableStateFlow<List<Module>>(emptyList())
+    val modules: StateFlow<List<Module>> = _modules.asStateFlow()
 
     private val _workflows = workflowRepository.getAllWorkflows()
         .catch { e ->
@@ -41,14 +45,29 @@ class WorkflowViewModel @Inject constructor(
         _query.value = query
     }
 
+    fun addModule(module: Module) {
+        _modules.value = _modules.value + module
+    }
+
+    fun removeModule(module: Module) {
+        _modules.value = _modules.value - module
+    }
+
+    fun moveModule(from: Int, to: Int) {
+        val updatedList = _modules.value.toMutableList()
+        val movedItem = updatedList.removeAt(from)
+        updatedList.add(to, movedItem)
+        _modules.value = updatedList
+    }
+
     fun saveNewWorkflow(name: String, description: String) {
         viewModelScope.launch {
             val newWorkflow = Workflow(
                 id = UUID.randomUUID().toString(),
                 name = name,
                 description = description,
+                modules = _modules.value,
                 status = "active"
-                // modules, trigger, and tags can be added later
             )
             workflowRepository.saveWorkflow(newWorkflow)
             Timber.d("New workflow created: $name")

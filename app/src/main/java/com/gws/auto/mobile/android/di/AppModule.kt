@@ -7,8 +7,11 @@ import androidx.room.Room
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.gws.auto.mobile.android.data.local.db.AppDatabase
+import com.gws.auto.mobile.android.data.local.db.HistoryDao
+import com.gws.auto.mobile.android.data.local.db.ScheduleDao
 import com.gws.auto.mobile.android.data.local.db.TagDao
 import com.gws.auto.mobile.android.data.local.db.WorkflowDao
+import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
 import com.gws.auto.mobile.android.data.repository.TagRepository
@@ -61,6 +64,18 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideHistoryDao(appDatabase: AppDatabase): HistoryDao {
+        return appDatabase.historyDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideScheduleDao(appDatabase: AppDatabase): ScheduleDao {
+        return appDatabase.scheduleDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideGoogleApiAuthorizer(@ApplicationContext context: Context): GoogleApiAuthorizer {
         return GoogleApiAuthorizer(context)
     }
@@ -78,17 +93,24 @@ object AppModule {
     @Provides
     @Singleton
     fun provideScheduleRepository(
+        scheduleDao: ScheduleDao,
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
         googleApiAuthorizer: GoogleApiAuthorizer
     ): ScheduleRepository {
-        return ScheduleRepositoryImpl(firestore, auth, googleApiAuthorizer)
+        return ScheduleRepositoryImpl(scheduleDao, firestore, auth, googleApiAuthorizer)
     }
 
     @Provides
     @Singleton
     fun provideTagRepository(tagDao: TagDao): TagRepository {
         return TagRepository(tagDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHistoryRepository(historyDao: HistoryDao): HistoryRepository {
+        return HistoryRepository(historyDao)
     }
 
     @Provides

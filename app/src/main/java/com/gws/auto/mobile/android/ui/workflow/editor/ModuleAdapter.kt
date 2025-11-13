@@ -1,39 +1,44 @@
 package com.gws.auto.mobile.android.ui.workflow.editor
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.gws.auto.mobile.android.R
+import com.gws.auto.mobile.android.databinding.ItemModuleBinding
 import com.gws.auto.mobile.android.domain.model.Module
 
-class ModuleAdapter(private val modules: MutableList<Module>) : RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder>() {
+class ModuleAdapter(
+    private var modules: MutableList<Module>,
+    private val onModuleRemoved: (Int) -> Unit
+) : RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_module, parent, false)
-        return ModuleViewHolder(view)
+        val binding = ItemModuleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ModuleViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
-        val module = modules[position]
-        holder.moduleType.text = module.type
+        holder.bind(modules[position])
     }
 
-    override fun getItemCount() = modules.size
+    override fun getItemCount(): Int = modules.size
 
-    fun onItemMove(fromPosition: Int, toPosition: Int) {
-        val movedModule = modules.removeAt(fromPosition)
-        modules.add(toPosition, movedModule)
-        notifyItemMoved(fromPosition, toPosition)
+    fun getModules(): List<Module> = modules
+
+    fun getModuleAt(position: Int): Module {
+        return modules[position]
     }
 
-    fun onItemDismiss(position: Int) {
-        modules.removeAt(position)
-        notifyItemRemoved(position)
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateModules(newModules: List<Module>) {
+        modules.clear()
+        modules.addAll(newModules)
+        notifyDataSetChanged() // In a real app, use DiffUtil for better performance
     }
 
-    class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val moduleType: TextView = itemView.findViewById(R.id.module_type)
+    class ModuleViewHolder(private val binding: ItemModuleBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(module: Module) {
+            binding.moduleType.text = module.type
+        }
     }
 }

@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 
         setupViewPager()
         setupBottomNavigation()
-        setupSearchView()
         setupBackButtonHandler()
         observeViewModel()
     }
@@ -75,8 +74,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+    private fun setupSearchView(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
@@ -90,14 +89,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeViewModel() {
         mainSharedViewModel.currentPage.onEach { page ->
-            val hint = when(page) {
-                0 -> getString(R.string.search_workflows_hint)
-                1 -> "Search schedules..." // TODO: Add to strings.xml
-                2 -> "Search history..."   // TODO: Add to strings.xml
-                3 -> "Search dashboard..." // TODO: Add to strings.xml
-                else -> ""
-            }
-            binding.searchView.queryHint = hint
+            // This part might need adjustment depending on how you handle the search view hint
         }.launchIn(lifecycleScope)
 
         announcementViewModel.hasUnread.onEach { hasUnread ->
@@ -152,6 +144,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+        setupSearchView(searchView)
         return true
     }
 

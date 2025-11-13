@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
+import com.gws.auto.mobile.android.domain.model.Schedule
 import com.gws.auto.mobile.android.domain.worker.ScheduleWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,6 +20,7 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalTime
 import java.time.ZonedDateTime
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -110,6 +111,7 @@ class ScheduleSettingsViewModel @Inject constructor(
     fun saveSchedule() {
         val uiState = _uiState.value
         val schedule = Schedule(
+            id = UUID.randomUUID().toString(),
             // workflowId will be set later
             scheduleType = uiState.scheduleType,
             hourlyInterval = if (uiState.scheduleType == "時間毎") uiState.hourlyInterval else null,

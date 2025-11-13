@@ -11,6 +11,7 @@ import com.gws.auto.mobile.android.domain.model.Workflow
 
 class WorkflowAdapter(
     private val onRunClicked: (Workflow) -> Unit,
+    private val onEditClicked: (Workflow) -> Unit,
     private val onDeleteClicked: (Workflow) -> Unit,
     private val onAddClicked: () -> Unit
 ) : ListAdapter<Workflow, RecyclerView.ViewHolder>(WorkflowDiffCallback()) {
@@ -34,7 +35,7 @@ class WorkflowAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_WORKFLOW) {
             val binding = ListItemWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            WorkflowViewHolder(binding, onRunClicked, onDeleteClicked)
+            WorkflowViewHolder(binding, onRunClicked, onEditClicked, onDeleteClicked)
         } else {
             val binding = ListItemAddWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             AddWorkflowViewHolder(binding, onAddClicked)
@@ -50,6 +51,7 @@ class WorkflowAdapter(
     class WorkflowViewHolder(
         private val binding: ListItemWorkflowBinding,
         private val onRunClicked: (Workflow) -> Unit,
+        private val onEditClicked: (Workflow) -> Unit,
         private val onDeleteClicked: (Workflow) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(workflow: Workflow) {
@@ -58,6 +60,7 @@ class WorkflowAdapter(
             binding.workflowStatus.text = workflow.status
             binding.workflowTrigger.text = workflow.trigger
             binding.runButton.setOnClickListener { onRunClicked(workflow) }
+            binding.editButton.setOnClickListener { onEditClicked(workflow) }
             binding.deleteButton.setOnClickListener { onDeleteClicked(workflow) }
         }
     }
@@ -77,10 +80,8 @@ class WorkflowDiffCallback : androidx.recyclerview.widget.DiffUtil.ItemCallback<
         return oldItem.id == newItem.id
     }
 
+    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: Workflow, newItem: Workflow): Boolean {
-        return oldItem.name == newItem.name &&
-                oldItem.description == newItem.description &&
-                oldItem.status == newItem.status &&
-                oldItem.trigger == newItem.trigger
+        return oldItem == newItem
     }
 }

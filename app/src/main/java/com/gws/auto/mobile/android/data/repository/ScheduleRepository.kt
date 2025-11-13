@@ -1,6 +1,6 @@
 package com.gws.auto.mobile.android.data.repository
 
-import com.gws.auto.mobile.android.data.model.Schedule
+import com.gws.auto.mobile.android.domain.model.Schedule
 import com.gws.auto.mobile.android.domain.model.Holiday
 import kotlinx.coroutines.flow.Flow
 

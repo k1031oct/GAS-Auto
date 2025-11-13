@@ -65,6 +65,7 @@
     <string name="sign_out_and_disable_sync">Sign Out and Disable Sync</string>
     <string name="sync_enabled_with">Sync enabled with: %1$s</string>
     <string name="sync_disabled">Sync is currently disabled.</string>
+    <string name="skip">Skip</string>
 
     <!-- Workflow -->
     <string name="workflow_name">Workflow Name</string>
@@ -132,6 +133,9 @@
 
     <string name="execution_status_success">Success</string>
     <string name="execution_status_failure">Failure</string>
+    <string name="refresh">Refresh</string>
+    <string name="dashboard_total_executions">Total: %1$d</string>
+    <string name="dashboard_error_count">Errors: %1$d</string>
 
     <string-array name="first_day_of_week_entries">
         <item>Sunday</item>

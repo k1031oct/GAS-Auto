@@ -166,6 +166,7 @@ dependencies {
     // Third Party
     implementation(libs.coil.compose)
     implementation(libs.jakewharton.timber)
+    implementation(libs.mpandroidchart)
 
     // Testing
     testImplementation(libs.junit)

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
@@ -30,9 +29,6 @@ public final class ActivityMainBinding implements ViewBinding {
   public final BottomNavigationView bottomNavView;
 
   @NonNull
-  public final SearchView searchView;
-
-  @NonNull
   public final Toolbar toolbar;
 
   @NonNull
@@ -40,11 +36,10 @@ public final class ActivityMainBinding implements ViewBinding {
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
       @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
-      @NonNull SearchView searchView, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+      @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
     this.appBarLayout = appBarLayout;
     this.bottomNavView = bottomNavView;
-    this.searchView = searchView;
     this.toolbar = toolbar;
     this.viewPager = viewPager;
   }
@@ -88,12 +83,6 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.search_view;
-      SearchView searchView = ViewBindings.findChildViewById(rootView, id);
-      if (searchView == null) {
-        break missingId;
-      }
-
       id = R.id.toolbar;
       Toolbar toolbar = ViewBindings.findChildViewById(rootView, id);
       if (toolbar == null) {
@@ -107,7 +96,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, appBarLayout, bottomNavView,
-          searchView, toolbar, viewPager);
+          toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

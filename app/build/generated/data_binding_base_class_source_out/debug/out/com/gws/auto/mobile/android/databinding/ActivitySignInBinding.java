@@ -4,6 +4,7 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -22,10 +23,14 @@ public final class ActivitySignInBinding implements ViewBinding {
   @NonNull
   public final MaterialButton signInButton;
 
+  @NonNull
+  public final Button skipButton;
+
   private ActivitySignInBinding(@NonNull ConstraintLayout rootView,
-      @NonNull MaterialButton signInButton) {
+      @NonNull MaterialButton signInButton, @NonNull Button skipButton) {
     this.rootView = rootView;
     this.signInButton = signInButton;
+    this.skipButton = skipButton;
   }
 
   @Override
@@ -61,7 +66,13 @@ public final class ActivitySignInBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivitySignInBinding((ConstraintLayout) rootView, signInButton);
+      id = R.id.skip_button;
+      Button skipButton = ViewBindings.findChildViewById(rootView, id);
+      if (skipButton == null) {
+        break missingId;
+      }
+
+      return new ActivitySignInBinding((ConstraintLayout) rootView, signInButton, skipButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

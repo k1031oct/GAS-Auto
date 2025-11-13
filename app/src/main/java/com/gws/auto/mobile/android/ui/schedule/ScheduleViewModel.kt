@@ -4,14 +4,15 @@ import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gws.auto.mobile.android.BuildConfig
-import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.domain.model.Holiday
+import com.gws.auto.mobile.android.domain.model.Schedule
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.time.LocalDate
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,9 +53,9 @@ class ScheduleViewModel @Inject constructor(
 
     private fun createDummySchedules(): List<Schedule> {
         return listOf(
-            Schedule(workflowId = "Dummy Event 1", scheduleType = "daily", time = "10:00"),
-            Schedule(workflowId = "Dummy Event 2", scheduleType = "monthly", monthlyDays = listOf(15), time = "14:30"),
-            Schedule(workflowId = "Long Name Workflow To Test Ellipsis", scheduleType = "monthly", monthlyDays = listOf(15), time = "15:00")
+            Schedule(id = UUID.randomUUID().toString(), workflowId = "Dummy Event 1", scheduleType = "daily", time = "10:00"),
+            Schedule(id = UUID.randomUUID().toString(), workflowId = "Dummy Event 2", scheduleType = "monthly", monthlyDays = listOf(15), time = "14:30"),
+            Schedule(id = UUID.randomUUID().toString(), workflowId = "Long Name Workflow To Test Ellipsis", scheduleType = "monthly", monthlyDays = listOf(15), time = "15:00")
         )
     }
 

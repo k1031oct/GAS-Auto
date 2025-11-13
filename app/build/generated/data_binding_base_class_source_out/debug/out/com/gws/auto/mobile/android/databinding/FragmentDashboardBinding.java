@@ -4,12 +4,16 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.ScrollView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.PieChart;
+import com.google.android.material.button.MaterialButton;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -17,20 +21,42 @@ import java.lang.String;
 
 public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
-  private final ScrollView rootView;
+  private final ConstraintLayout rootView;
 
   @NonNull
-  public final GridLayout dashboardGrid;
+  public final TextView errorCountText;
 
-  private FragmentDashboardBinding(@NonNull ScrollView rootView,
-      @NonNull GridLayout dashboardGrid) {
+  @NonNull
+  public final PieChart errorRateChart;
+
+  @NonNull
+  public final MaterialButton refreshButton;
+
+  @NonNull
+  public final LinearLayout summaryLayout;
+
+  @NonNull
+  public final TextView totalExecutionsText;
+
+  @NonNull
+  public final BarChart workflowRankingChart;
+
+  private FragmentDashboardBinding(@NonNull ConstraintLayout rootView,
+      @NonNull TextView errorCountText, @NonNull PieChart errorRateChart,
+      @NonNull MaterialButton refreshButton, @NonNull LinearLayout summaryLayout,
+      @NonNull TextView totalExecutionsText, @NonNull BarChart workflowRankingChart) {
     this.rootView = rootView;
-    this.dashboardGrid = dashboardGrid;
+    this.errorCountText = errorCountText;
+    this.errorRateChart = errorRateChart;
+    this.refreshButton = refreshButton;
+    this.summaryLayout = summaryLayout;
+    this.totalExecutionsText = totalExecutionsText;
+    this.workflowRankingChart = workflowRankingChart;
   }
 
   @Override
   @NonNull
-  public ScrollView getRoot() {
+  public ConstraintLayout getRoot() {
     return rootView;
   }
 
@@ -55,13 +81,44 @@ public final class FragmentDashboardBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.dashboard_grid;
-      GridLayout dashboardGrid = ViewBindings.findChildViewById(rootView, id);
-      if (dashboardGrid == null) {
+      id = R.id.error_count_text;
+      TextView errorCountText = ViewBindings.findChildViewById(rootView, id);
+      if (errorCountText == null) {
         break missingId;
       }
 
-      return new FragmentDashboardBinding((ScrollView) rootView, dashboardGrid);
+      id = R.id.error_rate_chart;
+      PieChart errorRateChart = ViewBindings.findChildViewById(rootView, id);
+      if (errorRateChart == null) {
+        break missingId;
+      }
+
+      id = R.id.refresh_button;
+      MaterialButton refreshButton = ViewBindings.findChildViewById(rootView, id);
+      if (refreshButton == null) {
+        break missingId;
+      }
+
+      id = R.id.summary_layout;
+      LinearLayout summaryLayout = ViewBindings.findChildViewById(rootView, id);
+      if (summaryLayout == null) {
+        break missingId;
+      }
+
+      id = R.id.total_executions_text;
+      TextView totalExecutionsText = ViewBindings.findChildViewById(rootView, id);
+      if (totalExecutionsText == null) {
+        break missingId;
+      }
+
+      id = R.id.workflow_ranking_chart;
+      BarChart workflowRankingChart = ViewBindings.findChildViewById(rootView, id);
+      if (workflowRankingChart == null) {
+        break missingId;
+      }
+
+      return new FragmentDashboardBinding((ConstraintLayout) rootView, errorCountText,
+          errorRateChart, refreshButton, summaryLayout, totalExecutionsText, workflowRankingChart);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

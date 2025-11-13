@@ -25,6 +25,9 @@ public final class ListItemWorkflowBinding implements ViewBinding {
   public final ImageButton deleteButton;
 
   @NonNull
+  public final ImageButton editButton;
+
+  @NonNull
   public final Button runButton;
 
   @NonNull
@@ -40,11 +43,12 @@ public final class ListItemWorkflowBinding implements ViewBinding {
   public final TextView workflowTrigger;
 
   private ListItemWorkflowBinding(@NonNull MaterialCardView rootView,
-      @NonNull ImageButton deleteButton, @NonNull Button runButton,
+      @NonNull ImageButton deleteButton, @NonNull ImageButton editButton, @NonNull Button runButton,
       @NonNull TextView workflowDescription, @NonNull TextView workflowName,
       @NonNull TextView workflowStatus, @NonNull TextView workflowTrigger) {
     this.rootView = rootView;
     this.deleteButton = deleteButton;
+    this.editButton = editButton;
     this.runButton = runButton;
     this.workflowDescription = workflowDescription;
     this.workflowName = workflowName;
@@ -85,6 +89,12 @@ public final class ListItemWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.edit_button;
+      ImageButton editButton = ViewBindings.findChildViewById(rootView, id);
+      if (editButton == null) {
+        break missingId;
+      }
+
       id = R.id.run_button;
       Button runButton = ViewBindings.findChildViewById(rootView, id);
       if (runButton == null) {
@@ -115,8 +125,8 @@ public final class ListItemWorkflowBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ListItemWorkflowBinding((MaterialCardView) rootView, deleteButton, runButton,
-          workflowDescription, workflowName, workflowStatus, workflowTrigger);
+      return new ListItemWorkflowBinding((MaterialCardView) rootView, deleteButton, editButton,
+          runButton, workflowDescription, workflowName, workflowStatus, workflowTrigger);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

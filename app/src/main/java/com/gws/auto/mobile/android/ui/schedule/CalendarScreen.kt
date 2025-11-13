@@ -5,19 +5,49 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,8 +61,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gws.auto.mobile.android.R
-import com.gws.auto.mobile.android.data.model.Schedule
 import com.gws.auto.mobile.android.domain.model.Holiday
+import com.gws.auto.mobile.android.domain.model.Schedule
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -55,10 +85,14 @@ fun CalendarScreen(
     )
     val holidays by viewModel.holidays.collectAsState()
     val schedules by viewModel.schedules.collectAsState()
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.PartiallyExpanded
+        )
+    )
 
     val currentVisibleMonth by remember {
         derivedStateOf {
@@ -73,74 +107,72 @@ fun CalendarScreen(
         }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                context.startActivity(Intent(context, ScheduleSettingsActivity::class.java))
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_schedule))
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetContent = {
+            DayTimelineSheet(date = selectedDate, holidays = holidays, schedules = schedules)
+        },
+        sheetPeekHeight = 64.dp // Show handle
+    ) {
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    context.startActivity(Intent(context, ScheduleSettingsActivity::class.java))
+                }) {
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_schedule))
+                }
             }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            Row(
+        ) { paddingValues ->
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .padding(paddingValues)
             ) {
-                Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
-                Text(
-                    text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
-            }
-
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)) {
-                val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
-                daysOfWeek.forEach { day ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
                     Text(
-                        text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f)
+                        text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+                }
+
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)) {
+                    val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
+                    daysOfWeek.forEach { day ->
+                        Text(
+                            text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+
+                VerticalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize() // Fills remaining space
+                ) { page ->
+                    val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
+                    MonthView(
+                        yearMonth = month,
+                        holidays = holidays,
+                        schedules = schedules,
+                        onDateClick = {
+                            selectedDate = it
+                            scope.launch { scaffoldState.bottomSheetState.expand() }
+                        }
                     )
                 }
             }
-
-            VerticalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize() // Fills remaining space
-            ) { page ->
-                val month = YearMonth.now().plusMonths((page - (Int.MAX_VALUE / 2)).toLong())
-                MonthView(
-                    yearMonth = month,
-                    holidays = holidays,
-                    schedules = schedules,
-                    onDateClick = {
-                        selectedDate = it
-                        scope.launch { sheetState.show() }
-                    }
-                )
-            }
-        }
-    }
-
-    if (sheetState.isVisible && selectedDate != null) {
-        ModalBottomSheet(
-            onDismissRequest = { scope.launch { selectedDate = null; sheetState.hide() } },
-            sheetState = sheetState,
-            modifier = Modifier.fillMaxHeight(0.9f) // Allow sheet to take up most of the screen
-        ) {
-            DayTimelineSheet(date = selectedDate!!, holidays = holidays, schedules = schedules)
         }
     }
 }

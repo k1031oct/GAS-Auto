@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gws.auto.mobile.android.databinding.FragmentWorkflowBinding
 import com.gws.auto.mobile.android.domain.engine.WorkflowEngine
+import com.gws.auto.mobile.android.domain.model.Workflow
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.workflow.editor.WorkflowEditorActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +64,11 @@ class WorkflowFragment : Fragment() {
                         Timber.e(e, "Failed to execute workflow: ${workflow.name}")
                     }
                 }
+            },
+            onEditClicked = { workflow ->
+                val intent = Intent(activity, WorkflowEditorActivity::class.java)
+                intent.putExtra("workflowId", workflow.id)
+                startActivity(intent)
             },
             onDeleteClicked = { workflow -> viewModel.deleteWorkflow(workflow) },
             onAddClicked = {
