@@ -64,7 +64,7 @@ class AppSettingsFragment : Fragment() {
             R.array.first_day_of_week_entries,
             R.layout.spinner_item_right_aligned
         ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setDropDownViewResource(R.layout.spinner_item_right_aligned)
             binding.firstDayOfWeekSpinner.adapter = it
         }
 
@@ -86,7 +86,7 @@ class AppSettingsFragment : Fragment() {
             R.array.country_entries,
             R.layout.spinner_item_right_aligned
         ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setDropDownViewResource(R.layout.spinner_item_right_aligned)
             binding.countrySpinner.adapter = it
         }
 
@@ -109,7 +109,7 @@ class AppSettingsFragment : Fragment() {
             R.array.language_entries,
             R.layout.spinner_item_right_aligned
         ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setDropDownViewResource(R.layout.spinner_item_right_aligned)
             binding.languageSpinner.adapter = it
         }
 
@@ -133,7 +133,7 @@ class AppSettingsFragment : Fragment() {
             R.array.theme_entries,
             R.layout.spinner_item_right_aligned
         ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setDropDownViewResource(R.layout.spinner_item_right_aligned)
             binding.themeSpinner.adapter = it
         }
 
@@ -165,7 +165,7 @@ class AppSettingsFragment : Fragment() {
             R.array.highlight_color_entries,
             R.layout.spinner_item_right_aligned
         ).also {
-            it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setDropDownViewResource(R.layout.spinner_item_right_aligned)
             binding.highlightColorSpinner.adapter = it
         }
 

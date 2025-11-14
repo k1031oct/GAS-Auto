@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android.ui.settings.user;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
 import dagger.MembersInjector;
 import dagger.internal.DaggerGenerated;
@@ -26,21 +27,33 @@ import javax.annotation.processing.Generated;
 public final class UserInfoFragment_MembersInjector implements MembersInjector<UserInfoFragment> {
   private final Provider<FirebaseAuth> authProvider;
 
-  private UserInfoFragment_MembersInjector(Provider<FirebaseAuth> authProvider) {
+  private final Provider<GoogleSignInClient> googleSignInClientProvider;
+
+  private UserInfoFragment_MembersInjector(Provider<FirebaseAuth> authProvider,
+      Provider<GoogleSignInClient> googleSignInClientProvider) {
     this.authProvider = authProvider;
+    this.googleSignInClientProvider = googleSignInClientProvider;
   }
 
   @Override
   public void injectMembers(UserInfoFragment instance) {
     injectAuth(instance, authProvider.get());
+    injectGoogleSignInClient(instance, googleSignInClientProvider.get());
   }
 
-  public static MembersInjector<UserInfoFragment> create(Provider<FirebaseAuth> authProvider) {
-    return new UserInfoFragment_MembersInjector(authProvider);
+  public static MembersInjector<UserInfoFragment> create(Provider<FirebaseAuth> authProvider,
+      Provider<GoogleSignInClient> googleSignInClientProvider) {
+    return new UserInfoFragment_MembersInjector(authProvider, googleSignInClientProvider);
   }
 
   @InjectedFieldSignature("com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment.auth")
   public static void injectAuth(UserInfoFragment instance, FirebaseAuth auth) {
     instance.auth = auth;
+  }
+
+  @InjectedFieldSignature("com.gws.auto.mobile.android.ui.settings.user.UserInfoFragment.googleSignInClient")
+  public static void injectGoogleSignInClient(UserInfoFragment instance,
+      GoogleSignInClient googleSignInClient) {
+    instance.googleSignInClient = googleSignInClient;
   }
 }
