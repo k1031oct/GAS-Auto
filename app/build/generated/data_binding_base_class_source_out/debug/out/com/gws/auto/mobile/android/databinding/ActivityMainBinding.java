@@ -4,7 +4,6 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +25,7 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final CheckBox actionFavoriteIcon;
+  public final ImageView actionFavoriteIcon;
 
   @NonNull
   public final ImageView actionSettingsIcon;
@@ -50,7 +49,7 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull CheckBox actionFavoriteIcon, @NonNull ImageView actionSettingsIcon,
+      @NonNull ImageView actionFavoriteIcon, @NonNull ImageView actionSettingsIcon,
       @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
       @NonNull SearchView searchView, @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar,
       @NonNull ViewPager2 viewPager) {
@@ -93,7 +92,7 @@ public final class ActivityMainBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.action_favorite_icon;
-      CheckBox actionFavoriteIcon = ViewBindings.findChildViewById(rootView, id);
+      ImageView actionFavoriteIcon = ViewBindings.findChildViewById(rootView, id);
       if (actionFavoriteIcon == null) {
         break missingId;
       }

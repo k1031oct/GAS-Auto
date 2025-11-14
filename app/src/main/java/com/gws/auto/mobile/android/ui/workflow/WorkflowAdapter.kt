@@ -63,7 +63,8 @@ class WorkflowAdapter(
             binding.workflowStatus.text = workflow.status
             binding.workflowTrigger.text = workflow.trigger
 
-            binding.favoriteButton.isChecked = workflow.isFavorite
+            val iconRes = if (workflow.isFavorite) R.drawable.ic_star else R.drawable.ic_star_border
+            binding.favoriteButton.setImageResource(iconRes)
 
             binding.runButton.setOnClickListener { onRunClicked(workflow) }
             binding.editButton.setOnClickListener { onEditClicked(workflow) }
