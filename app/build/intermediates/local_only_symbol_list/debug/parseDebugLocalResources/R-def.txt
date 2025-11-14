@@ -287,6 +287,7 @@ layout list_item_timeline_event
 layout list_item_workflow
 layout list_item_workflow_stat
 layout menu_item_settings_with_badge
+layout spinner_item_right_aligned
 menu bottom_nav_menu
 menu history_menu
 menu main_menu

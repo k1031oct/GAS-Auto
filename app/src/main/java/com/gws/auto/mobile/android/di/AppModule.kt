@@ -4,8 +4,12 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import androidx.room.Room
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.data.local.db.AppDatabase
 import com.gws.auto.mobile.android.data.local.db.HistoryDao
 import com.gws.auto.mobile.android.data.local.db.ScheduleDao
@@ -41,6 +45,16 @@ object AppModule {
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideGoogleSignInClient(@ApplicationContext context: Context): GoogleSignInClient {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        return GoogleSignIn.getClient(context, gso)
     }
 
     @Provides

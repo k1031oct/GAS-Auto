@@ -251,6 +251,7 @@
         <item name="colorOutline">@color/md_theme_light_outline</item>
         <item name="colorError">@color/md_theme_light_error</item>
         <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
+import com.google.android.gms.common.SignInButton;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -24,15 +25,20 @@ public final class FragmentUserInfoBinding implements ViewBinding {
   public final ImageView profileImage;
 
   @NonNull
+  public final SignInButton signInButton;
+
+  @NonNull
   public final TextView userEmail;
 
   @NonNull
   public final TextView userName;
 
   private FragmentUserInfoBinding(@NonNull ConstraintLayout rootView,
-      @NonNull ImageView profileImage, @NonNull TextView userEmail, @NonNull TextView userName) {
+      @NonNull ImageView profileImage, @NonNull SignInButton signInButton,
+      @NonNull TextView userEmail, @NonNull TextView userName) {
     this.rootView = rootView;
     this.profileImage = profileImage;
+    this.signInButton = signInButton;
     this.userEmail = userEmail;
     this.userName = userName;
   }
@@ -70,6 +76,12 @@ public final class FragmentUserInfoBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.sign_in_button;
+      SignInButton signInButton = ViewBindings.findChildViewById(rootView, id);
+      if (signInButton == null) {
+        break missingId;
+      }
+
       id = R.id.user_email;
       TextView userEmail = ViewBindings.findChildViewById(rootView, id);
       if (userEmail == null) {
@@ -82,8 +94,8 @@ public final class FragmentUserInfoBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentUserInfoBinding((ConstraintLayout) rootView, profileImage, userEmail,
-          userName);
+      return new FragmentUserInfoBinding((ConstraintLayout) rootView, profileImage, signInButton,
+          userEmail, userName);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

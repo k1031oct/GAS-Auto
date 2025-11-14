@@ -62,7 +62,7 @@ class AppSettingsFragment : Fragment() {
         val firstDayOfWeekAdapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.first_day_of_week_entries,
-            android.R.layout.simple_spinner_item
+            R.layout.spinner_item_right_aligned
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.firstDayOfWeekSpinner.adapter = it
@@ -84,7 +84,7 @@ class AppSettingsFragment : Fragment() {
         val countryAdapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.country_entries,
-            android.R.layout.simple_spinner_item
+            R.layout.spinner_item_right_aligned
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.countrySpinner.adapter = it
@@ -107,7 +107,7 @@ class AppSettingsFragment : Fragment() {
         val languageAdapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.language_entries,
-            android.R.layout.simple_spinner_item
+            R.layout.spinner_item_right_aligned
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.languageSpinner.adapter = it
@@ -131,7 +131,7 @@ class AppSettingsFragment : Fragment() {
         val themeAdapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.theme_entries,
-            android.R.layout.simple_spinner_item
+            R.layout.spinner_item_right_aligned
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.themeSpinner.adapter = it
@@ -163,7 +163,7 @@ class AppSettingsFragment : Fragment() {
         val highlightColorAdapter = ArrayAdapter.createFromResource(
             requireContext(),
             R.array.highlight_color_entries,
-            android.R.layout.simple_spinner_item
+            R.layout.spinner_item_right_aligned
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.highlightColorSpinner.adapter = it
