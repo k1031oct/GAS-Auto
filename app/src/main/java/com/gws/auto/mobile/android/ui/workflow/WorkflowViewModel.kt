@@ -2,6 +2,7 @@ package com.gws.auto.mobile.android.ui.workflow
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gws.auto.mobile.android.data.repository.SearchHistoryRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.domain.model.Workflow
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WorkflowViewModel @Inject constructor(
-    private val workflowRepository: WorkflowRepository
+    private val workflowRepository: WorkflowRepository,
+    private val searchHistoryRepository: SearchHistoryRepository
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
@@ -42,6 +44,10 @@ class WorkflowViewModel @Inject constructor(
 
     fun onQueryChanged(query: String) {
         _searchQuery.value = query
+    }
+
+    fun addSearchHistory(query: String) = viewModelScope.launch {
+        searchHistoryRepository.insertSearchHistory(query)
     }
 
     fun deleteWorkflow(workflow: Workflow) = viewModelScope.launch {

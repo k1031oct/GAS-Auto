@@ -1,10 +1,14 @@
 package com.gws.auto.mobile.android
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -57,6 +61,15 @@ class MainActivity : AppCompatActivity() {
         observeViewModel()
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            currentFocus!!.clearFocus()
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
     private fun setupViewPager() {
         binding.viewPager.adapter = MainFragmentStateAdapter(this)
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -81,9 +94,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSearchView() {
+        val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+        searchEditText.background = null
+
         binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+                mainSharedViewModel.setSearchQuery(query.orEmpty())
+                if (query?.isNotBlank() == true) {
+                    workflowViewModel.addSearchHistory(query)
+                }
+                binding.searchView.clearFocus()
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
