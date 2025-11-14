@@ -88,7 +88,7 @@ class SearchFragment : BottomSheetDialogFragment() {
 
     private fun setupClickListeners() {
         binding.clearHistoryButton.setOnClickListener {
-            showDeleteConfirmationDialog(getString(R.string.clear_history_confirmation), null) { viewModel.clearSearchHistory() }
+            showDeleteConfirmationDialog(getString(R.string.clear_search_history_confirmation), null) { viewModel.clearSearchHistory() }
         }
     }
 

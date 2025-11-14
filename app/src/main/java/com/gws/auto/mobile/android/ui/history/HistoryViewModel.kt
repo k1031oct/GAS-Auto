@@ -55,7 +55,7 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    fun deleteAllHistory() {
+    fun clearHistory() {
         viewModelScope.launch {
             historyRepository.deleteAllHistory()
         }

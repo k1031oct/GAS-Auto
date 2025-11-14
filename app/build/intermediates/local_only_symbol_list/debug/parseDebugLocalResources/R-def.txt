@@ -100,6 +100,7 @@ drawable ic_unread_indicator
 drawable ic_workflow
 drawable search_view_background
 id about_app
+id action_clear_history
 id action_delete_all_history
 id action_favorite_icon
 id action_settings
@@ -310,7 +311,9 @@ string app_name
 string calendar_next_month_button
 string calendar_previous_month_button
 string cancel
-string clear_history_confirmation
+string clear_history_confirmation_message
+string clear_history_confirmation_title
+string clear_search_history_confirmation
 string com.google.firebase.crashlytics.mapping_file_id
 string com.google.firebase.crashlytics.version_control_info
 string country_for_holidays

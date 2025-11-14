@@ -3999,6 +3999,7 @@ id action_bar_root
 id action_bar_spinner
 id action_bar_subtitle
 id action_bar_title
+id action_clear_history
 id action_container
 id action_context_bar
 id action_delete_all_history
@@ -5005,7 +5006,9 @@ string cancel
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
-string clear_history_confirmation
+string clear_history_confirmation_message
+string clear_history_confirmation_title
+string clear_search_history_confirmation
 string clear_text_end_icon_content_description
 string close_drawer
 string close_sheet

@@ -32,7 +32,9 @@
     <string name="delete">Delete</string>
     <string name="delete_tag_confirmation">Are you sure you want to delete the tag</string>
     <string name="delete_history_confirmation">Are you sure you want to delete the history item</string>
-    <string name="clear_history_confirmation">Are you sure you want to clear all search history?</string>
+    <string name="clear_history_confirmation_title">Clear History</string>
+    <string name="clear_history_confirmation_message">Are you sure you want to clear all execution history?</string>
+    <string name="clear_search_history_confirmation">Are you sure you want to clear all search history?</string>
     <string name="add_tag_title">Add New Tag</string>
     <string name="tag_name_hint">Tag Name</string>
 

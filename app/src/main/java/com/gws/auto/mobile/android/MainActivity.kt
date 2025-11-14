@@ -23,6 +23,7 @@ import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
+import com.gws.auto.mobile.android.ui.history.HistoryViewModel
 import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val mainSharedViewModel: MainSharedViewModel by viewModels()
     private lateinit var announcementViewModel: AnnouncementViewModel
     private val workflowViewModel: WorkflowViewModel by viewModels()
+    private val historyViewModel: HistoryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         setupSearchView()
         setupSettingsIcon()
         setupFavoriteIcon()
+        setupClearHistoryButton()
         setupBackButtonHandler()
         observeViewModel()
     }
@@ -133,9 +136,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupClearHistoryButton() {
+        binding.actionClearHistory.setOnClickListener {
+            showClearHistoryConfirmationDialog()
+        }
+    }
+
     private fun observeViewModel() {
         mainSharedViewModel.currentPage.onEach { page ->
             binding.actionFavoriteIcon.visibility = if (page == 0) View.VISIBLE else View.GONE
+            binding.actionClearHistory.visibility = if (page == 2) View.VISIBLE else View.GONE
         }.launchIn(lifecycleScope)
 
         workflowViewModel.isFavoriteFilterActive.onEach { isActive ->
@@ -165,6 +175,15 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.exit_confirmation_message))
             .setPositiveButton(getString(R.string.exit)) { _, _ -> finish() }
             .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
+    private fun showClearHistoryConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.clear_history_confirmation_title)
+            .setMessage(R.string.clear_history_confirmation_message)
+            .setPositiveButton(R.string.delete) { _, _ -> historyViewModel.clearHistory() }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 

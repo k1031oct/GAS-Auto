@@ -132,7 +132,9 @@
     <string name="calendar_next_month_button">></string>
     <string name="calendar_previous_month_button">&lt;</string>
     <string name="cancel">Cancel</string>
-    <string name="clear_history_confirmation">Are you sure you want to clear all search history?</string>
+    <string name="clear_history_confirmation_message">Are you sure you want to clear all execution history?</string>
+    <string name="clear_history_confirmation_title">Clear History</string>
+    <string name="clear_search_history_confirmation">Are you sure you want to clear all search history?</string>
     <string name="com.google.firebase.crashlytics.mapping_file_id" ns1:ignore="UnusedResources,TypographyDashes" translatable="false">00000000000000000000000000000000</string>
     <string name="com.google.firebase.crashlytics.version_control_info">""</string>
     <string name="country_for_holidays">Country for holidays</string>

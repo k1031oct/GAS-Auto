@@ -105,7 +105,7 @@ class HistoryFragment : Fragment() {
         AlertDialog.Builder(requireContext())
             .setTitle("Delete All History")
             .setMessage("Are you sure you want to delete all execution history? This action cannot be undone.")
-            .setPositiveButton("Delete") { _, _ -> viewModel.deleteAllHistory() }
+            .setPositiveButton("Delete") { _, _ -> viewModel.clearHistory() }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }

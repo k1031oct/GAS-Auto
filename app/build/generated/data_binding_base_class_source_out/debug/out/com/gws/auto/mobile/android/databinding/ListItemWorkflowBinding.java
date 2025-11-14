@@ -5,8 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -33,7 +33,7 @@ public final class ListItemWorkflowBinding implements ViewBinding {
   public final ImageButton editButton;
 
   @NonNull
-  public final ImageView favoriteButton;
+  public final CheckBox favoriteButton;
 
   @NonNull
   public final Button runButton;
@@ -52,7 +52,7 @@ public final class ListItemWorkflowBinding implements ViewBinding {
 
   private ListItemWorkflowBinding(@NonNull MaterialCardView rootView,
       @NonNull LinearLayout buttonContainer, @NonNull ImageButton deleteButton,
-      @NonNull ImageButton editButton, @NonNull ImageView favoriteButton, @NonNull Button runButton,
+      @NonNull ImageButton editButton, @NonNull CheckBox favoriteButton, @NonNull Button runButton,
       @NonNull TextView workflowDescription, @NonNull TextView workflowName,
       @NonNull TextView workflowStatus, @NonNull TextView workflowTrigger) {
     this.rootView = rootView;
@@ -113,7 +113,7 @@ public final class ListItemWorkflowBinding implements ViewBinding {
       }
 
       id = R.id.favorite_button;
-      ImageView favoriteButton = ViewBindings.findChildViewById(rootView, id);
+      CheckBox favoriteButton = ViewBindings.findChildViewById(rootView, id);
       if (favoriteButton == null) {
         break missingId;
       }
