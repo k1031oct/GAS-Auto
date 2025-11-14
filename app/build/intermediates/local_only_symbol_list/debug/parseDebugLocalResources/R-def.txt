@@ -98,8 +98,10 @@ drawable ic_schedule
 drawable ic_search
 drawable ic_unread_indicator
 drawable ic_workflow
+drawable search_view_background
 id about_app
 id action_delete_all_history
+id action_favorite_icon
 id action_settings
 id action_settings_icon
 id add_tag_button
@@ -110,6 +112,8 @@ id app_bar_layout
 id auth_button
 id back_button
 id bottom_nav_view
+id button_container
+id clear_history_button
 id compose_view
 id contact_button
 id country_spinner
@@ -117,7 +121,6 @@ id dark_button
 id date
 id day_text
 id delete_button
-id delete_tag_button
 id edit_button
 id error_count_day_change_text
 id error_count_month_change_text
@@ -127,6 +130,7 @@ id event_title
 id execution_count_text
 id execution_status
 id execution_time
+id favorite_button
 id first_day_of_week_spinner
 id highlight_color_spinner
 id history_recycler_view
@@ -162,6 +166,7 @@ id next_button
 id privacy_policy_button
 id profile_image
 id progressBar
+id query_text
 id rating_button
 id refresh_button
 id run_button
@@ -188,8 +193,8 @@ id sunday_button
 id sync_status_text
 id system_button
 id tag_management_button
+id tag_name
 id tag_name_input
-id tag_name_text
 id tag_recycler_view
 id theme_dark_radio
 id theme_group
@@ -245,6 +250,7 @@ layout fragment_history
 layout fragment_licenses
 layout fragment_main_settings
 layout fragment_schedule
+layout fragment_search
 layout fragment_settings
 layout fragment_tag_management
 layout fragment_theme_settings
@@ -258,6 +264,7 @@ layout item_history_table
 layout item_module
 layout item_workflow
 layout item_workflow_table
+layout list_item_add_tag
 layout list_item_add_workflow
 layout list_item_announcement
 layout list_item_calendar_day
@@ -267,6 +274,7 @@ layout list_item_history_log
 layout list_item_module_library
 layout list_item_module_stat
 layout list_item_schedule
+layout list_item_search_history
 layout list_item_setting
 layout list_item_tag
 layout list_item_timeline
@@ -295,18 +303,23 @@ string add_a_tag
 string add_module
 string add_new_workflow
 string add_schedule
+string add_tag_title
 string all_schedules_title
 string announcement_unread_indicator
 string app_name
 string calendar_next_month_button
 string calendar_previous_month_button
 string cancel
+string clear_history_confirmation
 string com.google.firebase.crashlytics.mapping_file_id
 string com.google.firebase.crashlytics.version_control_info
 string country_for_holidays
 string dashboard_error_count
 string dashboard_total_executions
 string default_web_client_id
+string delete
+string delete_history_confirmation
+string delete_tag_confirmation
 string dummy_status_active
 string dummy_trigger_daily
 string event_time_placeholder
@@ -345,6 +358,7 @@ string refresh
 string save_workflow
 string schedule_list_item_type
 string schedule_list_item_workflow
+string search_hint
 string search_workflows_hint
 string settings_category_account
 string settings_category_app
@@ -358,6 +372,7 @@ string skip
 string sunday
 string sync_disabled
 string sync_enabled_with
+string tag_name_hint
 string theme
 string theme_dark
 string theme_light
@@ -407,10 +422,5 @@ style SettingsItem
 style SettingsItemContainer
 style Theme.GWSAutoForAndroid
 style Theme.GWSAutoForAndroid.Splash
-style Widget.App.StatCard
-style Widget.App.StatCardChange
-style Widget.App.StatCardContent
-style Widget.App.StatCardTitle
-style Widget.App.StatCardValue
 xml backup_rules
 xml data_extraction_rules

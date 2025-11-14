@@ -50,7 +50,7 @@ public final class WorkflowDao_Impl implements WorkflowDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `workflows` (`id`,`name`,`description`,`modules`,`status`,`trigger`,`tags`) VALUES (?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `workflows` (`id`,`name`,`description`,`modules`,`status`,`trigger`,`tags`,`isFavorite`) VALUES (?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -65,6 +65,8 @@ public final class WorkflowDao_Impl implements WorkflowDao {
         statement.bindString(6, entity.getTrigger());
         final String _tmp_1 = __listConverter.fromList(entity.getTags());
         statement.bindString(7, _tmp_1);
+        final int _tmp_2 = entity.isFavorite() ? 1 : 0;
+        statement.bindLong(8, _tmp_2);
       }
     };
     this.__deletionAdapterOfWorkflow = new EntityDeletionOrUpdateAdapter<Workflow>(__db) {
@@ -84,7 +86,7 @@ public final class WorkflowDao_Impl implements WorkflowDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `workflows` SET `id` = ?,`name` = ?,`description` = ?,`modules` = ?,`status` = ?,`trigger` = ?,`tags` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `workflows` SET `id` = ?,`name` = ?,`description` = ?,`modules` = ?,`status` = ?,`trigger` = ?,`tags` = ?,`isFavorite` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -99,7 +101,9 @@ public final class WorkflowDao_Impl implements WorkflowDao {
         statement.bindString(6, entity.getTrigger());
         final String _tmp_1 = __listConverter.fromList(entity.getTags());
         statement.bindString(7, _tmp_1);
-        statement.bindString(8, entity.getId());
+        final int _tmp_2 = entity.isFavorite() ? 1 : 0;
+        statement.bindLong(8, _tmp_2);
+        statement.bindString(9, entity.getId());
       }
     };
   }
@@ -178,6 +182,7 @@ public final class WorkflowDao_Impl implements WorkflowDao {
           final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
           final int _cursorIndexOfTrigger = CursorUtil.getColumnIndexOrThrow(_cursor, "trigger");
           final int _cursorIndexOfTags = CursorUtil.getColumnIndexOrThrow(_cursor, "tags");
+          final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
           final List<Workflow> _result = new ArrayList<Workflow>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final Workflow _item;
@@ -199,7 +204,11 @@ public final class WorkflowDao_Impl implements WorkflowDao {
             final String _tmp_1;
             _tmp_1 = _cursor.getString(_cursorIndexOfTags);
             _tmpTags = __listConverter.fromString(_tmp_1);
-            _item = new Workflow(_tmpId,_tmpName,_tmpDescription,_tmpModules,_tmpStatus,_tmpTrigger,_tmpTags);
+            final boolean _tmpIsFavorite;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsFavorite);
+            _tmpIsFavorite = _tmp_2 != 0;
+            _item = new Workflow(_tmpId,_tmpName,_tmpDescription,_tmpModules,_tmpStatus,_tmpTrigger,_tmpTags,_tmpIsFavorite);
             _result.add(_item);
           }
           return _result;
@@ -235,6 +244,7 @@ public final class WorkflowDao_Impl implements WorkflowDao {
           final int _cursorIndexOfStatus = CursorUtil.getColumnIndexOrThrow(_cursor, "status");
           final int _cursorIndexOfTrigger = CursorUtil.getColumnIndexOrThrow(_cursor, "trigger");
           final int _cursorIndexOfTags = CursorUtil.getColumnIndexOrThrow(_cursor, "tags");
+          final int _cursorIndexOfIsFavorite = CursorUtil.getColumnIndexOrThrow(_cursor, "isFavorite");
           final Workflow _result;
           if (_cursor.moveToFirst()) {
             final String _tmpId;
@@ -255,7 +265,11 @@ public final class WorkflowDao_Impl implements WorkflowDao {
             final String _tmp_1;
             _tmp_1 = _cursor.getString(_cursorIndexOfTags);
             _tmpTags = __listConverter.fromString(_tmp_1);
-            _result = new Workflow(_tmpId,_tmpName,_tmpDescription,_tmpModules,_tmpStatus,_tmpTrigger,_tmpTags);
+            final boolean _tmpIsFavorite;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsFavorite);
+            _tmpIsFavorite = _tmp_2 != 0;
+            _result = new Workflow(_tmpId,_tmpName,_tmpDescription,_tmpModules,_tmpStatus,_tmpTrigger,_tmpTags,_tmpIsFavorite);
           } else {
             _result = null;
           }

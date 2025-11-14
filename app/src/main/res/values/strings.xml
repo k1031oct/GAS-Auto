@@ -29,6 +29,12 @@
     <string name="exit_confirmation_message">Are you sure you want to exit?</string>
     <string name="exit">Exit</string>
     <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="delete_tag_confirmation">Are you sure you want to delete the tag</string>
+    <string name="delete_history_confirmation">Are you sure you want to delete the history item</string>
+    <string name="clear_history_confirmation">Are you sure you want to clear all search history?</string>
+    <string name="add_tag_title">Add New Tag</string>
+    <string name="tag_name_hint">Tag Name</string>
 
     <!-- Wizard -->
     <string name="wizard_welcome_title">Welcome to GWS Automater</string>
@@ -100,6 +106,7 @@
     <string name="previous_month">&lt;</string>
     <string name="next_month">&gt;</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
+    <string name="search_hint">検索</string>
     <string name="event_time_placeholder">10:00 AM</string>
     <string name="event_title_placeholder">Google Calendar Event</string>
     <string name="timeline_for_date">Timeline for %1$s</string>

@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.GWSAutoForAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
@@ -31,51 +31,6 @@
         <item name="android:windowLightStatusBar">false</item>
     </style>
 
-    <!-- Custom Component Styles -->
-    <style name="SettingsItem">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
-        <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <style name="Divider">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">1dp</item>
-        <item name="android:background">?attr/colorOutlineVariant</item>
-    </style>
-
-    <style name="Widget.App.StatCard" parent="Widget.Material3.CardView.Elevated">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_columnWeight">1</item>
-        <item name="android:layout_margin">4dp</item>
-    </style>
-
-    <style name="Widget.App.StatCardContent" parent="">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:gravity">center_horizontal</item>
-        <item name="android:padding">8dp</item>
-    </style>
-
-    <style name="Widget.App.StatCardTitle" parent="">
-        <item name="android:textAppearance">?attr/textAppearanceLabelLarge</item>
-    </style>
-
-    <style name="Widget.App.StatCardValue" parent="">
-        <item name="android:textAppearance">?attr/textAppearanceHeadlineSmall</item>
-        <item name="android:layout_marginTop">4dp</item>
-    </style>
-
-    <style name="Widget.App.StatCardChange" parent="">
-        <item name="android:textAppearance">?attr/textAppearanceBodySmall</item>
-    </style>
+    <style name="Theme.GWSAutoForAndroid" parent="Base.Theme.GWSAutoForAndroid" />
 
 </resources>

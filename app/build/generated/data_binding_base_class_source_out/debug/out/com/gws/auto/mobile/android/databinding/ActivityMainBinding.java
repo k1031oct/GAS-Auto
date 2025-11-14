@@ -4,6 +4,7 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,9 @@ import java.lang.String;
 public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   private final ConstraintLayout rootView;
+
+  @NonNull
+  public final CheckBox actionFavoriteIcon;
 
   @NonNull
   public final ImageView actionSettingsIcon;
@@ -46,10 +50,12 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull ImageView actionSettingsIcon, @NonNull AppBarLayout appBarLayout,
-      @NonNull BottomNavigationView bottomNavView, @NonNull SearchView searchView,
-      @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+      @NonNull CheckBox actionFavoriteIcon, @NonNull ImageView actionSettingsIcon,
+      @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
+      @NonNull SearchView searchView, @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar,
+      @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
+    this.actionFavoriteIcon = actionFavoriteIcon;
     this.actionSettingsIcon = actionSettingsIcon;
     this.appBarLayout = appBarLayout;
     this.bottomNavView = bottomNavView;
@@ -86,6 +92,12 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.action_favorite_icon;
+      CheckBox actionFavoriteIcon = ViewBindings.findChildViewById(rootView, id);
+      if (actionFavoriteIcon == null) {
+        break missingId;
+      }
+
       id = R.id.action_settings_icon;
       ImageView actionSettingsIcon = ViewBindings.findChildViewById(rootView, id);
       if (actionSettingsIcon == null) {
@@ -128,8 +140,9 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, actionSettingsIcon, appBarLayout,
-          bottomNavView, searchView, settingsBadge, toolbar, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, actionFavoriteIcon,
+          actionSettingsIcon, appBarLayout, bottomNavView, searchView, settingsBadge, toolbar,
+          viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

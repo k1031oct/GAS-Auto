@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
@@ -23,7 +23,7 @@
         <item name="postSplashScreenTheme">@style/Theme.GWSAutoForAndroid</item>
     </style>
 
-    <!-- Settings Screen Styles -->
+    <!-- Custom Component Styles -->
     <style name="SettingsHeader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -56,6 +56,12 @@
         <item name="android:paddingTop">12dp</item>
         <item name="android:paddingBottom">12dp</item>
         <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
     </style>
 
 </resources>

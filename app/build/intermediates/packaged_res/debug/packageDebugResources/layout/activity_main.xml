@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
+        app:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
@@ -29,9 +30,23 @@
                     android:id="@+id/search_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/search_view_background"
                     app:iconifiedByDefault="false"
-                    app:queryHint="@string/search_workflows_hint"
+                    app:queryHint="@string/search_hint"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/action_favorite_icon"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <CheckBox
+                    android:id="@+id/action_favorite_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@android:drawable/btn_star"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toStartOf="@+id/action_settings_icon"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"/>
@@ -55,7 +70,7 @@
                     android:src="@drawable/badge_dot"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="@id/action_settings_icon"
-                    app:layout_constraintTop_toTopOf="@+id/action_settings_icon"
+                    app:layout_constraintTop_toTopOf="@id/action_settings_icon"
                     tools:visibility="visible"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

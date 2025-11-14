@@ -125,18 +125,23 @@
     <string name="add_module">Add Module</string>
     <string name="add_new_workflow">Add new workflow</string>
     <string name="add_schedule">Add schedule</string>
+    <string name="add_tag_title">Add New Tag</string>
     <string name="all_schedules_title">All Schedules</string>
     <string name="announcement_unread_indicator">Unread indicator</string>
     <string name="app_name">GWS Auto for Android</string>
     <string name="calendar_next_month_button">></string>
     <string name="calendar_previous_month_button">&lt;</string>
     <string name="cancel">Cancel</string>
+    <string name="clear_history_confirmation">Are you sure you want to clear all search history?</string>
     <string name="com.google.firebase.crashlytics.mapping_file_id" ns1:ignore="UnusedResources,TypographyDashes" translatable="false">00000000000000000000000000000000</string>
     <string name="com.google.firebase.crashlytics.version_control_info">""</string>
     <string name="country_for_holidays">Country for holidays</string>
     <string name="dashboard_error_count">Errors: %1$d</string>
     <string name="dashboard_total_executions">Total: %1$d</string>
     <string name="default_web_client_id" translatable="false">46549959857-ae1ivjnof9s9off7cvub8ms16qb6h7vh.apps.googleusercontent.com</string>
+    <string name="delete">Delete</string>
+    <string name="delete_history_confirmation">Are you sure you want to delete the history item</string>
+    <string name="delete_tag_confirmation">Are you sure you want to delete the tag</string>
     <string name="dummy_status_active">Active</string>
     <string name="dummy_trigger_daily">Daily at 9:00</string>
     <string name="event_time_placeholder">10:00 AM</string>
@@ -175,6 +180,7 @@
     <string name="save_workflow">Save Workflow</string>
     <string name="schedule_list_item_type">Type: %1$s</string>
     <string name="schedule_list_item_workflow">Workflow: %1$s</string>
+    <string name="search_hint">検索</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
     <string name="settings_category_account">アカウント設定</string>
     <string name="settings_category_app">アプリ設定</string>
@@ -188,6 +194,7 @@
     <string name="sunday">Sunday</string>
     <string name="sync_disabled">Sync is currently disabled.</string>
     <string name="sync_enabled_with">Sync enabled with: %1$s</string>
+    <string name="tag_name_hint">Tag Name</string>
     <string name="theme">Theme</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
@@ -230,7 +237,7 @@
     <string name="workflow_run_button">Run</string>
     <string name="workflow_trigger_icon_desc">Trigger icon</string>
     <string name="yes">Yes</string>
-    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.GWSAutoForAndroid" parent="Theme.Material3.Light.NoActionBar">
         
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
@@ -242,6 +249,11 @@
         <item name="colorOutline">@color/md_theme_light_outline</item>
         <item name="colorError">@color/md_theme_light_error</item>
         <item name="colorOnError">@color/md_theme_light_onError</item>
+    </style>
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
     </style>
     <style name="SettingsHeader">
         <item name="android:layout_width">match_parent</item>

@@ -9,11 +9,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.gws.auto.mobile.android.data.local.db.AppDatabase
 import com.gws.auto.mobile.android.data.local.db.HistoryDao
 import com.gws.auto.mobile.android.data.local.db.ScheduleDao
+import com.gws.auto.mobile.android.data.local.db.SearchHistoryDao
 import com.gws.auto.mobile.android.data.local.db.TagDao
 import com.gws.auto.mobile.android.data.local.db.WorkflowDao
 import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
+import com.gws.auto.mobile.android.data.repository.SearchHistoryRepository
 import com.gws.auto.mobile.android.data.repository.TagRepository
 import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
@@ -77,6 +79,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSearchHistoryDao(appDatabase: AppDatabase): SearchHistoryDao {
+        return appDatabase.searchHistoryDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideGoogleApiAuthorizer(@ApplicationContext context: Context): GoogleApiAuthorizer {
         return GoogleApiAuthorizer(context)
     }
@@ -108,6 +116,12 @@ object AppModule {
     @Singleton
     fun provideHistoryRepository(historyDao: HistoryDao): HistoryRepository {
         return HistoryRepository(historyDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchHistoryRepository(searchHistoryDao: SearchHistoryDao): SearchHistoryRepository {
+        return SearchHistoryRepository(searchHistoryDao)
     }
 
     @Provides

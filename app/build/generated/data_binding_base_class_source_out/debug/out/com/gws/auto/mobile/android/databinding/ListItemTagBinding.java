@@ -4,38 +4,29 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
-import androidx.viewbinding.ViewBindings;
+import com.google.android.material.chip.Chip;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
-import java.lang.String;
 
 public final class ListItemTagBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final Chip rootView;
 
   @NonNull
-  public final ImageButton deleteTagButton;
+  public final Chip tagName;
 
-  @NonNull
-  public final TextView tagNameText;
-
-  private ListItemTagBinding(@NonNull LinearLayout rootView, @NonNull ImageButton deleteTagButton,
-      @NonNull TextView tagNameText) {
+  private ListItemTagBinding(@NonNull Chip rootView, @NonNull Chip tagName) {
     this.rootView = rootView;
-    this.deleteTagButton = deleteTagButton;
-    this.tagNameText = tagNameText;
+    this.tagName = tagName;
   }
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public Chip getRoot() {
     return rootView;
   }
 
@@ -56,25 +47,12 @@ public final class ListItemTagBinding implements ViewBinding {
 
   @NonNull
   public static ListItemTagBinding bind(@NonNull View rootView) {
-    // The body of this method is generated in a way you would not otherwise write.
-    // This is done to optimize the compiled bytecode for size and performance.
-    int id;
-    missingId: {
-      id = R.id.delete_tag_button;
-      ImageButton deleteTagButton = ViewBindings.findChildViewById(rootView, id);
-      if (deleteTagButton == null) {
-        break missingId;
-      }
-
-      id = R.id.tag_name_text;
-      TextView tagNameText = ViewBindings.findChildViewById(rootView, id);
-      if (tagNameText == null) {
-        break missingId;
-      }
-
-      return new ListItemTagBinding((LinearLayout) rootView, deleteTagButton, tagNameText);
+    if (rootView == null) {
+      throw new NullPointerException("rootView");
     }
-    String missingId = rootView.getResources().getResourceName(id);
-    throw new NullPointerException("Missing required view with ID: ".concat(missingId));
+
+    Chip tagName = (Chip) rootView;
+
+    return new ListItemTagBinding((Chip) rootView, tagName);
   }
 }

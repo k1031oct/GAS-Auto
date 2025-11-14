@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gws.auto.mobile.android.databinding.ActivityWorkflowEditorBinding
 import com.gws.auto.mobile.android.domain.model.Module
-import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -26,7 +25,7 @@ import java.util.UUID
 class WorkflowEditorActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWorkflowEditorBinding
-    private val viewModel: WorkflowViewModel by viewModels()
+    private val viewModel: WorkflowEditorViewModel by viewModels()
     private lateinit var moduleAdapter: ModuleAdapter
     private lateinit var libraryAdapter: ModuleLibraryAdapter
 
@@ -41,6 +40,11 @@ class WorkflowEditorActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
             insets
+        }
+
+        val workflowId = intent.getStringExtra("workflowId")
+        if (workflowId != null) {
+            viewModel.loadWorkflow(workflowId)
         }
 
         setupRecyclerView()

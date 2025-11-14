@@ -19,5 +19,6 @@ data class Workflow(
     val modules: List<Module> = emptyList(),
     val status: String = "",
     val trigger: String = "",
-    val tags: List<String> = emptyList()
+    val tags: List<String> = emptyList(),
+    val isFavorite: Boolean = false
 )

@@ -19,7 +19,9 @@ import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
+import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
+import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -31,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainSharedViewModel: MainSharedViewModel by viewModels()
     private lateinit var announcementViewModel: AnnouncementViewModel
+    private val workflowViewModel: WorkflowViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNavigation()
         setupSearchView()
         setupSettingsIcon()
+        setupFavoriteIcon()
         setupBackButtonHandler()
         observeViewModel()
     }
@@ -87,6 +91,13 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         })
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val searchFragment = SearchFragment()
+                searchFragment.show(supportFragmentManager, searchFragment.tag)
+            }
+        }
     }
 
     private fun setupSettingsIcon() {
@@ -95,16 +106,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupFavoriteIcon() {
+        binding.actionFavoriteIcon.setOnClickListener {
+            workflowViewModel.toggleFavoriteFilter()
+        }
+    }
+
     private fun observeViewModel() {
         mainSharedViewModel.currentPage.onEach { page ->
-            val hint = when(page) {
-                0 -> getString(R.string.search_workflows_hint)
-                1 -> "Search schedules..." // TODO: Add to strings.xml
-                2 -> "Search history..."   // TODO: Add to strings.xml
-                3 -> "Search dashboard..." // TODO: Add to strings.xml
-                else -> ""
-            }
-            binding.searchView.queryHint = hint
+            binding.actionFavoriteIcon.visibility = if (page == 0) View.VISIBLE else View.GONE
+        }.launchIn(lifecycleScope)
+
+        workflowViewModel.isFavoriteFilterActive.onEach { isActive ->
+            binding.actionFavoriteIcon.isChecked = isActive
         }.launchIn(lifecycleScope)
 
         announcementViewModel.hasUnread.onEach { hasUnread ->

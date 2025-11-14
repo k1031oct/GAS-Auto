@@ -3935,6 +3935,7 @@ drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable preference_list_divider_material
+drawable search_view_background
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -4002,6 +4003,7 @@ id action_container
 id action_context_bar
 id action_delete_all_history
 id action_divider
+id action_favorite_icon
 id action_image
 id action_menu_divider
 id action_menu_presenter
@@ -4066,6 +4068,7 @@ id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
 id buttonPanel
+id button_container
 id cache_measures
 id callMeasure
 id cancel_button
@@ -4082,6 +4085,7 @@ id checkbox
 id checked
 id chronometer
 id circle_center
+id clear_history_button
 id clear_text
 id clip_horizontal
 id clip_vertical
@@ -4121,7 +4125,6 @@ id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
 id delete_button
-id delete_tag_button
 id deltaRelative
 id dependency_ordering
 id design_bottom_sheet
@@ -4174,6 +4177,7 @@ id exitUntilCollapsed
 id expand_activities_button
 id expanded_menu
 id fade
+id favorite_button
 id fill
 id fill_horizontal
 id fill_vertical
@@ -4412,6 +4416,7 @@ id profile_image
 id progressBar
 id progress_circular
 id progress_horizontal
+id query_text
 id radio
 id rating_button
 id ratio
@@ -4527,8 +4532,8 @@ id tag_accessibility_heading
 id tag_accessibility_pane_title
 id tag_compat_insets_dispatch
 id tag_management_button
+id tag_name
 id tag_name_input
-id tag_name_text
 id tag_on_apply_window_listener
 id tag_on_receive_content_listener
 id tag_on_receive_content_mime_types
@@ -4800,6 +4805,7 @@ layout fragment_history
 layout fragment_licenses
 layout fragment_main_settings
 layout fragment_schedule
+layout fragment_search
 layout fragment_settings
 layout fragment_tag_management
 layout fragment_theme_settings
@@ -4822,6 +4828,7 @@ layout libraries_social_licenses_license_loading
 layout libraries_social_licenses_license_menu_activity
 layout license_menu_activity_loading
 layout license_menu_activity_no_licenses
+layout list_item_add_tag
 layout list_item_add_workflow
 layout list_item_announcement
 layout list_item_calendar_day
@@ -4831,6 +4838,7 @@ layout list_item_history_log
 layout list_item_module_library
 layout list_item_module_stat
 layout list_item_schedule
+layout list_item_search_history
 layout list_item_setting
 layout list_item_tag
 layout list_item_timeline
@@ -4970,6 +4978,7 @@ string add_a_tag
 string add_module
 string add_new_workflow
 string add_schedule
+string add_tag_title
 string all_schedules_title
 string android_credentials_TYPE_PASSWORD_CREDENTIAL
 string androidx_credentials_TYPE_PUBLIC_KEY_CREDENTIAL
@@ -4996,6 +5005,7 @@ string cancel
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string clear_history_confirmation
 string clear_text_end_icon_content_description
 string close_drawer
 string close_sheet
@@ -5029,6 +5039,9 @@ string default_error_message
 string default_error_msg
 string default_popup_window_title
 string default_web_client_id
+string delete
+string delete_history_confirmation
+string delete_tag_confirmation
 string dest_title
 string dropdown_menu
 string dummy_status_active
@@ -5286,6 +5299,7 @@ string refresh
 string save_workflow
 string schedule_list_item_type
 string schedule_list_item_workflow
+string search_hint
 string search_menu_title
 string search_workflows_hint
 string searchbar_scrolling_view_behavior
@@ -5314,6 +5328,7 @@ string switch_role
 string sync_disabled
 string sync_enabled_with
 string tab
+string tag_name_hint
 string template_percent
 string theme
 string theme_dark
@@ -6231,11 +6246,6 @@ style ThemeOverlay_MaterialComponents_TimePicker_Display_TextInputEditText
 style ThemeOverlay_MaterialComponents_Toolbar_Popup_Primary
 style ThemeOverlay_MaterialComponents_Toolbar_Primary
 style ThemeOverlay_MaterialComponents_Toolbar_Surface
-style Widget_App_StatCard
-style Widget_App_StatCardChange
-style Widget_App_StatCardContent
-style Widget_App_StatCardTitle
-style Widget_App_StatCardValue
 style Widget_AppCompat_ActionBar
 style Widget_AppCompat_ActionBar_Solid
 style Widget_AppCompat_ActionBar_TabBar

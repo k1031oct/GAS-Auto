@@ -2,11 +2,10 @@ package com.gws.auto.mobile.android.ui.workflow.editor
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 
 class ModuleTouchHelperCallback(
     private val adapter: ModuleAdapter,
-    private val viewModel: WorkflowViewModel
+    private val viewModel: WorkflowEditorViewModel
 ) : ItemTouchHelper.Callback() {
 
     override fun getMovementFlags(
@@ -23,13 +22,15 @@ class ModuleTouchHelperCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        viewModel.moveModule(viewHolder.adapterPosition, target.adapterPosition)
+        val fromPosition = viewHolder.adapterPosition
+        val toPosition = target.adapterPosition
+        viewModel.moveModule(fromPosition, toPosition)
         return true
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-        val module = adapter.getModuleAt(position)
+        val module = adapter.getModules()[position]
         viewModel.removeModule(module)
     }
 }

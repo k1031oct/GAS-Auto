@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ListItemAddWorkflowBinding
 import com.gws.auto.mobile.android.databinding.ListItemWorkflowBinding
 import com.gws.auto.mobile.android.domain.model.Workflow
@@ -13,7 +14,8 @@ class WorkflowAdapter(
     private val onRunClicked: (Workflow) -> Unit,
     private val onEditClicked: (Workflow) -> Unit,
     private val onDeleteClicked: (Workflow) -> Unit,
-    private val onAddClicked: () -> Unit
+    private val onAddClicked: () -> Unit,
+    private val onFavoriteClicked: (Workflow) -> Unit
 ) : ListAdapter<Workflow, RecyclerView.ViewHolder>(WorkflowDiffCallback()) {
 
     private val VIEW_TYPE_WORKFLOW = 1
@@ -35,7 +37,7 @@ class WorkflowAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == VIEW_TYPE_WORKFLOW) {
             val binding = ListItemWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            WorkflowViewHolder(binding, onRunClicked, onEditClicked, onDeleteClicked)
+            WorkflowViewHolder(binding, onRunClicked, onEditClicked, onDeleteClicked, onFavoriteClicked)
         } else {
             val binding = ListItemAddWorkflowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             AddWorkflowViewHolder(binding, onAddClicked)
@@ -52,16 +54,21 @@ class WorkflowAdapter(
         private val binding: ListItemWorkflowBinding,
         private val onRunClicked: (Workflow) -> Unit,
         private val onEditClicked: (Workflow) -> Unit,
-        private val onDeleteClicked: (Workflow) -> Unit
+        private val onDeleteClicked: (Workflow) -> Unit,
+        private val onFavoriteClicked: (Workflow) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(workflow: Workflow) {
             binding.workflowName.text = workflow.name
             binding.workflowDescription.text = workflow.description
             binding.workflowStatus.text = workflow.status
             binding.workflowTrigger.text = workflow.trigger
+
+            binding.favoriteButton.isChecked = workflow.isFavorite
+
             binding.runButton.setOnClickListener { onRunClicked(workflow) }
             binding.editButton.setOnClickListener { onEditClicked(workflow) }
             binding.deleteButton.setOnClickListener { onDeleteClicked(workflow) }
+            binding.favoriteButton.setOnClickListener { onFavoriteClicked(workflow) }
         }
     }
 

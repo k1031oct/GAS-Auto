@@ -74,6 +74,9 @@ class WorkflowFragment : Fragment() {
             onAddClicked = {
                 Timber.d("Add new workflow clicked")
                 startActivity(Intent(activity, WorkflowEditorActivity::class.java))
+            },
+            onFavoriteClicked = { workflow ->
+                viewModel.toggleFavorite(workflow)
             }
         )
         binding.workflowRecyclerView.layoutManager = LinearLayoutManager(context)
