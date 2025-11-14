@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         setupSearchView()
         setupSettingsIcon()
         setupFavoriteIcon()
+        setupBookmarkFilterIcon()
         setupClearHistoryButton()
         setupBackButtonHandler()
         observeViewModel()
@@ -136,6 +137,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupBookmarkFilterIcon() {
+        binding.actionBookmarkFilter.setOnClickListener {
+            historyViewModel.toggleBookmarkFilter()
+        }
+    }
+
     private fun setupClearHistoryButton() {
         binding.actionClearHistory.setOnClickListener {
             showClearHistoryConfirmationDialog()
@@ -145,11 +152,16 @@ class MainActivity : AppCompatActivity() {
     private fun observeViewModel() {
         mainSharedViewModel.currentPage.onEach { page ->
             binding.actionFavoriteIcon.visibility = if (page == 0) View.VISIBLE else View.GONE
+            binding.actionBookmarkFilter.visibility = if (page == 2) View.VISIBLE else View.GONE
             binding.actionClearHistory.visibility = if (page == 2) View.VISIBLE else View.GONE
         }.launchIn(lifecycleScope)
 
         workflowViewModel.isFavoriteFilterActive.onEach { isActive ->
             binding.actionFavoriteIcon.isChecked = isActive
+        }.launchIn(lifecycleScope)
+
+        historyViewModel.isBookmarkFilterActive.onEach { isActive ->
+            binding.actionBookmarkFilter.isChecked = isActive
         }.launchIn(lifecycleScope)
 
         announcementViewModel.hasUnread.onEach { hasUnread ->

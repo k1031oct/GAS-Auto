@@ -45,7 +45,7 @@ class DashboardViewModel @Inject constructor(
         getStatsForMonth(LocalDate.now().minusMonths(1)),
         getStatsForDay(LocalDate.now()),
         getStatsForDay(LocalDate.now().minusDays(1))
-    ) { statsMonth, statsPrevMonth, statsDay, statsPrevDay ->
+    ) { statsMonth: StatsSummary, statsPrevMonth: StatsSummary, statsDay: StatsSummary, statsPrevDay: StatsSummary ->
         PeriodStats(statsMonth, statsPrevMonth, statsDay, statsPrevDay)
     }
 
@@ -54,7 +54,7 @@ class DashboardViewModel @Inject constructor(
         historyRepository.getWorkflowExecutionCounts(),
         workflowRepository.getAllWorkflows(),
         historyRepository.getAllHistory()
-    ) { workflowCounts, allWorkflows, allHistory ->
+    ) { workflowCounts: List<WorkflowExecutionCount>, allWorkflows: List<Workflow>, allHistory: List<History> ->
         RepositoryData(workflowCounts, allWorkflows, allHistory)
     }
 

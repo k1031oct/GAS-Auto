@@ -202,22 +202,12 @@ fun DayTimelineSheet() {
     val eventColor = MaterialTheme.colorScheme.primary
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        // This is the sheet's own handle area.
-        Box(
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .align(Alignment.CenterHorizontally)
-                .width(32.dp)
-                .height(4.dp)
-                .background(MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
-        )
-
         Text(
             text = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 16.dp)
+                .padding(bottom = 16.dp, top = 16.dp)
         )
 
         LazyColumn {

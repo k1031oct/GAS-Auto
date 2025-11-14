@@ -27,6 +27,9 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
+  public final CheckBox actionBookmarkFilter;
+
+  @NonNull
   public final ImageButton actionClearHistory;
 
   @NonNull
@@ -54,11 +57,13 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull ImageButton actionClearHistory, @NonNull CheckBox actionFavoriteIcon,
-      @NonNull ImageView actionSettingsIcon, @NonNull AppBarLayout appBarLayout,
-      @NonNull BottomNavigationView bottomNavView, @NonNull SearchView searchView,
-      @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+      @NonNull CheckBox actionBookmarkFilter, @NonNull ImageButton actionClearHistory,
+      @NonNull CheckBox actionFavoriteIcon, @NonNull ImageView actionSettingsIcon,
+      @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
+      @NonNull SearchView searchView, @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar,
+      @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
+    this.actionBookmarkFilter = actionBookmarkFilter;
     this.actionClearHistory = actionClearHistory;
     this.actionFavoriteIcon = actionFavoriteIcon;
     this.actionSettingsIcon = actionSettingsIcon;
@@ -97,6 +102,12 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.action_bookmark_filter;
+      CheckBox actionBookmarkFilter = ViewBindings.findChildViewById(rootView, id);
+      if (actionBookmarkFilter == null) {
+        break missingId;
+      }
+
       id = R.id.action_clear_history;
       ImageButton actionClearHistory = ViewBindings.findChildViewById(rootView, id);
       if (actionClearHistory == null) {
@@ -151,9 +162,9 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, actionClearHistory,
-          actionFavoriteIcon, actionSettingsIcon, appBarLayout, bottomNavView, searchView,
-          settingsBadge, toolbar, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmarkFilter,
+          actionClearHistory, actionFavoriteIcon, actionSettingsIcon, appBarLayout, bottomNavView,
+          searchView, settingsBadge, toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

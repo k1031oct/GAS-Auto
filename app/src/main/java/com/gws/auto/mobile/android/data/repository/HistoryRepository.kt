@@ -9,7 +9,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) {
+class HistoryRepository @Inject constructor(
+    private val historyDao: HistoryDao
+) {
 
     fun getAllHistory(): Flow<List<History>> {
         return historyDao.getAllHistory()
@@ -19,20 +21,16 @@ class HistoryRepository @Inject constructor(private val historyDao: HistoryDao) 
         historyDao.insertHistory(history)
     }
 
-    suspend fun deleteHistoryById(historyId: Long) {
-        historyDao.deleteHistoryById(historyId)
+    suspend fun deleteHistoryById(id: Long) {
+        historyDao.deleteHistoryById(id)
     }
 
     suspend fun deleteAllHistory() {
         historyDao.deleteAllHistory()
     }
 
-    fun getTotalCount(): Flow<Int> {
-        return historyDao.getTotalCount()
-    }
-
-    fun getErrorCount(): Flow<Int> {
-        return historyDao.getErrorCount()
+    suspend fun updateHistory(history: History) {
+        historyDao.insertHistory(history) // Using insert with OnConflictStrategy.REPLACE as an update
     }
 
     fun getWorkflowExecutionCounts(): Flow<List<WorkflowExecutionCount>> {

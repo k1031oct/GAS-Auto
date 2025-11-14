@@ -39,16 +39,16 @@ public final class AppDatabase_Impl extends AppDatabase {
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(7) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(8) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `workflows` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `modules` TEXT NOT NULL, `status` TEXT NOT NULL, `trigger` TEXT NOT NULL, `tags` TEXT NOT NULL, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `tags` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))");
-        db.execSQL("CREATE TABLE IF NOT EXISTS `execution_history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workflowId` TEXT NOT NULL, `workflowName` TEXT NOT NULL, `executedAt` INTEGER NOT NULL, `status` TEXT NOT NULL, `logs` TEXT NOT NULL, `durationMs` INTEGER NOT NULL)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `execution_history` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `workflowId` TEXT NOT NULL, `workflowName` TEXT NOT NULL, `executedAt` INTEGER NOT NULL, `status` TEXT NOT NULL, `logs` TEXT NOT NULL, `durationMs` INTEGER NOT NULL, `isBookmarked` INTEGER NOT NULL)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `schedules` (`id` TEXT NOT NULL, `workflowId` TEXT NOT NULL, `scheduleType` TEXT NOT NULL, `hourlyInterval` INTEGER, `time` TEXT, `weeklyDays` TEXT, `monthlyDays` TEXT, `yearlyMonth` INTEGER, `yearlyDayOfMonth` INTEGER, `lastRun` INTEGER, `nextRun` INTEGER, `isEnabled` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS `search_history` (`query` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, PRIMARY KEY(`query`))");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f12fcf062b994339ba5d98da9e16ff3')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f26a201107e0eeb2028c5b3bb648e871')");
       }
 
       @Override
@@ -130,7 +130,7 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoTags + "\n"
                   + " Found:\n" + _existingTags);
         }
-        final HashMap<String, TableInfo.Column> _columnsExecutionHistory = new HashMap<String, TableInfo.Column>(7);
+        final HashMap<String, TableInfo.Column> _columnsExecutionHistory = new HashMap<String, TableInfo.Column>(8);
         _columnsExecutionHistory.put("id", new TableInfo.Column("id", "INTEGER", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsExecutionHistory.put("workflowId", new TableInfo.Column("workflowId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsExecutionHistory.put("workflowName", new TableInfo.Column("workflowName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
@@ -138,6 +138,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         _columnsExecutionHistory.put("status", new TableInfo.Column("status", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsExecutionHistory.put("logs", new TableInfo.Column("logs", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsExecutionHistory.put("durationMs", new TableInfo.Column("durationMs", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsExecutionHistory.put("isBookmarked", new TableInfo.Column("isBookmarked", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final HashSet<TableInfo.ForeignKey> _foreignKeysExecutionHistory = new HashSet<TableInfo.ForeignKey>(0);
         final HashSet<TableInfo.Index> _indicesExecutionHistory = new HashSet<TableInfo.Index>(0);
         final TableInfo _infoExecutionHistory = new TableInfo("execution_history", _columnsExecutionHistory, _foreignKeysExecutionHistory, _indicesExecutionHistory);
@@ -183,7 +184,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "0f12fcf062b994339ba5d98da9e16ff3", "8850787085b90d74df0a1486c22c1b97");
+    }, "f26a201107e0eeb2028c5b3bb648e871", "837605f7aa25d13af9d17f75c30c952b");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;

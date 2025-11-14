@@ -16,5 +16,6 @@ data class History(
     val executedAt: Date,
     val status: String, // e.g., "Success", "Failure"
     val logs: String, // Simple text log for now, could be JSON for structured logs
-    val durationMs: Long = 0
+    val durationMs: Long = 0,
+    val isBookmarked: Boolean = false
 )

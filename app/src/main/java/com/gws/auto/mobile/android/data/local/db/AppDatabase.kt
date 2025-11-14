@@ -9,7 +9,7 @@ import com.gws.auto.mobile.android.domain.model.SearchHistory
 import com.gws.auto.mobile.android.domain.model.Tag
 import com.gws.auto.mobile.android.domain.model.Workflow
 
-@Database(entities = [Workflow::class, Tag::class, History::class, Schedule::class, SearchHistory::class], version = 7, exportSchema = false)
+@Database(entities = [Workflow::class, Tag::class, History::class, Schedule::class, SearchHistory::class], version = 8, exportSchema = false)
 @TypeConverters(ListConverter::class, ModuleListConverter::class, DateConverter::class, IntListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun workflowDao(): WorkflowDao

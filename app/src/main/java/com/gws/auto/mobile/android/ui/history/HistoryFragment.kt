@@ -35,9 +35,14 @@ class HistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
-        historyAdapter = HistoryAdapter { historyId ->
-            viewModel.toggleItemExpanded(historyId.toLong())
-        }
+        historyAdapter = HistoryAdapter(
+            onHeaderClick = { historyId ->
+                viewModel.toggleItemExpanded(historyId.toLong())
+            },
+            onBookmarkClick = { headerItem ->
+                viewModel.toggleBookmark(headerItem.history)
+            }
+        )
         binding.historyRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.historyRecyclerView.adapter = historyAdapter
         return binding.root

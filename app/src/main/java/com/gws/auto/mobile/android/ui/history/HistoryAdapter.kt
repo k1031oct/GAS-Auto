@@ -11,7 +11,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class HistoryAdapter(
-    private val onHeaderClick: (String) -> Unit
+    private val onHeaderClick: (String) -> Unit,
+    private val onBookmarkClick: (HistoryListItem.HeaderItem) -> Unit
 ) : ListAdapter<HistoryListItem, RecyclerView.ViewHolder>(HistoryDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -26,7 +27,7 @@ class HistoryAdapter(
         return when (viewType) {
             VIEW_TYPE_HEADER -> {
                 val binding = ListItemHistoryHeaderBinding.inflate(inflater, parent, false)
-                HeaderViewHolder(binding, onHeaderClick)
+                HeaderViewHolder(binding, onHeaderClick, onBookmarkClick)
             }
             else -> {
                 val binding = ListItemHistoryLogBinding.inflate(inflater, parent, false)
@@ -44,7 +45,8 @@ class HistoryAdapter(
 
     class HeaderViewHolder(
         private val binding: ListItemHistoryHeaderBinding,
-        private val onHeaderClick: (String) -> Unit
+        private val onHeaderClick: (String) -> Unit,
+        private val onBookmarkClick: (HistoryListItem.HeaderItem) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: HistoryListItem.HeaderItem) {
             binding.workflowName.text = item.history.workflowName
@@ -52,8 +54,12 @@ class HistoryAdapter(
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
             binding.executionTime.text = sdf.format(item.history.executedAt)
             binding.executionStatus.text = item.history.status
+            binding.bookmarkButton.isChecked = item.history.isBookmarked
             itemView.setOnClickListener {
                 onHeaderClick(item.history.id.toString())
+            }
+            binding.bookmarkButton.setOnClickListener {
+                onBookmarkClick(item)
             }
         }
     }
