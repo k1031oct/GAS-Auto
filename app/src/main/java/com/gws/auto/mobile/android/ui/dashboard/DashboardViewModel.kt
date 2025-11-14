@@ -45,18 +45,18 @@ class DashboardViewModel @Inject constructor(
         getStatsForMonth(LocalDate.now().minusMonths(1)),
         getStatsForDay(LocalDate.now()),
         getStatsForDay(LocalDate.now().minusDays(1))
-    ) { statsMonth: StatsSummary, statsPrevMonth: StatsSummary, statsDay: StatsSummary, statsPrevDay: StatsSummary ->
+    ) { statsMonth, statsPrevMonth, statsDay, statsPrevDay ->
         PeriodStats(statsMonth, statsPrevMonth, statsDay, statsPrevDay)
-    }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, PeriodStats(StatsSummary(0, 0, 0), StatsSummary(0, 0, 0), StatsSummary(0, 0, 0), StatsSummary(0, 0, 0)))
 
     // Intermediate flow for repository data
     private val repoDataFlow: Flow<RepositoryData> = combine(
         historyRepository.getWorkflowExecutionCounts(),
         workflowRepository.getAllWorkflows(),
         historyRepository.getAllHistory()
-    ) { workflowCounts: List<WorkflowExecutionCount>, allWorkflows: List<Workflow>, allHistory: List<History> ->
+    ) { workflowCounts, allWorkflows, allHistory ->
         RepositoryData(workflowCounts, allWorkflows, allHistory)
-    }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, RepositoryData(emptyList(), emptyList(), emptyList()))
 
     // Final combined UI state
     val uiState: StateFlow<DashboardUiState> = combine(

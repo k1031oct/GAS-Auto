@@ -4000,7 +4000,6 @@ id action_bar_spinner
 id action_bar_subtitle
 id action_bar_title
 id action_bookmark_filter
-id action_clear_history
 id action_container
 id action_context_bar
 id action_delete_all_history
@@ -4088,6 +4087,7 @@ id checkbox
 id checked
 id chronometer
 id circle_center
+id clear_history_button
 id clear_text
 id clip_horizontal
 id clip_vertical

@@ -5,6 +5,9 @@ import com.gws.auto.mobile.android.domain.model.History
 import com.gws.auto.mobile.android.ui.dashboard.StatsSummary
 import com.gws.auto.mobile.android.ui.dashboard.WorkflowExecutionCount
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -14,7 +17,30 @@ class HistoryRepository @Inject constructor(
 ) {
 
     fun getAllHistory(): Flow<List<History>> {
-        return historyDao.getAllHistory()
+        val dummyData = listOf(
+            History(
+                id = 1,
+                workflowId = "wf-1",
+                workflowName = "Daily Report",
+                executedAt = Date(),
+                status = "Success",
+                logs = "Execution started...\nStep 1 completed.\nStep 2 completed.\nExecution finished.",
+                durationMs = 1200
+            ),
+            History(
+                id = 2,
+                workflowId = "wf-2",
+                workflowName = "File Cleanup",
+                executedAt = Date(System.currentTimeMillis() - 86400000), // 1 day ago
+                status = "Failure",
+                logs = "Execution started...\nFailed at Step 2: File not found.",
+                durationMs = 500,
+                isBookmarked = true
+            )
+        )
+        return combine(historyDao.getAllHistory(), flowOf(dummyData)) { dbHistory, dummy ->
+            (dbHistory + dummy).distinctBy { it.id }
+        }
     }
 
     suspend fun insertHistory(history: History) {

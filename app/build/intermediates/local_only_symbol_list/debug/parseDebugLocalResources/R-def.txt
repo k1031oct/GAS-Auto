@@ -101,7 +101,6 @@ drawable ic_workflow
 drawable search_view_background
 id about_app
 id action_bookmark_filter
-id action_clear_history
 id action_delete_all_history
 id action_favorite_icon
 id action_settings
@@ -116,6 +115,7 @@ id back_button
 id bookmark_button
 id bottom_nav_view
 id button_container
+id clear_history_button
 id compose_view
 id contact_button
 id country_spinner

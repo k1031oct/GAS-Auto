@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,9 +27,6 @@ public final class ActivityMainBinding implements ViewBinding {
 
   @NonNull
   public final CheckBox actionBookmarkFilter;
-
-  @NonNull
-  public final ImageButton actionClearHistory;
 
   @NonNull
   public final CheckBox actionFavoriteIcon;
@@ -57,14 +53,12 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ViewPager2 viewPager;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull CheckBox actionBookmarkFilter, @NonNull ImageButton actionClearHistory,
-      @NonNull CheckBox actionFavoriteIcon, @NonNull ImageView actionSettingsIcon,
-      @NonNull AppBarLayout appBarLayout, @NonNull BottomNavigationView bottomNavView,
-      @NonNull SearchView searchView, @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar,
-      @NonNull ViewPager2 viewPager) {
+      @NonNull CheckBox actionBookmarkFilter, @NonNull CheckBox actionFavoriteIcon,
+      @NonNull ImageView actionSettingsIcon, @NonNull AppBarLayout appBarLayout,
+      @NonNull BottomNavigationView bottomNavView, @NonNull SearchView searchView,
+      @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
     this.actionBookmarkFilter = actionBookmarkFilter;
-    this.actionClearHistory = actionClearHistory;
     this.actionFavoriteIcon = actionFavoriteIcon;
     this.actionSettingsIcon = actionSettingsIcon;
     this.appBarLayout = appBarLayout;
@@ -105,12 +99,6 @@ public final class ActivityMainBinding implements ViewBinding {
       id = R.id.action_bookmark_filter;
       CheckBox actionBookmarkFilter = ViewBindings.findChildViewById(rootView, id);
       if (actionBookmarkFilter == null) {
-        break missingId;
-      }
-
-      id = R.id.action_clear_history;
-      ImageButton actionClearHistory = ViewBindings.findChildViewById(rootView, id);
-      if (actionClearHistory == null) {
         break missingId;
       }
 
@@ -163,8 +151,8 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmarkFilter,
-          actionClearHistory, actionFavoriteIcon, actionSettingsIcon, appBarLayout, bottomNavView,
-          searchView, settingsBadge, toolbar, viewPager);
+          actionFavoriteIcon, actionSettingsIcon, appBarLayout, bottomNavView, searchView,
+          settingsBadge, toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
