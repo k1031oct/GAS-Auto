@@ -8,10 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 
 private val DarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
@@ -41,35 +38,17 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun GWSAutoForAndroidTheme(
-    themeViewModel: ThemeViewModel = hiltViewModel(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = false, // Dynamic color is disabled for now
     content: @Composable () -> Unit
 ) {
-    val highlightColor by themeViewModel.highlightColor.collectAsState()
-    val theme by themeViewModel.theme.collectAsState()
-
-    val darkTheme = when (theme) {
-        "Light" -> false
-        "Dark" -> true
-        else -> isSystemInDarkTheme()
-    }
-
-    val dynamicColor = false // Dynamic color is disabled for now
-
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> when (highlightColor) {
-            "forest" -> DarkColorScheme.copy(primary = forest_theme_dark_primary, onPrimary = forest_theme_dark_onPrimary)
-            "ocean" -> DarkColorScheme.copy(primary = ocean_theme_dark_primary, onPrimary = ocean_theme_dark_onPrimary)
-            else -> DarkColorScheme
-        }
-        else -> when (highlightColor) {
-            "forest" -> LightColorScheme.copy(primary = forest_theme_light_primary, onPrimary = forest_theme_light_onPrimary)
-            "ocean" -> LightColorScheme.copy(primary = ocean_theme_light_primary, onPrimary = ocean_theme_light_onPrimary)
-            else -> LightColorScheme
-        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
 
     MaterialTheme(

@@ -101,7 +101,7 @@ fun CalendarScreen(
             sheetPeekHeight = 32.dp, // Provide a peek height for the handle area
             sheetContent = { DayTimelineSheet() },
             sheetContainerColor = MaterialTheme.colorScheme.surfaceContainer, // Use a lighter surface color
-            containerColor = MaterialTheme.colorScheme.background // Ensure calendar has no extra background
+            containerColor = Color.Transparent // Ensure calendar has no extra background
         ) {
             CalendarContent(viewModel = viewModel) {
                 viewModel.setCurrentDate(it)
@@ -291,7 +291,7 @@ fun MonthView(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
-        modifier = Modifier.fillMaxHeight().background(Color.Transparent), // Ensure no background is drawn by the grid
+        modifier = Modifier.fillMaxHeight(), // Ensure no background is drawn by the grid
         userScrollEnabled = false
     ) {
         if (startOffset >= 0) {
