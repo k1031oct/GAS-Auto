@@ -4126,6 +4126,7 @@ id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
 id delete_button
+id delete_tag_button
 id deltaRelative
 id dependency_ordering
 id design_bottom_sheet
@@ -4535,6 +4536,7 @@ id tag_compat_insets_dispatch
 id tag_management_button
 id tag_name
 id tag_name_input
+id tag_name_text
 id tag_on_apply_window_listener
 id tag_on_receive_content_listener
 id tag_on_receive_content_mime_types
@@ -4841,6 +4843,7 @@ layout list_item_module_stat
 layout list_item_schedule
 layout list_item_search_history
 layout list_item_setting
+layout list_item_setting_tag
 layout list_item_tag
 layout list_item_timeline
 layout list_item_timeline_event

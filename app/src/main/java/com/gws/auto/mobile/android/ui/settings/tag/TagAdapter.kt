@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.gws.auto.mobile.android.databinding.ListItemTagBinding
+import com.gws.auto.mobile.android.databinding.ListItemSettingTagBinding
 import com.gws.auto.mobile.android.domain.model.Tag
 
 class TagAdapter(
@@ -13,7 +13,7 @@ class TagAdapter(
 ) : ListAdapter<Tag, TagAdapter.TagViewHolder>(TagDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
-        val binding = ListItemTagBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ListItemSettingTagBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TagViewHolder(binding, onDeleteClicked)
     }
 
@@ -22,7 +22,7 @@ class TagAdapter(
     }
 
     class TagViewHolder(
-        private val binding: ListItemTagBinding,
+        private val binding: ListItemSettingTagBinding,
         private val onDeleteClicked: (Tag) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(tag: Tag) {

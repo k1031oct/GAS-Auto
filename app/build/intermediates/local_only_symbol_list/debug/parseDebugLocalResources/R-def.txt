@@ -122,6 +122,7 @@ id dark_button
 id date
 id day_text
 id delete_button
+id delete_tag_button
 id edit_button
 id error_count_day_change_text
 id error_count_month_change_text
@@ -196,6 +197,7 @@ id system_button
 id tag_management_button
 id tag_name
 id tag_name_input
+id tag_name_text
 id tag_recycler_view
 id theme_dark_radio
 id theme_group
@@ -277,6 +279,7 @@ layout list_item_module_stat
 layout list_item_schedule
 layout list_item_search_history
 layout list_item_setting
+layout list_item_setting_tag
 layout list_item_tag
 layout list_item_timeline
 layout list_item_timeline_event
