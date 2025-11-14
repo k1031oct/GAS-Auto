@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,12 +29,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -45,13 +47,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gws.auto.mobile.android.R
@@ -86,18 +88,20 @@ fun CalendarScreen(
             }
         }
     ) { paddingValues ->
+        // Create a new padding that ignores the bottom padding from the parent Scaffold
+        val newPadding = PaddingValues(
+            top = paddingValues.calculateTopPadding(),
+            start = paddingValues.calculateLeftPadding(LayoutDirection.Ltr),
+            end = paddingValues.calculateRightPadding(LayoutDirection.Ltr)
+        )
+
         BottomSheetScaffold(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.padding(newPadding), // Apply the new padding
             scaffoldState = scaffoldState,
-            sheetPeekHeight = 64.dp,
-            sheetContent = {
-                DayTimelineSheet(
-                    date = viewModel.currentDate.collectAsState().value,
-                    holidays = viewModel.holidays.collectAsState().value,
-                    schedules = viewModel.schedules.collectAsState().value
-                )
-            },
-            sheetContainerColor = MaterialTheme.colorScheme.surface
+            sheetPeekHeight = 32.dp, // Provide a peek height for the handle area
+            sheetContent = { DayTimelineSheet() },
+            sheetContainerColor = MaterialTheme.colorScheme.surfaceContainer, // Use a lighter surface color
+            containerColor = MaterialTheme.colorScheme.background // Ensure calendar has no extra background
         ) {
             CalendarContent(viewModel = viewModel) {
                 viewModel.setCurrentDate(it)
@@ -117,6 +121,16 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
     val holidays by viewModel.holidays.collectAsState()
     val schedules by viewModel.schedules.collectAsState()
     val currentDate by viewModel.currentDate.collectAsState()
+    val firstDayOfWeekSetting by viewModel.firstDayOfWeek.collectAsState()
+
+    val daysOfWeek = remember(firstDayOfWeekSetting) {
+        val week = DayOfWeek.values()
+        if (firstDayOfWeekSetting.equals("Monday", ignoreCase = true)) {
+            week.toList().subList(1, 7) + week[0]
+        } else {
+            week.toList()
+        }
+    }
 
     val currentVisibleMonth by remember {
         derivedStateOf {
@@ -131,7 +145,7 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,18 +153,17 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
+            FilledTonalButton(onClick = { viewModel.moveToPreviousMonth() }) { Text(stringResource(id = R.string.calendar_previous_month_button)) }
             Text(
                 text = currentVisibleMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())),
                 style = MaterialTheme.typography.headlineSmall
             )
-            Button(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
+            FilledTonalButton(onClick = { viewModel.moveToNextMonth() }) { Text(stringResource(id = R.string.calendar_next_month_button)) }
         }
 
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)) {
-            val daysOfWeek = listOf(DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)
+            .padding(horizontal = 8.dp, vertical = 8.dp)) {
             daysOfWeek.forEach { day ->
                 Text(
                     text = day.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
@@ -170,41 +183,34 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
                 yearMonth = month,
                 holidays = holidays,
                 schedules = schedules,
-                onDateClick = onDateClick
+                onDateClick = onDateClick,
+                daysOfWeek = daysOfWeek
             )
         }
     }
 }
 
 @Composable
-fun DayTimelineSheet(date: LocalDate, holidays: List<Holiday>, schedules: List<Schedule>) {
+fun DayTimelineSheet() {
+    // Dummy Data for now, will be replaced by ViewModel
+    val date = LocalDate.now()
+    val holidays = emptyList<Holiday>()
+    val schedules = emptyList<Schedule>()
+
     val timelineHourHeight = 64.dp
     val hourTextWidth = 60.dp
     val eventColor = MaterialTheme.colorScheme.primary
 
-    val schedulesForDay = remember(date, schedules) {
-        schedules.mapNotNull { schedule ->
-            val scheduledDate = when (schedule.scheduleType) {
-                "daily" -> true
-                "weekly" -> schedule.weeklyDays?.any { it.equals(date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.ENGLISH), ignoreCase = true) } ?: false
-                "monthly" -> schedule.monthlyDays?.contains(date.dayOfMonth) ?: false
-                else -> false
-            }
-            if (scheduledDate) {
-                schedule.time?.let { LocalTime.parse(it) to schedule.workflowId }
-            } else {
-                null
-            }
-        }.sortedBy { it.first }
-    }
-
-    val holidaysForDay = remember(date, holidays) {
-        holidays.filter { it.date == date }
-    }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        // The Box for the handle is removed from here.
-        Spacer(modifier = Modifier.height(12.dp))
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        // This is the sheet's own handle area.
+        Box(
+            modifier = Modifier
+                .padding(vertical = 16.dp)
+                .align(Alignment.CenterHorizontally)
+                .width(32.dp)
+                .height(4.dp)
+                .background(MaterialTheme.colorScheme.onSurfaceVariant, CircleShape)
+        )
 
         Text(
             text = date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)),
@@ -215,12 +221,12 @@ fun DayTimelineSheet(date: LocalDate, holidays: List<Holiday>, schedules: List<S
         )
 
         LazyColumn {
-            items(holidaysForDay) { holiday ->
+            items(holidays) { holiday ->
                 Text(holiday.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
             }
 
             item {
-                HourTimeline(schedules = schedulesForDay, timelineHourHeight = timelineHourHeight, hourTextWidth = hourTextWidth, eventColor = eventColor)
+                HourTimeline(schedules = emptyList(), timelineHourHeight = timelineHourHeight, hourTextWidth = hourTextWidth, eventColor = eventColor)
             }
         }
     }
@@ -264,8 +270,7 @@ private fun HourTimeline(schedules: List<Pair<LocalTime, String>>, timelineHourH
             ) {
                 Box(modifier = Modifier
                     .size(8.dp)
-                    .clip(CircleShape)
-                    .background(eventColor))
+                    .background(eventColor, CircleShape))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(name, style = MaterialTheme.typography.bodyMedium, fontSize = 14.sp)
             }
@@ -278,17 +283,20 @@ fun MonthView(
     yearMonth: YearMonth,
     holidays: List<Holiday>,
     schedules: List<Schedule>,
-    onDateClick: (LocalDate) -> Unit
+    onDateClick: (LocalDate) -> Unit,
+    daysOfWeek: List<DayOfWeek>
 ) {
     val firstDayOfMonth = yearMonth.atDay(1)
-    val startOffset = (firstDayOfMonth.dayOfWeek.value % 7).let { if (it == 0) 7 else it } - 1
+    val startOffset = daysOfWeek.indexOf(firstDayOfMonth.dayOfWeek)
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(7),
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier.fillMaxHeight().background(Color.Transparent), // Ensure no background is drawn by the grid
         userScrollEnabled = false
     ) {
-        items(startOffset) { }
+        if (startOffset >= 0) {
+            items(startOffset) { }
+        }
 
         items(yearMonth.lengthOfMonth()) { dayIndex ->
             val dayOfMonth = dayIndex + 1
@@ -319,14 +327,19 @@ fun DayCell(
             .padding(4.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = date.dayOfMonth.toString(),
-            textAlign = TextAlign.Center,
+        Box(
             modifier = if (isToday) Modifier
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer) else Modifier,
-            color = if (holidays.isNotEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-        )
+                .size(24.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+            else Modifier.size(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = date.dayOfMonth.toString(),
+                textAlign = TextAlign.Center,
+                color = if (holidays.isNotEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            )
+        }
 
         Spacer(modifier = Modifier.height(4.dp))
 

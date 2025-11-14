@@ -58,41 +58,4 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <!-- Base Widget Namespace -->
-    <style name="Widget.App" parent="" />
-
-    <!-- Dashboard Styles (Using Material Components 2 for XML Layouts) -->
-    <style name="Widget.App.StatCard" parent="Widget.MaterialComponents.CardView">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_columnWeight">1</item>
-        <item name="android:layout_gravity">fill_horizontal</item>
-        <item name="android:layout_margin">4dp</item>
-    </style>
-
-    <style name="Widget.App.StatCardContent">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:padding">16dp</item>
-    </style>
-
-    <style name="Widget.App.StatCardTitle" parent="Widget.MaterialComponents.TextView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAppearance">?attr/textAppearanceCaption</item>
-    </style>
-
-    <style name="Widget.App.StatCardValue" parent="Widget.MaterialComponents.TextView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAppearance">?attr/textAppearanceHeadline5</item>
-    </style>
-
-    <style name="Widget.App.StatCardChange" parent="Widget.MaterialComponents.TextView">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
-    </style>
-
 </resources>

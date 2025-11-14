@@ -17,12 +17,35 @@ class UserPreferencesRepository @Inject constructor(private val prefs: SharedPre
             }
         }
         prefs.registerOnSharedPreferenceChangeListener(listener)
-        // Send initial value
         trySend(prefs.getString(PREF_HIGHLIGHT_COLOR, "default") ?: "default")
+        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    val theme: Flow<String> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_THEME) {
+                trySend(prefs.getString(key, "System") ?: "System")
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        trySend(prefs.getString(PREF_THEME, "System") ?: "System")
+        awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+
+    val firstDayOfWeek: Flow<String> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_FIRST_DAY_OF_WEEK) {
+                trySend(prefs.getString(key, "Sunday") ?: "Sunday")
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        trySend(prefs.getString(PREF_FIRST_DAY_OF_WEEK, "Sunday") ?: "Sunday")
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
     companion object {
         const val PREF_HIGHLIGHT_COLOR = "highlight_color"
+        const val PREF_THEME = "theme"
+        const val PREF_FIRST_DAY_OF_WEEK = "first_day_of_week"
     }
 }

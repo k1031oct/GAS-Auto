@@ -20,4 +20,11 @@ class ThemeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = "default"
         )
+
+    val theme: StateFlow<String> = userPreferencesRepository.theme
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = "System"
+        )
 }

@@ -407,7 +407,6 @@ style SettingsItem
 style SettingsItemContainer
 style Theme.GWSAutoForAndroid
 style Theme.GWSAutoForAndroid.Splash
-style Widget.App
 style Widget.App.StatCard
 style Widget.App.StatCardChange
 style Widget.App.StatCardContent

@@ -49,12 +49,35 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                style="@style/Widget.App.StatCard">
-                <LinearLayout style="@style/Widget.App.StatCardContent">
-                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Total Runs" />
-                    <TextView android:id="@+id/total_executions_text" style="@style/Widget.App.StatCardValue" tools:text="1,234" />
-                    <TextView android:id="@+id/total_executions_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="+5% vs Yesterday" />
-                    <TextView android:id="@+id/total_executions_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+20% vs Last Month" />
+                android:layout_margin="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Runs"
+                        android:textAppearance="?attr/textAppearanceCaption" />
+                    <TextView
+                        android:id="@+id/total_executions_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceHeadline5"
+                        tools:text="1,234" />
+                    <TextView
+                        android:id="@+id/total_executions_day_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="+5% vs Yesterday" />
+                    <TextView
+                        android:id="@+id/total_executions_month_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="+20% vs Last Month" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -63,12 +86,35 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                style="@style/Widget.App.StatCard">
-                <LinearLayout style="@style/Widget.App.StatCardContent">
-                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Errors" />
-                    <TextView android:id="@+id/error_count_text" style="@style/Widget.App.StatCardValue" tools:text="56" />
-                    <TextView android:id="@+id/error_count_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="-2% vs Yesterday" />
-                    <TextView android:id="@+id/error_count_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+10% vs Last Month" />
+                android:layout_margin="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Errors"
+                        android:textAppearance="?attr/textAppearanceCaption" />
+                    <TextView
+                        android:id="@+id/error_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceHeadline5"
+                        tools:text="56" />
+                    <TextView
+                        android:id="@+id/error_count_day_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="-2% vs Yesterday" />
+                    <TextView
+                        android:id="@+id/error_count_month_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="+10% vs Last Month" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -77,12 +123,35 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                style="@style/Widget.App.StatCard">
-                <LinearLayout style="@style/Widget.App.StatCardContent">
-                    <TextView style="@style/Widget.App.StatCardTitle" android:text="Total Time" />
-                    <TextView android:id="@+id/total_duration_text" style="@style/Widget.App.StatCardValue" tools:text="12h 34m" />
-                    <TextView android:id="@+id/total_duration_day_change_text" style="@style/Widget.App.StatCardChange" tools:text="+15% vs Yesterday" />
-                    <TextView android:id="@+id/total_duration_month_change_text" style="@style/Widget.App.StatCardChange" tools:text="+30% vs Last Month" />
+                android:layout_margin="4dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Time"
+                        android:textAppearance="?attr/textAppearanceCaption" />
+                    <TextView
+                        android:id="@+id/total_duration_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceHeadline5"
+                        tools:text="12h 34m" />
+                    <TextView
+                        android:id="@+id/total_duration_day_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="+15% vs Yesterday" />
+                    <TextView
+                        android:id="@+id/total_duration_month_change_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        tools:text="+30% vs Last Month" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

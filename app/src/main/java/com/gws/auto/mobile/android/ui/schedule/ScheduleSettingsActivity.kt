@@ -5,8 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.preference.PreferenceManager
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Month
@@ -31,21 +28,8 @@ class ScheduleSettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val theme = prefs.getString("theme", "Default")
-        when (theme) {
-            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
-
         setContent {
-            val darkTheme = when (prefs.getString("theme", "Default")) {
-                "Light" -> false
-                "Dark" -> true
-                else -> isSystemInDarkTheme()
-            }
-            GWSAutoForAndroidTheme(darkTheme = darkTheme) {
+            GWSAutoForAndroidTheme {
                 ScheduleSettingsScreen(viewModel)
             }
         }
@@ -137,7 +121,7 @@ fun ScheduleSettingsScreen(viewModel: ScheduleSettingsViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(
+                TextButton(
                     onClick = { (context as? Activity)?.finish() },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -194,15 +178,7 @@ fun WeeklySettings(
     time: java.time.LocalTime,
     onTimeChange: (java.time.LocalTime) -> Unit
 ) {
-    val context = LocalContext.current
-    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-    val startDay = prefs.getString("first_day_of_week", "Sunday")
-
-    val daysOfWeek = if (startDay == "Sunday") {
-        listOf("日", "月", "火", "水", "木", "金", "土")
-    } else {
-        listOf("月", "火", "水", "木", "金", "土", "日")
-    }
+    val daysOfWeek = listOf("日", "月", "火", "水", "木", "金", "土")
 
     val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
     // Update ViewModel when state changes

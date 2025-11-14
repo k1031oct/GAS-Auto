@@ -41,12 +41,19 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun GWSAutoForAndroidTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
     themeViewModel: ThemeViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
     val highlightColor by themeViewModel.highlightColor.collectAsState()
+    val theme by themeViewModel.theme.collectAsState()
+
+    val darkTheme = when (theme) {
+        "Light" -> false
+        "Dark" -> true
+        else -> isSystemInDarkTheme()
+    }
+
+    val dynamicColor = false // Dynamic color is disabled for now
 
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {

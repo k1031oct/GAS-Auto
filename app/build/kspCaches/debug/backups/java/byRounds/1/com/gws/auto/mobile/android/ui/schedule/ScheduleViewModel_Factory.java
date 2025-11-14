@@ -1,7 +1,7 @@
 package com.gws.auto.mobile.android.ui.schedule;
 
-import android.content.SharedPreferences;
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository;
+import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.Provider;
@@ -28,27 +28,27 @@ import javax.annotation.processing.Generated;
 public final class ScheduleViewModel_Factory implements Factory<ScheduleViewModel> {
   private final Provider<ScheduleRepository> scheduleRepositoryProvider;
 
-  private final Provider<SharedPreferences> prefsProvider;
+  private final Provider<UserPreferencesRepository> userPreferencesRepositoryProvider;
 
   private ScheduleViewModel_Factory(Provider<ScheduleRepository> scheduleRepositoryProvider,
-      Provider<SharedPreferences> prefsProvider) {
+      Provider<UserPreferencesRepository> userPreferencesRepositoryProvider) {
     this.scheduleRepositoryProvider = scheduleRepositoryProvider;
-    this.prefsProvider = prefsProvider;
+    this.userPreferencesRepositoryProvider = userPreferencesRepositoryProvider;
   }
 
   @Override
   public ScheduleViewModel get() {
-    return newInstance(scheduleRepositoryProvider.get(), prefsProvider.get());
+    return newInstance(scheduleRepositoryProvider.get(), userPreferencesRepositoryProvider.get());
   }
 
   public static ScheduleViewModel_Factory create(
       Provider<ScheduleRepository> scheduleRepositoryProvider,
-      Provider<SharedPreferences> prefsProvider) {
-    return new ScheduleViewModel_Factory(scheduleRepositoryProvider, prefsProvider);
+      Provider<UserPreferencesRepository> userPreferencesRepositoryProvider) {
+    return new ScheduleViewModel_Factory(scheduleRepositoryProvider, userPreferencesRepositoryProvider);
   }
 
   public static ScheduleViewModel newInstance(ScheduleRepository scheduleRepository,
-      SharedPreferences prefs) {
-    return new ScheduleViewModel(scheduleRepository, prefs);
+      UserPreferencesRepository userPreferencesRepository) {
+    return new ScheduleViewModel(scheduleRepository, userPreferencesRepository);
   }
 }
