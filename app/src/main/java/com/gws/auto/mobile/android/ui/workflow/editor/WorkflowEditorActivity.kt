@@ -49,7 +49,6 @@ class WorkflowEditorActivity : AppCompatActivity() {
         if (workflowId != null) {
             viewModel.loadWorkflow(workflowId)
         } else {
-            // New workflow, enable editing by default
             isEditingEnabled = true
             updateEditState()
         }
@@ -94,22 +93,34 @@ class WorkflowEditorActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        moduleAdapter = ModuleAdapter(mutableListOf()) { position ->
-            val module = moduleAdapter.getModules()[position]
-            viewModel.removeModule(module)
-        }
+        moduleAdapter = ModuleAdapter(
+            mutableListOf(),
+            onEditClicked = { module ->
+                val dialog = ModuleSettingsDialogFragment(module)
+                dialog.show(supportFragmentManager, "ModuleSettingsDialog")
+            },
+            onRemoveClicked = { position ->
+                val module = moduleAdapter.getModules()[position]
+                viewModel.removeModule(module)
+            }
+        )
         binding.moduleRecyclerView.apply {
             adapter = moduleAdapter
             layoutManager = LinearLayoutManager(this@WorkflowEditorActivity)
         }
 
-        val callback = ModuleTouchHelperCallback(moduleAdapter, viewModel)
+        val callback = ModuleTouchHelperCallback(moduleAdapter)
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(binding.moduleRecyclerView)
     }
 
     private fun setupLibraryRecyclerView() {
         val libraryModules = listOf(
+            Module(id = "", type = "DEFINE_VARIABLE", parameters = emptyMap()),
+            Module(id = "", type = "GET_RELATIVE_DATE", parameters = emptyMap()),
+            Module(id = "", type = "CREATE_GMAIL_DRAFT", parameters = emptyMap()),
+            Module(id = "", type = "DUPLICATE_SPREADSHEET", parameters = emptyMap()),
+            Module(id = "", type = "COPY_PASTE_SHEET_VALUES", parameters = emptyMap()),
             Module(id = "", type = "Delay", parameters = emptyMap()),
             Module(id = "", type = "IfElse", parameters = emptyMap()),
             Module(id = "", type = "Toast", parameters = emptyMap()),

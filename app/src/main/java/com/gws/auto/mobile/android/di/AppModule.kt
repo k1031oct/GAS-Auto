@@ -24,8 +24,10 @@ import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.data.repository.TagRepository
 import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
+import com.gws.auto.mobile.android.domain.service.DriveApiService
 import com.gws.auto.mobile.android.domain.service.GmailApiService
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
+import com.gws.auto.mobile.android.domain.service.SheetsApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -109,6 +111,18 @@ object AppModule {
     @Singleton
     fun provideGmailApiService(googleApiAuthorizer: GoogleApiAuthorizer): GmailApiService {
         return GmailApiService(googleApiAuthorizer)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDriveApiService(googleApiAuthorizer: GoogleApiAuthorizer): DriveApiService {
+        return DriveApiService(googleApiAuthorizer)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSheetsApiService(googleApiAuthorizer: GoogleApiAuthorizer): SheetsApiService {
+        return SheetsApiService(googleApiAuthorizer)
     }
 
     @Provides

@@ -109,6 +109,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/NOTICE.md"
             pickFirsts += "META-INF/DEPENDENCIES"
             pickFirsts += "META-INF/INDEX.LIST"
         }
@@ -167,6 +169,10 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+
+    // JavaMail API for Android
+    implementation(libs.com.sun.mail.android.mail)
+    implementation(libs.com.sun.mail.android.activation)
 
     // Third Party
     implementation(libs.coil.compose)

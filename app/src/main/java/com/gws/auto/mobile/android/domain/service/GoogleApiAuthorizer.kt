@@ -5,33 +5,29 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.HttpTransport
 import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.gson.GsonFactory
-import com.google.api.services.calendar.Calendar
-import com.gws.auto.mobile.android.R
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-// This is now a plain Kotlin class, without any Hilt annotations.
-class GoogleApiAuthorizer(private val context: Context) {
+@Singleton
+class GoogleApiAuthorizer @Inject constructor(@ApplicationContext private val context: Context) {
+
+    internal val httpTransport: HttpTransport by lazy { NetHttpTransport() }
+    internal val jsonFactory: JsonFactory by lazy { GsonFactory.getDefaultInstance() }
 
     private fun getLastSignedInAccount(): GoogleSignInAccount? {
         return GoogleSignIn.getLastSignedInAccount(context)
     }
 
-    fun getCalendarClient(): Calendar? {
-        val account = getLastSignedInAccount() ?: return null
-
-        val credential = GoogleAccountCredential.usingOAuth2(
-            context,
-            listOf(Scope.CalendarReadOnly.scopeUri)
-        ).apply {
+    fun getCredential(scopes: List<String>): GoogleAccountCredential {
+        val account = getLastSignedInAccount() ?: throw IllegalStateException("User not signed in")
+        return GoogleAccountCredential.usingOAuth2(context, scopes).apply {
             selectedAccount = account.account
         }
-
-        return Calendar.Builder(
-            NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            credential
-        ).setApplicationName(context.getString(R.string.app_name)).build()
     }
 
     fun signOut(onComplete: () -> Unit) {

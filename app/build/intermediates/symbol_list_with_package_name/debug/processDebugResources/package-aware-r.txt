@@ -4401,6 +4401,7 @@ id outward
 id overshoot
 id packed
 id parallax
+id parameters_container
 id parent
 id parentPanel
 id parentRelative
@@ -4813,6 +4814,7 @@ layout fragment_dashboard
 layout fragment_history
 layout fragment_licenses
 layout fragment_main_settings
+layout fragment_module_settings
 layout fragment_schedule
 layout fragment_search
 layout fragment_settings

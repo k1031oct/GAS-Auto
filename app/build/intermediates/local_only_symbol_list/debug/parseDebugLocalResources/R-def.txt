@@ -171,6 +171,7 @@ id navigation_schedule
 id navigation_user_info
 id navigation_workflow
 id next_button
+id parameters_container
 id privacy_policy_button
 id profile_image
 id progressBar
@@ -259,6 +260,7 @@ layout fragment_dashboard
 layout fragment_history
 layout fragment_licenses
 layout fragment_main_settings
+layout fragment_module_settings
 layout fragment_schedule
 layout fragment_search
 layout fragment_settings

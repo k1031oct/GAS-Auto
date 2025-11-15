@@ -4400,6 +4400,7 @@ int id outward 0x7f0901c3
 int id overshoot 0x7f0901c4
 int id packed 0x7f0901c5
 int id parallax 0x7f0901c6
+int id parameters_container 0x7f0902c6
 int id parent 0x7f0901c7
 int id parentPanel 0x7f0901c8
 int id parentRelative 0x7f0901c9
@@ -4812,6 +4813,7 @@ int layout fragment_dashboard 0x7f0c003a
 int layout fragment_history 0x7f0c003b
 int layout fragment_licenses 0x7f0c003c
 int layout fragment_main_settings 0x7f0c003d
+int layout fragment_module_settings 0x7f0c00ba
 int layout fragment_schedule 0x7f0c003e
 int layout fragment_search 0x7f0c003f
 int layout fragment_settings 0x7f0c0040
