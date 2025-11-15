@@ -95,6 +95,7 @@ drawable ic_menu
 drawable ic_menu_hamburger
 drawable ic_more_vert
 drawable ic_notification
+drawable ic_play_arrow
 drawable ic_refresh
 drawable ic_schedule
 drawable ic_search

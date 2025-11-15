@@ -3855,6 +3855,7 @@ int drawable ic_notification 0x7f0800c6
 int drawable ic_other_sign_in 0x7f0800c7
 int drawable ic_passkey 0x7f0800c8
 int drawable ic_password 0x7f0800c9
+int drawable ic_play_arrow 0x7f080120
 int drawable ic_refresh 0x7f0800ca
 int drawable ic_schedule 0x7f0800cb
 int drawable ic_search 0x7f0800cc

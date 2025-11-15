@@ -4,7 +4,6 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -36,7 +35,7 @@ public final class ListItemWorkflowBinding implements ViewBinding {
   public final CheckBox favoriteButton;
 
   @NonNull
-  public final Button runButton;
+  public final ImageButton runButton;
 
   @NonNull
   public final TextView workflowDescription;
@@ -52,9 +51,10 @@ public final class ListItemWorkflowBinding implements ViewBinding {
 
   private ListItemWorkflowBinding(@NonNull MaterialCardView rootView,
       @NonNull LinearLayout buttonContainer, @NonNull ImageButton deleteButton,
-      @NonNull ImageButton editButton, @NonNull CheckBox favoriteButton, @NonNull Button runButton,
-      @NonNull TextView workflowDescription, @NonNull TextView workflowName,
-      @NonNull TextView workflowStatus, @NonNull TextView workflowTrigger) {
+      @NonNull ImageButton editButton, @NonNull CheckBox favoriteButton,
+      @NonNull ImageButton runButton, @NonNull TextView workflowDescription,
+      @NonNull TextView workflowName, @NonNull TextView workflowStatus,
+      @NonNull TextView workflowTrigger) {
     this.rootView = rootView;
     this.buttonContainer = buttonContainer;
     this.deleteButton = deleteButton;
@@ -119,7 +119,7 @@ public final class ListItemWorkflowBinding implements ViewBinding {
       }
 
       id = R.id.run_button;
-      Button runButton = ViewBindings.findChildViewById(rootView, id);
+      ImageButton runButton = ViewBindings.findChildViewById(rootView, id);
       if (runButton == null) {
         break missingId;
       }

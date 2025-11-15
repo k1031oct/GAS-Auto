@@ -3856,6 +3856,7 @@ drawable ic_notification
 drawable ic_other_sign_in
 drawable ic_passkey
 drawable ic_password
+drawable ic_play_arrow
 drawable ic_refresh
 drawable ic_schedule
 drawable ic_search

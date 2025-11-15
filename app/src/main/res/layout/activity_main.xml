@@ -45,7 +45,7 @@
                 android:id="@+id/action_bookmark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:button="@android:drawable/btn_star"
+                android:button="@drawable/sl_bookmark"
                 android:visibility="gone"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toStartOf="@+id/delete_all_button"

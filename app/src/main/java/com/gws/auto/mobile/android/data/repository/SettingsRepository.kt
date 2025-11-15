@@ -19,16 +19,29 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
 
     private object PreferencesKeys {
         val FIRST_DAY_OF_WEEK = stringPreferencesKey("first_day_of_week")
+        val COUNTRY = stringPreferencesKey("country")
+        val THEME = stringPreferencesKey("theme")
+        val HIGHLIGHT_COLOR = stringPreferencesKey("highlight_color")
     }
 
-    val firstDayOfWeek: Flow<String> = context.dataStore.data
-        .map { preferences ->
-            preferences[PreferencesKeys.FIRST_DAY_OF_WEEK] ?: "Sunday"
-        }
+    val firstDayOfWeek: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.FIRST_DAY_OF_WEEK] ?: "Sunday" }
+    val country: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.COUNTRY] ?: "US" }
+    val theme: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.THEME] ?: "System" }
+    val highlightColor: Flow<String> = context.dataStore.data.map { it[PreferencesKeys.HIGHLIGHT_COLOR] ?: "default" }
 
     suspend fun saveFirstDayOfWeek(firstDayOfWeek: String) {
-        context.dataStore.edit { settings ->
-            settings[PreferencesKeys.FIRST_DAY_OF_WEEK] = firstDayOfWeek
-        }
+        context.dataStore.edit { it[PreferencesKeys.FIRST_DAY_OF_WEEK] = firstDayOfWeek }
+    }
+
+    suspend fun saveCountry(country: String) {
+        context.dataStore.edit { it[PreferencesKeys.COUNTRY] = country }
+    }
+
+    suspend fun saveTheme(theme: String) {
+        context.dataStore.edit { it[PreferencesKeys.THEME] = theme }
+    }
+
+    suspend fun saveHighlightColor(highlightColor: String) {
+        context.dataStore.edit { it[PreferencesKeys.HIGHLIGHT_COLOR] = highlightColor }
     }
 }

@@ -18,7 +18,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
+import com.gws.auto.mobile.android.domain.model.History
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
@@ -29,7 +31,10 @@ import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Date
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -39,6 +44,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var announcementViewModel: AnnouncementViewModel
     private val workflowViewModel: WorkflowViewModel by viewModels()
     private val historyViewModel: HistoryViewModel by viewModels()
+
+    @Inject
+    lateinit var historyRepository: HistoryRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +67,41 @@ class MainActivity : AppCompatActivity() {
         setupActionButtons()
         setupBackButtonHandler()
         observeViewModel()
+
+        // Insert dummy data
+        lifecycleScope.launch {
+            insertDummyHistoryData()
+        }
+    }
+
+    private suspend fun insertDummyHistoryData() {
+        val dummyHistories = listOf(
+            History(
+                workflowId = "Dummy Workflow 1",
+                workflowName = "Success Case",
+                executedAt = Date(System.currentTimeMillis() - 86400000), // 1 day ago
+                status = "Success",
+                logs = "Log message 1",
+                isBookmarked = true
+            ),
+            History(
+                workflowId = "Dummy Workflow 2",
+                workflowName = "Failure Case",
+                executedAt = Date(System.currentTimeMillis() - 18000000), // 5 hours ago
+                status = "Failure",
+                logs = "Step 1 completed\nStep 2 failed due to an error",
+                isBookmarked = false
+            ),
+            History(
+                workflowId = "Dummy Workflow 3",
+                workflowName = "Another Success",
+                executedAt = Date(System.currentTimeMillis() - 1800000), // 30 minutes ago
+                status = "Success",
+                logs = "All steps completed successfully",
+                isBookmarked = false
+            )
+        )
+        dummyHistories.forEach { historyRepository.insertHistory(it) }
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

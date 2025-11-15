@@ -3,7 +3,7 @@ package com.gws.auto.mobile.android.ui.schedule
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
-import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.domain.model.Holiday
 import com.gws.auto.mobile.android.domain.model.Schedule
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _currentDate = MutableStateFlow(LocalDate.now())
@@ -34,11 +34,11 @@ class ScheduleViewModel @Inject constructor(
     private val _holidays = MutableStateFlow<List<Holiday>>(emptyList())
     val holidays: StateFlow<List<Holiday>> = _holidays
 
-    val firstDayOfWeek = userPreferencesRepository.firstDayOfWeek
+    val firstDayOfWeek = settingsRepository.firstDayOfWeek
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Sunday")
 
     init {
-        userPreferencesRepository.country
+        settingsRepository.country
             .onEach { loadHolidaysForCurrentMonth() }
             .launchIn(viewModelScope)
     }
@@ -60,7 +60,7 @@ class ScheduleViewModel @Inject constructor(
     fun loadHolidaysForCurrentMonth() {
         viewModelScope.launch {
             val yearMonth = YearMonth.from(_currentDate.value)
-            val country = userPreferencesRepository.country.first()
+            val country = settingsRepository.country.first()
             _holidays.value = scheduleRepository.getHolidays(country, yearMonth.year)
         }
     }
