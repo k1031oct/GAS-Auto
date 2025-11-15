@@ -23,6 +23,10 @@ class GoogleApiAuthorizer @Inject constructor(@ApplicationContext private val co
         return GoogleSignIn.getLastSignedInAccount(context)
     }
 
+    fun isSignedIn(): Boolean {
+        return getLastSignedInAccount() != null
+    }
+
     fun getCredential(scopes: List<String>): GoogleAccountCredential {
         val account = getLastSignedInAccount() ?: throw IllegalStateException("User not signed in")
         return GoogleAccountCredential.usingOAuth2(context, scopes).apply {

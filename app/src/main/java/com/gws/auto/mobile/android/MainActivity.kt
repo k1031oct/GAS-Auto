@@ -12,13 +12,16 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.gws.auto.mobile.android.data.repository.HistoryRepository
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.domain.model.History
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
@@ -28,6 +31,7 @@ import com.gws.auto.mobile.android.ui.history.HistoryViewModel
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -47,9 +51,17 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var historyRepository: HistoryRepository
 
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called")
+
+        lifecycleScope.launch {
+            applySettings()
+        }
+
         installSplashScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -70,6 +82,26 @@ class MainActivity : AppCompatActivity() {
         // Insert dummy data
         lifecycleScope.launch {
             insertDummyHistoryData()
+        }
+    }
+
+    private suspend fun applySettings() {
+        val language = settingsRepository.language.first()
+        val theme = settingsRepository.theme.first()
+
+        val localeTag = when (language) {
+            "Japanese" -> "ja"
+            "Chinese" -> "zh"
+            "Korean" -> "ko"
+            else -> "en"
+        }
+        val appLocale = LocaleListCompat.forLanguageTags(localeTag)
+        AppCompatDelegate.setApplicationLocales(appLocale)
+
+        when (theme) {
+            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
     }
 

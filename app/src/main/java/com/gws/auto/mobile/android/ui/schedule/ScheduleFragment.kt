@@ -6,17 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
+import com.gws.auto.mobile.android.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
     private val viewModel: ScheduleViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels()
+
+    @Inject
+    lateinit var googleApiAuthorizer: GoogleApiAuthorizer
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,7 +35,13 @@ class ScheduleFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                GWSAutoForAndroidTheme {
+                val theme by themeViewModel.theme.collectAsState()
+                val highlightColor by themeViewModel.highlightColor.collectAsState()
+
+                GWSAutoForAndroidTheme(
+                    theme = theme,
+                    highlightColor = highlightColor
+                ) {
                     // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colorScheme.background) {
                         CalendarScreen(viewModel = viewModel)
@@ -38,6 +53,8 @@ class ScheduleFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadHolidaysForCurrentMonth()
+        if (googleApiAuthorizer.isSignedIn()) {
+            viewModel.loadHolidaysForCurrentMonth()
+        }
     }
 }

@@ -22,25 +22,25 @@
 
     <RadioGroup
         android:id="@+id/theme_group"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp">
 
         <RadioButton
             android:id="@+id/light_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/theme_light" />
 
         <RadioButton
             android:id="@+id/dark_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/theme_dark" />
 
         <RadioButton
             android:id="@+id/system_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/theme_system" />
     </RadioGroup>

@@ -8,10 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 
 private val DarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,
@@ -79,12 +76,10 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun GWSAutoForAndroidTheme(
-    themeViewModel: ThemeViewModel = hiltViewModel(),
+    theme: String = "System",
+    highlightColor: String = "default",
     content: @Composable () -> Unit
 ) {
-    val highlightColor by themeViewModel.highlightColor.collectAsState()
-    val theme by themeViewModel.theme.collectAsState()
-
     val darkTheme = when (theme) {
         "Light" -> false
         "Dark" -> true

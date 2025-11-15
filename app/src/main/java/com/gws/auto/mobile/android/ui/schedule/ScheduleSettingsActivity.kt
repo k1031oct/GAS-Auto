@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
+import com.gws.auto.mobile.android.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
 import java.time.Month
@@ -28,12 +29,19 @@ import java.util.Locale
 @AndroidEntryPoint
 class ScheduleSettingsActivity : ComponentActivity() {
     private val viewModel: ScheduleSettingsViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            GWSAutoForAndroidTheme {
+            val theme by themeViewModel.theme.collectAsState()
+            val highlightColor by themeViewModel.highlightColor.collectAsState()
+
+            GWSAutoForAndroidTheme(
+                theme = theme,
+                highlightColor = highlightColor
+            ) {
                 ScheduleSettingsScreen(viewModel)
             }
         }

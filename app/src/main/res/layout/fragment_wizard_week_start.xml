@@ -22,19 +22,19 @@
 
     <RadioGroup
         android:id="@+id/week_start_group"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp">
 
         <RadioButton
             android:id="@+id/sunday_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/sunday" />
 
         <RadioButton
             android:id="@+id/monday_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/monday" />
     </RadioGroup>

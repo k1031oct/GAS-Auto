@@ -1,7 +1,5 @@
 package com.gws.auto.mobile.android.ui.wizard
 
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gws.auto.mobile.android.data.repository.SettingsRepository
@@ -21,14 +19,9 @@ class WizardViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "System")
 
     fun setLanguage(language: String) {
-        val localeTag = when (language) {
-            "Japanese" -> "ja"
-            "Chinese" -> "zh"
-            "Korean" -> "ko"
-            else -> "en"
+        viewModelScope.launch {
+            settingsRepository.saveLanguage(language)
         }
-        val appLocale = LocaleListCompat.forLanguageTags(localeTag)
-        AppCompatDelegate.setApplicationLocales(appLocale)
     }
 
     fun setCountry(countryCode: String) {
@@ -47,15 +40,11 @@ class WizardViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.saveTheme(theme)
         }
-        when (theme) {
-            "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-        }
     }
 
     fun finishWizard() {
-        // This should probably be handled by a different mechanism
-        // but for now, we leave it as it is.
+        viewModelScope.launch {
+            settingsRepository.setWizardCompleted(true)
+        }
     }
 }
