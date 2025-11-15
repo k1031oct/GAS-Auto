@@ -165,35 +165,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupActionButtons() {
         binding.actionSettings.setOnClickListener { showSettingsMenu(it) }
-        binding.actionFavorite.setOnClickListener { workflowViewModel.toggleFavoriteFilter() }
-        binding.actionBookmark.setOnClickListener { historyViewModel.toggleBookmarkFilter() }
-        binding.deleteAllButton.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("Delete All History")
-                .setMessage("Are you sure you want to delete all execution history? This action cannot be undone.")
-                .setPositiveButton("Delete") { _, _ -> historyViewModel.clearHistory() }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        }
     }
 
     private fun observeViewModel() {
-        mainSharedViewModel.currentPage.onEach { pageIndex ->
-            val isWorkflowPage = pageIndex == 0
-            val isHistoryPage = pageIndex == 2
-
-            binding.actionFavorite.visibility = if (isWorkflowPage) View.VISIBLE else View.GONE
-            binding.actionBookmark.visibility = if (isHistoryPage) View.VISIBLE else View.GONE
-            binding.deleteAllButton.visibility = if (isHistoryPage) View.VISIBLE else View.GONE
-        }.launchIn(lifecycleScope)
-
-        workflowViewModel.isFavoriteFilterActive.onEach {
-            binding.actionFavorite.isChecked = it
-        }.launchIn(lifecycleScope)
-
-        historyViewModel.isBookmarkFilterActive.onEach {
-            binding.actionBookmark.isChecked = it
-        }.launchIn(lifecycleScope)
+        // No-op for now, will be re-implemented if needed
     }
 
     private fun setupBackButtonHandler() {
