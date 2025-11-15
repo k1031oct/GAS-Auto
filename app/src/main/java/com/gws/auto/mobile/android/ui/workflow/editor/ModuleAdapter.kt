@@ -1,17 +1,18 @@
 package com.gws.auto.mobile.android.ui.workflow.editor
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.gws.auto.mobile.android.databinding.ListItemModuleBinding
 import com.gws.auto.mobile.android.domain.model.Module
-import java.util.Collections
 
 class ModuleAdapter(
-    private val modules: MutableList<Module>,
     private val onEditClicked: (Module) -> Unit,
-    private val onRemoveClicked: (Int) -> Unit
-) : RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder>(), ModuleTouchHelperCallback.ItemTouchHelperAdapter {
+    private val onRemoveClicked: (Module) -> Unit
+) : ListAdapter<Module, ModuleAdapter.ModuleViewHolder>(ModuleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val binding = ListItemModuleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,39 +20,26 @@ class ModuleAdapter(
     }
 
     override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
-        val module = modules[position]
+        val module = getItem(position)
         holder.bind(module)
         holder.itemView.setOnClickListener { onEditClicked(module) }
-        holder.binding.deleteButton.setOnClickListener { onRemoveClicked(position) }
+        holder.binding.deleteButton.setOnClickListener { onRemoveClicked(module) }
     }
 
-    override fun getItemCount(): Int = modules.size
-
-    fun getModules(): List<Module> = modules
-
-    fun updateModules(newModules: List<Module>) {
-        modules.clear()
-        modules.addAll(newModules)
-        notifyDataSetChanged()
-    }
-
-    override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                Collections.swap(modules, i, i + 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(modules, i, i - 1)
-            }
-        }
-        notifyItemMoved(fromPosition, toPosition)
-        return true
-    }
-
-    class ModuleViewHolder(val binding: ListItemModuleBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ModuleViewHolder(val binding: ListItemModuleBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(module: Module) {
             binding.moduleName.text = module.type
         }
+    }
+}
+
+class ModuleDiffCallback : DiffUtil.ItemCallback<Module>() {
+    override fun areItemsTheSame(oldItem: Module, newItem: Module): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    @SuppressLint("DiffUtilEquals")
+    override fun areContentsTheSame(oldItem: Module, newItem: Module): Boolean {
+        return oldItem == newItem
     }
 }

@@ -94,13 +94,11 @@ class WorkflowEditorActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         moduleAdapter = ModuleAdapter(
-            mutableListOf(),
             onEditClicked = { module ->
                 val dialog = ModuleSettingsDialogFragment(module)
                 dialog.show(supportFragmentManager, "ModuleSettingsDialog")
             },
-            onRemoveClicked = { position ->
-                val module = moduleAdapter.getModules()[position]
+            onRemoveClicked = { module ->
                 viewModel.removeModule(module)
             }
         )
@@ -109,9 +107,7 @@ class WorkflowEditorActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@WorkflowEditorActivity)
         }
 
-        val callback = ModuleTouchHelperCallback(moduleAdapter)
-        val itemTouchHelper = ItemTouchHelper(callback)
-        itemTouchHelper.attachToRecyclerView(binding.moduleRecyclerView)
+        // The drag and drop functionality will be handled by a different helper class
     }
 
     private fun setupLibraryRecyclerView() {
@@ -161,7 +157,7 @@ class WorkflowEditorActivity : AppCompatActivity() {
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.modules.collectLatest { modules ->
-                moduleAdapter.updateModules(modules)
+                moduleAdapter.submitList(modules)
             }
         }
     }
