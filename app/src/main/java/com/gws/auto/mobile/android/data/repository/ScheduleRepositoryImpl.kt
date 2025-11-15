@@ -55,8 +55,14 @@ class ScheduleRepositoryImpl @Inject constructor(
                 .execute()
 
             events.items.mapNotNull { event ->
-                val eventDate = event.start.date?.value?.let { LocalDate.parse(it.toString()) } ?: return@mapNotNull null
-                Holiday(name = event.summary, date = eventDate)
+                val dateString = event.start.date?.toString() ?: event.start.dateTime?.toStringRfc3339()?.substring(0, 10)
+                val eventDate = dateString?.let { LocalDate.parse(it) }
+
+                if (eventDate != null) {
+                    Holiday(name = event.summary, date = eventDate)
+                } else {
+                    null
+                }
             }
         } catch (e: IOException) {
             Timber.e(e, "Failed to fetch holidays for $country, $year-$month")
