@@ -81,6 +81,8 @@ drawable bg_today
 drawable ic_add
 drawable ic_announcement
 drawable ic_badge
+drawable ic_bookmark
+drawable ic_bookmark_border
 drawable ic_dashboard
 drawable ic_delete
 drawable ic_delete_sweep
@@ -99,6 +101,7 @@ drawable ic_search
 drawable ic_unread_indicator
 drawable ic_workflow
 drawable search_view_background
+drawable sl_bookmark
 id about_app
 id action_bookmark
 id action_edit
@@ -156,7 +159,6 @@ id module_stats_title
 id module_type
 id monday_button
 id nav_graph
-id nav_host_fragment
 id navigation_account_connections
 id navigation_announcement
 id navigation_app_settings
@@ -225,6 +227,7 @@ id user_email
 id user_info_button
 id user_name
 id version_text
+id view_pager
 id week_start_group
 id wizard_view_pager
 id workflow_description

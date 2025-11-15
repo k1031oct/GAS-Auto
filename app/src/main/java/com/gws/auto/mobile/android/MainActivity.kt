@@ -17,9 +17,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.viewpager2.widget.ViewPager2
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
+import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.history.HistoryViewModel
@@ -52,14 +52,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-        binding.bottomNav.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            mainSharedViewModel.setCurrentPage(destination.id)
-        }
-
+        setupViewPager()
+        setupBottomNavigation()
         setupSearchView()
         setupActionButtons()
         setupBackButtonHandler()
@@ -73,6 +67,31 @@ class MainActivity : AppCompatActivity() {
             currentFocus!!.clearFocus()
         }
         return super.dispatchTouchEvent(ev)
+    }
+
+    private fun setupViewPager() {
+        binding.viewPager.adapter = MainFragmentStateAdapter(this)
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                binding.bottomNav.menu.getItem(position).isChecked = true
+                mainSharedViewModel.setCurrentPage(position)
+            }
+        })
+    }
+
+    private fun setupBottomNavigation() {
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            val pageIndex = when (item.itemId) {
+                R.id.navigation_workflow -> 0
+                R.id.navigation_schedule -> 1
+                R.id.navigation_history -> 2
+                R.id.navigation_dashboard -> 3
+                else -> 0
+            }
+            binding.viewPager.setCurrentItem(pageIndex, true)
+            true
+        }
     }
 
     private fun setupSearchView() {
@@ -104,9 +123,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        mainSharedViewModel.currentPage.onEach { pageId ->
-            val isWorkflowPage = pageId == R.id.navigation_workflow
-            val isHistoryPage = pageId == R.id.navigation_history
+        mainSharedViewModel.currentPage.onEach { pageIndex ->
+            val isWorkflowPage = pageIndex == 0
+            val isHistoryPage = pageIndex == 2
 
             binding.actionFavorite.visibility = if (isWorkflowPage) View.VISIBLE else View.GONE
             binding.actionBookmark.visibility = if (isHistoryPage) View.VISIBLE else View.GONE
@@ -125,10 +144,10 @@ class MainActivity : AppCompatActivity() {
     private fun setupBackButtonHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.bottomNav.selectedItemId == R.id.navigation_workflow) {
+                if (binding.viewPager.currentItem == 0) {
                     showExitConfirmationDialog()
                 } else {
-                    binding.bottomNav.selectedItemId = R.id.navigation_workflow
+                    binding.viewPager.currentItem = 0
                 }
             }
         })

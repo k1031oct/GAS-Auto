@@ -3820,6 +3820,8 @@ drawable ic_announcement
 drawable ic_arrow_back_black_24
 drawable ic_arrow_down_24dp
 drawable ic_badge
+drawable ic_bookmark
+drawable ic_bookmark_border
 drawable ic_call_answer
 drawable ic_call_answer_low
 drawable ic_call_answer_video
@@ -3936,6 +3938,7 @@ drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
 drawable preference_list_divider_material
 drawable search_view_background
+drawable sl_bookmark
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -4338,7 +4341,6 @@ id mtrl_view_tag_bottom_padding
 id multiply
 id nav_controller_view_tag
 id nav_graph
-id nav_host_fragment
 id nav_host_fragment_container
 id navigation_account_connections
 id navigation_announcement
@@ -4617,6 +4619,7 @@ id version_text
 id vertical
 id vertical_only
 id view_offset_helper
+id view_pager
 id view_transition
 id view_tree_disjoint_parent
 id view_tree_lifecycle_owner

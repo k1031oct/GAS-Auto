@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.DayOfWeek
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -98,7 +99,8 @@ fun ScheduleSettingsScreen(viewModel: ScheduleSettingsViewModel) {
                         selectedDays = uiState.weeklyDays,
                         onDayToggle = { viewModel.toggleWeeklyDay(it) },
                         time = uiState.weeklyTime,
-                        onTimeChange = { viewModel.setWeeklyTime(it) }
+                        onTimeChange = { viewModel.setWeeklyTime(it) },
+                        firstDayOfWeek = uiState.firstDayOfWeek
                     )
                     "月毎" -> MonthlySettings(
                         selectedDays = uiState.monthlyDays,
@@ -176,9 +178,17 @@ fun WeeklySettings(
     selectedDays: Set<String>,
     onDayToggle: (String) -> Unit,
     time: java.time.LocalTime,
-    onTimeChange: (java.time.LocalTime) -> Unit
+    onTimeChange: (java.time.LocalTime) -> Unit,
+    firstDayOfWeek: String
 ) {
-    val daysOfWeek = listOf("日", "月", "火", "水", "木", "金", "土")
+    val daysOfWeek = remember(firstDayOfWeek) {
+        val week = listOf("日", "月", "火", "水", "木", "金", "土")
+        if (firstDayOfWeek.equals("Monday", ignoreCase = true)) {
+            week.subList(1, week.size) + week[0]
+        } else {
+            week
+        }
+    }
 
     val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
     // Update ViewModel when state changes
@@ -205,7 +215,7 @@ fun WeeklySettings(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ai::class)
 @Composable
 fun MonthlySettings(
     selectedDays: Set<Int>,

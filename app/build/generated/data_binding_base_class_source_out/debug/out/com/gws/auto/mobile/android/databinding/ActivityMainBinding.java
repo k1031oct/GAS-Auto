@@ -12,9 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
+import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
@@ -41,28 +41,27 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ImageButton deleteAllButton;
 
   @NonNull
-  public final FragmentContainerView navHostFragment;
-
-  @NonNull
   public final SearchView searchView;
 
   @NonNull
   public final Toolbar toolbar;
 
+  @NonNull
+  public final ViewPager2 viewPager;
+
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull CheckBox actionBookmark,
       @NonNull CheckBox actionFavorite, @NonNull ImageView actionSettings,
       @NonNull BottomNavigationView bottomNav, @NonNull ImageButton deleteAllButton,
-      @NonNull FragmentContainerView navHostFragment, @NonNull SearchView searchView,
-      @NonNull Toolbar toolbar) {
+      @NonNull SearchView searchView, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
     this.actionBookmark = actionBookmark;
     this.actionFavorite = actionFavorite;
     this.actionSettings = actionSettings;
     this.bottomNav = bottomNav;
     this.deleteAllButton = deleteAllButton;
-    this.navHostFragment = navHostFragment;
     this.searchView = searchView;
     this.toolbar = toolbar;
+    this.viewPager = viewPager;
   }
 
   @Override
@@ -122,12 +121,6 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.nav_host_fragment;
-      FragmentContainerView navHostFragment = ViewBindings.findChildViewById(rootView, id);
-      if (navHostFragment == null) {
-        break missingId;
-      }
-
       id = R.id.search_view;
       SearchView searchView = ViewBindings.findChildViewById(rootView, id);
       if (searchView == null) {
@@ -140,8 +133,14 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.view_pager;
+      ViewPager2 viewPager = ViewBindings.findChildViewById(rootView, id);
+      if (viewPager == null) {
+        break missingId;
+      }
+
       return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmark, actionFavorite,
-          actionSettings, bottomNav, deleteAllButton, navHostFragment, searchView, toolbar);
+          actionSettings, bottomNav, deleteAllButton, searchView, toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
