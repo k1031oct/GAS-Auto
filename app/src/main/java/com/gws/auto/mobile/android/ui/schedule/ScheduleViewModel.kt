@@ -10,49 +10,58 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     private val _currentDate = MutableStateFlow(LocalDate.now())
-    val currentDate = _currentDate.asStateFlow()
+    val currentDate: StateFlow<LocalDate> = _currentDate
 
     val schedules: StateFlow<List<Schedule>> = scheduleRepository.getSchedulesFlow()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _holidays = MutableStateFlow<List<Holiday>>(emptyList())
-    val holidays = _holidays.asStateFlow()
+    val holidays: StateFlow<List<Holiday>> = _holidays
 
-    val firstDayOfWeek: StateFlow<String> = userPreferencesRepository.firstDayOfWeek
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "Sunday")
+    val firstDayOfWeek = userPreferencesRepository.firstDayOfWeek
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Sunday")
+
+    init {
+        userPreferencesRepository.country
+            .onEach { loadHolidaysForCurrentMonth() }
+            .launchIn(viewModelScope)
+    }
 
     fun setCurrentDate(date: LocalDate) {
         _currentDate.value = date
     }
 
     fun moveToNextMonth() {
-        _currentDate.value = _currentDate.value.plusMonths(1).withDayOfMonth(1)
+        _currentDate.value = _currentDate.value.plusMonths(1)
+        loadHolidaysForCurrentMonth()
     }
 
     fun moveToPreviousMonth() {
-        _currentDate.value = _currentDate.value.minusMonths(1).withDayOfMonth(1)
+        _currentDate.value = _currentDate.value.minusMonths(1)
+        loadHolidaysForCurrentMonth()
     }
 
     fun loadHolidaysForCurrentMonth() {
         viewModelScope.launch {
-            val country = Locale.getDefault().country
-            val year = YearMonth.from(_currentDate.value).year
-            _holidays.value = scheduleRepository.getHolidays(country, year)
+            val yearMonth = YearMonth.from(_currentDate.value)
+            val country = userPreferencesRepository.country.first()
+            _holidays.value = scheduleRepository.getHolidays(country, yearMonth.year)
         }
     }
 }

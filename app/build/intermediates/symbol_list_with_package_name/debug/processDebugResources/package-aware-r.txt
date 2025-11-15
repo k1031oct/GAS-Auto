@@ -4267,7 +4267,6 @@ id listMode
 id list_item
 id locale
 id log_message
-id login_prompt_text
 id ltr
 id m3_side_sheet
 id manual_button

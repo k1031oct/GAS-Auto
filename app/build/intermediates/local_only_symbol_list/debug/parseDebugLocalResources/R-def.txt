@@ -146,7 +146,6 @@ id licensesRecyclerView
 id licenses_button
 id light_button
 id log_message
-id login_prompt_text
 id manual_button
 id module_error_rate_chart
 id module_library_label

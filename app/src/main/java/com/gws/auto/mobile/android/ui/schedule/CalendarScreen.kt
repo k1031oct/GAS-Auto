@@ -125,7 +125,7 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
     val daysOfWeek = remember(firstDayOfWeekSetting) {
         val week = DayOfWeek.values()
         if (firstDayOfWeekSetting.equals("Monday", ignoreCase = true)) {
-            week.toList().subList(1, 7) + week[0]
+            listOf(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)
         } else {
             week.toList()
         }
@@ -194,11 +194,6 @@ fun DayTimelineSheet() {
     // Dummy Data for now, will be replaced by ViewModel
     val date = LocalDate.now()
     val holidays = emptyList<Holiday>()
-    val schedules = emptyList<Schedule>()
-
-    val timelineHourHeight = 64.dp
-    val hourTextWidth = 60.dp
-    val eventColor = MaterialTheme.colorScheme.primary
 
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
@@ -215,7 +210,7 @@ fun DayTimelineSheet() {
             }
 
             item {
-                HourTimeline(schedules = emptyList(), timelineHourHeight = timelineHourHeight, hourTextWidth = hourTextWidth, eventColor = eventColor)
+                HourTimeline(schedules = emptyList(), timelineHourHeight = 64.dp, hourTextWidth = 60.dp, eventColor = MaterialTheme.colorScheme.primary)
             }
         }
     }
