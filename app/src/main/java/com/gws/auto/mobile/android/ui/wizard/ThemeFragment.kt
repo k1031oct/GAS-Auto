@@ -4,56 +4,77 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.gws.auto.mobile.android.R
-import com.gws.auto.mobile.android.databinding.FragmentWizardThemeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ThemeFragment : Fragment() {
 
-    private var _binding: FragmentWizardThemeBinding? = null
-    private val binding get() = _binding!!
     private val viewModel: WizardViewModel by activityViewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentWizardThemeBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        // 1. Set initial state without triggering listener
-        updateInitialThemeSelection()
-
-        // 2. Set listener for user interaction
-        binding.themeGroup.setOnCheckedChangeListener { _, checkedId ->
-            val selection = when (checkedId) {
-                R.id.light_button -> "Light"
-                R.id.dark_button -> "Dark"
-                else -> "Default"
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val theme by viewModel.theme.collectAsState()
+                ThemeScreen(selectedTheme = theme, onThemeSelected = { viewModel.setTheme(it) })
             }
-            viewModel.setTheme(selection)
         }
     }
+}
 
-    private fun updateInitialThemeSelection() {
-        // Temporarily disable the listener to prevent loops
-        binding.themeGroup.setOnCheckedChangeListener(null)
-        when (viewModel.getTheme()) {
-            "Light" -> binding.lightButton.isChecked = true
-            "Dark" -> binding.darkButton.isChecked = true
-            else -> binding.systemButton.isChecked = true
+@Composable
+fun ThemeScreen(selectedTheme: String, onThemeSelected: (String) -> Unit) {
+    val themes = listOf("System", "Light", "Dark")
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = stringResource(R.string.wizard_theme_title), style = MaterialTheme.typography.headlineSmall)
+        Text(text = stringResource(R.string.wizard_theme_subtitle), style = MaterialTheme.typography.bodyLarge)
+
+        Column(modifier = Modifier.padding(top = 16.dp)) {
+            themes.forEach { theme ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { onThemeSelected(theme) }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (theme == selectedTheme),
+                        onClick = { onThemeSelected(theme) }
+                    )
+                    Text(
+                        text = theme,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 }

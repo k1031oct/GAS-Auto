@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -13,6 +16,9 @@ import javax.inject.Inject
 class WizardViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
+
+    val theme: StateFlow<String> = settingsRepository.theme
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "System")
 
     fun setLanguage(language: String) {
         val localeTag = when (language) {
