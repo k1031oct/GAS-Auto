@@ -33,7 +33,13 @@ class ScheduleRepositoryImpl @Inject constructor(
     override suspend fun getHolidays(country: String, year: Int, month: Int): List<Holiday> = withContext(Dispatchers.IO) {
         try {
             val calendarService = getCalendarService()
-            val calendarId = "en.$country#holiday@group.v.calendar.google.com"
+            val calendarId = when (country) {
+                "US" -> "en.usa#holiday@group.v.calendar.google.com"
+                "JP" -> "ja.japanese#holiday@group.v.calendar.google.com"
+                "CN" -> "zh.china#holiday@group.v.calendar.google.com"
+                "KR" -> "ko.south_korea#holiday@group.v.calendar.google.com"
+                else -> "en.usa#holiday@group.v.calendar.google.com" // Default to US
+            }
 
             val startOfMonth = LocalDate.of(year, month, 1)
             val endOfMonth = startOfMonth.plusMonths(1)
