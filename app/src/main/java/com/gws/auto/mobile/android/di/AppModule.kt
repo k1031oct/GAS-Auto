@@ -20,6 +20,7 @@ import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
 import com.gws.auto.mobile.android.data.repository.SearchHistoryRepository
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.data.repository.TagRepository
 import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
@@ -148,5 +149,11 @@ object AppModule {
     @Singleton
     fun provideUserPreferencesRepository(prefs: SharedPreferences): UserPreferencesRepository {
         return UserPreferencesRepository(prefs)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(@ApplicationContext context: Context): SettingsRepository {
+        return SettingsRepository(context)
     }
 }

@@ -7,6 +7,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.gws.auto.mobile.android.data.repository.ScheduleRepository
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.domain.model.Schedule
 import com.gws.auto.mobile.android.domain.worker.ScheduleWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -26,6 +28,7 @@ import javax.inject.Inject
 
 data class ScheduleSettingsUiState(
     val scheduleType: String = "時間毎",
+    val firstDayOfWeek: String = "Sunday",
     // Hourly
     val hourlyInterval: Int = 1,
     // Daily
@@ -45,11 +48,19 @@ data class ScheduleSettingsUiState(
 @HiltViewModel
 class ScheduleSettingsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScheduleSettingsUiState())
     val uiState: StateFlow<ScheduleSettingsUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val firstDayOfWeek = settingsRepository.firstDayOfWeek.first()
+            _uiState.update { it.copy(firstDayOfWeek = firstDayOfWeek) }
+        }
+    }
 
     fun onScheduleTypeChange(newType: String) {
         _uiState.update { it.copy(scheduleType = newType) }
