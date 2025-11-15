@@ -2,13 +2,9 @@ package com.gws.auto.mobile.android.ui.history
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -35,6 +31,12 @@ class HistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHistoryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         historyAdapter = HistoryAdapter(
             onHeaderClick = { historyId ->
                 viewModel.toggleItemExpanded(historyId.toLong())
@@ -45,15 +47,9 @@ class HistoryFragment : Fragment() {
         )
         binding.historyRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.historyRecyclerView.adapter = historyAdapter
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
         setupItemTouchHelper()
         observeViewModel()
-        setupMenu()
     }
 
     private fun setupItemTouchHelper() {
@@ -88,22 +84,6 @@ class HistoryFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.history_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.action_delete_all_history) {
-                    showDeleteAllConfirmationDialog()
-                    return true
-                }
-                return false
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun showDeleteAllConfirmationDialog() {

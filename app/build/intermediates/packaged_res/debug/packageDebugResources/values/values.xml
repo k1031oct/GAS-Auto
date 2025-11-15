@@ -142,6 +142,7 @@
     <string name="dashboard_total_executions">Total: %1$d</string>
     <string name="default_web_client_id" translatable="false">46549959857-ae1ivjnof9s9off7cvub8ms16qb6h7vh.apps.googleusercontent.com</string>
     <string name="delete">Delete</string>
+    <string name="delete_all_history">Delete All History</string>
     <string name="delete_history_confirmation">Are you sure you want to delete the history item</string>
     <string name="delete_tag_confirmation">Are you sure you want to delete the tag</string>
     <string name="dummy_status_active">Active</string>
@@ -183,6 +184,7 @@
     <string name="schedule_list_item_type">Type: %1$s</string>
     <string name="schedule_list_item_workflow">Workflow: %1$s</string>
     <string name="search_hint">検索</string>
+    <string name="search_history">Search History</string>
     <string name="search_workflows_hint">Search workflows by name or tag</string>
     <string name="settings_category_account">アカウント設定</string>
     <string name="settings_category_app">アプリ設定</string>

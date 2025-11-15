@@ -5,16 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import androidx.viewpager2.widget.ViewPager2;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.gws.auto.mobile.android.R;
 import java.lang.NullPointerException;
@@ -26,47 +26,43 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final CheckBox actionBookmarkFilter;
+  public final CheckBox actionBookmark;
 
   @NonNull
-  public final CheckBox actionFavoriteIcon;
+  public final CheckBox actionFavorite;
 
   @NonNull
-  public final ImageView actionSettingsIcon;
+  public final ImageView actionSettings;
 
   @NonNull
-  public final AppBarLayout appBarLayout;
+  public final BottomNavigationView bottomNav;
 
   @NonNull
-  public final BottomNavigationView bottomNavView;
+  public final ImageButton deleteAllButton;
+
+  @NonNull
+  public final FragmentContainerView navHostFragment;
 
   @NonNull
   public final SearchView searchView;
 
   @NonNull
-  public final ImageView settingsBadge;
-
-  @NonNull
   public final Toolbar toolbar;
 
-  @NonNull
-  public final ViewPager2 viewPager;
-
-  private ActivityMainBinding(@NonNull ConstraintLayout rootView,
-      @NonNull CheckBox actionBookmarkFilter, @NonNull CheckBox actionFavoriteIcon,
-      @NonNull ImageView actionSettingsIcon, @NonNull AppBarLayout appBarLayout,
-      @NonNull BottomNavigationView bottomNavView, @NonNull SearchView searchView,
-      @NonNull ImageView settingsBadge, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+  private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull CheckBox actionBookmark,
+      @NonNull CheckBox actionFavorite, @NonNull ImageView actionSettings,
+      @NonNull BottomNavigationView bottomNav, @NonNull ImageButton deleteAllButton,
+      @NonNull FragmentContainerView navHostFragment, @NonNull SearchView searchView,
+      @NonNull Toolbar toolbar) {
     this.rootView = rootView;
-    this.actionBookmarkFilter = actionBookmarkFilter;
-    this.actionFavoriteIcon = actionFavoriteIcon;
-    this.actionSettingsIcon = actionSettingsIcon;
-    this.appBarLayout = appBarLayout;
-    this.bottomNavView = bottomNavView;
+    this.actionBookmark = actionBookmark;
+    this.actionFavorite = actionFavorite;
+    this.actionSettings = actionSettings;
+    this.bottomNav = bottomNav;
+    this.deleteAllButton = deleteAllButton;
+    this.navHostFragment = navHostFragment;
     this.searchView = searchView;
-    this.settingsBadge = settingsBadge;
     this.toolbar = toolbar;
-    this.viewPager = viewPager;
   }
 
   @Override
@@ -96,33 +92,39 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.action_bookmark_filter;
-      CheckBox actionBookmarkFilter = ViewBindings.findChildViewById(rootView, id);
-      if (actionBookmarkFilter == null) {
+      id = R.id.action_bookmark;
+      CheckBox actionBookmark = ViewBindings.findChildViewById(rootView, id);
+      if (actionBookmark == null) {
         break missingId;
       }
 
-      id = R.id.action_favorite_icon;
-      CheckBox actionFavoriteIcon = ViewBindings.findChildViewById(rootView, id);
-      if (actionFavoriteIcon == null) {
+      id = R.id.action_favorite;
+      CheckBox actionFavorite = ViewBindings.findChildViewById(rootView, id);
+      if (actionFavorite == null) {
         break missingId;
       }
 
-      id = R.id.action_settings_icon;
-      ImageView actionSettingsIcon = ViewBindings.findChildViewById(rootView, id);
-      if (actionSettingsIcon == null) {
+      id = R.id.action_settings;
+      ImageView actionSettings = ViewBindings.findChildViewById(rootView, id);
+      if (actionSettings == null) {
         break missingId;
       }
 
-      id = R.id.app_bar_layout;
-      AppBarLayout appBarLayout = ViewBindings.findChildViewById(rootView, id);
-      if (appBarLayout == null) {
+      id = R.id.bottom_nav;
+      BottomNavigationView bottomNav = ViewBindings.findChildViewById(rootView, id);
+      if (bottomNav == null) {
         break missingId;
       }
 
-      id = R.id.bottom_nav_view;
-      BottomNavigationView bottomNavView = ViewBindings.findChildViewById(rootView, id);
-      if (bottomNavView == null) {
+      id = R.id.delete_all_button;
+      ImageButton deleteAllButton = ViewBindings.findChildViewById(rootView, id);
+      if (deleteAllButton == null) {
+        break missingId;
+      }
+
+      id = R.id.nav_host_fragment;
+      FragmentContainerView navHostFragment = ViewBindings.findChildViewById(rootView, id);
+      if (navHostFragment == null) {
         break missingId;
       }
 
@@ -132,27 +134,14 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.settings_badge;
-      ImageView settingsBadge = ViewBindings.findChildViewById(rootView, id);
-      if (settingsBadge == null) {
-        break missingId;
-      }
-
       id = R.id.toolbar;
       Toolbar toolbar = ViewBindings.findChildViewById(rootView, id);
       if (toolbar == null) {
         break missingId;
       }
 
-      id = R.id.view_pager;
-      ViewPager2 viewPager = ViewBindings.findChildViewById(rootView, id);
-      if (viewPager == null) {
-        break missingId;
-      }
-
-      return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmarkFilter,
-          actionFavoriteIcon, actionSettingsIcon, appBarLayout, bottomNavView, searchView,
-          settingsBadge, toolbar, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmark, actionFavorite,
+          actionSettings, bottomNav, deleteAllButton, navHostFragment, searchView, toolbar);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

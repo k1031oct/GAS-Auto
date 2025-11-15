@@ -120,6 +120,10 @@
     <string name="timeline_list_item_all_day">All Day</string>
     <string name="timeline_list_item_unknown_event">Unknown event</string>
 
+    <!-- History -->
+    <string name="search_history">Search History</string>
+    <string name="delete_all_history">Delete All History</string>
+
     <!-- Table Headers (for XML Layouts) -->
     <string name="header_workflow_name">Workflow Name</string>
     <string name="header_status">Status</string>

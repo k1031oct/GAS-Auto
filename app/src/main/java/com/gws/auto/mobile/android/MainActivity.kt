@@ -14,17 +14,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager2.widget.ViewPager2
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
-import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.history.HistoryViewModel
-import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,12 +52,16 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        setupViewPager()
-        setupBottomNavigation()
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNav.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            mainSharedViewModel.setCurrentPage(destination.id)
+        }
+
         setupSearchView()
-        setupSettingsIcon()
-        setupFavoriteIcon()
-        setupBookmarkFilterIcon()
+        setupActionButtons()
         setupBackButtonHandler()
         observeViewModel()
     }
@@ -73,101 +75,60 @@ class MainActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
-    private fun setupViewPager() {
-        binding.viewPager.adapter = MainFragmentStateAdapter(this)
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                binding.bottomNavView.menu.getItem(position).isChecked = true
-                mainSharedViewModel.setCurrentPage(position)
-            }
-        })
-    }
-
-    private fun setupBottomNavigation() {
-        binding.bottomNavView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_workflow -> binding.viewPager.currentItem = 0
-                R.id.navigation_schedule -> binding.viewPager.currentItem = 1
-                R.id.navigation_history -> binding.viewPager.currentItem = 2
-                R.id.navigation_dashboard -> binding.viewPager.currentItem = 3
-            }
-            true
-        }
-    }
-
     private fun setupSearchView() {
-        val searchPlate = binding.searchView.findViewById<View>(androidx.appcompat.R.id.search_plate)
-        searchPlate?.setBackgroundColor(ContextCompat.getColor(this, android.R.color.transparent))
-
-        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 mainSharedViewModel.setSearchQuery(query.orEmpty())
-                if (query?.isNotBlank() == true) {
-                    workflowViewModel.addSearchHistory(query)
-                }
-                binding.searchView.clearFocus()
-                return true
+                return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 mainSharedViewModel.setSearchQuery(newText.orEmpty())
-                return true
+                return false
             }
         })
-
-        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val searchFragment = SearchFragment()
-                searchFragment.show(supportFragmentManager, searchFragment.tag)
-            }
-        }
     }
 
-    private fun setupSettingsIcon() {
-        binding.actionSettingsIcon.setOnClickListener {
-            showSettingsMenu(it)
-        }
-    }
-
-    private fun setupFavoriteIcon() {
-        binding.actionFavoriteIcon.setOnClickListener {
-            workflowViewModel.toggleFavoriteFilter()
-        }
-    }
-
-    private fun setupBookmarkFilterIcon() {
-        binding.actionBookmarkFilter.setOnClickListener {
-            historyViewModel.toggleBookmarkFilter()
+    private fun setupActionButtons() {
+        binding.actionSettings.setOnClickListener { showSettingsMenu(it) }
+        binding.actionFavorite.setOnClickListener { workflowViewModel.toggleFavoriteFilter() }
+        binding.actionBookmark.setOnClickListener { historyViewModel.toggleBookmarkFilter() }
+        binding.deleteAllButton.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Delete All History")
+                .setMessage("Are you sure you want to delete all execution history? This action cannot be undone.")
+                .setPositiveButton("Delete") { _, _ -> historyViewModel.clearHistory() }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
         }
     }
 
     private fun observeViewModel() {
-        mainSharedViewModel.currentPage.onEach { page ->
-            binding.actionFavoriteIcon.visibility = if (page == 0) View.VISIBLE else View.GONE
-            binding.actionBookmarkFilter.visibility = if (page == 2) View.VISIBLE else View.GONE
+        mainSharedViewModel.currentPage.onEach { pageId ->
+            val isWorkflowPage = pageId == R.id.navigation_workflow
+            val isHistoryPage = pageId == R.id.navigation_history
+
+            binding.actionFavorite.visibility = if (isWorkflowPage) View.VISIBLE else View.GONE
+            binding.actionBookmark.visibility = if (isHistoryPage) View.VISIBLE else View.GONE
+            binding.deleteAllButton.visibility = if (isHistoryPage) View.VISIBLE else View.GONE
         }.launchIn(lifecycleScope)
 
-        workflowViewModel.isFavoriteFilterActive.onEach { isActive ->
-            binding.actionFavoriteIcon.isChecked = isActive
+        workflowViewModel.isFavoriteFilterActive.onEach {
+            binding.actionFavorite.isChecked = it
         }.launchIn(lifecycleScope)
 
-        historyViewModel.isBookmarkFilterActive.onEach { isActive ->
-            binding.actionBookmarkFilter.isChecked = isActive
-        }.launchIn(lifecycleScope)
-
-        announcementViewModel.hasUnread.onEach { hasUnread ->
-            binding.settingsBadge.visibility = if (hasUnread) View.VISIBLE else View.GONE
+        historyViewModel.isBookmarkFilterActive.onEach {
+            binding.actionBookmark.isChecked = it
         }.launchIn(lifecycleScope)
     }
 
     private fun setupBackButtonHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                if (binding.viewPager.currentItem == 0) {
+                if (binding.bottomNav.selectedItemId == R.id.navigation_workflow) {
                     showExitConfirmationDialog()
                 } else {
-                    binding.viewPager.currentItem = 0
+                    binding.bottomNav.selectedItemId = R.id.navigation_workflow
                 }
             }
         })
@@ -204,14 +165,5 @@ class MainActivity : AppCompatActivity() {
             true
         }
         popup.show()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // We are using a custom layout in the toolbar, so we don't inflate a menu here.
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return super.onOptionsItemSelected(item)
     }
 }

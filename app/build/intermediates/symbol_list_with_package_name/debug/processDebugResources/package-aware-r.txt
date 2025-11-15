@@ -3999,13 +3999,12 @@ id action_bar_root
 id action_bar_spinner
 id action_bar_subtitle
 id action_bar_title
-id action_bookmark_filter
+id action_bookmark
 id action_container
 id action_context_bar
-id action_delete_all_history
 id action_divider
 id action_edit
-id action_favorite_icon
+id action_favorite
 id action_image
 id action_menu_divider
 id action_menu_presenter
@@ -4013,7 +4012,6 @@ id action_mode_bar
 id action_mode_bar_stub
 id action_mode_close_button
 id action_settings
-id action_settings_icon
 id action_text
 id actions
 id activity_chooser_view_content
@@ -4037,7 +4035,6 @@ id announcement_recycler_view
 id announcement_title
 id antiClockwise
 id anticipate
-id app_bar_layout
 id arc
 id asConfigured
 id async
@@ -4060,7 +4057,7 @@ id bestChoice
 id blocking
 id bookmark_button
 id bottom
-id bottom_nav_view
+id bottom_nav
 id bounce
 id bounceBoth
 id bounceEnd
@@ -4128,6 +4125,7 @@ id decelerate
 id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
+id delete_all_button
 id delete_button
 id delete_tag_button
 id deltaRelative
@@ -4340,6 +4338,7 @@ id mtrl_view_tag_bottom_padding
 id multiply
 id nav_controller_view_tag
 id nav_graph
+id nav_host_fragment
 id nav_host_fragment_container
 id navigation_account_connections
 id navigation_announcement
@@ -4618,7 +4617,6 @@ id version_text
 id vertical
 id vertical_only
 id view_offset_helper
-id view_pager
 id view_transition
 id view_tree_disjoint_parent
 id view_tree_lifecycle_owner
@@ -4935,6 +4933,7 @@ layout splash_screen_view
 layout support_simple_spinner_dropdown_item
 menu bottom_nav_menu
 menu history_menu
+menu main_activity_menu
 menu main_menu
 menu settings_menu
 menu workflow_editor_menu
@@ -5050,6 +5049,7 @@ string default_error_msg
 string default_popup_window_title
 string default_web_client_id
 string delete
+string delete_all_history
 string delete_history_confirmation
 string delete_tag_confirmation
 string dest_title
@@ -5310,6 +5310,7 @@ string save_workflow
 string schedule_list_item_type
 string schedule_list_item_workflow
 string search_hint
+string search_history
 string search_menu_title
 string search_workflows_hint
 string searchbar_scrolling_view_behavior

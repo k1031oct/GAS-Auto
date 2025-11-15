@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -52,7 +51,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gws.auto.mobile.android.R
@@ -87,22 +85,17 @@ fun CalendarScreen(
             }
         }
     ) { paddingValues ->
-        // Create a new padding that ignores the bottom padding from the parent Scaffold
-        val newPadding = PaddingValues(
-            top = paddingValues.calculateTopPadding(),
-            start = paddingValues.calculateLeftPadding(LayoutDirection.Ltr),
-            end = paddingValues.calculateRightPadding(LayoutDirection.Ltr)
-        )
-
         BottomSheetScaffold(
-            modifier = Modifier.padding(newPadding), // Apply the new padding
             scaffoldState = scaffoldState,
             sheetPeekHeight = 32.dp, // Provide a peek height for the handle area
             sheetContent = { DayTimelineSheet() },
             sheetContainerColor = MaterialTheme.colorScheme.surfaceContainer, // Use a lighter surface color
             containerColor = MaterialTheme.colorScheme.background // Ensure calendar has the correct background
         ) {
-            CalendarContent(viewModel = viewModel) {
+            CalendarContent(
+                viewModel = viewModel,
+                modifier = Modifier.padding(paddingValues)
+            ) {
                 viewModel.setCurrentDate(it)
                 scope.launch { scaffoldState.bottomSheetState.expand() }
             }
@@ -112,7 +105,11 @@ fun CalendarScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Unit) {
+fun CalendarContent(
+    viewModel: ScheduleViewModel, 
+    modifier: Modifier = Modifier,
+    onDateClick: (LocalDate) -> Unit
+) {
     val pagerState = rememberPagerState(
         initialPage = Int.MAX_VALUE / 2,
         pageCount = { Int.MAX_VALUE }
@@ -144,7 +141,7 @@ fun CalendarContent(viewModel: ScheduleViewModel, onDateClick: (LocalDate) -> Un
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(top = 16.dp)) {
+    Column(modifier = modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
