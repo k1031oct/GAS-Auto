@@ -16,12 +16,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import com.gws.auto.mobile.android.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
@@ -29,6 +33,9 @@ class ScheduleFragment : Fragment() {
     private val viewModel: ScheduleViewModel by viewModels()
     private val themeViewModel: ThemeViewModel by viewModels()
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +66,10 @@ class ScheduleFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainSharedViewModel.isSignedIn
+                combine(
+                    mainSharedViewModel.isSignedIn,
+                    settingsRepository.country.distinctUntilChanged()
+                ) { isSignedIn, _ -> isSignedIn }
                     .filter { it }
                     .collect { 
                         viewModel.loadHolidaysForCurrentMonth()

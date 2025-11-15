@@ -6,8 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.os.LocaleListCompat
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.gws.auto.mobile.android.R
@@ -102,14 +101,16 @@ class AppSettingsFragment : Fragment() {
             binding.languageSpinner.adapter = it
         }
         val languageValues = resources.getStringArray(R.array.language_values)
-        val currentLang = AppCompatDelegate.getApplicationLocales().toLanguageTags()
-        val langPosition = languageValues.indexOf(currentLang.ifEmpty { "en" })
-        binding.languageSpinner.setSelection(if (langPosition != -1) langPosition else 0)
+        lifecycleScope.launch {
+            val currentLanguage = settingsRepository.language.first()
+            val langPosition = languageValues.indexOf(currentLanguage)
+            binding.languageSpinner.setSelection(if (langPosition != -1) langPosition else 0)
+        }
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedLang = languageValues[position]
-                val appLocale = LocaleListCompat.forLanguageTags(selectedLang)
-                AppCompatDelegate.setApplicationLocales(appLocale)
+                val selection = languageValues[position]
+                lifecycleScope.launch { settingsRepository.saveLanguage(selection) }
+                Toast.makeText(requireContext(), "App restart required to apply changes", Toast.LENGTH_SHORT).show()
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
@@ -129,12 +130,7 @@ class AppSettingsFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selection = themeValues[position]
                 lifecycleScope.launch { settingsRepository.saveTheme(selection) }
-                val mode = when (selection) {
-                    "Light" -> AppCompatDelegate.MODE_NIGHT_NO
-                    "Dark" -> AppCompatDelegate.MODE_NIGHT_YES
-                    else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                }
-                AppCompatDelegate.setDefaultNightMode(mode)
+                Toast.makeText(requireContext(), "App restart required to apply changes", Toast.LENGTH_SHORT).show()
             }
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
