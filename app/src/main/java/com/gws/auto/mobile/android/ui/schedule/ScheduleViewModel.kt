@@ -6,11 +6,11 @@ import com.gws.auto.mobile.android.data.repository.ScheduleRepository
 import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.domain.model.Holiday
 import com.gws.auto.mobile.android.domain.model.Schedule
+import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -20,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val googleApiAuthorizer: GoogleApiAuthorizer
 ) : ViewModel() {
 
     private val _currentDate = MutableStateFlow(LocalDate.now())
@@ -34,6 +35,9 @@ class ScheduleViewModel @Inject constructor(
 
     val firstDayOfWeek = settingsRepository.firstDayOfWeek
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Sunday")
+    
+    private val country = settingsRepository.country
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "US")
 
     fun setCurrentDate(date: LocalDate) {
         _currentDate.value = date
@@ -51,10 +55,11 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun loadHolidaysForCurrentMonth() {
+        if (!googleApiAuthorizer.isSignedIn()) return
+        
         viewModelScope.launch {
             val yearMonth = YearMonth.from(_currentDate.value)
-            val country = settingsRepository.country.first()
-            _holidays.value = scheduleRepository.getHolidays(country, yearMonth.year, yearMonth.monthValue)
+            _holidays.value = scheduleRepository.getHolidays(country.value, yearMonth.year, yearMonth.monthValue)
         }
     }
 }

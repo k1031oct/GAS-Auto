@@ -9,10 +9,10 @@ import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.IOException
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.TimeZone
 import javax.inject.Inject
 
 class ScheduleRepositoryImpl @Inject constructor(
@@ -53,7 +53,10 @@ class ScheduleRepositoryImpl @Inject constructor(
                 Holiday(name = event.summary, date = eventDate)
             }
         } catch (e: IOException) {
-            // Consider logging the exception or handling it more gracefully
+            Timber.e(e, "Failed to fetch holidays for $country, $year-$month")
+            emptyList()
+        } catch (e: Exception) {
+            Timber.e(e, "An unexpected error occurred while fetching holidays for $country, $year-$month")
             emptyList()
         }
     }
