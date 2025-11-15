@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.os.Bundle
 import android.view.DragEvent
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
@@ -13,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ActivityWorkflowEditorBinding
 import com.gws.auto.mobile.android.domain.model.Module
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +30,7 @@ class WorkflowEditorActivity : AppCompatActivity() {
     private val viewModel: WorkflowEditorViewModel by viewModels()
     private lateinit var moduleAdapter: ModuleAdapter
     private lateinit var libraryAdapter: ModuleLibraryAdapter
+    private var isEditingEnabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +48,10 @@ class WorkflowEditorActivity : AppCompatActivity() {
         val workflowId = intent.getStringExtra("workflowId")
         if (workflowId != null) {
             viewModel.loadWorkflow(workflowId)
+        } else {
+            // New workflow, enable editing by default
+            isEditingEnabled = true
+            updateEditState()
         }
 
         setupRecyclerView()
@@ -52,8 +59,37 @@ class WorkflowEditorActivity : AppCompatActivity() {
         setupDragAndDrop()
         observeViewModel()
 
-        binding.saveWorkflowButton.setOnClickListener {
-            saveWorkflow()
+        binding.cancelButton.setOnClickListener { finish() }
+        binding.saveButton.setOnClickListener { saveWorkflow() }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.workflow_editor_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressedDispatcher.onBackPressed()
+                true
+            }
+            R.id.action_edit -> {
+                isEditingEnabled = !isEditingEnabled
+                updateEditState()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateEditState() {
+        binding.workflowNameEditor.isFocusable = isEditingEnabled
+        binding.workflowNameEditor.isFocusableInTouchMode = isEditingEnabled
+        binding.workflowDescriptionEditor.isFocusable = isEditingEnabled
+        binding.workflowDescriptionEditor.isFocusableInTouchMode = isEditingEnabled
+        if(isEditingEnabled) {
+            binding.workflowNameEditor.requestFocus()
         }
     }
 
@@ -137,16 +173,6 @@ class WorkflowEditorActivity : AppCompatActivity() {
                 Timber.e(e, "Failed to save workflow.")
                 // Optionally, show a toast or a snackbar to the user
             }
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressedDispatcher.onBackPressed()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 }

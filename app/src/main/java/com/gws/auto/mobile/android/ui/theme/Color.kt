@@ -63,3 +63,19 @@ val md_theme_dark_shadow = Color(0xFF000000)
 val md_theme_dark_surfaceTint = Color(0xFFD0BCFF)
 val md_theme_dark_outlineVariant = Color(0xFF49454F)
 val md_theme_dark_scrim = Color(0xFF000000)
+
+// Forest Light Theme Colors
+val forest_theme_light_primary = Color(0xFF386A1F)
+val forest_theme_light_onPrimary = Color(0xFFFFFFFF)
+
+// Forest Dark Theme Colors
+val forest_theme_dark_primary = Color(0xFF9DCD83)
+val forest_theme_dark_onPrimary = Color(0xFF083900)
+
+// Ocean Light Theme Colors
+val ocean_theme_light_primary = Color(0xFF00696F)
+val ocean_theme_light_onPrimary = Color(0xFFFFFFFF)
+
+// Ocean Dark Theme Colors
+val ocean_theme_dark_primary = Color(0xFF4DD9E2)
+val ocean_theme_dark_onPrimary = Color(0xFF00373A)

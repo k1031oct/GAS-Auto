@@ -4004,6 +4004,7 @@ id action_container
 id action_context_bar
 id action_delete_all_history
 id action_divider
+id action_edit
 id action_favorite_icon
 id action_image
 id action_menu_divider
@@ -4070,6 +4071,7 @@ id browser_actions_menu_item_text
 id browser_actions_menu_items
 id browser_actions_menu_view
 id buttonPanel
+id button_bar
 id button_container
 id cache_measures
 id callMeasure
@@ -4437,9 +4439,9 @@ id rounded
 id row_index_key
 id rtl
 id run_button
+id save_button
 id save_non_transition_alpha
 id save_overlay_view
-id save_workflow_button
 id sawtooth
 id scale
 id schedule_status
@@ -4936,6 +4938,7 @@ menu bottom_nav_menu
 menu history_menu
 menu main_menu
 menu settings_menu
+menu workflow_editor_menu
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round

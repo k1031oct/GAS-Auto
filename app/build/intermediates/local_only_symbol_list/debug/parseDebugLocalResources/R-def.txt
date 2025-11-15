@@ -102,6 +102,7 @@ drawable search_view_background
 id about_app
 id action_bookmark_filter
 id action_delete_all_history
+id action_edit
 id action_favorite_icon
 id action_settings
 id action_settings_icon
@@ -114,7 +115,9 @@ id auth_button
 id back_button
 id bookmark_button
 id bottom_nav_view
+id button_bar
 id button_container
+id cancel_button
 id clear_history_button
 id compose_view
 id contact_button
@@ -173,7 +176,7 @@ id query_text
 id rating_button
 id refresh_button
 id run_button
-id save_workflow_button
+id save_button
 id schedule_status
 id schedule_title_text
 id schedule_type_and_time
@@ -292,6 +295,7 @@ menu bottom_nav_menu
 menu history_menu
 menu main_menu
 menu settings_menu
+menu workflow_editor_menu
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
