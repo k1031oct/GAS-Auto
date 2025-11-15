@@ -35,7 +35,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -101,7 +100,7 @@ fun CalendarScreen(
             sheetPeekHeight = 32.dp, // Provide a peek height for the handle area
             sheetContent = { DayTimelineSheet() },
             sheetContainerColor = MaterialTheme.colorScheme.surfaceContainer, // Use a lighter surface color
-            containerColor = Color.Transparent // Ensure calendar has no extra background
+            containerColor = MaterialTheme.colorScheme.background // Ensure calendar has the correct background
         ) {
             CalendarContent(viewModel = viewModel) {
                 viewModel.setCurrentDate(it)
