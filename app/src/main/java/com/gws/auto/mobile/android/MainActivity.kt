@@ -25,6 +25,7 @@ import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.history.HistoryViewModel
+import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        // No-op for now, will be re-implemented if needed
+        // All icon visibility is now managed within SearchFragment
     }
 
     private fun setupBackButtonHandler() {
