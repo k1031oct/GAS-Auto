@@ -24,6 +24,7 @@ import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.data.repository.TagRepository
 import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
+import com.gws.auto.mobile.android.domain.service.GmailApiService
 import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import dagger.Module
 import dagger.Provides
@@ -102,6 +103,12 @@ object AppModule {
     @Singleton
     fun provideGoogleApiAuthorizer(@ApplicationContext context: Context): GoogleApiAuthorizer {
         return GoogleApiAuthorizer(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGmailApiService(googleApiAuthorizer: GoogleApiAuthorizer): GmailApiService {
+        return GmailApiService(googleApiAuthorizer)
     }
 
     @Provides

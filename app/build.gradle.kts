@@ -149,6 +149,7 @@ dependencies {
     implementation(libs.google.api.services.drive)
     implementation(libs.google.api.services.sheets)
     implementation(libs.google.api.services.calendar)
+    implementation(libs.google.api.services.gmail)
     implementation(libs.google.oauth.client)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.splashscreen)
