@@ -4,23 +4,35 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.lifecycleScope
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.ui.wizard.WizardActivity
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        installSplashScreen()
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        val isFirstRun = prefs.getBoolean("is_first_run", true)
+        splashScreen.setKeepOnScreenCondition { true }
 
-        if (isFirstRun) {
-            startActivity(Intent(this, WizardActivity::class.java))
-        } else {
-            startActivity(Intent(this, MainActivity::class.java))
+        lifecycleScope.launch {
+            val isWizardCompleted = settingsRepository.isWizardCompleted.first()
+            val intent = if (isWizardCompleted) {
+                Intent(this@SplashActivity, MainActivity::class.java)
+            } else {
+                Intent(this@SplashActivity, WizardActivity::class.java)
+            }
+            startActivity(intent)
+            finish()
         }
-        finish()
     }
 }

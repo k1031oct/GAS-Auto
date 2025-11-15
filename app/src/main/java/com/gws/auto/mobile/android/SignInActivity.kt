@@ -1,5 +1,6 @@
 package com.gws.auto.mobile.android
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -39,7 +40,6 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.skipButton.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
     }
@@ -92,7 +92,7 @@ class SignInActivity : AppCompatActivity() {
 
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
-            startActivity(Intent(this, MainActivity::class.java))
+            setResult(Activity.RESULT_OK)
             finish()
         } else {
             Toast.makeText(this, "Firebase authentication failed.", Toast.LENGTH_SHORT).show()

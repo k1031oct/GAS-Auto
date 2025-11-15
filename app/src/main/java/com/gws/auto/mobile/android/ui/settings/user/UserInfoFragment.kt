@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import coil.load
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -14,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentUserInfoBinding
+import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,6 +25,8 @@ class UserInfoFragment : Fragment() {
 
     private var _binding: FragmentUserInfoBinding? = null
     private val binding get() = _binding!!
+
+    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
 
     @Inject
     @JvmField
@@ -71,6 +75,7 @@ class UserInfoFragment : Fragment() {
             ?.addOnCompleteListener(requireActivity()) {
                 if (it.isSuccessful) {
                     Timber.d("Sign-in with Google successful.")
+                    mainSharedViewModel.setSignedInStatus(true)
                     updateUI()
                 } else {
                     Timber.w(it.exception, "Sign-in with Google failed.")
