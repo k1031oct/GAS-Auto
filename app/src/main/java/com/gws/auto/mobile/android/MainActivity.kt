@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +25,7 @@ import com.gws.auto.mobile.android.data.repository.HistoryRepository
 import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.databinding.ActivityMainBinding
 import com.gws.auto.mobile.android.domain.model.History
+import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
 import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
@@ -54,6 +56,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    lateinit var googleApiAuthorizer: GoogleApiAuthorizer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called")
@@ -83,6 +88,11 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             insertDummyHistoryData()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainSharedViewModel.setSignedInStatus(googleApiAuthorizer.isSignedIn())
     }
 
     private suspend fun applySettings() {
@@ -149,8 +159,13 @@ class MainActivity : AppCompatActivity() {
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                binding.bottomNav.menu.getItem(position).isChecked = true
-                mainSharedViewModel.setCurrentPage(position)
+                if (mainSharedViewModel.isSignedIn.value || position == 0) {
+                    binding.bottomNav.menu.getItem(position).isChecked = true
+                    mainSharedViewModel.setCurrentPage(position)
+                } else {
+                    binding.viewPager.currentItem = 0
+                    Toast.makeText(this@MainActivity, R.string.sign_in_required, Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }
@@ -164,8 +179,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_dashboard -> 3
                 else -> 0
             }
-            binding.viewPager.setCurrentItem(pageIndex, true)
-            true
+
+            if (mainSharedViewModel.isSignedIn.value || pageIndex == 0) {
+                binding.viewPager.setCurrentItem(pageIndex, true)
+                true
+            } else {
+                Toast.makeText(this, R.string.sign_in_required, Toast.LENGTH_SHORT).show()
+                false
+            }
         }
     }
 

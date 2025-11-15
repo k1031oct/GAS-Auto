@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,11 +53,25 @@ class ThemeFragment : Fragment() {
 fun ThemeScreen(selectedTheme: String, onThemeSelected: (String) -> Unit) {
     val themes = listOf("System", "Light", "Dark")
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = stringResource(R.string.wizard_theme_title), style = MaterialTheme.typography.headlineSmall)
-        Text(text = stringResource(R.string.wizard_theme_subtitle), style = MaterialTheme.typography.bodyLarge)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(R.string.wizard_theme_title),
+            style = MaterialTheme.typography.headlineLarge
+        )
+        Text(
+            text = stringResource(R.string.wizard_theme_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-        Column(modifier = Modifier.padding(top = 16.dp)) {
+        Column(modifier = Modifier.padding(top = 32.dp)) {
             themes.forEach { theme ->
                 Row(
                     Modifier

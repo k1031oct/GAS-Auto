@@ -74,6 +74,7 @@
     <string name="sync_enabled_with">Sync enabled with: %1$s</string>
     <string name="sync_disabled">Sync is currently disabled.</string>
     <string name="skip">Skip</string>
+    <string name="sign_in_required">Sign-in required to access this feature.</string>
 
     <!-- Workflow -->
     <string name="workflow_name">Workflow Name</string>
