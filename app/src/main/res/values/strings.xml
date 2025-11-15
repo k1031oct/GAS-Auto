@@ -34,7 +34,7 @@
     <string name="delete_history_confirmation">Are you sure you want to delete the history item</string>
     <string name="clear_history_confirmation_title">Clear History</string>
     <string name="clear_history_confirmation_message">Are you sure you want to clear all execution history?</string>
-    <string name="clear_search_history_confirmation">Are you sure you want to clear all search history?</string>
+    <string name="clear_search_history_confirmation">Clear Search History?</string>
     <string name="add_tag_title">Add New Tag</string>
     <string name="tag_name_hint">Tag Name</string>
 
@@ -123,6 +123,7 @@
     <!-- History -->
     <string name="search_history">Search History</string>
     <string name="delete_all_history">Delete All History</string>
+    <string name="clear_history_button_text">Clear</string>
 
     <!-- Table Headers (for XML Layouts) -->
     <string name="header_workflow_name">Workflow Name</string>

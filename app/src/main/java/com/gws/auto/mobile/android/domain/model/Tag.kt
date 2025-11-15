@@ -7,4 +7,9 @@ import androidx.room.PrimaryKey
 data class Tag(
     @PrimaryKey
     val name: String
-)
+) : DisplayTag {
+    override val displayName: String
+        get() = name
+    override val isFilter: Boolean
+        get() = false
+}

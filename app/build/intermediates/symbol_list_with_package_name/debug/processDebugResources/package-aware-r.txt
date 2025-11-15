@@ -4003,12 +4003,10 @@ id action_bar_root
 id action_bar_spinner
 id action_bar_subtitle
 id action_bar_title
-id action_bookmark
 id action_container
 id action_context_bar
 id action_divider
 id action_edit
-id action_favorite
 id action_image
 id action_menu_divider
 id action_menu_presenter
@@ -4129,7 +4127,6 @@ id decelerate
 id decelerateAndComplete
 id decor_content_parent
 id default_activity_button
-id delete_all_button
 id delete_button
 id delete_tag_button
 id deltaRelative
@@ -5016,6 +5013,7 @@ string cancel
 string character_counter_content_description
 string character_counter_overflowed_content_description
 string character_counter_pattern
+string clear_history_button_text
 string clear_history_confirmation_message
 string clear_history_confirmation_title
 string clear_search_history_confirmation

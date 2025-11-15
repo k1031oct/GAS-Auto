@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.ListItemAddWorkflowBinding
 import com.gws.auto.mobile.android.databinding.ListItemWorkflowBinding
 import com.gws.auto.mobile.android.domain.model.Workflow

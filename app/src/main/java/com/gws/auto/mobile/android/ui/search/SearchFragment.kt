@@ -12,8 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentSearchBinding
+import com.gws.auto.mobile.android.domain.model.DisplayTag
+import com.gws.auto.mobile.android.domain.model.FilterTag
+import com.gws.auto.mobile.android.domain.model.FilterType
+import com.gws.auto.mobile.android.domain.model.Tag
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
+import com.gws.auto.mobile.android.ui.history.HistoryViewModel
+import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -24,18 +31,14 @@ class SearchFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: SearchViewModel by viewModels()
-    private val mainSharedViewModel: MainSharedViewModel by viewModels({
-        requireActivity()
-    })
+    private val mainSharedViewModel: MainSharedViewModel by viewModels({ requireActivity() })
+    private val workflowViewModel: WorkflowViewModel by viewModels({ requireActivity() })
+    private val historyViewModel: HistoryViewModel by viewModels({ requireActivity() })
 
     private lateinit var tagAdapter: TagAdapter
     private lateinit var historyAdapter: SearchHistoryAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -49,17 +52,11 @@ class SearchFragment : BottomSheetDialogFragment() {
 
     private fun setupRecyclerViews() {
         tagAdapter = TagAdapter(
-            onTagClicked = { tag ->
-                mainSharedViewModel.setSearchQuery(tag.name)
-                viewModel.addSearchHistory(tag.name)
-                dismiss()
-            },
+            onTagClicked = { tag -> handleTagClick(tag) },
             onTagLongClicked = { tag ->
                 showDeleteConfirmationDialog(getString(R.string.delete_tag_confirmation), tag.name) { viewModel.deleteTag(tag) }
             },
-            onAddTagClicked = {
-                showAddTagDialog()
-            }
+            onAddTagClicked = { showAddTagDialog() }
         )
         binding.tagRecyclerView.adapter = tagAdapter
 
@@ -76,9 +73,35 @@ class SearchFragment : BottomSheetDialogFragment() {
         binding.historyRecyclerView.adapter = historyAdapter
     }
 
+    private fun handleTagClick(tag: DisplayTag) {
+        when (tag) {
+            is FilterTag -> {
+                when (tag.type) {
+                    FilterType.FAVORITE -> workflowViewModel.toggleFavoriteFilter()
+                    FilterType.BOOKMARK -> historyViewModel.toggleBookmarkFilter()
+                }
+            }
+            is Tag -> {
+                mainSharedViewModel.setSearchQuery(tag.name)
+                viewModel.addSearchHistory(tag.name)
+                dismiss()
+            }
+        }
+    }
+
     private fun observeViewModel() {
-        viewModel.tags.onEach { tags ->
-            tagAdapter.submitList(tags)
+        val favoriteFilterTag = FilterTag("★ Favorites", FilterType.FAVORITE)
+        val bookmarkFilterTag = FilterTag("🔖 Bookmarks", FilterType.BOOKMARK)
+
+        combine(mainSharedViewModel.currentPage, viewModel.tags) { page, tags ->
+            val filterTags = when (page) {
+                0 -> listOf(favoriteFilterTag)
+                2 -> listOf(bookmarkFilterTag)
+                else -> emptyList()
+            }
+            filterTags + tags
+        }.onEach { combinedTags ->
+            tagAdapter.submitList(combinedTags)
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.searchHistory.onEach { history ->

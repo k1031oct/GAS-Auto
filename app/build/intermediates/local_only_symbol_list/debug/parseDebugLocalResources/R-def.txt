@@ -104,9 +104,7 @@ drawable ic_workflow
 drawable search_view_background
 drawable sl_bookmark
 id about_app
-id action_bookmark
 id action_edit
-id action_favorite
 id action_settings
 id add_tag_button
 id announcement_content
@@ -126,7 +124,6 @@ id country_spinner
 id dark_button
 id date
 id day_text
-id delete_all_button
 id delete_button
 id delete_tag_button
 id edit_button
@@ -322,6 +319,7 @@ string app_name
 string calendar_next_month_button
 string calendar_previous_month_button
 string cancel
+string clear_history_button_text
 string clear_history_confirmation_message
 string clear_history_confirmation_title
 string clear_search_history_confirmation

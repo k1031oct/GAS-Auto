@@ -4,8 +4,6 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,19 +24,10 @@ public final class ActivityMainBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
-  public final CheckBox actionBookmark;
-
-  @NonNull
-  public final CheckBox actionFavorite;
-
-  @NonNull
   public final ImageView actionSettings;
 
   @NonNull
   public final BottomNavigationView bottomNav;
-
-  @NonNull
-  public final ImageButton deleteAllButton;
 
   @NonNull
   public final SearchView searchView;
@@ -49,16 +38,12 @@ public final class ActivityMainBinding implements ViewBinding {
   @NonNull
   public final ViewPager2 viewPager;
 
-  private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull CheckBox actionBookmark,
-      @NonNull CheckBox actionFavorite, @NonNull ImageView actionSettings,
-      @NonNull BottomNavigationView bottomNav, @NonNull ImageButton deleteAllButton,
-      @NonNull SearchView searchView, @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
+  private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull ImageView actionSettings,
+      @NonNull BottomNavigationView bottomNav, @NonNull SearchView searchView,
+      @NonNull Toolbar toolbar, @NonNull ViewPager2 viewPager) {
     this.rootView = rootView;
-    this.actionBookmark = actionBookmark;
-    this.actionFavorite = actionFavorite;
     this.actionSettings = actionSettings;
     this.bottomNav = bottomNav;
-    this.deleteAllButton = deleteAllButton;
     this.searchView = searchView;
     this.toolbar = toolbar;
     this.viewPager = viewPager;
@@ -91,18 +76,6 @@ public final class ActivityMainBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.action_bookmark;
-      CheckBox actionBookmark = ViewBindings.findChildViewById(rootView, id);
-      if (actionBookmark == null) {
-        break missingId;
-      }
-
-      id = R.id.action_favorite;
-      CheckBox actionFavorite = ViewBindings.findChildViewById(rootView, id);
-      if (actionFavorite == null) {
-        break missingId;
-      }
-
       id = R.id.action_settings;
       ImageView actionSettings = ViewBindings.findChildViewById(rootView, id);
       if (actionSettings == null) {
@@ -112,12 +85,6 @@ public final class ActivityMainBinding implements ViewBinding {
       id = R.id.bottom_nav;
       BottomNavigationView bottomNav = ViewBindings.findChildViewById(rootView, id);
       if (bottomNav == null) {
-        break missingId;
-      }
-
-      id = R.id.delete_all_button;
-      ImageButton deleteAllButton = ViewBindings.findChildViewById(rootView, id);
-      if (deleteAllButton == null) {
         break missingId;
       }
 
@@ -139,8 +106,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, actionBookmark, actionFavorite,
-          actionSettings, bottomNav, deleteAllButton, searchView, toolbar, viewPager);
+      return new ActivityMainBinding((ConstraintLayout) rootView, actionSettings, bottomNav,
+          searchView, toolbar, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

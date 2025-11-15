@@ -108,12 +108,12 @@ class DashboardFragment : Fragment() {
 
     private fun updateWorkflowCharts(uiState: DashboardUiState) {
         updateErrorRateChart(binding.workflowErrorRateChart, uiState.totalCountMonth, uiState.errorCountMonth, "Workflow Error Rate")
-        updateRankingChart(binding.workflowRankingChart, uiState.workflowExecutionCounts.map { BarEntry(it.workflowName.hashCode().toFloat(), it.executionCount.toFloat()) }, uiState.workflowExecutionCounts.map { it.workflowName })
+        updateRankingChart(binding.workflowRankingChart, uiState.workflowExecutionCounts.mapIndexed { index, it -> BarEntry(index.toFloat(), it.executionCount.toFloat()) }, uiState.workflowExecutionCounts.map { it.workflowName })
     }
 
     private fun updateModuleCharts(uiState: DashboardUiState) {
         updateErrorRateChart(binding.moduleErrorRateChart, uiState.moduleUsageCount, uiState.moduleErrorCount, "Module Error Rate")
-        updateRankingChart(binding.moduleRankingChart, uiState.moduleStats.map { BarEntry(it.moduleName.hashCode().toFloat(), it.usageCount.toFloat()) }, uiState.moduleStats.map { it.moduleName })
+        updateRankingChart(binding.moduleRankingChart, uiState.moduleStats.mapIndexed { index, it -> BarEntry(index.toFloat(), it.usageCount.toFloat()) }, uiState.moduleStats.map { it.moduleName })
     }
 
     private fun updateErrorRateChart(chart: com.github.mikephil.charting.charts.PieChart, total: Int, errors: Int, centerText: String) {
