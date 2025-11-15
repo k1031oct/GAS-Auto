@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp"
-    app:cardUseCompatPadding="true"
     app:cardBackgroundColor="?attr/colorSurfaceContainer">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +31,7 @@
             android:layout_marginTop="4dp"
             android:textAppearance="?attr/textAppearanceBodySmall"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/workflow_name_text"
+            app:layout_constraintTop_toBottomOf="@+id/workflow_name_text"
             tools:text="2025-11-11 20:30:00" />
 
         <com.google.android.material.chip.Chip

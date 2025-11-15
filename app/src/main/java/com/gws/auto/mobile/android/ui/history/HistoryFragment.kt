@@ -60,8 +60,10 @@ class HistoryFragment : Fragment() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                (historyAdapter.currentList[position] as? HistoryListItem.HeaderItem)?.let {
-                    viewModel.deleteHistory(it.history)
+                (historyAdapter.currentList[position] as? HistoryListItem.HeaderItem)?.let { headerItem ->
+                    showDeleteConfirmationDialog(headerItem) {
+                        historyAdapter.notifyItemChanged(position)
+                    }
                 }
             }
 
@@ -86,12 +88,13 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    private fun showDeleteAllConfirmationDialog() {
+    private fun showDeleteConfirmationDialog(headerItem: HistoryListItem.HeaderItem, onCancel: () -> Unit) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Delete All History")
-            .setMessage("Are you sure you want to delete all execution history? This action cannot be undone.")
-            .setPositiveButton("Delete") { _, _ -> viewModel.clearHistory() }
-            .setNegativeButton(R.string.cancel, null)
+            .setTitle("Delete History Item")
+            .setMessage("Are you sure you want to delete this execution history item?")
+            .setPositiveButton("Delete") { _, _ -> viewModel.deleteHistory(headerItem.history) }
+            .setNegativeButton(R.string.cancel) { _, _ -> onCancel() }
+            .setOnCancelListener { onCancel() }
             .show()
     }
 
