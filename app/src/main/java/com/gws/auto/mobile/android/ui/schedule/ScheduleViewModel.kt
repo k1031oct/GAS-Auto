@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -22,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val scheduleRepository: ScheduleRepository,
-    private val settingsRepository: SettingsRepository,
+    settingsRepository: SettingsRepository,
     private val googleApiAuthorizer: GoogleApiAuthorizer
 ) : ViewModel() {
 
@@ -42,12 +43,12 @@ class ScheduleViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "US")
 
     init {
-        country.combine(currentDate) { country, date ->
-            // Combine country and date changes to trigger holiday loading
-            country to date
-        }.stateIn(viewModelScope, SharingStarted.Lazily, null) // Use stateIn to avoid multiple collectors
-            .onEach { loadHolidaysForCurrentMonth() }
-            .launchIn(viewModelScope)
+        // React to changes in country or the current date
+        combine(country, currentDate) { _, _ ->
+            Unit // We don't need the result, just the trigger.
+        }.onEach {
+            loadHolidaysForCurrentMonth()
+        }.launchIn(viewModelScope)
     }
 
     fun setCurrentDate(date: LocalDate) {
