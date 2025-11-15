@@ -149,11 +149,25 @@
     <string name="dummy_status_active">Active</string>
     <string name="dummy_trigger_daily">Daily at 9:00</string>
 
+    <!-- Execution Status -->
     <string name="execution_status_success">Success</string>
     <string name="execution_status_failure">Failure</string>
     <string name="refresh">Refresh</string>
     <string name="dashboard_total_executions">Total: %1$d</string>
     <string name="dashboard_error_count">Errors: %1$d</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_summary_title">Summary</string>
+    <string name="dashboard_total_runs">Total Runs</string>
+    <string name="dashboard_errors">Errors</string>
+    <string name="dashboard_total_time">Total Time</string>
+    <string name="dashboard_workflow_stats_title">Workflow Statistics</string>
+    <string name="dashboard_module_stats_title">Module Statistics</string>
+    <string name="dashboard_vs_yesterday">vs Yesterday</string>
+    <string name="dashboard_vs_last_month">vs Last Month</string>
+    <string name="dashboard_workflow_error_rate">Workflow Error Rate</string>
+    <string name="dashboard_module_error_rate">Module Error Rate</string>
+    <string name="dashboard_executions">Executions</string>
 
     <string-array name="first_day_of_week_entries">
         <item>Sunday</item>

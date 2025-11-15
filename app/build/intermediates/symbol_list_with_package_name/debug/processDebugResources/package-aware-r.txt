@@ -3861,6 +3861,8 @@ drawable ic_refresh
 drawable ic_schedule
 drawable ic_search
 drawable ic_search_black_24
+drawable ic_star
+drawable ic_star_border
 drawable ic_unread_indicator
 drawable ic_workflow
 drawable icon_background
@@ -3940,6 +3942,7 @@ drawable notify_panel_notification_icon_bg
 drawable preference_list_divider_material
 drawable search_view_background
 drawable sl_bookmark
+drawable sl_favorite
 drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
@@ -4218,6 +4221,7 @@ id hide_ime_id
 id hide_in_inspector_tag
 id hideable
 id highlight_color_spinner
+id history_item_container
 id history_recycler_view
 id home
 id homeAsUp
@@ -5046,7 +5050,18 @@ string copy
 string copy_toast_msg
 string country_for_holidays
 string dashboard_error_count
+string dashboard_errors
+string dashboard_executions
+string dashboard_module_error_rate
+string dashboard_module_stats_title
+string dashboard_summary_title
 string dashboard_total_executions
+string dashboard_total_runs
+string dashboard_total_time
+string dashboard_vs_last_month
+string dashboard_vs_yesterday
+string dashboard_workflow_error_rate
+string dashboard_workflow_stats_title
 string default_error_message
 string default_error_msg
 string default_popup_window_title

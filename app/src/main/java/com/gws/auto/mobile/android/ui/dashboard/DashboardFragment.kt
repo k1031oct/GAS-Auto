@@ -92,27 +92,27 @@ class DashboardFragment : Fragment() {
     private fun updateSummary(uiState: DashboardUiState) {
         // Total Executions
         binding.totalExecutionsText.text = uiState.totalCountMonth.toString()
-        binding.totalExecutionsDayChangeText.text = formatChange(uiState.totalCountDayChange, "vs Yesterday")
-        binding.totalExecutionsMonthChangeText.text = formatChange(uiState.totalCountMonthChange, "vs Last Month")
+        binding.totalExecutionsDayChangeText.text = formatChange(uiState.totalCountDayChange, getString(R.string.dashboard_vs_yesterday))
+        binding.totalExecutionsMonthChangeText.text = formatChange(uiState.totalCountMonthChange, getString(R.string.dashboard_vs_last_month))
 
         // Error Count
         binding.errorCountText.text = uiState.errorCountMonth.toString()
-        binding.errorCountDayChangeText.text = formatChange(uiState.errorCountDayChange, "vs Yesterday")
-        binding.errorCountMonthChangeText.text = formatChange(uiState.errorCountMonthChange, "vs Last Month")
+        binding.errorCountDayChangeText.text = formatChange(uiState.errorCountDayChange, getString(R.string.dashboard_vs_yesterday))
+        binding.errorCountMonthChangeText.text = formatChange(uiState.errorCountMonthChange, getString(R.string.dashboard_vs_last_month))
 
         // Total Duration
         binding.totalDurationText.text = formatDuration(uiState.totalDurationMonth)
-        binding.totalDurationDayChangeText.text = formatChange(uiState.totalDurationDayChange, "vs Yesterday")
-        binding.totalDurationMonthChangeText.text = formatChange(uiState.totalDurationMonthChange, "vs Last Month")
+        binding.totalDurationDayChangeText.text = formatChange(uiState.totalDurationDayChange, getString(R.string.dashboard_vs_yesterday))
+        binding.totalDurationMonthChangeText.text = formatChange(uiState.totalDurationMonthChange, getString(R.string.dashboard_vs_last_month))
     }
 
     private fun updateWorkflowCharts(uiState: DashboardUiState) {
-        updateErrorRateChart(binding.workflowErrorRateChart, uiState.totalCountMonth, uiState.errorCountMonth, "Workflow Error Rate")
+        updateErrorRateChart(binding.workflowErrorRateChart, uiState.totalCountMonth, uiState.errorCountMonth, getString(R.string.dashboard_workflow_error_rate))
         updateRankingChart(binding.workflowRankingChart, uiState.workflowExecutionCounts.mapIndexed { index, it -> BarEntry(index.toFloat(), it.executionCount.toFloat()) }, uiState.workflowExecutionCounts.map { it.workflowName })
     }
 
     private fun updateModuleCharts(uiState: DashboardUiState) {
-        updateErrorRateChart(binding.moduleErrorRateChart, uiState.moduleUsageCount, uiState.moduleErrorCount, "Module Error Rate")
+        updateErrorRateChart(binding.moduleErrorRateChart, uiState.moduleUsageCount, uiState.moduleErrorCount, getString(R.string.dashboard_module_error_rate))
         updateRankingChart(binding.moduleRankingChart, uiState.moduleStats.mapIndexed { index, it -> BarEntry(index.toFloat(), it.usageCount.toFloat()) }, uiState.moduleStats.map { it.moduleName })
     }
 
@@ -156,7 +156,7 @@ class DashboardFragment : Fragment() {
         }
         chart.visibility = View.VISIBLE
 
-        val dataSet = BarDataSet(entries, "Executions").apply {
+        val dataSet = BarDataSet(entries, getString(R.string.dashboard_executions)).apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
             setDrawValues(true)
             valueTextSize = 10f

@@ -140,7 +140,18 @@
     <string name="com.google.firebase.crashlytics.version_control_info">""</string>
     <string name="country_for_holidays">Country for holidays</string>
     <string name="dashboard_error_count">Errors: %1$d</string>
+    <string name="dashboard_errors">Errors</string>
+    <string name="dashboard_executions">Executions</string>
+    <string name="dashboard_module_error_rate">Module Error Rate</string>
+    <string name="dashboard_module_stats_title">Module Statistics</string>
+    <string name="dashboard_summary_title">Summary</string>
     <string name="dashboard_total_executions">Total: %1$d</string>
+    <string name="dashboard_total_runs">Total Runs</string>
+    <string name="dashboard_total_time">Total Time</string>
+    <string name="dashboard_vs_last_month">vs Last Month</string>
+    <string name="dashboard_vs_yesterday">vs Yesterday</string>
+    <string name="dashboard_workflow_error_rate">Workflow Error Rate</string>
+    <string name="dashboard_workflow_stats_title">Workflow Statistics</string>
     <string name="default_web_client_id" translatable="false">46549959857-ae1ivjnof9s9off7cvub8ms16qb6h7vh.apps.googleusercontent.com</string>
     <string name="delete">Delete</string>
     <string name="delete_all_history">Delete All History</string>

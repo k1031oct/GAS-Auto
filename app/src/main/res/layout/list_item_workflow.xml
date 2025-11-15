@@ -17,10 +17,9 @@
 
         <CheckBox
             android:id="@+id/favorite_button"
-            style="?android:attr/starStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:button="@drawable/sl_favorite"
             android:contentDescription="Favorite Workflow"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/workflow_name"
@@ -64,8 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textAppearance="?attr/textAppearanceCaption"
-            app:layout_constraintStart_toEndOf="@id/workflow_status"
-            app:layout_constraintTop_toTopOf="@id/workflow_status"
+            app:layout_constraintStart_toEndOf="@+id/workflow_status"
+            app:layout_constraintTop_toTopOf="@+id/workflow_status"
             tools:text="Trigger: Manual" />
 
         <LinearLayout

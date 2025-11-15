@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:text="Summary"
+            android:text="@string/dashboard_summary_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/refresh_button" />
@@ -58,7 +58,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Runs"
+                        android:text="@string/dashboard_total_runs"
                         android:textAppearance="?attr/textAppearanceCaption" />
                     <TextView
                         android:id="@+id/total_executions_text"
@@ -95,7 +95,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Errors"
+                        android:text="@string/dashboard_errors"
                         android:textAppearance="?attr/textAppearanceCaption" />
                     <TextView
                         android:id="@+id/error_count_text"
@@ -132,7 +132,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Time"
+                        android:text="@string/dashboard_total_time"
                         android:textAppearance="?attr/textAppearanceCaption" />
                     <TextView
                         android:id="@+id/total_duration_text"
@@ -164,7 +164,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="Workflow Statistics"
+            android:text="@string/dashboard_workflow_stats_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/summary_grid" />
@@ -205,7 +205,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
-            android:text="Module Statistics"
+            android:text="@string/dashboard_module_stats_title"
             android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/workflow_stats_table" />
