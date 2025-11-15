@@ -97,12 +97,24 @@ fun GWSAutoForAndroidTheme(
         darkTheme -> when (highlightColor) {
             "forest" -> DarkColorScheme.copy(primary = forest_theme_dark_primary, onPrimary = forest_theme_dark_onPrimary)
             "ocean" -> DarkColorScheme.copy(primary = ocean_theme_dark_primary, onPrimary = ocean_theme_dark_onPrimary)
+            "sakura" -> DarkColorScheme.copy(
+                primary = sakura_theme_dark_primary,
+                onPrimary = sakura_theme_dark_onPrimary,
+                primaryContainer = sakura_theme_dark_primaryContainer,
+                onPrimaryContainer = sakura_theme_dark_onPrimaryContainer
+            )
             else -> DarkColorScheme
         }
 
         else -> when (highlightColor) {
             "forest" -> LightColorScheme.copy(primary = forest_theme_light_primary, onPrimary = forest_theme_light_onPrimary)
             "ocean" -> LightColorScheme.copy(primary = ocean_theme_light_primary, onPrimary = ocean_theme_light_onPrimary)
+            "sakura" -> LightColorScheme.copy(
+                primary = sakura_theme_light_primary,
+                onPrimary = sakura_theme_light_onPrimary,
+                primaryContainer = sakura_theme_light_primaryContainer,
+                onPrimaryContainer = sakura_theme_light_onPrimaryContainer
+            )
             else -> LightColorScheme
         }
     }

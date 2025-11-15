@@ -30,11 +30,13 @@
         <item>Default</item>
         <item>Forest</item>
         <item>Ocean</item>
+        <item>Sakura</item>
     </string-array>
     <string-array name="highlight_color_values">
         <item>default</item>
         <item>forest</item>
         <item>ocean</item>
+        <item>sakura</item>
     </string-array>
     <string-array name="language_entries">
         <item>English</item>

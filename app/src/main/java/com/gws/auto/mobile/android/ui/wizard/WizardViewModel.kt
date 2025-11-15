@@ -17,6 +17,9 @@ class WizardViewModel @Inject constructor(
 
     val theme: StateFlow<String> = settingsRepository.theme
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "System")
+    
+    val highlightColor: StateFlow<String> = settingsRepository.highlightColor
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "default")
 
     fun setLanguage(language: String) {
         viewModelScope.launch {
@@ -39,6 +42,12 @@ class WizardViewModel @Inject constructor(
     fun setTheme(theme: String) {
         viewModelScope.launch {
             settingsRepository.saveTheme(theme)
+        }
+    }
+
+    fun setHighlightColor(color: String) {
+        viewModelScope.launch {
+            settingsRepository.saveHighlightColor(color)
         }
     }
 

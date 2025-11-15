@@ -1,8 +1,6 @@
 package com.gws.auto.mobile.android.di
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import androidx.room.Room
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -22,7 +20,6 @@ import com.gws.auto.mobile.android.data.repository.ScheduleRepositoryImpl
 import com.gws.auto.mobile.android.data.repository.SearchHistoryRepository
 import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import com.gws.auto.mobile.android.data.repository.TagRepository
-import com.gws.auto.mobile.android.data.repository.UserPreferencesRepository
 import com.gws.auto.mobile.android.data.repository.WorkflowRepository
 import com.gws.auto.mobile.android.domain.service.DriveApiService
 import com.gws.auto.mobile.android.domain.service.GmailApiService
@@ -158,18 +155,6 @@ object AppModule {
     @Singleton
     fun provideSearchHistoryRepository(searchHistoryDao: SearchHistoryDao): SearchHistoryRepository {
         return SearchHistoryRepository(searchHistoryDao)
-    }
-
-    @Provides
-    @Singleton
-    fun provideSharedPreferences(@ApplicationContext appContext: Context): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(appContext)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserPreferencesRepository(prefs: SharedPreferences): UserPreferencesRepository {
-        return UserPreferencesRepository(prefs)
     }
 
     @Provides

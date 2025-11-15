@@ -23,10 +23,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.common.api.Scope
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.services.drive.DriveScopes
 import com.google.api.services.sheets.v4.Sheets
 import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.android.material.textfield.TextInputLayout
@@ -293,7 +291,7 @@ class ModuleSettingsDialogFragment(private val module: Module) : DialogFragment(
         binding.parametersContainer.addView(textView)
         binding.saveButton.setOnClickListener { dismiss() }
     }
-
+    
     private fun createSectionHeader(title: String): TextView {
         return TextView(requireContext()).apply {
             text = title
@@ -325,6 +323,7 @@ class ModuleSettingsDialogFragment(private val module: Module) : DialogFragment(
         }
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             type = mimeType
         }
         launchers[key]?.launch(intent)

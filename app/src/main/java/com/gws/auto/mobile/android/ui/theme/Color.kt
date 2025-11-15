@@ -79,3 +79,15 @@ val ocean_theme_light_onPrimary = Color(0xFFFFFFFF)
 // Ocean Dark Theme Colors
 val ocean_theme_dark_primary = Color(0xFF4DD9E2)
 val ocean_theme_dark_onPrimary = Color(0xFF00373A)
+
+// Sakura Light Theme Colors
+val sakura_theme_light_primary = Color(0xFFB14E69)
+val sakura_theme_light_onPrimary = Color(0xFFFFFFFF)
+val sakura_theme_light_primaryContainer = Color(0xFFFFD9DD)
+val sakura_theme_light_onPrimaryContainer = Color(0xFF3F001A)
+
+// Sakura Dark Theme Colors
+val sakura_theme_dark_primary = Color(0xFFFFAFD0)
+val sakura_theme_dark_onPrimary = Color(0xFF66203A)
+val sakura_theme_dark_primaryContainer = Color(0xFF853651)
+val sakura_theme_dark_onPrimaryContainer = Color(0xFFFFD9DD)
