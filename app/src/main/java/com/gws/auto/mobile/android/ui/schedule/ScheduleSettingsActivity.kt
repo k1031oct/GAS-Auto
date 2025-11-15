@@ -1,10 +1,12 @@
 package com.gws.auto.mobile.android.ui.schedule
 
 import android.app.Activity
+import android.app.TimePickerDialog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,8 +18,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalTime
 import java.time.Month
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -155,19 +159,30 @@ fun HourlySettings(interval: Int, onIntervalChange: (Int) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DailySettings(time: java.time.LocalTime, onTimeChange: (java.time.LocalTime) -> Unit) {
-    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
-    // Update ViewModel when state changes
-    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
-        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
+fun DailySettings(time: LocalTime, onTimeChange: (LocalTime) -> Unit) {
+    val context = LocalContext.current
+    val timeFormatter = remember { DateTimeFormatter.ofPattern("HH:mm") }
+
+    fun showTimePicker() {
+        TimePickerDialog(
+            context,
+            { _, hour, minute -> onTimeChange(LocalTime.of(hour, minute)) },
+            time.hour,
+            time.minute,
+            true
+        ).show()
     }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TimePicker(state = timePickerState)
+        Text(
+            text = time.format(timeFormatter),
+            style = MaterialTheme.typography.displayLarge,
+            modifier = Modifier.clickable { showTimePicker() }
+        )
     }
 }
 
@@ -176,8 +191,8 @@ fun DailySettings(time: java.time.LocalTime, onTimeChange: (java.time.LocalTime)
 fun WeeklySettings(
     selectedDays: Set<String>,
     onDayToggle: (String) -> Unit,
-    time: java.time.LocalTime,
-    onTimeChange: (java.time.LocalTime) -> Unit,
+    time: LocalTime,
+    onTimeChange: (LocalTime) -> Unit,
     firstDayOfWeek: String
 ) {
     val daysOfWeek = remember(firstDayOfWeek) {
@@ -187,12 +202,6 @@ fun WeeklySettings(
         } else {
             week
         }
-    }
-
-    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
-    // Update ViewModel when state changes
-    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
-        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -210,31 +219,25 @@ fun WeeklySettings(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        TimePicker(state = timePickerState)
+        DailySettings(time, onTimeChange) // Reuse DailySettings for time picking
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MonthlySettings(
     selectedDays: Set<Int>,
     onDayToggle: (Int) -> Unit,
-    time: java.time.LocalTime,
-    onTimeChange: (java.time.LocalTime) -> Unit
+    time: LocalTime,
+    onTimeChange: (LocalTime) -> Unit
 ) {
     val daysInMonth = (1..31).toList()
-    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
-    // Update ViewModel when state changes
-    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
-        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
-    }
 
     Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
         Text("実行する日")
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
             modifier = Modifier.weight(1f)
         ) {
             items(daysInMonth.size) { index ->
@@ -247,7 +250,7 @@ fun MonthlySettings(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        TimePicker(state = timePickerState)
+        DailySettings(time, onTimeChange)
     }
 }
 
@@ -258,17 +261,12 @@ fun YearlySettings(
     onMonthChange: (Int) -> Unit,
     selectedDay: Int,
     onDayChange: (Int) -> Unit,
-    time: java.time.LocalTime,
-    onTimeChange: (java.time.LocalTime) -> Unit
+    time: LocalTime,
+    onTimeChange: (LocalTime) -> Unit
 ) {
     val months = Month.entries.map { it.getDisplayName(TextStyle.FULL, Locale.getDefault()) }
     var monthExpanded by remember { mutableStateOf(false) }
     val daysInMonth = YearMonth.of(2024, selectedMonth).lengthOfMonth() // Use a leap year for Feb
-    val timePickerState = rememberTimePickerState(initialHour = time.hour, initialMinute = time.minute)
-    // Update ViewModel when state changes
-    LaunchedEffect(timePickerState.hour, timePickerState.minute) {
-        onTimeChange(java.time.LocalTime.of(timePickerState.hour, timePickerState.minute))
-    }
 
     Column(modifier = Modifier.fillMaxHeight(), horizontalAlignment = Alignment.CenterHorizontally) {
         ExposedDropdownMenuBox(
@@ -303,8 +301,8 @@ fun YearlySettings(
         Text("実行する日")
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
             modifier = Modifier.weight(1f)
         ) {
             items(daysInMonth) { dayOfMonth ->
@@ -318,6 +316,6 @@ fun YearlySettings(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        TimePicker(state = timePickerState)
+        DailySettings(time, onTimeChange)
     }
 }
