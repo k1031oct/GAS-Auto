@@ -23,6 +23,7 @@ import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.history.HistoryViewModel
+import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -98,14 +99,25 @@ class MainActivity : AppCompatActivity() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 mainSharedViewModel.setSearchQuery(query.orEmpty())
-                return false
+                if (!query.isNullOrBlank()) {
+                    workflowViewModel.addSearchHistory(query)
+                }
+                binding.searchView.clearFocus()
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 mainSharedViewModel.setSearchQuery(newText.orEmpty())
-                return false
+                return true
             }
         })
+
+        binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                val searchFragment = SearchFragment()
+                searchFragment.show(supportFragmentManager, searchFragment.tag)
+            }
+        }
     }
 
     private fun setupActionButtons() {
