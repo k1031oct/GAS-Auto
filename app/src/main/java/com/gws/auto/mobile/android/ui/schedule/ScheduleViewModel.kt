@@ -38,6 +38,7 @@ class ScheduleViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Sunday")
 
     init {
+        loadHolidaysForCurrentMonth()
         settingsRepository.country
             .onEach { loadHolidaysForCurrentMonth() }
             .launchIn(viewModelScope)
@@ -45,6 +46,7 @@ class ScheduleViewModel @Inject constructor(
 
     fun setCurrentDate(date: LocalDate) {
         _currentDate.value = date
+        loadHolidaysForCurrentMonth()
     }
 
     fun moveToNextMonth() {

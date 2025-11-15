@@ -1,20 +1,20 @@
 package com.gws.auto.mobile.android.ui.wizard
 
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.gws.auto.mobile.android.data.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class WizardViewModel @Inject constructor(
-    private val prefs: SharedPreferences
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     fun setLanguage(language: String) {
-        prefs.edit { putString("language", language) }
         val localeTag = when (language) {
             "Japanese" -> "ja"
             "Chinese" -> "zh"
@@ -26,15 +26,21 @@ class WizardViewModel @Inject constructor(
     }
 
     fun setCountry(countryCode: String) {
-        prefs.edit { putString("country", countryCode) }
+        viewModelScope.launch {
+            settingsRepository.saveCountry(countryCode)
+        }
     }
 
     fun setWeekStart(day: String) {
-        prefs.edit { putString("first_day_of_week", day) }
+        viewModelScope.launch {
+            settingsRepository.saveFirstDayOfWeek(day)
+        }
     }
 
     fun setTheme(theme: String) {
-        prefs.edit { putString("theme", theme) }
+        viewModelScope.launch {
+            settingsRepository.saveTheme(theme)
+        }
         when (theme) {
             "Light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -42,11 +48,8 @@ class WizardViewModel @Inject constructor(
         }
     }
 
-    fun getTheme(): String {
-        return prefs.getString("theme", "Default") ?: "Default"
-    }
-
     fun finishWizard() {
-        prefs.edit { putBoolean("is_first_run", false) }
+        // This should probably be handled by a different mechanism
+        // but for now, we leave it as it is.
     }
 }

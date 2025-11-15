@@ -1,7 +1,9 @@
 package com.gws.auto.mobile.android.ui.dashboard
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -136,9 +138,17 @@ class DashboardFragment : Fragment() {
             valueTextSize = 12f
         }
 
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
+        val holeColor = typedValue.data
+        requireContext().theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        val textColor = typedValue.data
+
         chart.apply {
             data = PieData(dataSet)
             isDrawHoleEnabled = true
+            setHoleColor(holeColor)
+            setCenterTextColor(textColor)
             holeRadius = 58f
             transparentCircleRadius = 61f
             this.centerText = centerText
