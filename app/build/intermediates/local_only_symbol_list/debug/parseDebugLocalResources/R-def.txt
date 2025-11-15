@@ -196,6 +196,7 @@ id settings_icon
 id settings_recycler_view
 id share_button
 id sign_in_button
+id sign_out_button
 id skip_button
 id status
 id status_chip

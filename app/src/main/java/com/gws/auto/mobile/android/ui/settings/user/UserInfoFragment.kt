@@ -1,5 +1,7 @@
 package com.gws.auto.mobile.android.ui.settings.user
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import coil.load
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.android.gms.common.api.Scope
+import com.google.api.services.drive.DriveScopes
+import com.google.api.services.sheets.v4.SheetsScopes
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentUserInfoBinding
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
@@ -29,26 +34,16 @@ class UserInfoFragment : Fragment() {
     private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
 
     @Inject
-    @JvmField
-    var auth: FirebaseAuth? = null
-
-    @Inject
     lateinit var googleSignInClient: GoogleSignInClient
 
-    private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            firebaseAuthWithGoogle(account.idToken!!)
-        } catch (e: ApiException) {
-            Timber.w(e, "Google sign in failed")
+    private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            handleSignInResult(task)
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentUserInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -56,11 +51,11 @@ class UserInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.signInButton.setOnClickListener { signIn() }
-        updateUI()
+        binding.signOutButton.setOnClickListener { signOut() }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         updateUI()
     }
 
@@ -69,36 +64,39 @@ class UserInfoFragment : Fragment() {
         signInLauncher.launch(signInIntent)
     }
 
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth?.signInWithCredential(credential)
-            ?.addOnCompleteListener(requireActivity()) {
-                if (it.isSuccessful) {
-                    Timber.d("Sign-in with Google successful.")
-                    mainSharedViewModel.setSignedInStatus(true)
-                    updateUI()
-                } else {
-                    Timber.w(it.exception, "Sign-in with Google failed.")
-                }
-            }
+    private fun signOut() {
+        googleSignInClient.signOut().addOnCompleteListener(requireActivity()) {
+            mainSharedViewModel.setSignedInStatus(false)
+            updateUI()
+        }
+    }
+
+    private fun handleSignInResult(completedTask: com.google.android.gms.tasks.Task<GoogleSignInAccount>) {
+        try {
+            val account = completedTask.getResult(ApiException::class.java)
+            mainSharedViewModel.setSignedInStatus(true)
+            updateUI()
+        } catch (e: ApiException) {
+            Timber.w(e, "signInResult:failed code=" + e.statusCode)
+            mainSharedViewModel.setSignedInStatus(false)
+            updateUI()
+        }
     }
 
     private fun updateUI() {
-        val user = auth?.currentUser
-        if (user != null) {
-            binding.userName.text = user.displayName
-            binding.userEmail.text = user.email
-            binding.profileImage.load(user.photoUrl) {
-                crossfade(true)
-                placeholder(R.mipmap.ic_launcher_round)
-                error(R.mipmap.ic_launcher_round)
-            }
+        val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+        if (account != null) {
+            binding.userName.text = account.displayName
+            binding.userEmail.text = account.email
+            binding.profileImage.load(account.photoUrl) { crossfade(true) }
             binding.signInButton.visibility = View.GONE
+            binding.signOutButton.visibility = View.VISIBLE
         } else {
-            binding.userName.text = getString(R.string.user_name_placeholder)
-            binding.userEmail.text = getString(R.string.user_email_placeholder)
+            binding.userName.text = "Not Signed In"
+            binding.userEmail.text = ""
             binding.profileImage.setImageResource(R.mipmap.ic_launcher_round)
             binding.signInButton.visibility = View.VISIBLE
+            binding.signOutButton.visibility = View.GONE
         }
     }
 

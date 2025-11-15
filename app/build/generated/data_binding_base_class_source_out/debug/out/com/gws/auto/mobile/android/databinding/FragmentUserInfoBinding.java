@@ -4,6 +4,7 @@ package com.gws.auto.mobile.android.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -28,6 +29,9 @@ public final class FragmentUserInfoBinding implements ViewBinding {
   public final SignInButton signInButton;
 
   @NonNull
+  public final Button signOutButton;
+
+  @NonNull
   public final TextView userEmail;
 
   @NonNull
@@ -35,10 +39,11 @@ public final class FragmentUserInfoBinding implements ViewBinding {
 
   private FragmentUserInfoBinding(@NonNull ConstraintLayout rootView,
       @NonNull ImageView profileImage, @NonNull SignInButton signInButton,
-      @NonNull TextView userEmail, @NonNull TextView userName) {
+      @NonNull Button signOutButton, @NonNull TextView userEmail, @NonNull TextView userName) {
     this.rootView = rootView;
     this.profileImage = profileImage;
     this.signInButton = signInButton;
+    this.signOutButton = signOutButton;
     this.userEmail = userEmail;
     this.userName = userName;
   }
@@ -82,6 +87,12 @@ public final class FragmentUserInfoBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.sign_out_button;
+      Button signOutButton = ViewBindings.findChildViewById(rootView, id);
+      if (signOutButton == null) {
+        break missingId;
+      }
+
       id = R.id.user_email;
       TextView userEmail = ViewBindings.findChildViewById(rootView, id);
       if (userEmail == null) {
@@ -95,7 +106,7 @@ public final class FragmentUserInfoBinding implements ViewBinding {
       }
 
       return new FragmentUserInfoBinding((ConstraintLayout) rootView, profileImage, signInButton,
-          userEmail, userName);
+          signOutButton, userEmail, userName);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

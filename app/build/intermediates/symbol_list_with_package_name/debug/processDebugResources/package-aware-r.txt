@@ -4490,6 +4490,7 @@ id showCustom
 id showHome
 id showTitle
 id sign_in_button
+id sign_out_button
 id sin
 id skipCollapsed
 id skip_button
