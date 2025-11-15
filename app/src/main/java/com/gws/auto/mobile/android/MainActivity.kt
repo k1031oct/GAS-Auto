@@ -25,7 +25,6 @@ import com.gws.auto.mobile.android.ui.MainFragmentStateAdapter
 import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.announcement.AnnouncementViewModel
 import com.gws.auto.mobile.android.ui.history.HistoryViewModel
-import com.gws.auto.mobile.android.ui.search.SearchFragment
 import com.gws.auto.mobile.android.ui.settings.SettingsActivity
 import com.gws.auto.mobile.android.ui.workflow.WorkflowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -156,10 +155,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         binding.searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                val searchFragment = SearchFragment()
-                searchFragment.show(supportFragmentManager, searchFragment.tag)
-            }
+            binding.searchFragmentContainer.visibility = if (hasFocus) View.VISIBLE else View.GONE
         }
     }
 
@@ -174,6 +170,11 @@ class MainActivity : AppCompatActivity() {
     private fun setupBackButtonHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                if (binding.searchFragmentContainer.visibility == View.VISIBLE) {
+                    binding.searchFragmentContainer.visibility = View.GONE
+                    return
+                }
+
                 if (binding.viewPager.currentItem == 0) {
                     showExitConfirmationDialog()
                 } else {

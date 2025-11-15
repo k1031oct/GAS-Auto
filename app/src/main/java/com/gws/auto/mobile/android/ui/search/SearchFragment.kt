@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.gws.auto.mobile.android.R
 import com.gws.auto.mobile.android.databinding.FragmentSearchBinding
 import com.gws.auto.mobile.android.domain.model.DisplayTag
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class SearchFragment : BottomSheetDialogFragment() {
+class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -63,7 +63,7 @@ class SearchFragment : BottomSheetDialogFragment() {
         historyAdapter = SearchHistoryAdapter(
             onHistoryItemClicked = { history ->
                 mainSharedViewModel.setSearchQuery(history.query)
-                dismiss()
+                requireActivity().findViewById<View>(R.id.search_fragment_container).visibility = View.GONE
             },
             onHistoryItemLongClicked = { history ->
                 showDeleteConfirmationDialog(getString(R.string.delete_history_confirmation), history.query) { viewModel.deleteSearchHistoryItem(history.query) }
@@ -84,7 +84,7 @@ class SearchFragment : BottomSheetDialogFragment() {
             is Tag -> {
                 mainSharedViewModel.setSearchQuery(tag.name)
                 viewModel.addSearchHistory(tag.name)
-                dismiss()
+                requireActivity().findViewById<View>(R.id.search_fragment_container).visibility = View.GONE
             }
         }
     }
