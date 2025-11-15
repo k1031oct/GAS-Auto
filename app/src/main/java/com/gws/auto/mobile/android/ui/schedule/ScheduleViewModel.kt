@@ -54,7 +54,7 @@ class ScheduleViewModel @Inject constructor(
         viewModelScope.launch {
             val yearMonth = YearMonth.from(_currentDate.value)
             val country = settingsRepository.country.first()
-            _holidays.value = scheduleRepository.getHolidays(country, yearMonth.year)
+            _holidays.value = scheduleRepository.getHolidays(country, yearMonth.year, yearMonth.monthValue)
         }
     }
 }

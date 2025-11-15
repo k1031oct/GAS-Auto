@@ -102,8 +102,8 @@ class AppSettingsFragment : Fragment() {
         }
         val languageValues = resources.getStringArray(R.array.language_values)
         lifecycleScope.launch {
-            val currentLanguage = settingsRepository.language.first()
-            val langPosition = languageValues.indexOf(currentLanguage)
+            val currentLanguageTag = settingsRepository.language.first()
+            val langPosition = languageValues.indexOf(currentLanguageTag)
             binding.languageSpinner.setSelection(if (langPosition != -1) langPosition else 0)
         }
         binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

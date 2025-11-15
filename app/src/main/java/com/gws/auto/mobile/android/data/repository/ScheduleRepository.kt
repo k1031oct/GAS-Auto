@@ -8,5 +8,5 @@ interface ScheduleRepository {
     fun getSchedulesFlow(): Flow<List<Schedule>>
     suspend fun addSchedule(schedule: Schedule)
     suspend fun updateSchedule(schedule: Schedule)
-    suspend fun getHolidays(country: String, year: Int): List<Holiday>
+    suspend fun getHolidays(country: String, year: Int, month: Int): List<Holiday>
 }

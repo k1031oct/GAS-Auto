@@ -96,16 +96,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun applySettings() {
-        val language = settingsRepository.language.first()
+        val languageTag = settingsRepository.language.first()
         val theme = settingsRepository.theme.first()
 
-        val localeTag = when (language) {
-            "Japanese" -> "ja"
-            "Chinese" -> "zh"
-            "Korean" -> "ko"
-            else -> "en"
-        }
-        val appLocale = LocaleListCompat.forLanguageTags(localeTag)
+        val appLocale = LocaleListCompat.forLanguageTags(languageTag)
         AppCompatDelegate.setApplicationLocales(appLocale)
 
         when (theme) {
