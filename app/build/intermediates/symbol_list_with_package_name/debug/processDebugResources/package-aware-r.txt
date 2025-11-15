@@ -96,6 +96,8 @@ array country_entries
 array country_values
 array crypto_fingerprint_fallback_prefixes
 array crypto_fingerprint_fallback_vendors
+array date_directions
+array date_units
 array delay_showing_prompt_models
 array first_day_of_week_entries
 array hide_fingerprint_instantly_prefixes

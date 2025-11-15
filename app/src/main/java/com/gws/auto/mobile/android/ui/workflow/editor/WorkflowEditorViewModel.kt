@@ -8,6 +8,7 @@ import com.gws.auto.mobile.android.domain.model.Workflow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -17,15 +18,15 @@ class WorkflowEditorViewModel @Inject constructor(
     private val workflowRepository: WorkflowRepository
 ) : ViewModel() {
 
+    private val _workflowId = MutableStateFlow<String?>(null)
     private val _modules = MutableStateFlow<List<Module>>(emptyList())
-    val modules: StateFlow<List<Module>> = _modules
-
-    private var currentWorkflowId: String? = null
+    val modules: StateFlow<List<Module>> = _modules.asStateFlow()
 
     fun loadWorkflow(workflowId: String) {
-        currentWorkflowId = workflowId
+        _workflowId.value = workflowId
         viewModelScope.launch {
-            workflowRepository.getWorkflowById(workflowId)?.let {
+            val workflow = workflowRepository.getWorkflowById(workflowId)
+            workflow?.let { 
                 _modules.value = it.modules
             }
         }
@@ -36,25 +37,26 @@ class WorkflowEditorViewModel @Inject constructor(
     }
 
     fun removeModule(module: Module) {
-        _modules.value = _modules.value - module
+        _modules.value = _modules.value.filter { it.id != module.id }
     }
 
-    fun moveModule(fromPosition: Int, toPosition: Int) {
-        val updatedList = _modules.value.toMutableList()
-        val movedModule = updatedList.removeAt(fromPosition)
-        updatedList.add(toPosition, movedModule)
-        _modules.value = updatedList
-    }
-
-    fun saveNewWorkflow(name: String, description: String) {
-        viewModelScope.launch {
-            val newWorkflow = Workflow(
-                id = currentWorkflowId ?: UUID.randomUUID().toString(),
-                name = name,
-                description = description,
-                modules = _modules.value
-            )
-            workflowRepository.saveWorkflow(newWorkflow)
+    fun updateModuleParameters(moduleId: String, parameters: Map<String, String>) {
+        _modules.value = _modules.value.map {
+            if (it.id == moduleId) {
+                it.copy(parameters = parameters)
+            } else {
+                it
+            }
         }
+    }
+
+    suspend fun saveNewWorkflow(name: String, description: String) {
+        val workflow = Workflow(
+            id = _workflowId.value ?: UUID.randomUUID().toString(),
+            name = name,
+            description = description,
+            modules = _modules.value
+        )
+        workflowRepository.saveWorkflow(workflow)
     }
 }

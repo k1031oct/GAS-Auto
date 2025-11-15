@@ -95,6 +95,8 @@ int array country_entries 0x7f030001
 int array country_values 0x7f030002
 int array crypto_fingerprint_fallback_prefixes 0x7f030003
 int array crypto_fingerprint_fallback_vendors 0x7f030004
+int array date_directions 0x7f03000e
+int array date_units 0x7f03000f
 int array delay_showing_prompt_models 0x7f030005
 int array first_day_of_week_entries 0x7f030006
 int array hide_fingerprint_instantly_prefixes 0x7f030007
