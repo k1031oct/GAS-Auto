@@ -11,6 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -35,31 +37,41 @@ class ScheduleViewModel @Inject constructor(
 
     val firstDayOfWeek = settingsRepository.firstDayOfWeek
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Sunday")
-    
+
     private val country = settingsRepository.country
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "US")
 
+    init {
+        country.combine(currentDate) { country, date ->
+            // Combine country and date changes to trigger holiday loading
+            country to date
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null) // Use stateIn to avoid multiple collectors
+            .onEach { loadHolidaysForCurrentMonth() }
+            .launchIn(viewModelScope)
+    }
+
     fun setCurrentDate(date: LocalDate) {
         _currentDate.value = date
-        loadHolidaysForCurrentMonth()
     }
 
     fun moveToNextMonth() {
         _currentDate.value = _currentDate.value.plusMonths(1)
-        loadHolidaysForCurrentMonth()
     }
 
     fun moveToPreviousMonth() {
         _currentDate.value = _currentDate.value.minusMonths(1)
-        loadHolidaysForCurrentMonth()
     }
 
     fun loadHolidaysForCurrentMonth() {
-        if (!googleApiAuthorizer.isSignedIn()) return
-        
+        if (!googleApiAuthorizer.isSignedIn()) {
+            _holidays.value = emptyList() // Clear holidays if not signed in
+            return
+        }
+
         viewModelScope.launch {
             val yearMonth = YearMonth.from(_currentDate.value)
-            _holidays.value = scheduleRepository.getHolidays(country.value, yearMonth.year, yearMonth.monthValue)
+            val currentCountry = country.value
+            _holidays.value = scheduleRepository.getHolidays(currentCountry, yearMonth.year, yearMonth.monthValue)
         }
     }
 }

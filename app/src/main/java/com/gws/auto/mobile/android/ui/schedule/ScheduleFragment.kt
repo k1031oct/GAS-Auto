@@ -13,29 +13,15 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.gws.auto.mobile.android.data.repository.SettingsRepository
-import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import com.gws.auto.mobile.android.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
     private val viewModel: ScheduleViewModel by viewModels()
-    private val themeViewModel: ThemeViewModel by viewModels()
-    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
-
-    @Inject
-    lateinit var settingsRepository: SettingsRepository
+    private val themeViewModel: ThemeViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,7 +38,6 @@ class ScheduleFragment : Fragment() {
                     theme = theme,
                     highlightColor = highlightColor
                 ) {
-                    // A surface container using the 'background' color from the theme
                     Surface(color = MaterialTheme.colorScheme.background) {
                         CalendarScreen(viewModel = viewModel)
                     }
@@ -61,20 +46,10 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    mainSharedViewModel.isSignedIn,
-                    settingsRepository.country.distinctUntilChanged()
-                ) { isSignedIn, _ -> isSignedIn }
-                    .filter { it }
-                    .collect { 
-                        viewModel.loadHolidaysForCurrentMonth()
-                    }
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        // ViewModel now handles loading holidays automatically when state changes.
+        // We can trigger a check here in case the sign-in state changed while the app was paused.
+        viewModel.loadHolidaysForCurrentMonth()
     }
 }
