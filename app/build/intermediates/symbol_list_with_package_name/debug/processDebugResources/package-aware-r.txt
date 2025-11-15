@@ -5344,6 +5344,7 @@ string settings_category_other
 string side_sheet_accessibility_pane_title
 string side_sheet_behavior
 string sign_in
+string sign_in_required
 string sign_in_with_google
 string sign_in_with_google_to_sync
 string sign_out

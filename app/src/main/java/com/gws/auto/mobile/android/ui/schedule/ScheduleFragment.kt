@@ -11,21 +11,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.gws.auto.mobile.android.domain.service.GoogleApiAuthorizer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.gws.auto.mobile.android.ui.MainSharedViewModel
 import com.gws.auto.mobile.android.ui.theme.GWSAutoForAndroidTheme
 import com.gws.auto.mobile.android.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ScheduleFragment : Fragment() {
 
     private val viewModel: ScheduleViewModel by viewModels()
     private val themeViewModel: ThemeViewModel by viewModels()
-
-    @Inject
-    lateinit var googleApiAuthorizer: GoogleApiAuthorizer
+    private val mainSharedViewModel: MainSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,10 +54,17 @@ class ScheduleFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (googleApiAuthorizer.isSignedIn()) {
-            viewModel.loadHolidaysForCurrentMonth()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainSharedViewModel.isSignedIn
+                    .filter { it }
+                    .collect { 
+                        viewModel.loadHolidaysForCurrentMonth()
+                    }
+            }
         }
     }
 }

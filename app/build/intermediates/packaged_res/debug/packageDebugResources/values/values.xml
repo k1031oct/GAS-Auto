@@ -202,6 +202,7 @@
     <string name="settings_category_app">アプリ設定</string>
     <string name="settings_category_other">その他</string>
     <string name="sign_in">Sign In</string>
+    <string name="sign_in_required">Sign-in required to access this feature.</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="sign_in_with_google_to_sync">Sign in with Google to Sync</string>
     <string name="sign_out">Sign Out</string>
