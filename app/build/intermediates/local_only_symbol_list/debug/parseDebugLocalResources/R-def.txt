@@ -179,6 +179,7 @@ id schedule_status
 id schedule_title_text
 id schedule_type_and_time
 id schedule_workflow_name
+id search_fragment_container
 id search_view
 id setting_title
 id settings_application
