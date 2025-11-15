@@ -283,6 +283,7 @@ layout list_item_calendar_day
 layout list_item_history
 layout list_item_history_header
 layout list_item_history_log
+layout list_item_module
 layout list_item_module_library
 layout list_item_module_stat
 layout list_item_schedule
